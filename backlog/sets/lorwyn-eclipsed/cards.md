@@ -2,13 +2,13 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 234 / 273
+**Implemented:** 235 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 39    | 36   |
 | Blue       | 39    | 34   |
-| Black      | 38    | 32   |
+| Black      | 38    | 33   |
 | Red        | 39    | 30   |
 | Green      | 39    | 32   |
 | Multicolor | 49    | 44   |
@@ -142,7 +142,7 @@
 - [x] Shimmercreep
 - [x] Taster of Wares
 - [x] Twilight Diviner
-- [ ] Unbury
+- [x] Unbury
 
 ## Red (39)
 

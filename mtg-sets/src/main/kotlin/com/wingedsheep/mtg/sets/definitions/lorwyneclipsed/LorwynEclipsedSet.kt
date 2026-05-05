@@ -231,6 +231,7 @@ object LorwynEclipsedSet {
         TwilightDiviner,
         TwinflameTravelers,
         Tweeze,
+        Unbury,
         UnexpectedAssistance,
         UnforgivingAim,
         UnwelcomeSprite,
