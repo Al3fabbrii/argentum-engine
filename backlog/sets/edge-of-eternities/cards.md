@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 72 / 261
+**Implemented:** 73 / 261
 
 ---
 
@@ -207,7 +207,7 @@
 - [ ] Starbreach Whale
 - [ ] Starfield Shepherd
 - [ ] Starfield Vocalist
-- [ ] Starfighter Pilot
+- [x] Starfighter Pilot
 - [ ] Starport Security
 - [ ] Starwinder
 - [ ] Station Monitor
