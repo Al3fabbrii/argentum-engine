@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 94 / 261
+**Implemented:** 95 / 261
 
 ---
 
@@ -132,7 +132,7 @@
 - [x] Lost in Space
 - [x] Lumen-Class Frigate
 - [ ] Luxknight Breacher
-- [ ] Mechan Assembler
+- [x] Mechan Assembler
 - [x] Mechan Navigator
 - [ ] Mechanozoa
 - [ ] Mechan Shieldmate

@@ -81,6 +81,7 @@ object EdgeOfEternitiesSet {
         LightlessEvangel,
         LostInSpace,
         LumenClassFrigate,
+        MechanAssembler,
         MechanNavigator,
         MeldedMoxite,
         MeltstridersGear,
