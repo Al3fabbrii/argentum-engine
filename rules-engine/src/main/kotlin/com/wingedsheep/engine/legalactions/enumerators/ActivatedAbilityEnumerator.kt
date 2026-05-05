@@ -559,6 +559,12 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
                             convokeCreatures = abilityConvokeCreatures
                         ))
                     } else {
+                        // Only hold priority when the top of the stack is something this
+                        // ability could actually target — otherwise an idle holdPriority
+                        // flag would stop auto-pass even when the ability has no relevant
+                        // work to do (e.g. the trigger we wanted to copy isn't on top yet).
+                        val holdPriorityForTopOfStack = ability.holdPriority &&
+                            state.stack.lastOrNull()?.let { it in firstReqInfo.validTargets } == true
                         result.add(LegalAction(
                             actionType = "ActivateAbility",
                             description = ability.description,
@@ -576,7 +582,7 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
                             manaCostString = abilityManaCostString,
                             hasConvoke = ability.hasConvoke,
                             convokeCreatures = abilityConvokeCreatures,
-                            holdPriority = ability.holdPriority
+                            holdPriority = holdPriorityForTopOfStack
                         ))
                     }
                 } else {

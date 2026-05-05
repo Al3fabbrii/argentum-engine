@@ -29,6 +29,11 @@ val KirolAttentiveFirstYear = card("Kirol, Attentive First-Year") {
         val ability = target("target triggered ability you control", Targets.TriggeredAbilityYouControl)
         effect = Effects.CopyTargetTriggeredAbility(ability)
         restrictions = listOf(ActivationRestriction.OncePerTurn)
+        // Hold priority while a triggered ability we control is on top of the stack —
+        // otherwise it would resolve before we got the chance to copy it. The legal-action
+        // enumerator gates this hint on the target type, so it won't trigger for unrelated
+        // stack items (spells, our own activated abilities, opponent's triggers).
+        holdPriority = true
         description = "Tap two untapped creatures you control: Copy target triggered ability you control. You may choose new targets for the copy. Activate only once each turn."
     }
 
