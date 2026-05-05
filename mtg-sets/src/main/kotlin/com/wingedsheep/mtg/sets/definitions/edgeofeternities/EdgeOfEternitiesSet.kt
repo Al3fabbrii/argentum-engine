@@ -78,6 +78,7 @@ object EdgeOfEternitiesSet {
         InvasiveManeuvers,
         KavaronHarrier,
         KavaronTurbodrone,
+        LightlessEvangel,
         LostInSpace,
         LumenClassFrigate,
         MechanNavigator,

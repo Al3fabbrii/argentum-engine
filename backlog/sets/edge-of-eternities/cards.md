@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 93 / 261
+**Implemented:** 94 / 261
 
 ---
 
@@ -125,7 +125,7 @@
 - [ ] Knight Luminary
 - [ ] Larval Scoutlander
 - [ ] Lashwhip Predator
-- [ ] Lightless Evangel
+- [x] Lightless Evangel
 - [ ] Lightstall Inquisitor
 - [ ] Lithobraking
 - [ ] Loading Zone
