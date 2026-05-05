@@ -356,10 +356,26 @@ internal class CombatDamageManager(
                     val manualAssignment = attackerContainer.get<DamageAssignmentComponent>()
                     when {
                         manualAssignment != null && manualAssignment.assignments.isNotEmpty() -> {
+                            // A DamageAssignmentComponent set during the first-strike damage step
+                            // persists into the regular damage step. If first-strike damage killed
+                            // a blocker, that blocker is no longer on the battlefield. Per CR 702.19c,
+                            // an attacker with trample whose blocker has been removed from combat
+                            // assigns the freed-up damage to the defending player/planeswalker.
+                            // Without trample, damage assigned to a removed blocker is lost.
+                            val defenderId = attackingComponent.defenderId
+                            val hasTrample = projected.hasKeyword(attackerId, Keyword.TRAMPLE)
+                            var trampleRedirect = 0
                             for ((targetId, damage) in manualAssignment.assignments) {
-                                if (damage > 0) {
+                                if (damage <= 0) continue
+                                val targetIsLive = targetId in state.getBattlefield() || targetId == defenderId
+                                if (targetIsLive) {
                                     assignments.add(CombatDamageAssignment(attackerId, targetId, damage))
+                                } else if (hasTrample) {
+                                    trampleRedirect += damage
                                 }
+                            }
+                            if (trampleRedirect > 0) {
+                                assignments.add(CombatDamageAssignment(attackerId, defenderId, trampleRedirect))
                             }
                         }
                         blockedBy == null -> {
