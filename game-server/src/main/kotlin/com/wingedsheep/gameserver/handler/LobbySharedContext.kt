@@ -7,6 +7,7 @@ import com.wingedsheep.gameserver.protocol.ErrorCode
 import com.wingedsheep.gameserver.protocol.ServerMessage
 import com.wingedsheep.gameserver.repository.GameRepository
 import com.wingedsheep.gameserver.repository.LobbyRepository
+import com.wingedsheep.gameserver.session.GameSession
 import com.wingedsheep.gameserver.session.PlayerIdentity
 import com.wingedsheep.gameserver.session.SessionRegistry
 import kotlinx.coroutines.CoroutineScope
@@ -100,8 +101,27 @@ class LobbySharedContext(
             val playerSession = identity.webSocketSession?.let { sessionRegistry.getPlayerSession(it.id) }
             if (playerSession != null) {
                 gameSession.removeSpectator(playerSession)
+                broadcastSpectatorCount(gameSession)
             }
         }
         identity.currentSpectatingGameId = null
+    }
+
+    /**
+     * Push the current spectator count to both players in [gameSession].
+     * Spectators themselves do not receive this message.
+     */
+    fun broadcastSpectatorCount(gameSession: GameSession) {
+        val count = gameSession.getSpectators().size
+        val message = ServerMessage.SpectatorCountChanged(
+            gameSessionId = gameSession.sessionId,
+            count = count
+        )
+        listOfNotNull(gameSession.player1, gameSession.player2).forEach { player ->
+            val ws = player.webSocketSession
+            if (ws.isOpen) {
+                sender.send(ws, message)
+            }
+        }
     }
 }

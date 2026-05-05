@@ -149,6 +149,53 @@ export function StandaloneConcedeButton() {
 }
 
 /**
+ * Subtle eye-icon badge indicating the number of spectators currently watching
+ * this player's game. Hidden when there are zero spectators.
+ *
+ * Positioned in the top-left, just to the right of the fullscreen button so it
+ * sits in the same low-attention strip without crowding the game UI.
+ */
+export function SpectatorCountBadge() {
+  const spectatorCount = useGameStore((state) => state.spectatorCount)
+  const responsive = useResponsiveContext()
+
+  if (spectatorCount <= 0) return null
+
+  const label = spectatorCount === 1 ? '1 watching' : `${spectatorCount} watching`
+
+  return (
+    <div
+      title={label}
+      aria-label={label}
+      style={{
+        position: 'absolute',
+        top: responsive.isMobile ? 8 : 12,
+        // Sits to the right of FullscreenButton (which is at left: 8/12).
+        // The button is roughly 90–110px wide depending on label, so 110/130
+        // gives a safe visual gap without measuring.
+        left: responsive.isMobile ? 110 : 130,
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: responsive.isMobile ? '6px 8px' : '6px 10px',
+        fontSize: responsive.fontSize.small,
+        backgroundColor: 'rgba(0, 0, 0, 0.35)',
+        color: '#9aa6b2',
+        border: '1px solid #2c333d',
+        borderRadius: 6,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        opacity: 0.85,
+      }}
+    >
+      <span aria-hidden style={{ fontSize: responsive.fontSize.small }}>👁</span>
+      <span>{spectatorCount}</span>
+    </div>
+  )
+}
+
+/**
  * Fullscreen toggle button, positioned top-left.
  */
 export function FullscreenButton() {

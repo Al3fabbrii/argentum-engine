@@ -257,6 +257,7 @@ export type {
   SpectatorDecisionStatus,
   SpectatingStartedMessage,
   SpectatingStoppedMessage,
+  SpectatorCountChangedMessage,
   SpectateGameMessage,
   StopSpectatingMessage,
   // Combat UI types

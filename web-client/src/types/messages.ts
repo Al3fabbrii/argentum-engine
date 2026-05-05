@@ -60,6 +60,7 @@ export type ServerMessage =
   | SpectatorStateUpdateMessage
   | SpectatingStartedMessage
   | SpectatingStoppedMessage
+  | SpectatorCountChangedMessage
   // Combat UI Messages
   | OpponentAttackerTargetsMessage
   | OpponentBlockerAssignmentsMessage
@@ -1180,6 +1181,16 @@ export interface SpectatingStartedMessage {
 
 export interface SpectatingStoppedMessage {
   readonly type: 'spectatingStopped'
+}
+
+/**
+ * Number of active spectators on a game session has changed.
+ * Sent to both players in the game (not to spectators themselves).
+ */
+export interface SpectatorCountChangedMessage {
+  readonly type: 'spectatorCountChanged'
+  readonly gameSessionId: string
+  readonly count: number
 }
 
 // ============================================================================

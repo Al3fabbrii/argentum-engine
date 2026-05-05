@@ -39,6 +39,7 @@ import type {
   SpectatorStateUpdateMessage,
   SpectatingStartedMessage,
   SpectatingStoppedMessage,
+  SpectatorCountChangedMessage,
   OpponentAttackerTargetsMessage,
   OpponentBlockerAssignmentsMessage,
   OpponentDisconnectedMessage,
@@ -100,6 +101,7 @@ export interface MessageHandlers {
   onSpectatorStateUpdate: (message: SpectatorStateUpdateMessage) => void
   onSpectatingStarted: (message: SpectatingStartedMessage) => void
   onSpectatingStopped: (message: SpectatingStoppedMessage) => void
+  onSpectatorCountChanged: (message: SpectatorCountChangedMessage) => void
   // Combat UI handlers
   onOpponentAttackerTargets: (message: OpponentAttackerTargetsMessage) => void
   onOpponentBlockerAssignments: (message: OpponentBlockerAssignmentsMessage) => void
@@ -244,6 +246,9 @@ export function handleServerMessage(message: ServerMessage, handlers: MessageHan
       break
     case 'spectatingStopped':
       handlers.onSpectatingStopped(message)
+      break
+    case 'spectatorCountChanged':
+      handlers.onSpectatorCountChanged(message)
       break
     // Combat UI messages
     case 'opponentAttackerTargets':

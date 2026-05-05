@@ -22,7 +22,7 @@ import { ManaSymbol } from '../ui/ManaSymbols'
 import { Battlefield, CardRow, StackDisplay, ZonePile, ResponsiveContext } from './board'
 import { RenderProfiler } from '@/utils/renderProfiler'
 import { CardPreview } from './card'
-import { TargetingOverlay, ManaColorSelectionOverlay, LifeDisplay, ActiveEffectsBadges, ConcedeButton, FullscreenButton } from './overlay'
+import { TargetingOverlay, ManaColorSelectionOverlay, LifeDisplay, ActiveEffectsBadges, ConcedeButton, FullscreenButton, SpectatorCountBadge } from './overlay'
 import { styles } from './board/styles'
 
 /**
@@ -322,6 +322,9 @@ export function GameBoard({ spectatorMode = false, topOffset = 0 }: GameBoardPro
     }}>
       {/* Fullscreen button (top-left) */}
       <FullscreenButton />
+
+      {/* Spectator-count indicator (top-left, next to fullscreen) - only for players */}
+      {!spectatorMode && <SpectatorCountBadge />}
 
       {/* Concede button (top-right) - hidden in spectator mode */}
       {!spectatorMode && <ConcedeButton />}

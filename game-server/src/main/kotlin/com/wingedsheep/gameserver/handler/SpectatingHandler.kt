@@ -40,6 +40,7 @@ class SpectatingHandler(
 
         gameSession.addSpectator(playerSession)
         identity.currentSpectatingGameId = message.gameSessionId
+        ctx.broadcastSpectatorCount(gameSession)
 
         val playerNames = gameSession.getPlayerNames()
         if (playerNames != null) {
@@ -75,6 +76,9 @@ class SpectatingHandler(
         if (gameSessionId != null) {
             val gameSession = ctx.gameRepository.findById(gameSessionId)
             gameSession?.removeSpectator(playerSession)
+            if (gameSession != null) {
+                ctx.broadcastSpectatorCount(gameSession)
+            }
             identity.currentSpectatingGameId = null
 
             logger.info("Player ${identity.playerName} stopped spectating game $gameSessionId")
@@ -99,6 +103,7 @@ class SpectatingHandler(
         }
 
         gameSession.addSpectator(playerSession)
+        ctx.broadcastSpectatorCount(gameSession)
 
         val playerNames = gameSession.getPlayerNames()
         if (playerNames != null) {

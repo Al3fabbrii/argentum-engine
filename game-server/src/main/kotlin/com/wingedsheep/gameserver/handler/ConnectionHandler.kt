@@ -197,6 +197,14 @@ class ConnectionHandler(
                     }
                     gameSession.associatePlayer(playerSession)
 
+                    // Re-sync the spectator-count badge for the reconnecting player.
+                    // Spectator joins/leaves only push to currently-connected players, so a
+                    // mid-game reconnect would otherwise see count = 0 until the next change.
+                    sender.send(session, ServerMessage.SpectatorCountChanged(
+                        gameSessionId = gameSession.sessionId,
+                        count = gameSession.getSpectators().size
+                    ))
+
                     if (gameSession.isStarted) {
                         when {
                             // Player needs to choose cards to put on bottom

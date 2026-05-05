@@ -858,6 +858,17 @@ sealed interface ServerMessage {
     @SerialName("spectatingStopped")
     data object SpectatingStopped : ServerMessage
 
+    /**
+     * Number of active spectators on a game session has changed.
+     * Sent to both players in the game (not to spectators themselves).
+     */
+    @Serializable
+    @SerialName("spectatorCountChanged")
+    data class SpectatorCountChanged(
+        val gameSessionId: String,
+        val count: Int
+    ) : ServerMessage
+
     // =========================================================================
     // Combat UI Messages
     // =========================================================================
