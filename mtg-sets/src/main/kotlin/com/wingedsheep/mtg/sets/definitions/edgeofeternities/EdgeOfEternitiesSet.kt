@@ -73,6 +73,7 @@ object EdgeOfEternitiesSet {
         IcecaveCrasher,
         IllvoiGaleblade,
         IllvoiLightJammer,
+        IllvoiOperative,
         IntrepidTenderfoot,
         InvasiveManeuvers,
         KavaronHarrier,
