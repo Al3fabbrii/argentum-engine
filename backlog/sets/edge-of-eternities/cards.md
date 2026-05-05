@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 76 / 261
+**Implemented:** 77 / 261
 
 ---
 
@@ -110,7 +110,7 @@
 - [ ] Icetill Explorer
 - [x] Illvoi Galeblade
 - [ ] Illvoi Infiltrator
-- [ ] Illvoi Light Jammer
+- [x] Illvoi Light Jammer
 - [ ] Illvoi Operative
 - [ ] Infinite Guideline Station
 - [ ] Insatiable Skittermaw

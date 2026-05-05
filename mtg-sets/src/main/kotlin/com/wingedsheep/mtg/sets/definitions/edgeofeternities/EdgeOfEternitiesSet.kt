@@ -63,6 +63,7 @@ object EdgeOfEternitiesSet {
         HonoredKnightCaptain,
         Hullcarver,
         IcecaveCrasher,
+        IllvoiLightJammer,
         IllvoiGaleblade,
         IntrepidTenderfoot,
         KavaronHarrier,
