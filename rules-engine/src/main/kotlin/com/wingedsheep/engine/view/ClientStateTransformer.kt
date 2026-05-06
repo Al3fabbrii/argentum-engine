@@ -465,12 +465,7 @@ class ClientStateTransformer(
             val triggeredModeDescriptions: List<String> =
                 if (triggeredModal != null && triggeredAbility.chosenModes.isNotEmpty()) {
                     val evaluator = DynamicAmountEvaluator()
-                    val context = EffectContext(
-                        sourceId = entityId,
-                        controllerId = triggeredAbility.controllerId,
-                        opponentId = state.getOpponent(triggeredAbility.controllerId),
-                        xValue = triggeredAbility.xValue
-                    )
+                    val context = triggeredAbilityContext(state, entityId, triggeredAbility)
                     triggeredAbility.chosenModes.map { modeIndex ->
                         val mode = triggeredModal.modes.getOrNull(modeIndex)
                             ?: return@map "Unknown mode"
@@ -502,7 +497,7 @@ class ClientStateTransformer(
                 subtypes = emptySet(),
                 colors = sourceCard?.colors ?: emptySet(),
                 oracleText = triggeredAbility.descriptionOverride
-                    ?: runtimeAbilityText(state, entityId, triggeredAbility.controllerId, triggeredAbility.effect, triggeredAbility.xValue)
+                    ?: runtimeAbilityText(state, entityId, triggeredAbility)
                     ?: triggeredAbility.description,
                 power = null,
                 toughness = null,
@@ -1240,7 +1235,7 @@ class ClientStateTransformer(
     }
 
     /**
-     * Generate runtime text for an ability on the stack with dynamic amounts resolved.
+     * Generate runtime text for an activated ability on the stack with dynamic amounts resolved.
      * Returns null if evaluation fails or the effect has no dynamic amounts.
      */
     private fun runtimeAbilityText(
@@ -1250,14 +1245,34 @@ class ClientStateTransformer(
         effect: Effect,
         xValue: Int?
     ): String? {
+        val context = EffectContext(
+            sourceId = abilityEntityId,
+            controllerId = controllerId,
+            opponentId = state.getOpponent(controllerId),
+            xValue = xValue
+        )
+        return runtimeAbilityText(state, effect, context)
+    }
+
+    /**
+     * Generate runtime text for a triggered ability on the stack. Builds an [EffectContext] with
+     * the triggering-entity fields populated so dynamic amounts referencing
+     * [com.wingedsheep.sdk.scripting.values.EntityReference.Triggering] (e.g., "deals damage equal
+     * to its power") render the correct value instead of falling back to 0.
+     */
+    private fun runtimeAbilityText(
+        state: GameState,
+        abilityEntityId: EntityId,
+        triggered: TriggeredAbilityOnStackComponent
+    ): String? = runtimeAbilityText(
+        state,
+        triggered.effect,
+        triggeredAbilityContext(state, abilityEntityId, triggered)
+    )
+
+    private fun runtimeAbilityText(state: GameState, effect: Effect, context: EffectContext): String? {
         return try {
             val evaluator = DynamicAmountEvaluator()
-            val context = EffectContext(
-                sourceId = abilityEntityId,
-                controllerId = controllerId,
-                opponentId = state.getOpponent(controllerId),
-                xValue = xValue
-            )
             val text = effect.runtimeDescription { amount -> evaluator.evaluate(state, amount, context) }
             // Only return if it differs from static description (i.e., dynamic amounts were resolved)
             if (text != effect.description) text else null
@@ -1265,6 +1280,30 @@ class ClientStateTransformer(
             null
         }
     }
+
+    /**
+     * Build an [EffectContext] mirroring how [TriggerProcessor] does at resolution time, so
+     * stack-text rendering can evaluate `EntityReference.Triggering`-based dynamic amounts (e.g.,
+     * "deals damage equal to its power") with the actual triggering entity instead of a null.
+     */
+    private fun triggeredAbilityContext(
+        state: GameState,
+        abilityEntityId: EntityId,
+        triggered: TriggeredAbilityOnStackComponent
+    ): EffectContext = EffectContext(
+        sourceId = abilityEntityId,
+        controllerId = triggered.controllerId,
+        opponentId = state.getOpponent(triggered.controllerId),
+        xValue = triggered.xValue,
+        triggerDamageAmount = triggered.triggerDamageAmount,
+        triggerCounterCount = triggered.triggerCounterCount,
+        triggerTotalCounterCount = triggered.triggerTotalCounterCount,
+        triggeringEntityId = triggered.triggeringEntityId,
+        triggeringPlayerId = triggered.triggeringPlayerId,
+        targetingSourceEntityId = triggered.targetingSourceEntityId,
+        triggerLastKnownPower = triggered.lastKnownPower,
+        triggerLastKnownToughness = triggered.lastKnownToughness
+    )
 
     /**
      * Transform player information.
