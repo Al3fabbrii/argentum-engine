@@ -1,21 +1,11 @@
 package com.wingedsheep.mtg.sets.definitions.lorwyneclipsed.cards
 
-import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Costs
+import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.effects.CardDestination
-import com.wingedsheep.sdk.scripting.effects.CardSource
-import com.wingedsheep.sdk.scripting.effects.CompositeEffect
-import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
-import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
-import com.wingedsheep.sdk.scripting.effects.SelectFromCollectionEffect
-import com.wingedsheep.sdk.scripting.effects.SelectionMode
-import com.wingedsheep.sdk.scripting.effects.ShuffleLibraryEffect
-import com.wingedsheep.sdk.scripting.effects.ZonePlacement
-import com.wingedsheep.sdk.scripting.references.Player
-import com.wingedsheep.sdk.scripting.values.DynamicAmount
+import com.wingedsheep.sdk.scripting.effects.SearchDestination
 
 val EvolvingWilds = card("Evolving Wilds") {
     typeLine = "Land"
@@ -23,27 +13,11 @@ val EvolvingWilds = card("Evolving Wilds") {
         "the battlefield tapped, then shuffle."
 
     activatedAbility {
-        cost = Costs.Composite(
-            Costs.Tap,
-            Costs.SacrificeSelf
-        )
-        effect = CompositeEffect(
-            listOf(
-                GatherCardsEffect(
-                    source = CardSource.FromZone(Zone.LIBRARY, Player.You, GameObjectFilter.BasicLand),
-                    storeAs = "searchable"
-                ),
-                SelectFromCollectionEffect(
-                    from = "searchable",
-                    selection = SelectionMode.ChooseUpTo(DynamicAmount.Fixed(1)),
-                    storeSelected = "found"
-                ),
-                MoveCollectionEffect(
-                    from = "found",
-                    destination = CardDestination.ToZone(Zone.BATTLEFIELD, placement = ZonePlacement.Tapped)
-                ),
-                ShuffleLibraryEffect()
-            )
+        cost = Costs.Composite(Costs.Tap, Costs.SacrificeSelf)
+        effect = EffectPatterns.searchLibrary(
+            filter = Filters.BasicLand,
+            destination = SearchDestination.BATTLEFIELD,
+            entersTapped = true,
         )
         manaAbility = false
     }
