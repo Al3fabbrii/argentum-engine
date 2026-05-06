@@ -405,6 +405,7 @@ class TriggerProcessor(
                 triggerDamageAmount = trigger.triggerContext.damageAmount,
                 triggerCounterCount = trigger.triggerContext.counterCount,
                 triggerTotalCounterCount = trigger.triggerContext.totalCounterCount,
+                triggerLastKnownCounters = trigger.triggerContext.lastKnownCounters,
                 triggerLastKnownPower = trigger.triggerContext.lastKnownPower,
                 triggerLastKnownToughness = trigger.triggerContext.lastKnownToughness
             )
@@ -442,6 +443,7 @@ class TriggerProcessor(
             targetRequirements = allRequirements,
             triggerCounterCount = trigger.triggerContext.counterCount,
             triggerTotalCounterCount = trigger.triggerContext.totalCounterCount,
+            triggerLastKnownCounters = trigger.triggerContext.lastKnownCounters,
             lastKnownPower = trigger.triggerContext.lastKnownPower,
             lastKnownToughness = trigger.triggerContext.lastKnownToughness
         )
@@ -484,6 +486,7 @@ class TriggerProcessor(
             xValue = trigger.triggerContext.xValue ?: computeXForDisplay(state, trigger),
             triggerCounterCount = trigger.triggerContext.counterCount,
             triggerTotalCounterCount = trigger.triggerContext.totalCounterCount,
+            triggerLastKnownCounters = trigger.triggerContext.lastKnownCounters,
             targetingSourceEntityId = trigger.triggerContext.targetingSourceEntityId,
             lastKnownPower = trigger.triggerContext.lastKnownPower,
             lastKnownToughness = trigger.triggerContext.lastKnownToughness

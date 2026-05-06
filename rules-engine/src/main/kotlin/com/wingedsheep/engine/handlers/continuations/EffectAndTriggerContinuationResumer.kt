@@ -70,7 +70,8 @@ class EffectAndTriggerContinuationResumer(
                     triggeringEntityId = continuation.triggeringEntityId,
                     triggeringPlayerId = continuation.triggeringPlayerId,
                     triggerCounterCount = continuation.triggerCounterCount,
-                    triggerTotalCounterCount = continuation.triggerTotalCounterCount
+                    triggerTotalCounterCount = continuation.triggerTotalCounterCount,
+                    triggerLastKnownCounters = continuation.triggerLastKnownCounters
                 )
                 val stackResult = services.stackResolver.putTriggeredAbility(state, elseComponent, emptyList())
                 if (!stackResult.isSuccess) return stackResult
@@ -97,7 +98,8 @@ class EffectAndTriggerContinuationResumer(
             triggeringEntityId = continuation.triggeringEntityId,
             triggeringPlayerId = continuation.triggeringPlayerId,
             triggerCounterCount = continuation.triggerCounterCount,
-            triggerTotalCounterCount = continuation.triggerTotalCounterCount
+            triggerTotalCounterCount = continuation.triggerTotalCounterCount,
+            triggerLastKnownCounters = continuation.triggerLastKnownCounters
         )
 
         val stackResult = services.stackResolver.putTriggeredAbility(
@@ -161,6 +163,7 @@ class EffectAndTriggerContinuationResumer(
             triggeringPlayerId = continuation.triggeringPlayerId,
             triggerCounterCount = continuation.triggerCounterCount,
             triggerTotalCounterCount = continuation.triggerTotalCounterCount,
+            triggerLastKnownCounters = continuation.triggerLastKnownCounters,
             selectedTargets = selectedTargets,
             targetRequirements = continuation.targetRequirements,
             totalDamage = totalDamage
@@ -207,6 +210,7 @@ class EffectAndTriggerContinuationResumer(
             triggeringPlayerId = continuation.triggeringPlayerId,
             triggerCounterCount = continuation.triggerCounterCount,
             triggerTotalCounterCount = continuation.triggerTotalCounterCount,
+            triggerLastKnownCounters = continuation.triggerLastKnownCounters,
             damageDistribution = response.distribution
         )
 

@@ -12,7 +12,6 @@ import com.wingedsheep.sdk.scripting.ConditionalStaticAbility
 import com.wingedsheep.sdk.scripting.GrantKeyword
 import com.wingedsheep.sdk.scripting.StaticTarget
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
 /**
  * Essence Channeler
@@ -53,16 +52,12 @@ val EssenceChanneler = card("Essence Channeler") {
         effect = Effects.AddCounters(Counters.PLUS_ONE_PLUS_ONE, 1, EffectTarget.Self)
     }
 
-    // When this creature dies, put its counters on target creature you control
-    // Uses LastKnownCounterCount to capture +1/+1 counters from before death
+    // When this creature dies, put its counters on target creature you control.
+    // Per the Bloomburrow ruling, this moves *all* counter kinds, not just +1/+1.
     triggeredAbility {
         trigger = Triggers.Dies
         target = Targets.CreatureYouControl
-        effect = Effects.AddDynamicCounters(
-            Counters.PLUS_ONE_PLUS_ONE,
-            DynamicAmount.LastKnownCounterCount,
-            EffectTarget.ContextTarget(0)
-        )
+        effect = Effects.MoveAllLastKnownCounters(EffectTarget.ContextTarget(0))
     }
 
     metadata {

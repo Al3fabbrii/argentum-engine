@@ -55,6 +55,7 @@ data class TriggeredAbilityContinuation(
     val targetRequirements: List<TargetRequirement> = emptyList(),
     val triggerCounterCount: Int? = null,
     val triggerTotalCounterCount: Int? = null,
+    val triggerLastKnownCounters: Map<String, Int>? = null,
     val lastKnownPower: Int? = null,
     val lastKnownToughness: Int? = null
 ) : ContinuationFrame
@@ -89,6 +90,7 @@ data class TriggerDamageDistributionContinuation(
     val triggeringPlayerId: EntityId? = null,
     val triggerCounterCount: Int? = null,
     val triggerTotalCounterCount: Int? = null,
+    val triggerLastKnownCounters: Map<String, Int>? = null,
     val selectedTargets: List<ChosenTarget>,
     val targetRequirements: List<TargetRequirement>,
     val totalDamage: Int,

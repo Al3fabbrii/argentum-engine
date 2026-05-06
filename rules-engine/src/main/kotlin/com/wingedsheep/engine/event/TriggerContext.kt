@@ -40,7 +40,14 @@ data class TriggerContext(
     /** Last known power when the triggering entity left the battlefield (for dies/leaves triggers) */
     val lastKnownPower: Int? = null,
     /** Last known toughness when the triggering entity left the battlefield (for dies/leaves triggers) */
-    val lastKnownToughness: Int? = null
+    val lastKnownToughness: Int? = null,
+    /**
+     * Last-known counter map (counter-type-string → count) when the triggering source left
+     * the battlefield. Used by triggers that move every counter onto another permanent
+     * (e.g., Essence Channeler's "put its counters on target creature you control").
+     * Null when the trigger's source never left the battlefield (or had no counters).
+     */
+    val lastKnownCounters: Map<String, Int>? = null
 ) {
     companion object {
         fun fromEvent(event: com.wingedsheep.engine.core.GameEvent): TriggerContext {
@@ -53,7 +60,8 @@ data class TriggerContext(
                         event.lastKnownMinusOneMinusOneCounterCount else null,
                     xValue = event.xValue,
                     lastKnownPower = event.lastKnownPower,
-                    lastKnownToughness = event.lastKnownToughness
+                    lastKnownToughness = event.lastKnownToughness,
+                    lastKnownCounters = event.lastKnownCounters.takeIf { it.isNotEmpty() }
                 )
                 is DamageDealtEvent -> TriggerContext(
                     triggeringEntityId = event.targetId,

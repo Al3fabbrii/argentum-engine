@@ -46,6 +46,25 @@ data class AddDynamicCountersEffect(
 }
 
 /**
+ * Put all counters that were on the triggering source onto a target.
+ * "When this creature dies, put its counters on target creature you control."
+ *
+ * At resolution, the executor reads the last-known counter map captured when the
+ * source left the battlefield (every counter type, not just +1/+1) and places one
+ * of each kind on the target.
+ */
+@SerialName("MoveAllLastKnownCounters")
+@Serializable
+data class MoveAllLastKnownCountersEffect(
+    val target: EffectTarget = EffectTarget.ContextTarget(0)
+) : Effect {
+    override val description: String =
+        "Put its counters on ${target.description}"
+
+    override fun applyTextReplacement(replacer: TextReplacer): Effect = this
+}
+
+/**
  * Remove counters effect.
  * "Remove X -1/-1 counters from target creature"
  */

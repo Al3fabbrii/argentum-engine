@@ -19,6 +19,7 @@ import com.wingedsheep.sdk.scripting.effects.ManaRestriction
 import com.wingedsheep.sdk.scripting.effects.AddCardTypeEffect
 import com.wingedsheep.sdk.scripting.effects.AddCountersEffect
 import com.wingedsheep.sdk.scripting.effects.AddDynamicCountersEffect
+import com.wingedsheep.sdk.scripting.effects.MoveAllLastKnownCountersEffect
 import com.wingedsheep.sdk.scripting.effects.AddSubtypeEffect
 import com.wingedsheep.sdk.scripting.effects.AddCountersToCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
@@ -724,6 +725,15 @@ object Effects {
      */
     fun AddDynamicCounters(counterType: String, amount: DynamicAmount, target: EffectTarget): Effect =
         AddDynamicCountersEffect(counterType, amount, target)
+
+    /**
+     * Put every counter that was on the triggering source onto a target.
+     * Reads the source's last-known counter map (captured on leave-battlefield),
+     * not just +1/+1 counters. Use for "put its counters on target creature you
+     * control" style triggered abilities (e.g., Essence Channeler).
+     */
+    fun MoveAllLastKnownCounters(target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        MoveAllLastKnownCountersEffect(target)
 
     /**
      * Remove counters of a given type from a target. No-op if the target has fewer

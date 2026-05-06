@@ -56,6 +56,13 @@ data class ZoneChangeEvent(
     val lastKnownCardDefinitionId: String? = null,
     /** Last known projected keywords when leaving battlefield (for trigger filters needing keyword info after death) */
     val lastKnownKeywords: Set<String> = emptySet(),
+    /**
+     * Last-known counter map (counter-type-string → count) when leaving the battlefield.
+     * Used by triggers that move every counter (e.g., Essence Channeler), not just one
+     * specific kind. Counter-type strings match the wire format used on counter effects
+     * (e.g., "+1/+1", "-1/-1", "loyalty", "charge", ...).
+     */
+    val lastKnownCounters: Map<String, Int> = emptyMap(),
     /** X value from the spell that put this permanent onto the battlefield (for ETB triggers using DynamicAmount.XValue) */
     val xValue: Int? = null
 ) : GameEvent

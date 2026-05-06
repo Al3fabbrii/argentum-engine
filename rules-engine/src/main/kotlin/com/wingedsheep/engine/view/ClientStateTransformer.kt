@@ -1311,6 +1311,7 @@ class ClientStateTransformer(
         triggerDamageAmount = triggered.triggerDamageAmount,
         triggerCounterCount = triggered.triggerCounterCount,
         triggerTotalCounterCount = triggered.triggerTotalCounterCount,
+        triggerLastKnownCounters = triggered.triggerLastKnownCounters,
         triggeringEntityId = triggered.triggeringEntityId,
         triggeringPlayerId = triggered.triggeringPlayerId,
         targetingSourceEntityId = triggered.targetingSourceEntityId,

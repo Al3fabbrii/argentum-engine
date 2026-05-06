@@ -1274,6 +1274,7 @@ class StackResolver(
             triggerDamageAmount = abilityComponent.triggerDamageAmount,
             triggerCounterCount = abilityComponent.triggerCounterCount,
             triggerTotalCounterCount = abilityComponent.triggerTotalCounterCount,
+            triggerLastKnownCounters = abilityComponent.triggerLastKnownCounters,
             triggeringEntityId = abilityComponent.triggeringEntityId,
             triggeringPlayerId = abilityComponent.triggeringPlayerId,
             targetingSourceEntityId = abilityComponent.targetingSourceEntityId,

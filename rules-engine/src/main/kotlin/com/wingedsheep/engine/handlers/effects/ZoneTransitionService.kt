@@ -126,6 +126,7 @@ object ZoneTransitionService {
         var lastKnownCounterCount = 0
         var lastKnownMinusOneMinusOneCounterCount = 0
         var lastKnownTotalCounterCount = 0
+        var lastKnownCounters: Map<String, Int> = emptyMap()
         var lastKnownPower: Int? = null
         var lastKnownToughness: Int? = null
         var lastKnownTypeLine: TypeLine? = null
@@ -139,6 +140,13 @@ object ZoneTransitionService {
             lastKnownMinusOneMinusOneCounterCount =
                 countersComponent?.getCount(CounterType.MINUS_ONE_MINUS_ONE) ?: 0
             lastKnownTotalCounterCount = countersComponent?.counters?.values?.sum() ?: 0
+            lastKnownCounters = countersComponent?.counters
+                ?.filterValues { it > 0 }
+                ?.mapKeys { (type, _) ->
+                    com.wingedsheep.engine.handlers.effects.permanent.counters
+                        .counterTypeToString(type)
+                }
+                ?: emptyMap()
             val projected = state.projectedState
             lastKnownPower = projected.getPower(entityId)
             lastKnownToughness = projected.getToughness(entityId)
@@ -295,6 +303,7 @@ object ZoneTransitionService {
                 lastKnownCounterCount = lastKnownCounterCount,
                 lastKnownMinusOneMinusOneCounterCount = lastKnownMinusOneMinusOneCounterCount,
                 lastKnownTotalCounterCount = lastKnownTotalCounterCount,
+                lastKnownCounters = lastKnownCounters,
                 lastKnownWasToken = lastKnownWasToken,
                 lastKnownPower = lastKnownPower,
                 lastKnownToughness = lastKnownToughness,

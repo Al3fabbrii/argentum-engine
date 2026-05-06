@@ -72,6 +72,13 @@ data class EffectContext(
     val triggerLastKnownPower: Int? = null,
     /** Toughness of the triggering entity the moment it left the battlefield (dies/leaves triggers) */
     val triggerLastKnownToughness: Int? = null,
+    /**
+     * Last-known counter map (counter-type-string → count) of the trigger's source the
+     * moment it left the battlefield. Read by `MoveAllLastKnownCountersEffect` when a
+     * dies/leaves trigger needs to put every counter — not just +1/+1 — onto another
+     * permanent (e.g., Essence Channeler).
+     */
+    val triggerLastKnownCounters: Map<String, Int>? = null,
     // --- Choice state ---
     /** Color chosen for "add one mana of any color" abilities */
     val manaColorChoice: Color? = null,
