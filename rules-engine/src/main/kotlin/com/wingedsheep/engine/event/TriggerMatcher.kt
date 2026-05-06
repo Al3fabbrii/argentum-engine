@@ -633,6 +633,10 @@ class TriggerMatcher(
         val recipientMatches = when (trigger.recipient) {
             RecipientFilter.Any -> true
             RecipientFilter.AnyPlayer -> event.targetId in state.turnOrder
+            RecipientFilter.AnyPlayerOrPlaneswalker -> {
+                event.targetId in state.turnOrder ||
+                    state.projectedState.isPlaneswalker(event.targetId)
+            }
             RecipientFilter.AnyCreature -> event.targetId !in state.turnOrder
             RecipientFilter.You -> false // handled separately in detectDamageToControllerTriggers
             RecipientFilter.Opponent -> {

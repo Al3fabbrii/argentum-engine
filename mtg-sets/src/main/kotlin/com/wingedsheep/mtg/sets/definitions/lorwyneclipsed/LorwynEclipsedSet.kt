@@ -224,6 +224,7 @@ object LorwynEclipsedSet {
         SunDappledCelebrant,
         SurlyFarrier,
         SwatAway,
+        SyggWanderwineWisdom,
         SyggsCommand,
         TamMindfulFirstYear,
         TanufelRimespeaker,

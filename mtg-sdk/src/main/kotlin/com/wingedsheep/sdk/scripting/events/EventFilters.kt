@@ -40,6 +40,12 @@ sealed interface RecipientFilter {
         override val description = "a player"
     }
 
+    @SerialName("AnyPlayerOrPlaneswalker")
+    @Serializable
+    data object AnyPlayerOrPlaneswalker : RecipientFilter {
+        override val description = "a player or planeswalker"
+    }
+
     @SerialName("CreatureYouControl")
     @Serializable
     data object CreatureYouControl : RecipientFilter {

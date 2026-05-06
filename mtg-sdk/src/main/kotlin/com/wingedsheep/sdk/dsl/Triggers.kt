@@ -352,6 +352,19 @@ object Triggers {
     )
 
     /**
+     * When this creature deals combat damage to a player or planeswalker.
+     * Modern oracle wording (post-2018) for cards that should fire when their attacker
+     * connects with either a player or one of that player's planeswalkers.
+     */
+    val DealsCombatDamageToPlayerOrPlaneswalker: TriggerSpec = TriggerSpec(
+        event = DealsDamageEvent(
+            damageType = DamageType.Combat,
+            recipient = RecipientFilter.AnyPlayerOrPlaneswalker
+        ),
+        binding = TriggerBinding.SELF
+    )
+
+    /**
      * Whenever a creature you control deals combat damage to a player.
      * Uses ANY binding — fires for each creature you control that connects.
      */
