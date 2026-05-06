@@ -423,6 +423,8 @@ export function getEffectIcon(icon: string): string {
       return '📋'
     case 'triggered-ability':
       return '✨'
+    case 'granted-ability':
+      return '✨'
     default:
       return '⚡'
   }

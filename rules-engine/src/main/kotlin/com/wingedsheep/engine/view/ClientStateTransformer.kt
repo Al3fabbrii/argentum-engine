@@ -2052,6 +2052,33 @@ class ClientStateTransformer(
             }
         }
 
+        // Surface temporarily-granted triggered abilities (e.g., Sygg, Wanderwine Wisdom
+        // grants a draw-on-combat-damage trigger to target creature until end of turn).
+        // The granted ability is real game state but the printed oracle text on the
+        // recipient doesn't reflect it, so without a badge a player can't see the grant.
+        for (granted in state.grantedTriggeredAbilities) {
+            if (granted.entityId != entityId) continue
+            effects.add(
+                ClientCardEffect(
+                    effectId = "granted_trig_${granted.ability.id.value}",
+                    name = "Granted Ability",
+                    description = granted.ability.description,
+                    icon = "granted-ability"
+                )
+            )
+        }
+        for (granted in state.grantedActivatedAbilities) {
+            if (granted.entityId != entityId) continue
+            effects.add(
+                ClientCardEffect(
+                    effectId = "granted_act_${granted.ability.id.value}",
+                    name = "Granted Ability",
+                    description = granted.ability.description,
+                    icon = "granted-ability"
+                )
+            )
+        }
+
         return effects
     }
 
