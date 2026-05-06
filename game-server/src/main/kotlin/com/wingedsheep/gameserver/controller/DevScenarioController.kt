@@ -755,7 +755,14 @@ class DevScenarioController(
 
             val cardId = EntityId.of("card-${entityIdCounter.incrementAndGet()}")
 
-            val definitionId = cardDef.metadata.collectorNumber?.let { "${cardDef.name}#$it" } ?: cardDef.name
+            // Use Name#SetCode-CollectorNumber when both are available so the resulting
+            // CardComponent.cardDefinitionId matches the key used by CardRegistry. Without the
+            // set-code prefix, registry lookups (e.g. TriggerAbilityResolver.getTriggeredAbilities)
+            // miss and the card silently has no triggered abilities.
+            val definitionId = cardDef.metadata.collectorNumber?.let { cn ->
+                if (cardDef.setCode != null) "${cardDef.name}#${cardDef.setCode}-$cn"
+                else "${cardDef.name}#$cn"
+            } ?: cardDef.name
             val cardComponent = CardComponent(
                 cardDefinitionId = definitionId,
                 name = cardDef.name,
