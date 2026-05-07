@@ -247,6 +247,20 @@ class ClientStateTransformer(
         val activePlayerId = state.activePlayerId ?: state.turnOrder.firstOrNull() ?: viewingPlayerId
         val priorityPlayerId = state.priorityPlayerId ?: activePlayerId
 
+        // Hijack indicators (Mindslaver-style). For every other player whose turn the
+        // viewing player currently controls, set youAreHijacking = that player. If the
+        // viewing player is themselves being controlled, set youAreHijackedBy.
+        var youAreHijacking: EntityId? = null
+        var youAreHijackedBy: EntityId? = null
+        for (playerId in state.turnOrder) {
+            val actor = state.actorFor(playerId)
+            if (playerId == viewingPlayerId && actor != viewingPlayerId) {
+                youAreHijackedBy = actor
+            } else if (playerId != viewingPlayerId && actor == viewingPlayerId) {
+                youAreHijacking = playerId
+            }
+        }
+
         return ClientGameState(
             viewingPlayerId = viewingPlayerId,
             cards = cards,
@@ -260,7 +274,9 @@ class ClientStateTransformer(
             isGameOver = state.gameOver,
             winnerId = state.winnerId,
             combat = combat,
-            voidActive = state.nonlandPermanentLeftBattlefieldThisTurn || state.spellWarpedThisTurn
+            voidActive = state.nonlandPermanentLeftBattlefieldThisTurn || state.spellWarpedThisTurn,
+            youAreHijacking = youAreHijacking,
+            youAreHijackedBy = youAreHijackedBy
         )
     }
 

@@ -92,5 +92,7 @@ export function applyStateDelta(
     winnerId: delta.winnerId !== undefined ? delta.winnerId : current.winnerId,
     combat,
     gameLog,
+    youAreHijacking: delta.youAreHijacking ?? null,
+    youAreHijackedBy: delta.youAreHijackedBy ?? null,
   }
 }

@@ -90,6 +90,8 @@ object StateDiffCalculator {
             combat = combatDelta,
             combatCleared = if (combatCleared) true else null,
             newLogEntries = newLogEntries,
+            youAreHijacking = current.youAreHijacking,
+            youAreHijackedBy = current.youAreHijackedBy,
         )
     }
 }

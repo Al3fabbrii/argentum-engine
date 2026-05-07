@@ -490,6 +490,17 @@ class GameSession(
     fun executeAction(playerId: EntityId, action: GameAction, messageId: String? = null): ActionResult = synchronized(stateLock) {
         val state = gameState ?: return ActionResult.Failure("Game not started")
 
+        // Seat authorization: a seat may submit actions tagged with its own playerId, or
+        // act on behalf of a player whose turn it currently controls (Mindslaver-style).
+        // The action.playerId always represents the in-game actor (whose mana, cards,
+        // and spell-controllership this action is); the controller is just the input
+        // device. Concede is excluded — the affected player can always concede regardless
+        // of who's controlling them.
+        val actionPlayerId = action.playerId
+        if (action !is Concede && playerId != actionPlayerId && state.actorFor(actionPlayerId) != playerId) {
+            return ActionResult.Failure("Not authorized to submit actions for player $actionPlayerId")
+        }
+
         // Idempotency check: if this messageId was already processed, skip
         if (messageId != null) {
             val lastId = lastProcessedMessageId[playerId]
@@ -548,10 +559,14 @@ class GameSession(
 
     fun getLegalActions(playerId: EntityId): List<LegalActionInfo> {
         val state = gameState ?: return emptyList()
-        if (state.priorityPlayerId != playerId) return emptyList()
+        val priorityPlayer = state.priorityPlayerId ?: return emptyList()
+        // Allow either the priority player or, when their turn is hijacked, the controller
+        // currently driving them. Legal actions are still enumerated for the affected
+        // player (whose mana, cards, and turn this is).
+        if (state.actorFor(priorityPlayer) != playerId) return emptyList()
         if (state.pendingDecision != null) return emptyList()
-        val engineActions = legalActionEnumerator.enumerate(state, playerId)
-        return legalActionEnricher.enrich(engineActions, state, playerId)
+        val engineActions = legalActionEnumerator.enumerate(state, priorityPlayer)
+        return legalActionEnricher.enrich(engineActions, state, priorityPlayer)
     }
 
 
@@ -573,16 +588,21 @@ class GameSession(
         val playerLog = gameLogs.getOrPut(playerId) { mutableListOf() }
         playerLog.addAll(logEntries)
 
-        // Include pending decision only for the player who needs to make it
+        // Include pending decision only for the player who needs to make it — i.e. the
+        // actor for the affected player. During a hijacked turn this routes the
+        // decision to the controller, not the affected player.
         // Enrich with imageUri from card registry since engine doesn't have access to metadata
-        val pendingDecision = state.pendingDecision?.takeIf { it.playerId == playerId }?.let {
+        val pendingDecision = state.pendingDecision?.takeIf { state.actorFor(it.playerId) == playerId }?.let {
             decisionEnricher.enrich(it, state)
         }
 
-        // Calculate next stop point for the Pass button (only if player has priority)
+        // Calculate next stop point for the Pass button (only if player has priority,
+        // or is the actor for whoever has priority during a hijacked turn).
         val playerOverrides = getStopOverrides(playerId)
         val playerMode = getPriorityMode(playerId)
-        val nextStopPoint = if (state.priorityPlayerId == playerId && playerMode != PriorityMode.FULL_CONTROL) {
+        val priorityHolder = state.priorityPlayerId
+        val isActorForPriority = priorityHolder != null && state.actorFor(priorityHolder) == playerId
+        val nextStopPoint = if (isActorForPriority && playerMode != PriorityMode.FULL_CONTROL) {
             val hasMeaningfulActions = legalActions.any { action ->
                 action.actionType != "PassPriority" &&
                 (!action.isManaAbility || action.additionalCostInfo?.costType == "SacrificePermanent")
@@ -592,8 +612,9 @@ class GameSession(
             null
         }
 
-        // Include opponent decision status for the OTHER player (so they know opponent is making a choice)
-        val opponentDecisionStatus = state.pendingDecision?.takeIf { it.playerId != playerId }?.let {
+        // Include opponent decision status for the player who is NOT driving this
+        // decision — i.e. when their seat is not the actor for the affected player.
+        val opponentDecisionStatus = state.pendingDecision?.takeIf { state.actorFor(it.playerId) != playerId }?.let {
             decisionEnricher.createOpponentDecisionStatus(it)
         }
 
@@ -709,17 +730,22 @@ class GameSession(
         // Get the player with priority
         val priorityPlayer = state.priorityPlayerId ?: return null
 
+        // The actor is whoever is actually clicking — normally the priority player, or
+        // the controller during a hijacked turn. Auto-pass settings track per-seat,
+        // so consult the actor's preferences and the actor's legal-actions view.
+        val actorPlayer = state.actorFor(priorityPlayer)
+
         // Check if player has full control enabled - never auto-pass
-        val playerMode = getPriorityMode(priorityPlayer)
+        val playerMode = getPriorityMode(actorPlayer)
         if (playerMode == PriorityMode.FULL_CONTROL) {
             return null
         }
 
-        // Get legal actions for that player
-        val legalActions = getLegalActions(priorityPlayer)
+        // Get legal actions for the actor (returns priority player's actions)
+        val legalActions = getLegalActions(actorPlayer)
 
         // Check if they should auto-pass
-        val overrides = getStopOverrides(priorityPlayer)
+        val overrides = getStopOverrides(actorPlayer)
 
         // Check for legal activated abilities from non-battlefield zones (e.g., graveyard).
         // These are often step-locked (like Undead Gladiator's upkeep-only ability) and the

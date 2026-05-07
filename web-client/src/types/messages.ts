@@ -205,6 +205,9 @@ export interface StateDelta {
   readonly combatCleared?: boolean | null
   /** New game log entries (append to existing) */
   readonly newLogEntries?: readonly import('./events').ClientEvent[] | null
+  /** Hijack indicators — always overwritten on apply (Mindslaver-style) */
+  readonly youAreHijacking?: EntityId | null
+  readonly youAreHijackedBy?: EntityId | null
 }
 
 /**

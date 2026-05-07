@@ -8,7 +8,7 @@ Driving card: **The Dominion Bracelet** (Edge of Eternities). The first card to 
 |-------|--------|--------|
 | **PR 1 — card shell, no-op hijack** | ✅ shipped | `0a80ba9b5` |
 | **2A — engine lifecycle** | ✅ shipped | `874fc1575` |
-| **2B — input routing** | ⏳ pending | — |
+| **2B — input routing** | ✅ shipped | (this commit) |
 | **2C — frontend visibility / UX** | ⏳ pending | — |
 | **PR 2D — proper card sourcing + cost reduction** | ⏳ pending | — |
 
@@ -26,34 +26,35 @@ Tests: `rules-engine/src/test/kotlin/com/wingedsheep/engine/scenarios/PlayerTurn
 
 ## Phase 2B — input routing (next)
 
-The `actorFor` seam exists; consult it everywhere "who is allowed to act" is decided.
+### Convention
+
+Per CR 722 / Mindslaver rulings, the **affected player V is the spell controller** — V's mana pays, V's cards are cast, V is the "actor" in game-rules terms. The controlling player H is only the *input device* that selects which decision V makes. With that as the model:
+
+- `action.playerId` is **always the affected player V**, in normal play and during hijack.
+- The controller's client sends actions tagged with V's playerId (it knows V via `youAreHijacking`).
+- The seat check (which WebSocket may submit an action for V) lives at the server — the engine doesn't need to learn about hijack.
 
 ### Engine
-- `rules-engine/.../handlers/actions/decision/SubmitDecisionHandler.validate` (line ~34): allow `action.playerId == state.actorFor(pending.playerId)` in addition to the strict equality check.
-- Per-action handlers — audit each for `state.priorityPlayerId == action.playerId` checks and route through `actorFor`. Files to read:
-  - `handlers/actions/spell/CastSpellHandler.kt`
-  - `handlers/actions/ability/ActivateAbilityHandler.kt`
-  - `handlers/actions/spell/PlayLandHandler.kt`
-  - `handlers/actions/priority/PassPriorityHandler.kt`
-  - `handlers/actions/combat/DeclareAttackersHandler.kt`
-  - `handlers/actions/combat/DeclareBlockersHandler.kt`
-  - `handlers/actions/combat/OrderBlockersHandler.kt`
-- **Resource ownership stays with the affected player.** `ManaSolver` / `CostHandler` / etc. read costs against the *spell's* controller, not `action.playerId` — verify this assumption with a test. The actor switch is purely an authorization seam.
+- `SubmitDecisionHandler.validate` keeps the strict `pending.playerId == action.playerId` check. No change needed; `action.playerId` is V on both ends.
+- Per-action handlers (`CastSpellHandler`, `ActivateAbilityHandler`, `PlayLandHandler`, combat handlers, `PassPriorityHandler`) — no changes. Their `state.priorityPlayerId == action.playerId` / `activePlayerId == action.playerId` checks compare V to V and remain correct.
+- `ManaSolver` / `CostHandler` etc. continue to read costs against `action.playerId` (== V). This was already correct.
 
 ### Game-server
-- `GameSession.getLegalActions(playerId)`: return enumerated actions when `playerId == state.actorFor(state.priorityPlayerId)` (currently strict equality).
-- `GameSession.createStateUpdate`: send `pendingDecision` and `legalActions` to the actor (controller) when hijacked.
+- `GameSession.executeAction(seatId, action)`: validate `seatId == action.playerId || state.actorFor(action.playerId) == seatId`. Reject otherwise. The seat is the WebSocket session's player.
+- `GameSession.getLegalActions(seatId)`: return enumerated actions when `seatId == state.actorFor(state.priorityPlayerId)` — same legal-actions list whether the affected player or the controller is asking.
+- `GameSession.createStateUpdate(seatId)`: route `pendingDecision` to the actor (controller) when hijacked — the affected-player branch (`pending.playerId == playerId`) becomes `state.actorFor(pending.playerId) == playerId`.
+- AI: `GamePlayHandler` lookups against `aiPlayer.playerId` for `getLegalActions` keep working, since `actorFor(V) == V` when not hijacked.
 
 ### Client DTO
-- New optional fields on `ClientGameState` (in `rules-engine/.../view/ClientDTO.kt`):
+- New optional fields on `ClientGameState`:
   - `youAreHijacking: EntityId?` — the affected player you're currently controlling, if any.
   - `youAreHijackedBy: EntityId?` — the controller currently driving your turn, if any.
-- Populate from `actorFor` in `ClientStateTransformer.transform`.
+- Populate from `state.actorFor` in `ClientStateTransformer.transform`.
 
 ### Tests for 2B
-- Scenario: hijacked player's `legalActions` is empty for them, populated for the controller.
-- Scenario: controller submits `CastSpell` against the hijacked player's hand (using a synthetic in-hand spell), engine accepts and resolves with the spell controller = the affected player.
-- Scenario: mana spent comes from the affected player's pool (not the controller's).
+- Scenario: while V's turn is hijacked, `getLegalActions(V)` and `getLegalActions(H)` both return V's legal actions.
+- Scenario: `executeAction(H, action-tagged-V)` succeeds; `executeAction(V, action-tagged-V)` also succeeds; an unrelated seat is rejected.
+- Scenario: controller H casts a spell from V's hand — the spell on the stack has `controllerId == V`, mana is deducted from V's pool, card moves from V's hand → V's stack/battlefield zone.
 
 ## Phase 2C — frontend visibility / UX
 

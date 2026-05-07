@@ -67,7 +67,20 @@ data class ClientGameState(
      * the battlefield this turn or a spell was warped this turn). Drives UI cues for cards
      * with Void abilities (Edge of Eternities).
      */
-    val voidActive: Boolean = false
+    val voidActive: Boolean = false,
+
+    /**
+     * If non-null, the affected player whose turn the viewing player is currently
+     * driving (Mindslaver-style hijack). Drives UI cues such as the controller banner
+     * and promoting the affected player's hand to face-up.
+     */
+    val youAreHijacking: EntityId? = null,
+
+    /**
+     * If non-null, the controller currently driving the viewing player's turn.
+     * Drives UI cues such as the affected-player banner and disabling click handlers.
+     */
+    val youAreHijackedBy: EntityId? = null
 )
 
 /**

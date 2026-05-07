@@ -43,4 +43,11 @@ data class StateDelta(
 
     /** New game log entries only (append to existing) */
     val newLogEntries: List<ClientEvent>? = null,
+
+    /**
+     * Hijack indicators (Mindslaver-style). Always present in the delta — overwrites the
+     * corresponding field on the client unconditionally. Rare to change but cheap to send.
+     */
+    val youAreHijacking: EntityId? = null,
+    val youAreHijackedBy: EntityId? = null,
 )
