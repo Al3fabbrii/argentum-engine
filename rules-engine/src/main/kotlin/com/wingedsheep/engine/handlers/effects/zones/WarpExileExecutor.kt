@@ -6,6 +6,7 @@ import com.wingedsheep.engine.handlers.effects.EffectExecutor
 import com.wingedsheep.engine.handlers.effects.ZoneTransitionService
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.identity.CardComponent
+import com.wingedsheep.engine.state.components.identity.MayPlayFromExileComponent
 import com.wingedsheep.engine.state.components.identity.WarpExiledComponent
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.scripting.effects.WarpExileEffect
@@ -14,8 +15,11 @@ import kotlin.reflect.KClass
 /**
  * Executor for WarpExileEffect.
  *
- * Exiles a warped permanent and marks it with [WarpExiledComponent] so that
- * the card can be re-cast from exile using its warp cost on a later turn.
+ * Exiles a warped permanent, grants its owner permission to cast it from
+ * exile on a later turn (CR 702.185a — regular mana cost; warp's alternative
+ * cost is hand-only), and marks it with [WarpExiledComponent] as the rule
+ * 702.185b "warped card in exile" identifier (used by cards like Close
+ * Encounter and Blade of the Swarm).
  *
  * Used by the warp mechanic's delayed trigger that fires at the beginning
  * of the next end step.
@@ -48,9 +52,11 @@ class WarpExileExecutor : EffectExecutor<WarpExileEffect> {
             destinationZone = Zone.EXILE
         )
 
-        // Add WarpExiledComponent so the card can be re-cast from exile via warp
+        // Grant cast-from-exile permission (regular mana cost — warp's alt cost is
+        // hand-only per CR 702.185a) and mark the card as a "warped" exile (CR 702.185b).
         val newState = transitionResult.state.updateEntity(targetId) { c ->
-            c.with(WarpExiledComponent(controllerId = context.controllerId))
+            c.with(MayPlayFromExileComponent(controllerId = context.controllerId, permanent = true))
+                .with(WarpExiledComponent(controllerId = context.controllerId))
         }
 
         return EffectResult.success(newState, transitionResult.events)

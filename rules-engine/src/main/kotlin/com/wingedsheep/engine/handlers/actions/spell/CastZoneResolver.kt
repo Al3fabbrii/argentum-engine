@@ -16,7 +16,6 @@ import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.MayPlayFromExileComponent
 import com.wingedsheep.engine.state.components.identity.PlayWithoutPayingCostComponent
-import com.wingedsheep.engine.state.components.identity.WarpExiledComponent
 import com.wingedsheep.engine.state.components.player.MayCastCreaturesFromGraveyardWithForageComponent
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.model.EntityId
@@ -183,23 +182,6 @@ class CastZoneResolver(
         val cardComponent = state.getEntity(cardId)?.get<CardComponent>() ?: return false
         val cardDef = cardRegistry.getCard(cardComponent.cardDefinitionId) ?: return false
         return cardDef.keywordAbilities.any { it is KeywordAbility.Warp }
-    }
-
-    /**
-     * Check if a card in exile has WarpExiledComponent granting
-     * the player permission to re-cast it using its warp cost.
-     */
-    fun hasWarpFromExilePermission(
-        state: GameState,
-        playerId: EntityId,
-        cardId: EntityId
-    ): Boolean {
-        val inAnyExile = state.turnOrder.any { pid ->
-            cardId in state.getZone(ZoneKey(pid, Zone.EXILE))
-        }
-        if (!inAnyExile) return false
-        val warpExiled = state.getEntity(cardId)?.get<WarpExiledComponent>() ?: return false
-        return warpExiled.controllerId == playerId
     }
 
     /**

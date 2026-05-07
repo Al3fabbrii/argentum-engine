@@ -143,13 +143,11 @@ class CastSpellHandler(
             zoneResolver.hasMayPlayPermanentFromGraveyardPermission(state, action.playerId, action.cardId, cardComponent)
         val hasFlashback = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard &&
             zoneResolver.hasFlashbackPermission(state, action.playerId, action.cardId)
-        val hasWarpFromExile = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback &&
-            zoneResolver.hasWarpFromExilePermission(state, action.playerId, action.cardId)
-        val hasGraveyardLifeCost = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback && !hasWarpFromExile &&
+        val hasGraveyardLifeCost = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback &&
             action.graveyardLifeCost > 0 && action.cardId in state.getZone(ZoneKey(action.playerId, Zone.GRAVEYARD))
-        val hasForageFromGraveyard = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback && !hasWarpFromExile && !hasGraveyardLifeCost &&
+        val hasForageFromGraveyard = !inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback && !hasGraveyardLifeCost &&
             zoneResolver.hasMayCastCreaturesFromGraveyardWithForage(state, action.playerId, action.cardId, cardComponent)
-        if (!inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback && !hasWarpFromExile && !hasGraveyardLifeCost && !hasForageFromGraveyard) {
+        if (!inHand && !onTopOfLibrary && !mayPlayFromExile && !mayCastFromZone && !mayCastFromGraveyard && !hasFlashback && !hasGraveyardLifeCost && !hasForageFromGraveyard) {
             return "Card is not in your hand"
         }
 
@@ -284,10 +282,9 @@ class CastSpellHandler(
             if (flashbackAbility != null && zoneResolver.hasFlashbackPermission(state, action.playerId, action.cardId)) {
                 costCalculator.calculateEffectiveCostWithAlternativeBase(state, cardDef, flashbackAbility.cost, action.playerId)
             } else {
-                // Check warp cost (card in hand or exile with warp permission)
+                // Check warp cost (hand only — CR 702.185a). Re-casts from exile pay the regular mana cost.
                 val warpAbility = cardDef.keywordAbilities.filterIsInstance<KeywordAbility.Warp>().firstOrNull()
-                if (warpAbility != null && (zoneResolver.hasWarpPermission(state, action.playerId, action.cardId)
-                            || zoneResolver.hasWarpFromExilePermission(state, action.playerId, action.cardId))) {
+                if (warpAbility != null && zoneResolver.hasWarpPermission(state, action.playerId, action.cardId)) {
                     costCalculator.calculateEffectiveCostWithAlternativeBase(state, cardDef, warpAbility.cost, action.playerId)
                 } else {
                     // Check evoke cost
@@ -1059,10 +1056,9 @@ class CastSpellHandler(
             if (flashbackAbility != null && zoneResolver.hasFlashbackPermission(currentState, action.playerId, action.cardId)) {
                 costCalculator.calculateEffectiveCostWithAlternativeBase(currentState, cardDef, flashbackAbility.cost, action.playerId)
             } else {
-                // Check warp cost
+                // Check warp cost (hand only — CR 702.185a). Re-casts from exile pay the regular mana cost.
                 val warpAbility = cardDef.keywordAbilities.filterIsInstance<KeywordAbility.Warp>().firstOrNull()
-                if (warpAbility != null && (zoneResolver.hasWarpPermission(currentState, action.playerId, action.cardId)
-                            || zoneResolver.hasWarpFromExilePermission(currentState, action.playerId, action.cardId))) {
+                if (warpAbility != null && zoneResolver.hasWarpPermission(currentState, action.playerId, action.cardId)) {
                     costCalculator.calculateEffectiveCostWithAlternativeBase(currentState, cardDef, warpAbility.cost, action.playerId)
                 } else {
                     // Check evoke cost
