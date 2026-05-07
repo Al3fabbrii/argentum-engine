@@ -100,10 +100,24 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
             }
         }
 
+        // OnePerColor(matchControllerPermanentColors = true) narrows eligibility to
+        // cards whose colours intersect the chooser's permanent colours.
+        val chooserId = decidingPlayerId ?: context.controllerId
+        val controllerPermanentColors: Set<com.wingedsheep.sdk.core.Color>? =
+            if (effect.restrictions.any { it is SelectionRestriction.OnePerColor && it.matchControllerPermanentColors }) {
+                colorsAmongPermanentsControlledBy(state, chooserId)
+            } else null
+        if (controllerPermanentColors != null) {
+            eligibleCards = eligibleCards.filter { cardId ->
+                val cardColors = state.getEntity(cardId)?.get<CardComponent>()?.colors ?: emptySet()
+                cardColors.any { it in controllerPermanentColors }
+            }
+        }
+
         // Restrictions can tighten the maximum number of selectable cards (e.g.,
         // OnePerCardType caps the max at the number of distinct card types present).
         // They are also propagated into the continuation for response-time normalization.
-        val restrictionCeiling = restrictionCeiling(effect.restrictions, state, eligibleCards)
+        val restrictionCeiling = restrictionCeiling(effect.restrictions, state, eligibleCards, controllerPermanentColors)
 
         return when (val selection = effect.selection) {
             is SelectionMode.All -> {
@@ -136,7 +150,7 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                 } else {
                     val clamped = minOf(count, eligibleCards.size)
                     val nonSelectable = if (effect.showAllCards) cards.filter { it !in eligibleCards } else emptyList()
-                    createDecision(state, context, effect, eligibleCards, clamped, clamped, decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable)
+                    createDecision(state, context, effect, eligibleCards, clamped, clamped, decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable, controllerPermanentColors = controllerPermanentColors)
                 }
             }
 
@@ -146,7 +160,7 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                 if (eligibleCards.isEmpty()) {
                     if (effect.showAllCards && cards.isNotEmpty()) {
                         // Show all cards even though none are selectable (e.g., "look at top 3, you may reveal a creature or land")
-                        return createDecision(state, context, effect, emptyList(), 0, 0, decidingPlayerId, allCards = cards, nonSelectableCards = cards)
+                        return createDecision(state, context, effect, emptyList(), 0, 0, decidingPlayerId, allCards = cards, nonSelectableCards = cards, controllerPermanentColors = controllerPermanentColors)
                     }
                     val collections = mutableMapOf(effect.storeSelected to emptyList<EntityId>())
                     if (remainderName != null) {
@@ -155,7 +169,7 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                     return EffectResult.success(state).copy(updatedCollections = collections)
                 }
                 val nonSelectable = if (effect.showAllCards) cards.filter { it !in eligibleCards } else emptyList()
-                createDecision(state, context, effect, eligibleCards, 0, minOf(count, eligibleCards.size), decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable)
+                createDecision(state, context, effect, eligibleCards, 0, minOf(count, eligibleCards.size), decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable, controllerPermanentColors = controllerPermanentColors)
             }
 
             is SelectionMode.Random -> {
@@ -174,7 +188,7 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                 if (eligibleCards.isEmpty()) {
                     if (effect.showAllCards && cards.isNotEmpty()) {
                         // Show all cards even though none are selectable (caster still sees the reveal).
-                        return createDecision(state, context, effect, emptyList(), 0, 0, decidingPlayerId, allCards = cards, nonSelectableCards = cards)
+                        return createDecision(state, context, effect, emptyList(), 0, 0, decidingPlayerId, allCards = cards, nonSelectableCards = cards, controllerPermanentColors = controllerPermanentColors)
                     }
                     val collections = mutableMapOf(effect.storeSelected to emptyList<EntityId>())
                     if (remainderName != null) collections[remainderName] = cards
@@ -182,7 +196,7 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                 }
                 val maxSelectable = minOf(eligibleCards.size, restrictionCeiling)
                 val nonSelectable = if (effect.showAllCards) cards.filter { it !in eligibleCards } else emptyList()
-                createDecision(state, context, effect, eligibleCards, 0, maxSelectable, decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable)
+                createDecision(state, context, effect, eligibleCards, 0, maxSelectable, decidingPlayerId, allCards = cards, nonSelectableCards = nonSelectable, controllerPermanentColors = controllerPermanentColors)
             }
         }
     }
@@ -192,10 +206,24 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
      * given the active [restrictions]. Returns [Int.MAX_VALUE] when no restriction
      * narrows the bound.
      */
+    private fun colorsAmongPermanentsControlledBy(
+        state: GameState,
+        playerId: EntityId
+    ): Set<com.wingedsheep.sdk.core.Color> {
+        val colors = mutableSetOf<com.wingedsheep.sdk.core.Color>()
+        for (entityId in state.getBattlefield()) {
+            val controller = state.getEntity(entityId)?.get<ControllerComponent>()?.playerId
+            if (controller != playerId) continue
+            colors += state.getEntity(entityId)?.get<CardComponent>()?.colors ?: emptySet()
+        }
+        return colors
+    }
+
     private fun restrictionCeiling(
         restrictions: List<SelectionRestriction>,
         state: GameState,
-        eligibleCards: List<EntityId>
+        eligibleCards: List<EntityId>,
+        controllerPermanentColors: Set<com.wingedsheep.sdk.core.Color>? = null
     ): Int {
         if (restrictions.isEmpty()) return Int.MAX_VALUE
         var ceiling = Int.MAX_VALUE
@@ -206,6 +234,25 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                         state.getEntity(cardId)?.get<CardComponent>()?.typeLine?.cardTypes ?: emptySet()
                     }.toSet()
                     distinctTypes.size.coerceAtLeast(0)
+                }
+                is SelectionRestriction.OnePerColor -> {
+                    // Each colour contributes one slot. When matchControllerPermanentColors is
+                    // set, eligibility is already filtered, so colourless cards are absent.
+                    // Otherwise colourless cards are unconstrained and raise the ceiling
+                    // by their full count.
+                    val distinctColors = mutableSetOf<com.wingedsheep.sdk.core.Color>()
+                    var colourlessCount = 0
+                    for (cardId in eligibleCards) {
+                        val cardColors = state.getEntity(cardId)?.get<CardComponent>()?.colors ?: emptySet()
+                        if (cardColors.isEmpty()) colourlessCount++ else distinctColors += cardColors
+                    }
+                    if (restriction.matchControllerPermanentColors && controllerPermanentColors != null) {
+                        // Slots are bounded by colours of controller's permanents, intersected with
+                        // colours actually present in the eligible set.
+                        distinctColors.intersect(controllerPermanentColors).size
+                    } else {
+                        distinctColors.size + colourlessCount
+                    }
                 }
             }
             if (limit < ceiling) ceiling = limit
@@ -228,7 +275,8 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
         maxSelections: Int,
         decidingPlayerId: EntityId? = null,
         allCards: List<EntityId> = cards,
-        nonSelectableCards: List<EntityId> = emptyList()
+        nonSelectableCards: List<EntityId> = emptyList(),
+        controllerPermanentColors: Set<com.wingedsheep.sdk.core.Color>? = null
     ): EffectResult {
         val playerId = decidingPlayerId ?: context.controllerId
         val decisionId = UUID.randomUUID().toString()
@@ -245,7 +293,8 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
                 name = cardComponent?.name ?: "Unknown",
                 manaCost = cardComponent?.manaCost?.toString() ?: "",
                 typeLine = cardComponent?.typeLine?.toString() ?: "",
-                imageUri = null
+                imageUri = null,
+                colors = cardComponent?.colors?.map { it.name }?.toList() ?: emptyList()
             )
         }
 
@@ -273,7 +322,9 @@ class SelectFromCollectionExecutor : EffectExecutor<SelectFromCollectionEffect> 
             remainderLabel = effect.remainderLabel,
             useTargetingUI = effect.useTargetingUI,
             nonSelectableOptions = nonSelectableCards,
-            onePerCardType = effect.restrictions.any { it is SelectionRestriction.OnePerCardType }
+            onePerCardType = effect.restrictions.any { it is SelectionRestriction.OnePerCardType },
+            onePerColor = effect.restrictions.any { it is SelectionRestriction.OnePerColor },
+            availableColors = controllerPermanentColors?.map { it.name }
         )
 
         val continuation = SelectFromCollectionContinuation(

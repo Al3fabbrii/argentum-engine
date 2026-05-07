@@ -139,7 +139,15 @@ data class SelectCardsDecision(
     /** Cards shown to the player but not selectable (used for "look at" effects) */
     val nonSelectableOptions: List<EntityId> = emptyList(),
     /** When true, at most one card of each card type may be selected */
-    val onePerCardType: Boolean = false
+    val onePerCardType: Boolean = false,
+    /** When true, at most one card of each colour may be selected (colourless cards unconstrained) */
+    val onePerColor: Boolean = false,
+    /**
+     * The colour budget for [onePerColor] when restricted to the chooser's permanent colours
+     * (e.g., Sanar's Vivid trigger). One pip per colour name (e.g., ["WHITE","BLUE"]). When null
+     * or empty, the UI falls back to a generic five-colour list.
+     */
+    val availableColors: List<String>? = null
 ) : PendingDecision
 
 /**
@@ -337,7 +345,9 @@ data class SearchCardInfo(
     val name: String,
     val manaCost: String,
     val typeLine: String,
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    /** Colour identity letters (e.g. ["W","U"]); empty for colourless cards */
+    val colors: List<String> = emptyList()
 )
 
 /**

@@ -291,6 +291,14 @@ export interface SelectCardsDecision extends PendingDecisionBase {
   readonly nonSelectableOptions?: readonly EntityId[]
   /** When true, at most one card of each card type may be selected */
   readonly onePerCardType?: boolean
+  /** When true, at most one card of each colour may be selected (colourless unconstrained) */
+  readonly onePerColor?: boolean
+  /**
+   * The colour budget for [onePerColor] when restricted to the chooser's permanent colours
+   * (e.g., Sanar's Vivid trigger). One pip per colour name (e.g., ["WHITE","BLUE"]). When
+   * undefined or empty, the UI shows the generic five-colour list.
+   */
+  readonly availableColors?: readonly string[] | null
 }
 
 /**
@@ -330,6 +338,8 @@ export interface SearchCardInfo {
   readonly manaCost: string
   readonly typeLine: string
   readonly imageUri: string | null
+  /** Colour names for cards backed by hidden zone info (e.g. ["WHITE","BLUE"]); empty for colourless. */
+  readonly colors?: readonly string[]
 }
 
 /**

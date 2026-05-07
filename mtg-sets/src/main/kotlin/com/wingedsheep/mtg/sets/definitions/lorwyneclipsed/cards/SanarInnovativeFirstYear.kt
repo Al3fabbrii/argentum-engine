@@ -17,6 +17,7 @@ import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.RevealCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.SelectFromCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.SelectionMode
+import com.wingedsheep.sdk.scripting.effects.SelectionRestriction
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 
 /**
@@ -32,9 +33,11 @@ import com.wingedsheep.sdk.scripting.effects.ZonePlacement
  *
  * The Vivid mechanic uses [DynamicAmounts.colorsAmongPermanents] to compute X via the projected
  * battlefield (so recolor effects apply). The "for each of those colors, you may exile a card
- * of that color" clause is enforced via a [SelectionMode.ChooseUpTo] cap of X — any subset of
- * the revealed nonland cards up to size X may be exiled, which matches the strict per-color
- * interpretation in every case where the revealed colors don't repeat.
+ * of that color" clause is enforced by a [SelectionMode.ChooseUpTo] cap of X plus a
+ * [SelectionRestriction.OnePerColor] with `matchControllerPermanentColors = true`: revealed
+ * nonland cards whose colours don't intersect the controller's permanent colours are filtered
+ * out, and at most one card per controller-colour can be exiled (so two cards sharing a colour
+ * can't both be picked even if both intersect the controller's colours).
  */
 val SanarInnovativeFirstYear = card("Sanar, Innovative First-Year") {
     manaCost = "{2}{U/R}{U/R}"
@@ -61,13 +64,14 @@ val SanarInnovativeFirstYear = card("Sanar, Innovative First-Year") {
                 count = colorCount
             ),
             RevealCollectionEffect(from = "allRevealed"),
-            // The caster picks any subset (up to X) of the revealed nonland cards to exile.
+            // The caster picks one card per colour (up to X) of the revealed nonlands to exile.
             SelectFromCollectionEffect(
                 from = "nonlandCards",
                 selection = SelectionMode.ChooseUpTo(colorCount),
                 storeSelected = "toExile",
                 selectedLabel = "Exile (you may cast this turn)",
-                alwaysPrompt = true
+                alwaysPrompt = true,
+                restrictions = listOf(SelectionRestriction.OnePerColor(matchControllerPermanentColors = true))
             ),
             MoveCollectionEffect(
                 from = "toExile",

@@ -18,6 +18,28 @@ function extractCardTypes(typeLine: string): string[] {
   return mainTypes.trim().split(/\s+/).filter((w) => CARD_TYPES.has(w))
 }
 
+/** Map colour name → display symbol + CSS colour for the indicator pip. */
+const COLOR_PIPS: Record<string, { symbol: string; bg: string; fg: string }> = {
+  WHITE: { symbol: 'W', bg: '#f8f6e8', fg: '#3a3320' },
+  BLUE: { symbol: 'U', bg: '#a6dafc', fg: '#0a2a48' },
+  BLACK: { symbol: 'B', bg: '#2b2a2a', fg: '#e6e2d8' },
+  RED: { symbol: 'R', bg: '#f5a986', fg: '#4a1a0a' },
+  GREEN: { symbol: 'G', bg: '#a8d59e', fg: '#0e3214' },
+}
+
+/** Parse colour identity from mana cost (fallback when explicit colors aren't shipped). */
+function parseColorsFromManaCost(manaCost: string): string[] {
+  const set = new Set<string>()
+  for (const ch of manaCost) {
+    if (ch === 'W') set.add('WHITE')
+    else if (ch === 'U') set.add('BLUE')
+    else if (ch === 'B') set.add('BLACK')
+    else if (ch === 'R') set.add('RED')
+    else if (ch === 'G') set.add('GREEN')
+  }
+  return [...set]
+}
+
 /**
  * Card selection decision - select cards from a list.
  */
@@ -72,13 +94,41 @@ export function CardSelectionDecision({
     return types
   }, [decision.onePerCardType, decision.cardInfo, selectedCards, gameState?.cards])
 
-  /** Check if a card is disabled by the OnePerCardType restriction. */
+  /** Resolve a card's colour identity from cardInfo, gameState, or its mana cost. */
+  const colorsForCard = (cardId: EntityId): string[] => {
+    const fromInfo = decision.cardInfo?.[cardId]?.colors
+    if (fromInfo && fromInfo.length > 0) return [...fromInfo]
+    const fromState = gameState?.cards[cardId]?.colors
+    if (fromState && fromState.length > 0) return [...fromState]
+    const manaCost = decision.cardInfo?.[cardId]?.manaCost ?? gameState?.cards[cardId]?.manaCost ?? ''
+    return parseColorsFromManaCost(typeof manaCost === 'string' ? manaCost : '')
+  }
+
+  // OnePerColor: compute which colours are already claimed by selected cards
+  const claimedColors = useMemo(() => {
+    if (!decision.onePerColor) return new Set<string>()
+    const colors = new Set<string>()
+    for (const id of selectedCards) {
+      for (const c of colorsForCard(id)) colors.add(c)
+    }
+    return colors
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [decision.onePerColor, decision.cardInfo, selectedCards, gameState?.cards])
+
+  /** Check if a card is disabled by an active selection restriction. */
   const isCardDisabled = (cardId: EntityId): boolean => {
-    if (!decision.onePerCardType) return false
     if (selectedCards.includes(cardId)) return false // already selected — can deselect
-    const typeLine = decision.cardInfo?.[cardId]?.typeLine ?? gameState?.cards[cardId]?.typeLine ?? ''
-    const types = extractCardTypes(typeLine)
-    return types.length > 0 && types.some((t) => claimedTypes.has(t))
+    if (decision.onePerCardType) {
+      const typeLine = decision.cardInfo?.[cardId]?.typeLine ?? gameState?.cards[cardId]?.typeLine ?? ''
+      const types = extractCardTypes(typeLine)
+      if (types.length > 0 && types.some((t) => claimedTypes.has(t))) return true
+    }
+    if (decision.onePerColor) {
+      const colors = colorsForCard(cardId)
+      // Colourless cards are unconstrained.
+      if (colors.length > 0 && colors.some((c) => claimedColors.has(c))) return true
+    }
+    return false
   }
 
   const toggleCard = (cardId: EntityId) => {
@@ -148,6 +198,53 @@ export function CardSelectionDecision({
           : `Selected: ${selectedCards.length} / ${decision.minSelections}${decision.minSelections !== decision.maxSelections ? ` - ${decision.maxSelections}` : ''}`
         }
       </p>
+
+      {decision.onePerColor && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            margin: '0 0 8px',
+            fontSize: 12,
+            opacity: 0.85,
+          }}
+        >
+          <span>At most one card per colour:</span>
+          {((decision.availableColors && decision.availableColors.length > 0)
+            ? decision.availableColors
+            : ['WHITE', 'BLUE', 'BLACK', 'RED', 'GREEN']
+          ).map((c) => {
+            const pip = COLOR_PIPS[c]
+            if (!pip) return null
+            const claimed = claimedColors.has(c)
+            return (
+              <span
+                key={c}
+                title={claimed ? `${pip.symbol} claimed` : pip.symbol}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  background: pip.bg,
+                  color: pip.fg,
+                  fontWeight: 700,
+                  fontSize: 11,
+                  lineHeight: 1,
+                  border: claimed ? '2px solid #ffd668' : '1px solid rgba(0,0,0,0.3)',
+                  opacity: claimed ? 1 : 0.45,
+                  boxShadow: claimed ? '0 0 6px rgba(255,214,104,0.7)' : 'none',
+                }}
+              >
+                {pip.symbol}
+              </span>
+            )
+          })}
+        </div>
+      )}
 
       {(decision.selectedLabel || decision.remainderLabel) && (
         <div className={styles.destinationLabels}>

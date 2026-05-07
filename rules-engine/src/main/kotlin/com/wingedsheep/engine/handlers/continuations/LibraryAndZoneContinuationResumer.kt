@@ -368,6 +368,7 @@ class LibraryAndZoneContinuationResumer(
         } else {
             val kept = mutableSetOf<EntityId>()
             val claimedTypes = mutableSetOf<com.wingedsheep.sdk.core.CardType>()
+            val claimedColors = mutableSetOf<com.wingedsheep.sdk.core.Color>()
             for (cardId in response.selectedCards) {
                 val acceptsAllRestrictions = continuation.restrictions.all { restriction ->
                     when (restriction) {
@@ -376,6 +377,13 @@ class LibraryAndZoneContinuationResumer(
                                 ?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()
                                 ?.typeLine?.cardTypes ?: emptySet()
                             cardTypes.isEmpty() || cardTypes.none { it in claimedTypes }
+                        }
+                        is SelectionRestriction.OnePerColor -> {
+                            val cardColors = state.getEntity(cardId)
+                                ?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()
+                                ?.colors ?: emptySet()
+                            // Colourless cards are not constrained by this restriction.
+                            cardColors.isEmpty() || cardColors.none { it in claimedColors }
                         }
                     }
                 }
@@ -388,6 +396,11 @@ class LibraryAndZoneContinuationResumer(
                                 claimedTypes += state.getEntity(cardId)
                                     ?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()
                                     ?.typeLine?.cardTypes ?: emptySet()
+                            }
+                            is SelectionRestriction.OnePerColor -> {
+                                claimedColors += state.getEntity(cardId)
+                                    ?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()
+                                    ?.colors ?: emptySet()
                             }
                         }
                     }

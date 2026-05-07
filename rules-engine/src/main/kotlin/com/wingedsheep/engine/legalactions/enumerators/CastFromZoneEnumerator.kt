@@ -300,6 +300,22 @@ class CastFromZoneEnumerator : ActionEnumerator {
                     val canPayAdditionalCost = exileAdditionalCostInfo == null ||
                         checkRuntimeAdditionalCostAffordability(state, playerId, runtimeAdditionalCost)
 
+                    // Honour the card's printed BlightOrPay additional cost when casting from exile
+                    // (e.g. Cinder Strike granted via Sanar's "you may cast" permission). If the
+                    // card has a payable blight path, emit a second legal action with
+                    // costType = "Blight" so the client surfaces both the pay and blight options.
+                    val printedBlightOrPay = cardDef?.script?.additionalCosts
+                        ?.flatMap { if (it is AdditionalCost.Composite) it.steps else listOf(it) }
+                        ?.filterIsInstance<AdditionalCost.BlightOrPay>()
+                        ?.firstOrNull()
+                    val blightCreatures = if (printedBlightOrPay != null) {
+                        val projected = state.projectedState
+                        projected.getBattlefieldControlledBy(playerId).filter { projected.isCreature(it) }
+                    } else emptyList()
+                    val canAffordBlightPath = printedBlightOrPay != null &&
+                        blightCreatures.isNotEmpty() &&
+                        !playForFree
+
                     if (hasCorrectTiming && meetsRestrictions && canAfford && canPayAdditionalCost) {
                         val targetReqs = buildList {
                             addAll(cardDef?.script?.targetRequirements ?: emptyList())
@@ -312,6 +328,7 @@ class CastFromZoneEnumerator : ActionEnumerator {
                             if (allSatisfied) {
                                 val firstReq = targetReqs.first()
                                 val firstInfo = targetInfos.first()
+                                // Emit the pay path first.
                                 result.add(
                                     LegalAction(
                                         actionType = "CastSpell",
@@ -330,6 +347,33 @@ class CastFromZoneEnumerator : ActionEnumerator {
                                         additionalCostInfo = exileAdditionalCostInfo
                                     )
                                 )
+                                // Emit the blight path as a second action when the card has
+                                // a printed BlightOrPay and the player controls a creature.
+                                if (canAffordBlightPath && printedBlightOrPay != null) {
+                                    result.add(
+                                        LegalAction(
+                                            actionType = "CastSpell",
+                                            description = "Cast ${cardComponent.name} (Blight ${printedBlightOrPay.blightAmount})",
+                                            action = CastSpell(playerId, cardId),
+                                            validTargets = firstInfo.validTargets,
+                                            requiresTargets = true,
+                                            targetCount = firstReq.count,
+                                            minTargets = firstReq.effectiveMinCount,
+                                            targetDescription = firstReq.description,
+                                            targetRequirements = if (targetInfos.size > 1) targetInfos else null,
+                                            manaCostString = costString,
+                                            hasXCost = hasXCost,
+                                            maxAffordableX = maxAffordableX,
+                                            sourceZone = sourceZoneLabel,
+                                            additionalCostInfo = AdditionalCostData(
+                                                description = "creature to blight",
+                                                costType = "Blight",
+                                                validBlightTargets = blightCreatures,
+                                                blightAmount = printedBlightOrPay.blightAmount
+                                            )
+                                        )
+                                    )
+                                }
                             }
                         } else {
                             result.add(
@@ -344,6 +388,25 @@ class CastFromZoneEnumerator : ActionEnumerator {
                                     additionalCostInfo = exileAdditionalCostInfo
                                 )
                             )
+                            if (canAffordBlightPath && printedBlightOrPay != null) {
+                                result.add(
+                                    LegalAction(
+                                        actionType = "CastSpell",
+                                        description = "Cast ${cardComponent.name} (Blight ${printedBlightOrPay.blightAmount})",
+                                        action = CastSpell(playerId, cardId),
+                                        manaCostString = costString,
+                                        hasXCost = hasXCost,
+                                        maxAffordableX = maxAffordableX,
+                                        sourceZone = sourceZoneLabel,
+                                        additionalCostInfo = AdditionalCostData(
+                                            description = "creature to blight",
+                                            costType = "Blight",
+                                            validBlightTargets = blightCreatures,
+                                            blightAmount = printedBlightOrPay.blightAmount
+                                        )
+                                    )
+                                )
+                            }
                         }
                     } else {
                         // Can't cast right now — show as unaffordable

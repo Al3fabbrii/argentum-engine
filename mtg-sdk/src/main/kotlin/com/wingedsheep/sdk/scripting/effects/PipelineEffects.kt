@@ -256,6 +256,36 @@ sealed interface SelectionRestriction {
     data object OnePerCardType : SelectionRestriction {
         override val description: String = "at most one card of each card type"
     }
+
+    /**
+     * At most one card of each colour may be selected. Colourless cards do not
+     * consume any colour and are always selectable (subject to the base
+     * [SelectionMode] cap).
+     *
+     * When [matchControllerPermanentColors] is true, eligibility is also
+     * narrowed to cards whose colours intersect the colours of permanents the
+     * chooser controls — this captures the "for each of those colours [the
+     * colours among permanents you control], you may exile a card of that
+     * colour" wording used by Lorwyn Eclipsed's Vivid mechanic (Sanar,
+     * Innovative First-Year). With this flag, colourless cards are never
+     * eligible (they share no colour with the controller's permanents).
+     *
+     * The executor enforces this server-side: if the player's response names
+     * multiple cards sharing a colour, only the first such card (in response
+     * order) is kept per colour.
+     */
+    @SerialName("OnePerColor")
+    @Serializable
+    data class OnePerColor(
+        val matchControllerPermanentColors: Boolean = false
+    ) : SelectionRestriction {
+        override val description: String = buildString {
+            append("at most one card of each colour")
+            if (matchControllerPermanentColors) {
+                append(", and only colours of permanents you control")
+            }
+        }
+    }
 }
 
 /**
