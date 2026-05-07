@@ -268,6 +268,27 @@ data class SourceAbilityResolvedNTimesThisTurn(val count: Int) : Condition {
 }
 
 // =============================================================================
+// Void (Edge of Eternities ability word)
+// =============================================================================
+
+/**
+ * Condition: "if a nonland permanent left the battlefield this turn or
+ * a spell was warped this turn".
+ *
+ * Backs the Void ability word from Edge of Eternities. The condition is global — it
+ * is satisfied by any player's nonland permanent leaving the battlefield (tokens
+ * count, lands do not) or any spell that was cast for its warp cost this turn,
+ * even if that spell was countered.
+ */
+@SerialName("Void")
+@Serializable
+data object VoidCondition : Condition {
+    override val description: String =
+        "if a nonland permanent left the battlefield this turn or a spell was warped this turn"
+    override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+}
+
+// =============================================================================
 // Stack Conditions
 // =============================================================================
 

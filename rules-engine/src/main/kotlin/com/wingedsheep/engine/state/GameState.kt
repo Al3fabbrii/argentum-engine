@@ -99,7 +99,10 @@ data class GameState(
     val pendingSpellCopies: List<PendingSpellCopy> = emptyList(),
 
     /** Whether a spell was warped this turn (for Void condition: "a spell was warped this turn") */
-    val spellWarpedThisTurn: Boolean = false
+    val spellWarpedThisTurn: Boolean = false,
+
+    /** Whether a nonland permanent left the battlefield this turn (for the Void ability word). */
+    val nonlandPermanentLeftBattlefieldThisTurn: Boolean = false
 ) {
     /**
      * Cached projection of the game state with all continuous effects (Rule 613) applied.

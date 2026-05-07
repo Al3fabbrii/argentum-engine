@@ -142,6 +142,11 @@ class CostCalculator(
             is CostReductionSource.GreatestManaValueAmongPermanentsYouControl -> {
                 greatestManaValueAmongMatching(state, playerId, source.filter)
             }
+            is CostReductionSource.FixedIfVoid -> {
+                if (state.nonlandPermanentLeftBattlefieldThisTurn || state.spellWarpedThisTurn)
+                    source.amount
+                else 0
+            }
         }
     }
 

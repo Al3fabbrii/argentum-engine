@@ -283,6 +283,20 @@ sealed interface CostReductionSource {
     data class FixedIfCreatureAttackingYou(val amount: Int) : CostReductionSource {
         override val description: String = "$amount if a creature is attacking you"
     }
+
+    /**
+     * Reduces cost by a fixed amount if the Void condition is met this turn — i.e.,
+     * a nonland permanent left the battlefield this turn or a spell was warped this turn.
+     * Used for Edge of Eternities cards like Temporal Intervention
+     * ("This spell costs {2} less to cast if a nonland permanent left the battlefield
+     * this turn or a spell was warped this turn").
+     */
+    @SerialName("FixedIfVoid")
+    @Serializable
+    data class FixedIfVoid(val amount: Int) : CostReductionSource {
+        override val description: String =
+            "$amount if a nonland permanent left the battlefield this turn or a spell was warped this turn"
+    }
 }
 
 /**

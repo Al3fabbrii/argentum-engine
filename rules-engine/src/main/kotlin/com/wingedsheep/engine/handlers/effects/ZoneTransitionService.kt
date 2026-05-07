@@ -314,6 +314,13 @@ object ZoneTransitionService {
             )
         )
 
+        // 8a2. Void: track that a nonland permanent left the battlefield this turn.
+        // Uses the last-known projected type line so that creature-lands (which carry the
+        // land type) correctly do NOT enable void.
+        if (leavingBattlefield && lastKnownTypeLine?.isLand == false) {
+            newState = newState.copy(nonlandPermanentLeftBattlefieldThisTurn = true)
+        }
+
         // 8b. Track creature deaths inline so subsequent effects can see counts
         if (leavingBattlefield && actualDestZone == Zone.GRAVEYARD && cardComponent.typeLine.isCreature) {
             val isToken = container.has<TokenComponent>()

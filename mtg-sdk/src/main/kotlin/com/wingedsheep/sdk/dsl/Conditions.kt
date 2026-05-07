@@ -432,6 +432,14 @@ object Conditions {
         com.wingedsheep.sdk.scripting.conditions.YouGainedAndLostLifeThisTurn
 
     /**
+     * Void: "if a nonland permanent left the battlefield this turn or a spell was warped this turn".
+     * Backs the Void ability word from Edge of Eternities. Tokens count as nonland permanents;
+     * lands do not. A warped spell satisfies the condition even if it was countered.
+     */
+    val Void: ConditionInterface =
+        com.wingedsheep.sdk.scripting.conditions.VoidCondition
+
+    /**
      * If an opponent lost life this turn (from any source).
      * Used for cards like Hired Claw: "Activate only if an opponent lost life this turn"
      */

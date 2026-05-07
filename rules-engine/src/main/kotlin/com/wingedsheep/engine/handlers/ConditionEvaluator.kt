@@ -83,6 +83,7 @@ import com.wingedsheep.sdk.scripting.conditions.YouAttackedThisTurn
 import com.wingedsheep.sdk.scripting.conditions.YouAttackedWithCreaturesThisTurn
 import com.wingedsheep.sdk.scripting.conditions.YouWereAttackedThisStep
 import com.wingedsheep.sdk.scripting.conditions.YouWereDealtCombatDamageThisTurn
+import com.wingedsheep.sdk.scripting.conditions.VoidCondition
 
 /**
  * Evaluates conditions from the SDK against the game state.
@@ -157,6 +158,10 @@ class ConditionEvaluator {
             is PutCounterOnCreatureThisTurn -> evaluatePutCounterOnCreatureThisTurn(state, context)
             is IsFirstSpellOfTypeCastThisTurn -> evaluateFirstSpellOfType(state, condition, context)
             is SourceAbilityResolvedNTimesThisTurn -> evaluateSourceAbilityResolvedNTimes(state, condition, context)
+
+            // Void (Edge of Eternities ability word)
+            is VoidCondition ->
+                state.nonlandPermanentLeftBattlefieldThisTurn || state.spellWarpedThisTurn
 
             // Stack conditions
             is OpponentSpellOnStack -> evaluateOpponentSpellOnStack(state, context)
