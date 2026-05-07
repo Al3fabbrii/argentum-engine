@@ -210,6 +210,7 @@ object LorwynEclipsedSet {
         RiverguardsReflexes,
         RunAwayTogether,
         SafewrightCavalry,
+        SanarInnovativeFirstYear,
         SaplingNursery,
         ScarbladesMalice,
         ScuzzbackScrounger,
