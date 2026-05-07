@@ -21,10 +21,11 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Vivid — When this creature enters, up to X target creatures you control get +X/+X
  * until end of turn, where X is the number of colors among permanents you control.
  *
- * Note on max target count: oracle text caps the target count at X (the number of
- * colours among permanents you control), but TargetRequirement.count is a static
- * Int. Since X cannot exceed 5 (the five MTG colours), we use count = 5 as the
- * upper bound. The +X/+X bonus is computed dynamically at resolution.
+ * X is locked twice (per the Scryfall ruling): once when the trigger goes on the
+ * stack — capping the number of selectable targets — and again at resolution to set
+ * the +N/+N bonus. We pass the same `colorsAmongPermanents()` value as both the
+ * `dynamicMaxCount` (so the engine resolves the cap at trigger placement time and
+ * the targeting UI shows "selected / X") and the `ModifyStats` amount.
  */
 val Prismabasher = card("Prismabasher") {
     manaCost = "{4}{G}{G}"
@@ -41,7 +42,12 @@ val Prismabasher = card("Prismabasher") {
         trigger = Triggers.EntersBattlefield
         target(
             "up to X target creatures you control",
-            TargetCreature(count = 5, optional = true, filter = TargetFilter.CreatureYouControl)
+            TargetCreature(
+                count = 5,
+                optional = true,
+                filter = TargetFilter.CreatureYouControl,
+                dynamicMaxCount = DynamicAmounts.colorsAmongPermanents()
+            )
         )
         effect = ForEachTargetEffect(
             listOf(

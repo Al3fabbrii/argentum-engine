@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.text.TextReplaceable
 import com.wingedsheep.sdk.scripting.text.TextReplacer
+import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -85,8 +86,16 @@ fun TargetCreature(
     minCount: Int = count,
     optional: Boolean = false,
     filter: TargetFilter = TargetFilter.Creature,
-    id: String? = null
-): TargetObject = TargetObject(count = count, minCount = minCount, optional = optional, filter = filter, id = id)
+    id: String? = null,
+    dynamicMaxCount: DynamicAmount? = null
+): TargetObject = TargetObject(
+    count = count,
+    minCount = minCount,
+    optional = optional,
+    filter = filter,
+    id = id,
+    dynamicMaxCount = dynamicMaxCount
+)
 
 // =============================================================================
 // Permanent Targeting (factory function — returns TargetObject)
@@ -242,9 +251,13 @@ fun TargetSpell(
  * Generalizes zone-specific targeting — the TargetFilter's zone field
  * determines which zone to look in.
  *
- * @param count Maximum number of targets
+ * @param count Maximum number of targets (absolute upper bound)
  * @param optional If true, allows 0 targets ("up to X" style targeting)
  * @param filter Determines what can be targeted and in which zone
+ * @param dynamicMaxCount When non-null, the engine evaluates this at the moment the
+ *   spell/ability goes on the stack and clamps the maximum number of targets to the
+ *   resolved value (still bounded by [count]). Used for "up to X target ..." where X
+ *   is determined by board state, like Prismabasher's Vivid trigger.
  */
 @SerialName("TargetObject")
 @Serializable
@@ -253,7 +266,8 @@ data class TargetObject(
     override val minCount: Int = count,
     override val optional: Boolean = false,
     val filter: TargetFilter,
-    override val id: String? = null
+    override val id: String? = null,
+    val dynamicMaxCount: DynamicAmount? = null
 ) : TargetRequirement {
     override val description: String = if (id != null) {
         buildString {

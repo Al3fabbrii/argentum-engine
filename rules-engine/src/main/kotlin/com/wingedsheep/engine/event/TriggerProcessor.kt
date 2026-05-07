@@ -21,6 +21,8 @@ import com.wingedsheep.sdk.scripting.effects.SelectionMode
 import com.wingedsheep.sdk.scripting.effects.StoreNumberEffect
 import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.engine.state.components.player.PlayerLostComponent
+import com.wingedsheep.sdk.scripting.targets.TargetObject
+import com.wingedsheep.sdk.scripting.targets.TargetOther
 import com.wingedsheep.sdk.scripting.targets.TargetRequirement
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
@@ -327,7 +329,11 @@ class TriggerProcessor(
         targetRequirement: TargetRequirement
     ): ExecutionResult {
         val ability = trigger.ability
-        val allRequirements = ability.allTargetRequirements
+        // Snapshot dynamicMaxCount on each requirement now (when the trigger is going on
+        // the stack) so the resolved cap is what the player sees and the validator
+        // enforces. CR 603.3c: X / target counts on triggered abilities are locked when
+        // the ability triggers. Only TargetObject carries dynamicMaxCount today.
+        val allRequirements = ability.allTargetRequirements.map { snapshotDynamicCount(state, trigger, it) }
 
         // Find legal targets for each requirement
         val allLegalTargets = mutableMapOf<Int, List<EntityId>>()
@@ -608,6 +614,49 @@ class TriggerProcessor(
         is StoreNumberEffect -> if (effect.name == name) effect.amount else null
         is CompositeEffect -> effect.effects.firstNotNullOfOrNull { findStoreNumberAmount(it, name) }
         else -> null
+    }
+
+    /**
+     * If the requirement carries a [TargetObject.dynamicMaxCount], evaluate it against
+     * the trigger's controller/source and return a copy with `count` (and `minCount`
+     * when not optional) clamped to the resolved value. Static caps are preserved as
+     * the absolute upper bound. Wrapping [TargetOther] is unwrapped, snapshotted, and
+     * re-wrapped so "another target" wording stays intact.
+     */
+    private fun snapshotDynamicCount(
+        state: GameState,
+        trigger: PendingTrigger,
+        requirement: TargetRequirement
+    ): TargetRequirement = when (requirement) {
+        is TargetObject -> {
+            val dyn = requirement.dynamicMaxCount
+            if (dyn == null) {
+                requirement
+            } else {
+                val resolved = try {
+                    val context = EffectContext(
+                        sourceId = trigger.sourceId,
+                        controllerId = trigger.controllerId,
+                        opponentId = state.getOpponent(trigger.controllerId),
+                        triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+                        triggeringPlayerId = trigger.triggerContext.triggeringPlayerId
+                    )
+                    DynamicAmountEvaluator().evaluate(state, dyn, context)
+                } catch (_: Exception) {
+                    requirement.count
+                }
+                val capped = resolved.coerceIn(0, requirement.count)
+                requirement.copy(
+                    count = capped,
+                    minCount = requirement.minCount.coerceAtMost(capped)
+                )
+            }
+        }
+        is TargetOther -> {
+            val newBase = snapshotDynamicCount(state, trigger, requirement.baseRequirement)
+            if (newBase !== requirement.baseRequirement) requirement.copy(baseRequirement = newBase) else requirement
+        }
+        else -> requirement
     }
 
     /**
