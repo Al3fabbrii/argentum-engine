@@ -102,6 +102,25 @@ data class RemoveAnyNumberOfCountersEffect(
 }
 
 /**
+ * Remove every counter (of any kind) from a target permanent.
+ *
+ * "Remove all counters from target creature."
+ *
+ * Mandatory and non-interactive — the executor clears every counter kind currently
+ * on the target. No-op when the target has no counters.
+ */
+@SerialName("RemoveAllCounters")
+@Serializable
+data class RemoveAllCountersEffect(
+    val target: EffectTarget = EffectTarget.ContextTarget(0)
+) : Effect {
+    override val description: String =
+        "Remove all counters from ${target.description}"
+
+    override fun applyTextReplacement(replacer: TextReplacer): Effect = this
+}
+
+/**
  * Put -1/-1 counters on a creature.
  * Used for blight effects and wither-style damage.
  *

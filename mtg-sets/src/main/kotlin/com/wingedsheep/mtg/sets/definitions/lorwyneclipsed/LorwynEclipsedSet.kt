@@ -187,6 +187,7 @@ object LorwynEclipsedSet {
         OkoLorwynLiege,
         OmniChangeling,
         Personify,
+        PerfectIntimidation,
         PesteredWellguard,
         PitilessFists,
         PridefulFeastling,

@@ -768,6 +768,13 @@ object Effects {
         com.wingedsheep.sdk.scripting.effects.RemoveAnyNumberOfCountersEffect(target)
 
     /**
+     * Remove every counter (of any kind) from a target permanent. Mandatory; clears
+     * all counter kinds currently on the target. Used by Perfect Intimidation.
+     */
+    fun RemoveAllCounters(target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        com.wingedsheep.sdk.scripting.effects.RemoveAllCountersEffect(target)
+
+    /**
      * Add counters to all entities in a named collection.
      */
     fun AddCountersToCollection(collectionName: String, counterType: String, count: Int = 1): Effect =

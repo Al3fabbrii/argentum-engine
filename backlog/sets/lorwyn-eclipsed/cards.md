@@ -2,13 +2,13 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 258 / 273
+**Implemented:** 259 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 39    | 39   |
 | Blue       | 39    | 36   |
-| Black      | 38    | 35   |
+| Black      | 38    | 36   |
 | Red        | 39    | 36   |
 | Green      | 39    | 37   |
 | Multicolor | 49    | 47   |
@@ -134,7 +134,7 @@
 - [x] Mudbutton Cursetosser
 - [x] Nameless Inversion
 - [x] Nightmare Sower
-- [ ] Perfect Intimidation
+- [x] Perfect Intimidation
 - [ ] Requiting Hex
 - [x] Retched Wretch
 - [ ] Scarblade Scout

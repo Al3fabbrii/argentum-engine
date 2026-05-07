@@ -28,6 +28,7 @@ import com.wingedsheep.engine.handlers.effects.permanent.counters.MoveAllLastKno
 import com.wingedsheep.engine.handlers.effects.permanent.counters.DistributeCountersAmongTargetsExecutor
 import com.wingedsheep.engine.handlers.effects.permanent.counters.DistributeCountersFromSelfExecutor
 import com.wingedsheep.engine.handlers.effects.permanent.counters.ProliferateExecutor
+import com.wingedsheep.engine.handlers.effects.permanent.counters.RemoveAllCountersExecutor
 import com.wingedsheep.engine.handlers.effects.permanent.counters.RemoveAnyNumberOfCountersExecutor
 import com.wingedsheep.engine.handlers.effects.permanent.counters.RemoveCountersExecutor
 import com.wingedsheep.engine.handlers.effects.permanent.abilities.GrantToxicExecutor
@@ -91,6 +92,7 @@ class PermanentExecutors(
         AddCountersToCollectionExecutor(),
         RemoveCountersExecutor(),
         RemoveAnyNumberOfCountersExecutor(),
+        RemoveAllCountersExecutor(),
         DistributeCountersFromSelfExecutor(),
         DistributeCountersAmongTargetsExecutor(),
         ProliferateExecutor(),
