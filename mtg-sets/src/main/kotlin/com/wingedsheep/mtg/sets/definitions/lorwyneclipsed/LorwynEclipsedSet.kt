@@ -235,6 +235,7 @@ object LorwynEclipsedSet {
         Stratosoarer,
         SummitSentinel,
         SunDappledCelebrant,
+        Sunderflock,
         SurlyFarrier,
         SwatAway,
         SyggWanderwineWisdom,

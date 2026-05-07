@@ -54,8 +54,10 @@ import com.wingedsheep.sdk.scripting.conditions.SourceIsAttacking
 import com.wingedsheep.sdk.scripting.conditions.SourceIsBlocking
 import com.wingedsheep.sdk.scripting.conditions.SourceIsTapped
 import com.wingedsheep.sdk.scripting.conditions.SourceIsUntapped
+import com.wingedsheep.sdk.scripting.conditions.WasCast
 import com.wingedsheep.sdk.scripting.conditions.WasCastFromHand
 import com.wingedsheep.sdk.scripting.conditions.WasCastFromZone
+import com.wingedsheep.engine.state.components.battlefield.CastFromGraveyardComponent
 import com.wingedsheep.sdk.scripting.conditions.SacrificedPermanentHadSubtype
 import com.wingedsheep.sdk.scripting.conditions.TargetMatchesFilter
 import com.wingedsheep.sdk.scripting.conditions.TriggeringEntityEnteredOrWasCastFromGraveyard
@@ -110,6 +112,7 @@ class ConditionEvaluator {
 
             // Source conditions
             is YouControlSource -> evaluateYouControlSource(state, context)
+            is WasCast -> evaluateWasCast(state, context)
             is WasCastFromHand -> evaluateWasCastFromHand(state, context)
             is WasCastFromZone -> evaluateWasCastFromZone(state, condition, context)
             is WasKicked -> evaluateWasKicked(state, context)
@@ -224,6 +227,17 @@ class ConditionEvaluator {
         val sourceId = context.sourceId ?: return false
         val sourceController = state.getEntity(sourceId)?.get<ControllerComponent>()?.playerId ?: return false
         return context.controllerId == sourceController
+    }
+
+    private fun evaluateWasCast(state: GameState, context: EffectContext): Boolean {
+        // For spells resolving, any non-null castFromZone means the spell is being cast
+        if (context.castFromZone != null) return true
+        // For permanents (e.g., ETB triggers), check the cast-from-zone markers added
+        // when the spell resolved. Reanimated, token, and "put onto battlefield"
+        // permanents lack these markers and are correctly excluded.
+        val sourceId = context.sourceId ?: return false
+        val container = state.getEntity(sourceId) ?: return false
+        return container.has<CastFromHandComponent>() || container.has<CastFromGraveyardComponent>()
     }
 
     private fun evaluateWasCastFromHand(state: GameState, context: EffectContext): Boolean {

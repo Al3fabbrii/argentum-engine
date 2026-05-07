@@ -127,6 +127,21 @@ data object WasCastFromHand : Condition {
 }
 
 /**
+ * Condition: "If you cast this spell" (from any zone).
+ * Used as an intervening-if condition on ETB triggers like Sunderflock's
+ * ("if you cast it"). True iff the source permanent entered the battlefield via
+ * stack resolution of a cast — i.e., it has a CastFromHand or CastFromGraveyard
+ * marker. False if the permanent was put onto the battlefield by another effect
+ * (e.g., reanimation, Show and Tell, token creation).
+ */
+@SerialName("WasCast")
+@Serializable
+data object WasCast : Condition {
+    override val description: String = "you cast it"
+    override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+}
+
+/**
  * Condition: "If this spell was cast from [zone]"
  * Used for flashback spells and other zone-dependent effects.
  * Checks whether the spell was cast from the specified zone.

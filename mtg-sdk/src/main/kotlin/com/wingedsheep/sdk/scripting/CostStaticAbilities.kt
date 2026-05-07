@@ -250,6 +250,24 @@ sealed interface CostReductionSource {
     }
 
     /**
+     * Reduces cost by the greatest mana value among permanents the caster controls
+     * matching a filter. Used for Sunderflock ("This spell costs {X} less to cast,
+     * where X is the greatest mana value among Elementals you control.").
+     *
+     * Empty matches yield 0 reduction. Mana value is read from the card definition
+     * (X-cost permanents contribute X = 0).
+     *
+     * @property filter The filter that controlled permanents must match
+     */
+    @SerialName("GreatestManaValueAmongPermanentsYouControl")
+    @Serializable
+    data class GreatestManaValueAmongPermanentsYouControl(
+        val filter: GameObjectFilter
+    ) : CostReductionSource {
+        override val description: String = "the greatest mana value among ${filter.description} you control"
+    }
+
+    /**
      * Reduces cost by a fixed amount if a creature is currently attacking the caster.
      * Used for cards like Swat Away ("This spell costs {2} less to cast if a creature
      * is attacking you").

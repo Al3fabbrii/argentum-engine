@@ -139,7 +139,36 @@ class CostCalculator(
             is CostReductionSource.FixedIfCreatureAttackingYou -> {
                 if (isAnyCreatureAttacking(state, playerId)) source.amount else 0
             }
+            is CostReductionSource.GreatestManaValueAmongPermanentsYouControl -> {
+                greatestManaValueAmongMatching(state, playerId, source.filter)
+            }
         }
+    }
+
+    /**
+     * Find the greatest mana value among permanents the player controls matching a filter.
+     * Returns 0 if none match. Mana value is read from CardDefinition.manaCost.cmc;
+     * X-costs contribute X = 0 per Rule 202.3b for permanents on the battlefield.
+     */
+    private fun greatestManaValueAmongMatching(
+        state: GameState,
+        playerId: EntityId,
+        filter: GameObjectFilter
+    ): Int {
+        val projectedState = state.projectedState
+        var maxMv = 0
+        for (entityId in state.getBattlefield(playerId)) {
+            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
+            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
+            val matches = filter.cardPredicates.all { predicate ->
+                matchesBattlefieldPredicate(entityId, cardDef, predicate, projectedState)
+            }
+            if (matches) {
+                val mv = cardDef.manaCost.cmc
+                if (mv > maxMv) maxMv = mv
+            }
+        }
+        return maxMv
     }
 
     /**
@@ -357,6 +386,7 @@ class CostCalculator(
             is CardPredicate.IsArtifact -> projectedState?.hasType(entityId, "ARTIFACT") ?: cardDef.typeLine.isArtifact
             is CardPredicate.IsEnchantment -> projectedState?.hasType(entityId, "ENCHANTMENT") ?: cardDef.typeLine.isEnchantment
             is CardPredicate.IsLand -> projectedState?.hasType(entityId, "LAND") ?: cardDef.typeLine.isLand
+            is CardPredicate.IsPermanent -> cardDef.typeLine.isPermanent
             is CardPredicate.HasSubtype -> projectedState?.hasSubtype(entityId, predicate.subtype.value) ?: (predicate.subtype in cardDef.typeLine.subtypes)
             else -> false // Only common predicates supported for cost reduction checks
         }

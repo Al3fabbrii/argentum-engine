@@ -12,6 +12,7 @@ import com.wingedsheep.sdk.scripting.conditions.Compare
 import com.wingedsheep.sdk.scripting.conditions.ComparisonOperator
 import com.wingedsheep.sdk.scripting.conditions.Exists
 import com.wingedsheep.sdk.scripting.conditions.NotCondition
+import com.wingedsheep.sdk.scripting.conditions.WasCast as WasCastCondition
 import com.wingedsheep.sdk.scripting.conditions.WasCastFromHand as WasCastFromHandCondition
 import com.wingedsheep.sdk.scripting.conditions.WasCastFromZone as WasCastFromZoneCondition
 import com.wingedsheep.sdk.scripting.conditions.WasKicked as WasKickedCondition
@@ -271,6 +272,14 @@ object Conditions {
     // =========================================================================
     // Source Conditions
     // =========================================================================
+
+    /**
+     * If you cast this permanent (from any zone). False if it was put onto the
+     * battlefield by another effect (reanimation, tokens, "put onto the battlefield").
+     * Used for ETB triggers gated on "if you cast it" (e.g., Sunderflock).
+     */
+    val WasCast: ConditionInterface =
+        WasCastCondition
 
     /**
      * If this permanent was cast from your hand.

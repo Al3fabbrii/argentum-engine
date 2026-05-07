@@ -2,12 +2,12 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 259 / 273
+**Implemented:** 260 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 39    | 39   |
-| Blue       | 39    | 36   |
+| Blue       | 39    | 37   |
 | Black      | 38    | 36   |
 | Red        | 39    | 36   |
 | Green      | 39    | 37   |
@@ -92,7 +92,7 @@
 - [x] Spell Snare
 - [x] Stratosoarer
 - [x] Summit Sentinel
-- [ ] Sunderflock
+- [x] Sunderflock
 - [x] Swat Away
 - [x] Tanufel Rimespeaker
 - [x] Temporal Cleansing
