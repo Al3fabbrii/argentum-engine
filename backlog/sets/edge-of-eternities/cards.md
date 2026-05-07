@@ -31,7 +31,7 @@
 - [x] Breeding Pool
 - [ ] Brightspear Zealot
 - [ ] Broodguard Elite
-- [ ] Bygone Colossus
+- [x] Bygone Colossus
 - [x] Cerebral Download
 - [ ] Chorale of the Void
 - [x] Chrome Companion

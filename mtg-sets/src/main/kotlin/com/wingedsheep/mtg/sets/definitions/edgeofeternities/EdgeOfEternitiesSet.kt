@@ -34,6 +34,7 @@ object EdgeOfEternitiesSet {
         Bombard,
         BreedingPool,
         BiotechSpecialist,
+        BygoneColossus,
         CerebralDownload,
         ChromeCompanion,
         CloudsculptTechnician,

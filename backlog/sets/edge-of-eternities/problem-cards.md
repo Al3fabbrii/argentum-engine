@@ -9,7 +9,7 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] All-Fates Stalker
 - [ ] Astelli Reclaimer
 - [ ] Blade of the Swarm
-- [ ] Bygone Colossus
+- [x] Bygone Colossus
 - [ ] Exalted Sunborn
 - [ ] Haliya, Guided by Light
 - [ ] Knight Luminary
