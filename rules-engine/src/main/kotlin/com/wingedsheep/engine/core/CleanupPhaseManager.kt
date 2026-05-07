@@ -15,6 +15,7 @@ import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.engine.state.components.battlefield.TokenReplacementOfferedThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.MustAttackThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.PlayerAttackedThisTurnComponent
+import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.MayPlayFromExileComponent
 import com.wingedsheep.engine.state.components.identity.PlayWithoutPayingCostComponent
@@ -357,6 +358,9 @@ class CleanupPhaseManager(
             if (container.has<PlayerAttackedThisTurnComponent>()) {
                 needsUpdate = true
             }
+            if (container.has<PlayerAttackersThisTurnComponent>()) {
+                needsUpdate = true
+            }
             if (container.has<GraveyardPlayPermissionUsedComponent>()) {
                 needsUpdate = true
             }
@@ -378,6 +382,7 @@ class CleanupPhaseManager(
                         .without<DamageDealtToCreaturesThisTurnComponent>()
                         .without<TargetedByControllerThisTurnComponent>()
                         .without<PlayerAttackedThisTurnComponent>()
+                        .without<PlayerAttackersThisTurnComponent>()
                         .without<GraveyardPlayPermissionUsedComponent>()
                         .without<TriggeredAbilityFiredThisTurnComponent>()
                         .without<AbilityResolutionCountThisTurnComponent>()

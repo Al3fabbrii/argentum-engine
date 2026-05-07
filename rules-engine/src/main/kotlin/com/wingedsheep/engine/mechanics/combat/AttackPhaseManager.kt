@@ -12,6 +12,7 @@ import com.wingedsheep.engine.state.components.combat.AttackersDeclaredThisComba
 import com.wingedsheep.engine.state.components.combat.MustAttackPlayerComponent
 import com.wingedsheep.engine.state.components.combat.MustAttackThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.PlayerAttackedThisTurnComponent
+import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.AttackingComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.player.ManaPoolComponent
@@ -127,6 +128,9 @@ internal class AttackPhaseManager(
             // Track that this player attacked this turn (for Raid and similar mechanics)
             if (attackers.isNotEmpty()) {
                 updated = updated.with(PlayerAttackedThisTurnComponent)
+                // Track each individual attacker for filter-based "attacked with N <type>" checks.
+                val previous = container.get<PlayerAttackersThisTurnComponent>()?.attackerIds ?: emptySet()
+                updated = updated.with(PlayerAttackersThisTurnComponent(previous + attackers.keys))
             }
             updated
         }

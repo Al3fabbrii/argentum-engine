@@ -150,3 +150,15 @@ data object MustAttackThisTurnComponent : Component
  */
 @Serializable
 data object PlayerAttackedThisTurnComponent : Component
+
+/**
+ * Records the entity IDs of every creature that the player has declared as an attacker
+ * during the current turn. Used by abilities that count attackers matching a filter
+ * (e.g., Deepway Navigator: "as long as you attacked with three or more Merfolk this turn").
+ *
+ * The set is the union across all combat phases this turn. Cleared at end of turn.
+ */
+@Serializable
+data class PlayerAttackersThisTurnComponent(
+    val attackerIds: Set<EntityId>
+) : Component

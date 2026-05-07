@@ -2,7 +2,7 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 256 / 273
+**Implemented:** 257 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
@@ -11,7 +11,7 @@
 | Black      | 38    | 35   |
 | Red        | 39    | 36   |
 | Green      | 39    | 37   |
-| Multicolor | 49    | 46   |
+| Multicolor | 49    | 47   |
 | Colorless  | 18    | 17   |
 | Land       | 12    | 11   |
 
@@ -240,7 +240,7 @@
 - [x] Chitinous Graspling
 - [x] Deceit
 - [x] Deepchannel Duelist
-- [ ] Deepway Navigator
+- [x] Deepway Navigator
 - [x] Doran, Besieged by Time
 - [x] Dream Harvest
 - [x] Eclipsed Boggart

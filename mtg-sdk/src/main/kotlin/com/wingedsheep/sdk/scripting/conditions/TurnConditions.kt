@@ -3,6 +3,7 @@ package com.wingedsheep.sdk.scripting.conditions
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.text.TextReplacer
+import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -85,6 +86,27 @@ data object YouWereDealtCombatDamageThisTurn : Condition {
 data object YouAttackedThisTurn : Condition {
     override val description: String = "if you attacked this turn"
     override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+}
+
+/**
+ * Condition: "If you attacked with [atLeast] or more creatures matching [filter] this turn".
+ * Counts every creature you declared as an attacker this turn whose current state
+ * (per the projected state) matches the filter.
+ *
+ * Used for cards like Deepway Navigator: "as long as you attacked with three or more
+ * Merfolk this turn".
+ */
+@SerialName("YouAttackedWithCreaturesThisTurn")
+@Serializable
+data class YouAttackedWithCreaturesThisTurn(
+    val filter: GameObjectFilter,
+    val atLeast: Int
+) : Condition {
+    override val description: String = "if you attacked with $atLeast or more ${DynamicAmount.pluralize(filter.description)} this turn"
+    override fun applyTextReplacement(replacer: TextReplacer): Condition {
+        val newFilter = filter.applyTextReplacement(replacer)
+        return if (newFilter !== filter) copy(filter = newFilter) else this
+    }
 }
 
 /**

@@ -80,6 +80,7 @@ object LorwynEclipsedSet {
         DawnsLightArcher,
         Deceit,
         DeepchannelDuelist,
+        DeepwayNavigator,
         DisruptorOfCurrents,
         DoranBesiegedByTime,
         DoseOfDawnglow,

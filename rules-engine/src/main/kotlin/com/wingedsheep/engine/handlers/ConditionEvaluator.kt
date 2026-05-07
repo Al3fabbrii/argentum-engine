@@ -15,6 +15,7 @@ import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.engine.state.components.combat.AttackingComponent
 import com.wingedsheep.engine.state.components.combat.BlockingComponent
 import com.wingedsheep.engine.state.components.combat.PlayerAttackedThisTurnComponent
+import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.LifeTotalComponent
@@ -77,6 +78,7 @@ import com.wingedsheep.sdk.scripting.conditions.WasKicked
 import com.wingedsheep.sdk.scripting.conditions.BlightWasPaid
 import com.wingedsheep.sdk.scripting.conditions.YouControlSource
 import com.wingedsheep.sdk.scripting.conditions.YouAttackedThisTurn
+import com.wingedsheep.sdk.scripting.conditions.YouAttackedWithCreaturesThisTurn
 import com.wingedsheep.sdk.scripting.conditions.YouWereAttackedThisStep
 import com.wingedsheep.sdk.scripting.conditions.YouWereDealtCombatDamageThisTurn
 
@@ -139,6 +141,7 @@ class ConditionEvaluator {
             is IsInPhase -> evaluateIsInPhase(state, condition, context)
             is PlayedLandThisTurn -> evaluatePlayedLandThisTurn(state, context)
             is YouAttackedThisTurn -> evaluateYouAttackedThisTurn(state, context)
+            is YouAttackedWithCreaturesThisTurn -> evaluateYouAttackedWithCreaturesThisTurn(state, condition, context)
             is YouGainedLifeThisTurn -> evaluateYouGainedLifeThisTurn(state, context)
             is YouGainedOrLostLifeThisTurn -> evaluateYouGainedOrLostLifeThisTurn(state, context)
             is YouLostLifeThisTurn -> evaluateYouLostLifeThisTurn(state, context)
@@ -393,6 +396,27 @@ class ConditionEvaluator {
 
     private fun evaluateYouAttackedThisTurn(state: GameState, context: EffectContext): Boolean {
         return state.getEntity(context.controllerId)?.has<PlayerAttackedThisTurnComponent>() == true
+    }
+
+    private fun evaluateYouAttackedWithCreaturesThisTurn(
+        state: GameState,
+        condition: YouAttackedWithCreaturesThisTurn,
+        context: EffectContext
+    ): Boolean {
+        val attackerIds = state.getEntity(context.controllerId)
+            ?.get<PlayerAttackersThisTurnComponent>()?.attackerIds ?: return condition.atLeast <= 0
+        if (attackerIds.size < condition.atLeast) return false
+        val predicateEvaluator = PredicateEvaluator()
+        val predicateContext = PredicateContext.fromEffectContext(context)
+        val projected = state.projectedState
+        var matches = 0
+        for (id in attackerIds) {
+            if (predicateEvaluator.matchesWithProjection(state, projected, id, condition.filter, predicateContext)) {
+                matches++
+                if (matches >= condition.atLeast) return true
+            }
+        }
+        return false
     }
 
     private fun evaluateYouGainedLifeThisTurn(state: GameState, context: EffectContext): Boolean {

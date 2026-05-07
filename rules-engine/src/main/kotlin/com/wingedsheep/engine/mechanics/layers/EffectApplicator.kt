@@ -307,6 +307,32 @@ internal class EffectApplicator(
             }
             false
         }
+        is SourceProjectionCondition.ControllerAttackedWithCreaturesThisTurn -> {
+            val controllerId = sourceValues?.controllerId
+            if (controllerId == null) {
+                false
+            } else {
+                val attackerIds = state.getEntity(controllerId)
+                    ?.get<com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnComponent>()
+                    ?.attackerIds
+                    ?: emptySet()
+                if (attackerIds.size < condition.atLeast) {
+                    false
+                } else {
+                    val predicateEvaluator = PredicateEvaluator()
+                    val intermediateProjected = buildIntermediateProjectedState(state, projectedValues)
+                    val predicateContext = PredicateContext(controllerId = controllerId)
+                    var matches = 0
+                    for (id in attackerIds) {
+                        if (predicateEvaluator.matchesWithProjection(state, intermediateProjected, id, condition.filter, predicateContext)) {
+                            matches++
+                            if (matches >= condition.atLeast) break
+                        }
+                    }
+                    matches >= condition.atLeast
+                }
+            }
+        }
         is SourceProjectionCondition.Not -> !evaluateSourceCondition(condition.condition, effect, state, projectedValues, sourceValues)
         is SourceProjectionCondition.Compare -> {
             val controllerId = sourceValues?.controllerId ?: effect.sourceId

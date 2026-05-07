@@ -391,6 +391,17 @@ object Conditions {
         com.wingedsheep.sdk.scripting.conditions.YouGainedLifeThisTurn
 
     /**
+     * As long as you attacked with [atLeast] or more creatures matching [filter] this turn.
+     * Used for cards like Deepway Navigator: "as long as you attacked with three or more
+     * Merfolk this turn".
+     */
+    fun YouAttackedWithCreaturesThisTurn(
+        filter: com.wingedsheep.sdk.scripting.GameObjectFilter,
+        atLeast: Int
+    ): ConditionInterface =
+        com.wingedsheep.sdk.scripting.conditions.YouAttackedWithCreaturesThisTurn(filter, atLeast)
+
+    /**
      * If you gained or lost life this turn.
      * Used for Star Charter and similar Bloomburrow cards.
      */

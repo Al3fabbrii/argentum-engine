@@ -321,6 +321,18 @@ sealed interface SourceProjectionCondition {
         val operator: ComparisonOperator,
         val right: DynamicAmount
     ) : SourceProjectionCondition
+
+    /**
+     * The source permanent's controller has attacked with at least [atLeast] creatures
+     * matching [filter] this turn (counted via the projected state of every attacker
+     * declared this turn). Used for cards like Deepway Navigator: "as long as you
+     * attacked with three or more Merfolk this turn".
+     */
+    @Serializable
+    data class ControllerAttackedWithCreaturesThisTurn(
+        val filter: GameObjectFilter,
+        val atLeast: Int
+    ) : SourceProjectionCondition
 }
 
 /**
