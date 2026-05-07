@@ -86,21 +86,36 @@ export function GraveyardTargetingUI({
   const minTargets = targetReq?.minTargets ?? 1
   const maxTargets = targetReq?.maxTargets ?? 1
   const isOptionalTarget = minTargets === 0
+  const isMultiTarget = maxTargets > 1
   const sourceName = decision.context.sourceName ?? 'this ability'
-  const targetDescription = targetReq?.description ?? 'card from a graveyard'
   const title = isOptionalTarget ? `Resolve ${sourceName}` : 'Choose from Graveyard'
 
   // Derive the action verb from effectHint so the button/text matches the actual effect
-  // (e.g., "Exile card in a graveyard" → "Exile"; "Return … to its owner's hand" → "Return to Hand")
+  // (e.g., "Exile card in a graveyard" → "Exile"; "Return … to its owner's hand" → "Return to Hand").
+  // Effects can be wrapped (ForEachTargetEffect, CompositeEffect, etc.) so the keyword may not be
+  // at the start — match anywhere in the hint.
   const effectHint = decision.context.effectHint?.toLowerCase() ?? ''
-  const optionalConfirmText = effectHint.startsWith('exile') ? 'Exile' : 'Return to Hand'
-  const optionalActionPhrase = effectHint.startsWith('exile')
-    ? `exile it`
-    : `return it to your hand`
+  const isExile = effectHint.includes('exile')
+  const optionalConfirmText = isExile ? 'Exile' : 'Return to Hand'
+  const actionVerb = isExile ? 'exile' : 'return to your hand'
+
+  const numWord = (n: number): string =>
+    ({ 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five' } as Record<number, string>)[n] ?? String(n)
+  const cardNoun = isMultiTarget ? 'cards' : 'a card'
+  const countPhrase =
+    minTargets === maxTargets
+      ? isMultiTarget
+        ? `${numWord(maxTargets)} ${cardNoun}`
+        : cardNoun
+      : minTargets === 0
+        ? isMultiTarget
+          ? `up to ${numWord(maxTargets)} ${cardNoun}`
+          : 'up to one card'
+        : `${numWord(minTargets)} to ${numWord(maxTargets)} cards`
 
   const helperText = isOptionalTarget
-    ? `Optional: choose ${targetDescription} to ${optionalActionPhrase}, or decline to leave it in the graveyard.`
-    : `Choose ${targetDescription}.`
+    ? `Optional: choose ${countPhrase} to ${actionVerb}, or decline.`
+    : `Choose ${countPhrase} to ${actionVerb}.`
 
   // Lift selection state to persist across tab switches
   const [selectedCards, setSelectedCards] = useState<EntityId[]>([])
