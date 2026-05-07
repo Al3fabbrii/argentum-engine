@@ -11,6 +11,7 @@ import type {
   PhaseResult,
   TargetingState,
   XSelectionState,
+  BlightVariableSelectionState,
   ConvokeSelectionState,
   DelveSelectionState,
   CounterDistributionState,
@@ -24,6 +25,7 @@ import type {
 
 export interface PipelineStoreMethods {
   startXSelection: (state: XSelectionState) => void
+  startBlightVariableSelection: (state: BlightVariableSelectionState) => void
   startConvokeSelection: (state: ConvokeSelectionState) => void
   startDelveSelection: (state: DelveSelectionState) => void
   startCounterDistribution: (state: CounterDistributionState) => void
@@ -130,6 +132,8 @@ export function computePhases(actionInfo: LegalActionInfo, options?: ComputePhas
       if (!isAutoSelectable) {
         phases.push({ type: 'costPayment' })
       }
+    } else if (costType === 'BlightVariable') {
+      phases.push({ type: 'blightVariable' })
     }
   }
 
@@ -253,6 +257,19 @@ export function mergeResult(
       return action
     }
 
+    case 'blightVariable': {
+      if (action.type === 'CastSpell') {
+        return {
+          ...action,
+          additionalCostPayment: {
+            ...action.additionalCostPayment,
+            blightAmount: result.blightAmount,
+          },
+        }
+      }
+      return action
+    }
+
     case 'costPayment': {
       const { costType, selectedTargets } = result
       if (action.type === 'CastSpell') {
@@ -260,16 +277,22 @@ export function mergeResult(
         if (costType === 'Conspire') {
           return { ...action, conspiredCreatures: selectedTargets }
         }
-        const additionalCostPayment =
+        const fieldUpdate =
           costType === 'DiscardCard'
             ? { discardedCards: selectedTargets }
             : costType === 'ExileFromGraveyard'
               ? { exiledCards: selectedTargets }
               : costType === 'Behold'
                 ? { beheldCards: selectedTargets }
-                : costType === 'Blight'
+                : costType === 'Blight' || costType === 'BlightVariable'
                   ? { blightTargets: selectedTargets }
                   : { sacrificedPermanents: selectedTargets }
+        // Spread the existing additionalCostPayment so prior phases' fields
+        // (e.g. `blightAmount` from a preceding BlightVariable phase) survive.
+        const additionalCostPayment = {
+          ...action.additionalCostPayment,
+          ...fieldUpdate,
+        }
         return { ...action, additionalCostPayment }
       }
       if (action.type === 'ActivateAbility') {
@@ -527,10 +550,14 @@ export function enterPhase(
           flags.targetDescription = costInfo.description
           break
         case 'Blight':
+        case 'BlightVariable':
           validTargets = [...(costInfo.validBlightTargets ?? [])]
           minTargets = 1
           maxTargets = 1
-          flags.targetDescription = costInfo.description
+          flags.targetDescription =
+            costType === 'BlightVariable'
+              ? `Choose a creature to receive ${(action as { additionalCostPayment?: { blightAmount?: number } }).additionalCostPayment?.blightAmount ?? 0} -1/-1 counter(s)`
+              : costInfo.description
           break
         default:
           return
@@ -579,6 +606,21 @@ export function enterPhase(
 
     case 'manaColorChoice': {
       store.startManaColorSelection({ action })
+      break
+    }
+
+    case 'blightVariable': {
+      const costInfo = actionInfo.additionalCostInfo
+      if (!costInfo) return
+      const cardName = actionInfo.description
+        .replace(/^Cast /, '')
+        .replace(/^Activate /, '')
+      store.startBlightVariableSelection({
+        actionInfo,
+        cardName,
+        maxX: costInfo.blightVariableMaxX ?? 0,
+        selectedX: 0,
+      })
       break
     }
 

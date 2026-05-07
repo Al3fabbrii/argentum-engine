@@ -78,6 +78,9 @@ class CastSpellEnumerator : ActionEnumerator {
             var beholdCount = 0
             var blightOrPayCost: AdditionalCost.BlightOrPay? = null
             var blightCreatures = emptyList<EntityId>()
+            var blightVariableCost: AdditionalCost.BlightVariable? = null
+            var blightVariableCreatures = emptyList<EntityId>()
+            var blightVariableMaxX = 0
             var beholdOrPayCost: AdditionalCost.BeholdOrPay? = null
             var beholdOrPayTargets = emptyList<EntityId>()
             var canPayAdditionalCosts = true
@@ -159,6 +162,21 @@ class CastSpellEnumerator : ActionEnumerator {
                         val projected = state.projectedState
                         blightCreatures = projected.getBattlefieldControlledBy(playerId)
                             .filter { projected.isCreature(it) }
+                    }
+                    is AdditionalCost.BlightVariable -> {
+                        // Always payable when minCount = 0 (X = 0 is valid even with no
+                        // creatures). Surface the creature pool + cap so the client can
+                        // prompt the player for X and a creature.
+                        val projected = state.projectedState
+                        val ownCreatures = projected.getBattlefieldControlledBy(playerId)
+                            .filter { projected.isCreature(it) }
+                        val maxToughness = ownCreatures.maxOfOrNull { projected.getToughness(it) ?: 0 } ?: 0
+                        if (maxToughness < cost.minCount) {
+                            canPayAdditionalCosts = false
+                        }
+                        blightVariableCost = cost
+                        blightVariableCreatures = ownCreatures
+                        blightVariableMaxX = maxToughness
                     }
                     is AdditionalCost.BeholdOrPay -> {
                         // Always payable: player can always choose the "pay mana" path
@@ -293,7 +311,8 @@ class CastSpellEnumerator : ActionEnumerator {
             val costInfo = buildAdditionalCostData(
                 additionalCosts, sacrificeTargets, variableSacrificeTargets,
                 exileTargets, exileMinCount, discardTargets, discardCount,
-                beholdTargets, beholdCount
+                beholdTargets, beholdCount,
+                blightVariableCost, blightVariableCreatures, blightVariableMaxX
             )
 
             // Compute blight path info (separate legal action with lower mana cost + blight target selection)
@@ -1218,8 +1237,19 @@ class CastSpellEnumerator : ActionEnumerator {
         discardTargets: List<EntityId>,
         discardCount: Int,
         beholdTargets: List<EntityId> = emptyList(),
-        beholdCount: Int = 0
+        beholdCount: Int = 0,
+        blightVariableCost: AdditionalCost.BlightVariable? = null,
+        blightVariableCreatures: List<EntityId> = emptyList(),
+        blightVariableMaxX: Int = 0
     ): AdditionalCostData? {
+        if (blightVariableCost != null) {
+            return AdditionalCostData(
+                description = blightVariableCost.description,
+                costType = "BlightVariable",
+                validBlightTargets = blightVariableCreatures,
+                blightVariableMaxX = blightVariableMaxX
+            )
+        }
         return if (variableSacrificeTargets.isNotEmpty()) {
             val varSacCost = additionalCosts.filterIsInstance<AdditionalCost.SacrificeCreaturesForCostReduction>().firstOrNull()
             AdditionalCostData(

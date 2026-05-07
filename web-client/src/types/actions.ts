@@ -69,6 +69,8 @@ export interface AdditionalCostPayment {
     count: number
   }>
   readonly blightTargets?: readonly EntityId[]
+  /** X chosen for `AdditionalCost.BlightVariable` (e.g., Soul Immolation). */
+  readonly blightAmount?: number
 }
 
 export interface AlternativePaymentChoice {

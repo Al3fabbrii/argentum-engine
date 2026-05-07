@@ -134,6 +134,7 @@ class LegalActionEnricher(
         counterRemovalCreatures = counterRemovalCreatures.map { it.toDto() },
         validBlightTargets = validBlightTargets,
         blightAmount = blightAmount,
+        blightVariableMaxX = blightVariableMaxX,
         distributedCounterRemovalTotal = distributedCounterRemovalTotal
     )
 

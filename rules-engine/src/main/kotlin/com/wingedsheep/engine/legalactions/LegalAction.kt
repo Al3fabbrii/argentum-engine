@@ -195,6 +195,12 @@ data class AdditionalCostData(
     val validBlightTargets: List<EntityId> = emptyList(),
     val blightAmount: Int = 0,
     /**
+     * For [AdditionalCost.BlightVariable]: the cap on X — the greatest toughness
+     * among creatures the caster controls at cast-enumeration time. The client
+     * uses this to bound the X slider (0..blightVariableMaxX).
+     */
+    val blightVariableMaxX: Int = 0,
+    /**
      * For [AdditionalCost.RemoveCountersFromYourCreatures]: total counters to remove
      * across all creatures you control (any counter types qualify).
      */

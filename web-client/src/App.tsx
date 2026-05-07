@@ -5,6 +5,7 @@ import { MulliganUI } from './components/mulligan/MulliganUI'
 import { DecisionUI } from './components/decisions/DecisionUI'
 import { RevealedCardsUI } from './components/decisions/RevealedCardsUI'
 import { XCostSelector } from './components/ui/XCostSelector'
+import { BlightVariableSelector } from './components/ui/BlightVariableSelector'
 import { ConvokeSelector } from './components/ui/ConvokeSelector'
 import { CrewSelector } from './components/ui/CrewSelector'
 import { DelveSelector } from './components/ui/DelveSelector'
@@ -285,6 +286,9 @@ export default function App() {
 
       {/* X cost selection overlay (when casting spells with X in cost) */}
       {showGame && <XCostSelector />}
+
+      {/* Blight X variable additional cost overlay (e.g., Soul Immolation) */}
+      {showGame && <BlightVariableSelector />}
 
       {/* Convoke selection overlay (when casting spells with Convoke) */}
       {showGame && <ConvokeSelector />}

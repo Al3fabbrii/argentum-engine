@@ -144,7 +144,15 @@ export const createPipelineSlice: SliceCreator<PipelineSlice> = (set, get) => ({
     }
 
     // Pop current phase
-    const nextPhases = remainingPhases.slice(1)
+    let nextPhases = remainingPhases.slice(1)
+
+    // Dynamic phase injection: when BlightVariable is paid with X > 0, we need
+    // a follow-up battlefield-target step so the player picks which of their
+    // creatures receives the X -1/-1 counters. Inject a costPayment phase that
+    // reuses the existing `Blight`/`BlightVariable` targeting flow.
+    if (result.type === 'blightVariable' && result.blightAmount > 0) {
+      nextPhases = [{ type: 'costPayment' }, ...nextPhases]
+    }
 
     // Dynamic phase injection: damage distribution after targeting with >1 targets
     if (
@@ -205,6 +213,7 @@ export const createPipelineSlice: SliceCreator<PipelineSlice> = (set, get) => ({
       pipelineState: null,
       targetingState: null,
       xSelectionState: null,
+      blightVariableSelectionState: null,
       convokeSelectionState: null,
       delveSelectionState: null,
       manaSelectionState: null,
@@ -219,6 +228,7 @@ function getStoreMethods(get: () => import('../types').GameStore): PipelineStore
   const state = get()
   return {
     startXSelection: state.startXSelection,
+    startBlightVariableSelection: state.startBlightVariableSelection,
     startConvokeSelection: state.startConvokeSelection,
     startDelveSelection: state.startDelveSelection,
     startCounterDistribution: state.startCounterDistribution,

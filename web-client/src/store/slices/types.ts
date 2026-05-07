@@ -188,6 +188,18 @@ export interface ManaSelectionState {
 }
 
 /**
+ * Variable-blight (`AdditionalCost.BlightVariable`) X-amount selection state.
+ * Only handles the numeric X chooser; the creature target (when X > 0) is
+ * picked inline on the battlefield via the standard targeting overlay.
+ */
+export interface BlightVariableSelectionState {
+  actionInfo: LegalActionInfo
+  cardName: string
+  maxX: number
+  selectedX: number
+}
+
+/**
  * X cost selection state when casting spells with X in their mana cost.
  */
 export interface XSelectionState {
@@ -558,6 +570,7 @@ export type PipelinePhase =
   | { type: 'convoke' }
   | { type: 'manaSource' }
   | { type: 'costPayment' }
+  | { type: 'blightVariable' }
   | { type: 'manaColorChoice' }
   | { type: 'targeting' }
   | { type: 'damageDistribution' }
@@ -577,6 +590,7 @@ export type PhaseResult =
   | { type: 'convoke'; convokedCreatures: Record<string, { color: string | null }> }
   | { type: 'manaSource'; selectedSources: EntityId[] }
   | { type: 'costPayment'; costType: string; selectedTargets: EntityId[] }
+  | { type: 'blightVariable'; blightAmount: number }
   | { type: 'manaColorChoice'; color: string }
   | { type: 'targeting'; selectedTargets: EntityId[] }
   | { type: 'damageDistribution'; distribution: Record<EntityId, number> }
@@ -806,6 +820,11 @@ export type GameStore = {
   updateXValue: (x: number) => void
   cancelXSelection: () => void
   confirmXSelection: () => void
+  blightVariableSelectionState: BlightVariableSelectionState | null
+  startBlightVariableSelection: (state: BlightVariableSelectionState) => void
+  updateBlightVariableX: (x: number) => void
+  cancelBlightVariableSelection: () => void
+  confirmBlightVariableSelection: () => void
   startConvokeSelection: (state: ConvokeSelectionState) => void
   toggleConvokeCreature: (entityId: EntityId, name: string, payingColor: string | null) => void
   cancelConvokeSelection: () => void

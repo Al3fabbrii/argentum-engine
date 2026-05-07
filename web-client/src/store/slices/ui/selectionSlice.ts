@@ -6,6 +6,7 @@ import type {
   SliceCreator,
   EntityId,
   XSelectionState,
+  BlightVariableSelectionState,
   ConvokeSelectionState,
   CrewSelectionState,
   DelveSelectionState,
@@ -24,6 +25,7 @@ import { parseManaCost as parseManaCostUtil, getRemainingCostSymbols } from '@/u
 
 export interface SelectionSliceState {
   xSelectionState: XSelectionState | null
+  blightVariableSelectionState: BlightVariableSelectionState | null
   convokeSelectionState: ConvokeSelectionState | null
   crewSelectionState: CrewSelectionState | null
   delveSelectionState: DelveSelectionState | null
@@ -37,6 +39,10 @@ export interface SelectionSliceActions {
   updateXValue: (x: number) => void
   cancelXSelection: () => void
   confirmXSelection: () => void
+  startBlightVariableSelection: (state: BlightVariableSelectionState) => void
+  updateBlightVariableX: (x: number) => void
+  cancelBlightVariableSelection: () => void
+  confirmBlightVariableSelection: () => void
   startConvokeSelection: (state: ConvokeSelectionState) => void
   toggleConvokeCreature: (entityId: EntityId, name: string, payingColor: string | null) => void
   cancelConvokeSelection: () => void
@@ -66,6 +72,7 @@ export type SelectionSlice = SelectionSliceState & SelectionSliceActions
 
 export const createSelectionSlice: SliceCreator<SelectionSlice> = (set, get) => ({
   xSelectionState: null,
+  blightVariableSelectionState: null,
   convokeSelectionState: null,
   crewSelectionState: null,
   delveSelectionState: null,
@@ -105,6 +112,41 @@ export const createSelectionSlice: SliceCreator<SelectionSlice> = (set, get) => 
       type: 'xSelection',
       xValue: xSelectionState.selectedX,
       ...(xSelectionState.isRepeatCount ? { isRepeatCount: true } : {}),
+    })
+  },
+
+  // BlightVariable selection actions
+  startBlightVariableSelection: (blightVariableSelectionState) => {
+    set({ blightVariableSelectionState })
+  },
+
+  updateBlightVariableX: (x) => {
+    set((state) => {
+      if (!state.blightVariableSelectionState) return state
+      const clamped = Math.max(0, Math.min(state.blightVariableSelectionState.maxX, x))
+      return {
+        blightVariableSelectionState: {
+          ...state.blightVariableSelectionState,
+          selectedX: clamped,
+        },
+      }
+    })
+  },
+
+  cancelBlightVariableSelection: () => {
+    const { pipelineState, cancelPipeline } = get()
+    if (pipelineState) { cancelPipeline(); return }
+    set({ blightVariableSelectionState: null })
+  },
+
+  confirmBlightVariableSelection: () => {
+    const { blightVariableSelectionState, pipelineState } = get()
+    if (!blightVariableSelectionState || !pipelineState) return
+    const { selectedX } = blightVariableSelectionState
+    set({ blightVariableSelectionState: null })
+    get().advancePipeline({
+      type: 'blightVariable',
+      blightAmount: selectedX,
     })
   },
 
