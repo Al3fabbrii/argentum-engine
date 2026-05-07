@@ -212,6 +212,7 @@ object LorwynEclipsedSet {
         RimefireTorque,
         RimekinRecluse,
         RiverguardsReflexes,
+        RooftopPercher,
         RunAwayTogether,
         SafewrightCavalry,
         SanarInnovativeFirstYear,

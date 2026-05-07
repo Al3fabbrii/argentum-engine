@@ -2,7 +2,7 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 272 / 273
+**Implemented:** 273 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
@@ -12,7 +12,7 @@
 | Red        | 39    | 39   |
 | Green      | 39    | 39   |
 | Multicolor | 49    | 49   |
-| Colorless  | 18    | 17   |
+| Colorless  | 18    | 18   |
 | Land       | 12    | 12   |
 
 > **Note:** Before implementing any card, check the `effects/` directory in this folder for any
@@ -295,7 +295,7 @@
 - [x] Mirrormind Crown
 - [x] Oko, Lorwyn Liege // Oko, Shadowmoor Scion
 - [x] Puca's Eye
-- [ ] Rooftop Percher
+- [x] Rooftop Percher
 - [x] Springleaf Drum
 - [x] Stalactite Dagger
 - [x] Sygg, Wanderwine Wisdom // Sygg, Wanderbrine Shield
