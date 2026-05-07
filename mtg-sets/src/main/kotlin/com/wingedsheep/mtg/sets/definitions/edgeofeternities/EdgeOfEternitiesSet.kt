@@ -123,6 +123,7 @@ object EdgeOfEternitiesSet {
         SystemsOverride,
         Thawbringer,
         UmbralCollarZealot,
+        UthrosScanship,
         VirusBeetle,
         WateryGrave,
         WedgelightRammer,

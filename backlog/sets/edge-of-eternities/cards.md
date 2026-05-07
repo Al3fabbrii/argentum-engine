@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 107 / 261
+**Implemented:** 108 / 261
 
 ---
 
@@ -248,7 +248,7 @@
 - [x] Umbral Collar Zealot
 - [ ] Unravel
 - [ ] Uthros Psionicist
-- [ ] Uthros Scanship
+- [x] Uthros Scanship
 - [ ] Uthros, Titanic Godcore
 - [ ] Vaultguard Trooper
 - [ ] Virulent Silencer
