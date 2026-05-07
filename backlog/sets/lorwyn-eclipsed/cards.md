@@ -2,14 +2,14 @@
 
 **Set Size:** 273 cards (main set, per Scryfall `set:ecl`)
 **Release Date:** January 23, 2026
-**Implemented:** 261 / 273
+**Implemented:** 262 / 273
 
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 39    | 39   |
 | Blue       | 39    | 38   |
 | Black      | 38    | 36   |
-| Red        | 39    | 36   |
+| Red        | 39    | 37   |
 | Green      | 39    | 37   |
 | Multicolor | 49    | 47   |
 | Colorless  | 18    | 17   |
@@ -176,7 +176,7 @@
 - [x] Reckless Ransacking
 - [x] Scuzzback Scrounger
 - [x] Sear
-- [ ] Sizzling Changeling
+- [x] Sizzling Changeling
 - [ ] Soul Immolation
 - [x] Soulbright Seeker
 - [x] Sourbread Auntie

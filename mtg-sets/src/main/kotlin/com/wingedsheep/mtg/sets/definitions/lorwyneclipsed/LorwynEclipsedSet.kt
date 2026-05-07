@@ -220,6 +220,7 @@ object LorwynEclipsedSet {
         ShoreLurker,
         SilvergillMentor,
         SilvergillPeddler,
+        SizzlingChangeling,
         SlumberingWalker,
         SoulbrightSeeker,
         SourbreadAuntie,
