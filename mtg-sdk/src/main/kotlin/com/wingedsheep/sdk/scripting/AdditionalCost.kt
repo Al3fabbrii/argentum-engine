@@ -217,6 +217,28 @@ sealed interface AdditionalCost : TextReplaceable<AdditionalCost> {
      * @property blightAmount Number of -1/-1 counters to place
      * @property alternativeManaCost Extra mana to pay instead of blighting (e.g., "{1}")
      */
+    /**
+     * Blight X (variable): the caster declares X at cast time, puts X -1/-1
+     * counters on a creature they control, and X is exposed to the spell's
+     * effects via [com.wingedsheep.sdk.scripting.values.DynamicAmount.AdditionalCostBlightAmount].
+     *
+     * X is bounded by the greatest toughness among creatures the caster controls
+     * (per CR text on Soul Immolation). The cap is computed at cast-enumeration
+     * time; if the caster controls no creatures, the only legal X is [minCount]
+     * (default 0 — i.e., the cost is silently zero, no creature choice required).
+     *
+     * @property minCount Minimum X (default 0 — caster may always declare X = 0)
+     */
+    @SerialName("BlightVariable")
+    @Serializable
+    data class BlightVariable(
+        val minCount: Int = 0
+    ) : AdditionalCost {
+        override val description: String =
+            "blight X. X can't be greater than the greatest toughness among creatures you control"
+        override fun applyTextReplacement(replacer: TextReplacer): AdditionalCost = this
+    }
+
     @SerialName("BlightOrPay")
     @Serializable
     data class BlightOrPay(
@@ -438,6 +460,13 @@ data class AdditionalCostPayment(
     val blightTargets: List<EntityId> = emptyList(),
 
     /**
+     * X chosen for [AdditionalCost.BlightVariable] — the number of -1/-1
+     * counters placed on [blightTargets] (singular target). Zero when no
+     * variable-blight cost is in play, or when the player chose X = 0.
+     */
+    val blightAmount: Int = 0,
+
+    /**
      * Distributed counter removals for costs like
      * [AdditionalCost.RemoveCountersFromYourCreatures] — each entry removes [count]
      * counters of [counterType] from [entityId]. The engine validates that the sum
@@ -456,6 +485,7 @@ data class AdditionalCostPayment(
                 bouncedPermanents.isEmpty() &&
                 counterRemovals.isEmpty() &&
                 blightTargets.isEmpty() &&
+                blightAmount == 0 &&
                 distributedCounterRemovals.isEmpty()
 
     companion object {

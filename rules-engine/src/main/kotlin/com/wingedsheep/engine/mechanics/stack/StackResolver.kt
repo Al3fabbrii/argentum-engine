@@ -101,6 +101,7 @@ class StackResolver(
         targetRequirements: List<TargetRequirement> = emptyList(),
         chosenCreatureType: String? = null,
         exiledCardCount: Int = 0,
+        additionalCostBlightAmount: Int = 0,
         wasKicked: Boolean = false,
         wasBlightPaid: Boolean = false,
         wasWarped: Boolean = false,
@@ -163,6 +164,7 @@ class StackResolver(
                 damageDistribution = damageDistribution,
                 chosenCreatureType = chosenCreatureType,
                 exiledCardCount = exiledCardCount,
+                additionalCostBlightAmount = additionalCostBlightAmount,
                 castFromZone = castFromZone,
                 wasWarped = wasWarped,
                 wasEvoked = wasEvoked,
@@ -1008,6 +1010,7 @@ class StackResolver(
                 modeTargetRequirements = spellComponent.modeTargetRequirements,
                 chosenCreatureType = spellComponent.chosenCreatureType,
                 exiledCardCount = spellComponent.exiledCardCount,
+                additionalCostBlightAmount = spellComponent.additionalCostBlightAmount,
                 castFromZone = spellComponent.castFromZone,
                 pipeline = PipelineState(
                     namedTargets = EffectContext.buildNamedTargets(targetRequirements, targets),

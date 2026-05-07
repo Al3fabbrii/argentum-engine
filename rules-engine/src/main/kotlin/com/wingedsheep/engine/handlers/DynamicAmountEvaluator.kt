@@ -154,6 +154,8 @@ class DynamicAmountEvaluator(
 
             is DynamicAmount.AdditionalCostExiledCount -> context.exiledCardCount
 
+            is DynamicAmount.AdditionalCostBlightAmount -> context.additionalCostBlightAmount
+
             is DynamicAmount.Conditional -> {
                 val eval = conditionEvaluator ?: ConditionEvaluator()
                 val met = eval.evaluate(state, amount.condition, context)

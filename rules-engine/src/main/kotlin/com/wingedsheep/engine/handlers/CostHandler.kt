@@ -721,6 +721,20 @@ class CostHandler(
                 // Always payable: player can always choose the "pay mana" path
                 true
             }
+            is AdditionalCost.BlightVariable -> {
+                // X = 0 is always legal (default minCount = 0); higher minCounts
+                // require a creature you control whose toughness >= minCount.
+                if (cost.minCount <= 0) {
+                    true
+                } else {
+                    val projected = state.projectedState
+                    state.getBattlefield().any { permId ->
+                        projected.getController(permId) == controllerId &&
+                            projected.isCreature(permId) &&
+                            (projected.getToughness(permId) ?: 0) >= cost.minCount
+                    }
+                }
+            }
             is AdditionalCost.BeholdOrPay -> {
                 // Always payable: player can always choose the "pay mana" path
                 true

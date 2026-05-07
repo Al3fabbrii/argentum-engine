@@ -28,6 +28,7 @@ data class SpellOnStackComponent(
     val damageDistribution: Map<EntityId, Int>? = null,  // For DividedDamageEffect - pre-chosen damage allocation
     val chosenCreatureType: String? = null,  // For spells that choose a creature type during casting (e.g., Aphetto Dredging)
     val exiledCardCount: Int = 0,  // For variable exile additional costs (e.g., Chill Haunting)
+    val additionalCostBlightAmount: Int = 0,  // For variable blight additional costs (e.g., Soul Immolation)
     val castFromZone: Zone? = null,  // Zone the spell was cast from (e.g., HAND for normal casting)
     val wasWarped: Boolean = false,  // For warp - permanent is exiled at end step
     val wasEvoked: Boolean = false,  // For evoke - permanent is sacrificed on ETB

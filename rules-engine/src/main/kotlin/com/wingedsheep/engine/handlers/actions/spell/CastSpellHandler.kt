@@ -942,6 +942,44 @@ class CastSpellHandler(
                     }
                     // If blightTargets is empty, the player is paying extra mana instead
                 }
+                is AdditionalCost.BlightVariable -> {
+                    val amount = action.additionalCostPayment?.blightAmount ?: 0
+                    if (amount < additionalCost.minCount) {
+                        return "Blight X must be at least ${additionalCost.minCount} (got $amount)"
+                    }
+                    if (amount < 0) {
+                        return "Blight X cannot be negative"
+                    }
+                    val maxToughness = state.getBattlefield()
+                        .filter { permId ->
+                            projected.getController(permId) == action.playerId &&
+                                projected.isCreature(permId)
+                        }
+                        .maxOfOrNull { projected.getToughness(it) ?: 0 } ?: 0
+                    if (amount > maxToughness) {
+                        return "Blight X ($amount) cannot exceed the greatest toughness among creatures you control ($maxToughness)"
+                    }
+                    if (amount > 0) {
+                        val blightTargets = action.additionalCostPayment?.blightTargets ?: emptyList()
+                        if (blightTargets.size != 1) {
+                            return "Blight X must target exactly one creature you control"
+                        }
+                        val targetId = blightTargets.first()
+                        val container = state.getEntity(targetId)
+                            ?: return "Blight target not found: $targetId"
+                        container.get<CardComponent>()
+                            ?: return "Blight target is not a card: $targetId"
+                        if (projected.getController(targetId) != action.playerId) {
+                            return "You can only blight creatures you control"
+                        }
+                        if (targetId !in state.getBattlefield()) {
+                            return "Blight target is not on the battlefield: $targetId"
+                        }
+                        if (!projected.isCreature(targetId)) {
+                            return "Blight target must be a creature"
+                        }
+                    }
+                }
                 is AdditionalCost.BeholdOrPay -> {
                     // BeholdOrPay: player chose behold if beheldCards is non-empty,
                     // otherwise chose to pay extra mana (validated via mana payment)
@@ -1422,6 +1460,31 @@ class CastSpellHandler(
                         }
                         // If blightTargets is empty, "pay mana" path — extra mana already added to effectiveCost
                     }
+                    is AdditionalCost.BlightVariable -> {
+                        val amount = action.additionalCostPayment.blightAmount
+                        if (amount > 0) {
+                            val targetId = action.additionalCostPayment.blightTargets.firstOrNull()
+                            val targetContainer = targetId?.let { currentState.getEntity(it) }
+                            if (targetId != null && targetContainer != null) {
+                                val counters = targetContainer.get<CountersComponent>() ?: CountersComponent()
+                                currentState = currentState.updateEntity(targetId) { c ->
+                                    c.with(counters.withAdded(CounterType.MINUS_ONE_MINUS_ONE, amount))
+                                }
+                                currentState = DamageUtils.markCounterPlacedOnCreature(
+                                    currentState,
+                                    action.playerId,
+                                    targetId
+                                )
+                                val targetName = targetContainer.get<CardComponent>()?.name ?: "Creature"
+                                events.add(CountersAddedEvent(
+                                    entityId = targetId,
+                                    counterType = Counters.MINUS_ONE_MINUS_ONE,
+                                    amount = amount,
+                                    entityName = targetName
+                                ))
+                            }
+                        }
+                    }
                     is AdditionalCost.BeholdOrPay -> {
                         // Store beheld card IDs in pipeline and reveal them, if behold path chosen
                         val chosen = action.additionalCostPayment.beheldCards
@@ -1702,6 +1765,7 @@ class CastSpellHandler(
             damageDistribution = action.damageDistribution,
             targetRequirements = spellTargetRequirements,
             exiledCardCount = exiledCardCount,
+            additionalCostBlightAmount = action.additionalCostPayment?.blightAmount ?: 0,
             wasKicked = action.wasKicked,
             wasBlightPaid = (action.additionalCostPayment?.blightTargets?.isNotEmpty() == true),
             wasWarped = wasWarped,

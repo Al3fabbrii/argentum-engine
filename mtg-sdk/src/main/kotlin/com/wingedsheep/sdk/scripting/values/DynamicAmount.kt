@@ -355,6 +355,17 @@ sealed interface DynamicAmount : TextReplaceable<DynamicAmount> {
         override fun applyTextReplacement(replacer: TextReplacer): DynamicAmount = this
     }
 
+    /**
+     * Number of -1/-1 counters chosen as the variable amount for a Blight X
+     * additional cost (e.g., Soul Immolation: "blight X. ... deals X damage").
+     */
+    @SerialName("AdditionalCostBlightAmount")
+    @Serializable
+    data object AdditionalCostBlightAmount : DynamicAmount {
+        override val description: String = "X"
+        override fun applyTextReplacement(replacer: TextReplacer): DynamicAmount = this
+    }
+
     // =========================================================================
     // Zone-based Counting — generic counting primitives
     // =========================================================================

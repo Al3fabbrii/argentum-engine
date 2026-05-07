@@ -222,6 +222,7 @@ object LorwynEclipsedSet {
         SilvergillPeddler,
         SizzlingChangeling,
         SlumberingWalker,
+        SoulImmolation,
         SoulbrightSeeker,
         SourbreadAuntie,
         SpellSnare,
