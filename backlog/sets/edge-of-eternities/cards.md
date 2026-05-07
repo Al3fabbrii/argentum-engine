@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 111 / 261
+**Implemented:** 112 / 261
 
 ---
 
@@ -167,7 +167,7 @@
 - [ ] Plasma Bolt
 - [ ] Possibility Technician
 - [ ] Pull Through the Weft
-- [ ] Pulsar Squadron Ace
+- [x] Pulsar Squadron Ace
 - [ ] Quantum Riddler
 - [x] Radiant Strike
 - [ ] Ragost, Deft Gastronaut

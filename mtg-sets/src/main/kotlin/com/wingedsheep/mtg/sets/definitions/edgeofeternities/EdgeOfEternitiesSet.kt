@@ -96,6 +96,7 @@ object EdgeOfEternitiesSet {
         NutrientBlock,
         OreplatePangolin,
         PinnacleKillShip,
+        PulsarSquadronAce,
         RadiantStrike,
         RemnantElemental,
         RerouteSystems,
