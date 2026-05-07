@@ -209,6 +209,7 @@ object LorwynEclipsedSet {
         RhysTheEvermore,
         RimeChill,
         RimefireTorque,
+        RimekinRecluse,
         RiverguardsReflexes,
         RunAwayTogether,
         SafewrightCavalry,
