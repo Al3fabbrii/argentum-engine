@@ -26,6 +26,7 @@ import com.wingedsheep.sdk.scripting.effects.SearchDestination
 import com.wingedsheep.sdk.scripting.effects.StoreCountEffect
 import com.wingedsheep.sdk.scripting.effects.StoreResultEffect
 import com.wingedsheep.sdk.scripting.effects.TapUntapEffect
+import com.wingedsheep.sdk.scripting.effects.WardCost
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 import com.wingedsheep.sdk.scripting.events.CounterTypeFilter
 import com.wingedsheep.sdk.scripting.events.DamageType
@@ -128,14 +129,15 @@ class CardDslTest : DescribeSpec({
                 power = 2
                 toughness = 2
                 keywords(Keyword.FLASH)
-                keywordAbility(KeywordAbility.WardMana(ManaCost.parse("{2}")))
+                keywordAbility(KeywordAbility.Ward(WardCost.Mana("{2}")))
             }
 
             creature.name shouldBe "Nimble Seafarer"
             creature.keywords shouldContain Keyword.FLASH
             creature.keywordAbilities shouldHaveSize 1
-            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.WardMana>()
-            (creature.keywordAbilities[0] as KeywordAbility.WardMana).cost.cmc shouldBe 2
+            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.Ward>()
+            val ward = creature.keywordAbilities[0] as KeywordAbility.Ward
+            (ward.cost as WardCost.Mana).manaCost shouldBe "{2}"
             creature.keywordAbilities[0].description shouldBe "Ward {2}"
         }
 
@@ -176,14 +178,15 @@ class CardDslTest : DescribeSpec({
                 typeLine = "Creature — Horror"
                 power = 3
                 toughness = 3
-                keywordAbility(KeywordAbility.WardDiscard(count = 1, random = true))
+                keywordAbility(KeywordAbility.Ward(WardCost.Discard(count = 1, random = true)))
             }
 
             creature.keywordAbilities shouldHaveSize 1
-            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.WardDiscard>()
-            val ward = creature.keywordAbilities[0] as KeywordAbility.WardDiscard
-            ward.count shouldBe 1
-            ward.random shouldBe true
+            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.Ward>()
+            val ward = creature.keywordAbilities[0] as KeywordAbility.Ward
+            val discard = ward.cost as WardCost.Discard
+            discard.count shouldBe 1
+            discard.random shouldBe true
             ward.description shouldBe "Ward—Discard a card at random"
         }
 
@@ -210,7 +213,7 @@ class CardDslTest : DescribeSpec({
                 toughness = 4
                 keywords(Keyword.FLYING, Keyword.VIGILANCE)
                 keywordAbilities(
-                    KeywordAbility.WardMana(ManaCost.parse("{3}")),
+                    KeywordAbility.Ward(WardCost.Mana("{3}")),
                     KeywordAbility.ProtectionFromColor(Color.BLACK)
                 )
             }
@@ -218,7 +221,7 @@ class CardDslTest : DescribeSpec({
             creature.keywords shouldContain Keyword.FLYING
             creature.keywords shouldContain Keyword.VIGILANCE
             creature.keywordAbilities shouldHaveSize 2
-            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.WardMana>()
+            creature.keywordAbilities[0].shouldBeInstanceOf<KeywordAbility.Ward>()
             creature.keywordAbilities[1].shouldBeInstanceOf<KeywordAbility.ProtectionFromColor>()
         }
 

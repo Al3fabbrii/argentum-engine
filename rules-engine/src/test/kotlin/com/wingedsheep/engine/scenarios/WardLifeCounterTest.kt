@@ -23,8 +23,8 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 /**
  * Tests for life-cost ward: Ward—Pay N life.
  *
- * Verifies both the intrinsic-ward path (KeywordAbility.WardLife) and the
- * static-grant path (GrantWardToGroup with WardCost.Life).
+ * Verifies both the intrinsic-ward path (KeywordAbility.Ward + WardCost.Life)
+ * and the static-grant path (GrantWardToGroup with WardCost.Life).
  */
 class WardLifeCounterTest : FunSpec({
 

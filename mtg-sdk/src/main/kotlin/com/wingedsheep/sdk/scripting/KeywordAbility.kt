@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.scripting.costs.PayCost
+import com.wingedsheep.sdk.scripting.effects.WardCost
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -21,7 +22,7 @@ import kotlinx.serialization.Serializable
  * Usage:
  * ```kotlin
  * KeywordAbility.Simple(Keyword.FLYING)
- * KeywordAbility.Ward(ManaCost.parse("{2}"))
+ * KeywordAbility.Ward(WardCost.Mana("{2}"))
  * KeywordAbility.ProtectionFromColor(Color.BLUE)
  * KeywordAbility.Annihilator(2)
  * ```
@@ -48,60 +49,28 @@ sealed interface KeywordAbility {
     }
 
     // =========================================================================
-    // Ward Variants
+    // Ward
     // =========================================================================
 
     /**
-     * Ward with a mana cost.
-     * "Ward {2}" - Whenever this creature becomes the target of a spell or ability
-     * an opponent controls, counter it unless that player pays {2}.
+     * Ward with a configurable cost.
+     *
+     * Examples:
+     * - `Ward(WardCost.Mana("{2}"))`         — "Ward {2}"
+     * - `Ward(WardCost.Life(2))`             — "Ward—Pay 2 life"
+     * - `Ward(WardCost.Discard())`           — "Ward—Discard a card"
+     * - `Ward(WardCost.Sacrifice(filter))`   — "Ward—Sacrifice a Food"
      */
-    @SerialName("WardMana")
+    @SerialName("Ward")
     @Serializable
-    data class WardMana(val cost: ManaCost) : KeywordAbility {
+    data class Ward(val cost: WardCost) : KeywordAbility {
         override val keyword: Keyword = Keyword.WARD
-        override val description: String = "Ward $cost"
-    }
-
-    /**
-     * Ward with a life cost.
-     * "Ward—Pay 2 life."
-     */
-    @SerialName("WardLife")
-    @Serializable
-    data class WardLife(val amount: Int) : KeywordAbility {
-        override val keyword: Keyword = Keyword.WARD
-        override val description: String = "Ward—Pay $amount life"
-    }
-
-    /**
-     * Ward with a discard cost.
-     * "Ward—Discard a card."
-     */
-    @SerialName("WardDiscard")
-    @Serializable
-    data class WardDiscard(val count: Int = 1, val random: Boolean = false) : KeywordAbility {
-        override val keyword: Keyword = Keyword.WARD
-        override val description: String = buildString {
-            append("Ward—Discard ")
-            if (count == 1) {
-                append("a card")
-            } else {
-                append("$count cards")
-            }
-            if (random) append(" at random")
+        override val description: String = when (cost) {
+            is WardCost.Mana -> "Ward ${cost.manaCost}"
+            is WardCost.Life -> "Ward—Pay ${cost.amount} life"
+            is WardCost.Discard -> "Ward—Discard ${cost.description}"
+            is WardCost.Sacrifice -> "Ward—Sacrifice ${cost.description}"
         }
-    }
-
-    /**
-     * Ward with a sacrifice cost.
-     * "Ward—Sacrifice a creature."
-     */
-    @SerialName("WardSacrifice")
-    @Serializable
-    data class WardSacrifice(val filter: GameObjectFilter) : KeywordAbility {
-        override val keyword: Keyword = Keyword.WARD
-        override val description: String = "Ward—Sacrifice a ${filter.description}"
     }
 
     // =========================================================================
@@ -587,18 +556,24 @@ sealed interface KeywordAbility {
         /**
          * Create Ward with mana cost from string.
          */
-        fun ward(cost: String): KeywordAbility = WardMana(ManaCost.parse(cost))
+        fun ward(cost: String): KeywordAbility = Ward(WardCost.Mana(cost))
 
         /**
          * Create Ward with life cost.
          */
-        fun wardLife(amount: Int): KeywordAbility = WardLife(amount)
+        fun wardLife(amount: Int): KeywordAbility = Ward(WardCost.Life(amount))
 
         /**
          * Create Ward with discard cost.
          */
         fun wardDiscard(count: Int = 1, random: Boolean = false): KeywordAbility =
-            WardDiscard(count, random)
+            Ward(WardCost.Discard(count, random))
+
+        /**
+         * Create Ward with sacrifice cost.
+         */
+        fun wardSacrifice(filter: GameObjectFilter): KeywordAbility =
+            Ward(WardCost.Sacrifice(filter))
 
         /**
          * Create Hexproof from a color.

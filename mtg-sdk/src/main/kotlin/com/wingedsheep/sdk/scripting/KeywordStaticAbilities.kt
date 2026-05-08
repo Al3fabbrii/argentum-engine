@@ -78,6 +78,8 @@ data class GrantWard(
     override val description: String = when (cost) {
         is WardCost.Mana -> "Enchanted creature has ward ${cost.manaCost}"
         is WardCost.Life -> "Enchanted creature has \"Ward—Pay ${cost.amount} life.\""
+        is WardCost.Discard -> "Enchanted creature has \"Ward—Discard ${cost.description}.\""
+        is WardCost.Sacrifice -> "Enchanted creature has \"Ward—Sacrifice ${cost.description}.\""
     }
     override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
 }
@@ -104,6 +106,10 @@ data class GrantWardToGroup(
             "${filter.description} have ward ${cost.manaCost}"
         is com.wingedsheep.sdk.scripting.effects.WardCost.Life ->
             "${filter.description} have \"Ward—Pay ${cost.amount} life.\""
+        is com.wingedsheep.sdk.scripting.effects.WardCost.Discard ->
+            "${filter.description} have \"Ward—Discard ${cost.description}.\""
+        is com.wingedsheep.sdk.scripting.effects.WardCost.Sacrifice ->
+            "${filter.description} have \"Ward—Sacrifice ${cost.description}.\""
     }
     override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
         val newFilter = filter.applyTextReplacement(replacer)

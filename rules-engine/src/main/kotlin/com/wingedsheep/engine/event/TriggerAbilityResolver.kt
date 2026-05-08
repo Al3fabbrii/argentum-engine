@@ -260,7 +260,7 @@ class TriggerAbilityResolver(
      * Generate ward triggered abilities for an entity.
      *
      * Checks two sources:
-     * 1. Intrinsic ward from the card's keywordAbilities (e.g., KeywordAbility.WardMana)
+     * 1. Intrinsic ward from the card's keywordAbilities (KeywordAbility.Ward)
      * 2. Ward granted by GrantWardToGroup static abilities on other permanents
      *
      * Each found ward produces a TriggeredAbility that fires on BecomesTargetEvent
@@ -277,13 +277,8 @@ class TriggerAbilityResolver(
         val cardDef = cardRegistry.getCard(cardDefinitionId)
         if (cardDef != null) {
             for (ka in cardDef.keywordAbilities) {
-                val cost: WardCost? = when (ka) {
-                    is KeywordAbility.WardMana -> WardCost.Mana(ka.cost.toString())
-                    is KeywordAbility.WardLife -> WardCost.Life(ka.amount)
-                    else -> null
-                }
-                if (cost != null) {
-                    result.add(createWardTriggeredAbility(cost, "intrinsic"))
+                if (ka is KeywordAbility.Ward) {
+                    result.add(createWardTriggeredAbility(ka.cost, "intrinsic"))
                 }
             }
         }

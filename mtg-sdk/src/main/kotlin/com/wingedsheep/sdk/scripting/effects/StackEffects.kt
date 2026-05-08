@@ -2,6 +2,7 @@ package com.wingedsheep.sdk.scripting.effects
 
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.ManaCost
+import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetRequirement
@@ -234,6 +235,23 @@ sealed interface WardCost {
     data class Life(val amount: Int) : WardCost {
         override val description: String = "pay $amount life"
     }
+
+    /** Ward with a discard cost — e.g. Ward—Discard a card. */
+    @SerialName("WardCost.Discard")
+    @Serializable
+    data class Discard(val count: Int = 1, val random: Boolean = false) : WardCost {
+        override val description: String = buildString {
+            if (count == 1) append("a card") else append("$count cards")
+            if (random) append(" at random")
+        }
+    }
+
+    /** Ward with a sacrifice cost — e.g. Ward—Sacrifice a Food. */
+    @SerialName("WardCost.Sacrifice")
+    @Serializable
+    data class Sacrifice(val filter: GameObjectFilter) : WardCost {
+        override val description: String = "a ${filter.description}"
+    }
 }
 
 /**
@@ -252,6 +270,8 @@ data class WardCounterEffect(
     override val description: String = when (cost) {
         is WardCost.Mana -> "Counter it unless its controller pays ${cost.manaCost}"
         is WardCost.Life -> "Counter it unless its controller pays ${cost.amount} life"
+        is WardCost.Discard -> "Counter it unless its controller discards ${cost.description}"
+        is WardCost.Sacrifice -> "Counter it unless its controller sacrifices ${cost.description}"
     }
 
     override fun applyTextReplacement(replacer: TextReplacer): Effect = this
