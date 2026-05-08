@@ -57,11 +57,11 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Tragic Trajectory
 - [ ] Voidforged Titan
 - [ ] Kavaron Skywarden
-- [ ] Plasma Bolt
+- [x] Plasma Bolt
 - [ ] Roving Actuator
 
 ## Differently named lands:
-- [ ] All-Fates Scroll
+- [x] All-Fates Scroll
 - [ ] Fungal Colossus
 - [ ] Survey Mechan
 

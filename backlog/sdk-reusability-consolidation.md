@@ -1,7 +1,7 @@
 # SDK Reusability Consolidation
 
 Catalog of duplicated/parameterizable primitives in `mtg-sdk`. Complement to
-[sdk-composability-gaps.md](sdk-composability-gaps.md) — that file tracks **missing**
+[sdk-composability-gaps.md](archived/sdk-composability-gaps.md) — that file tracks **missing**
 primitives; this one tracks **redundant** ones.
 
 **Premise:** the SDK already has the right primitives (`GameObjectFilter`, `GroupFilter`,

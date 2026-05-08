@@ -1,7 +1,7 @@
 # SDK Composability Gaps
 
 Remaining gaps preventing new cards from being implemented without SDK changes.
-Builds on the completed [effect-pipeline-roadmap.md](archived/effect-pipeline-roadmap.md) which brought
+Builds on the completed [effect-pipeline-roadmap.md](effect-pipeline-roadmap.md) which brought
 zone-manipulation pipeline coverage to ~85%.
 
 **Goal:** Any new card can be composed from existing atomic parts (effects, triggers, conditions,

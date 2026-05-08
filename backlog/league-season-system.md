@@ -7,7 +7,7 @@ standings across seasons. Requires a proper account system (SSO via Keycloak) to
 
 This feature depends on:
 - **Account system** (Phase 1 below) — persistent player identity is a prerequisite for everything else
-- PlayerIdentity state machine formalization ([architecture #6](game-server-architecture.md#6-formalize-playeridentity-state-machine)) — current identity model is ephemeral and needs rework
+- PlayerIdentity state machine formalization ([architecture #6](archived/game-server-architecture.md#6-formalize-playeridentity-state-machine)) — current identity model is ephemeral and needs rework
 
 ---
 

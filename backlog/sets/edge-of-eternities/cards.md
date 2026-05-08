@@ -7,7 +7,7 @@
 ---
 
 - [x] Adagia, Windswept Bastion
-- [ ] All-Fates Scroll
+- [x] All-Fates Scroll
 - [ ] All-Fates Stalker
 - [x] Alpharael, Dreaming Acolyte
 - [ ] Alpharael, Stonechosen

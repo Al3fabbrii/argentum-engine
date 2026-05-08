@@ -117,7 +117,7 @@ Search: `ColorsAmongPermanentsYouControl` in `rules-engine/` and audit the evalu
 ## Cross-reference
 
 Already on the existing backlog under a slightly different name:
-[sdk-composability-gaps.md §4c "NumberOfColorsAmong DynamicAmount"](../../../sdk-composability-gaps.md#4c-numberofcolorsamongfilter-gameobjectfilter).
+[sdk-composability-gaps.md §4c "NumberOfColorsAmong DynamicAmount"](../../../archived/sdk-composability-gaps.md#4c-numberofcolorsamongfilter-gameobjectfilter).
 That entry is currently Priority 3. Lorwyn Eclipsed promotes it to Priority 1. When picking the
 name, align with whatever §4c eventually lands on — don't ship two competing `DynamicAmount`
 cases.
