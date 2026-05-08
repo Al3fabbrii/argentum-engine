@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
+import com.wingedsheep.sdk.scripting.effects.IfYouDoEffect
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 
 /**
@@ -26,10 +27,10 @@ val Tweeze = card("Tweeze") {
         effect = CompositeEffect(listOf(
             Effects.DealDamage(3, damageTarget),
             MayEffect(
-                effect = CompositeEffect(listOf(
-                    EffectPatterns.discardCards(1),
-                    Effects.DrawCards(1)
-                )),
+                effect = IfYouDoEffect(
+                    action = EffectPatterns.discardCards(1),
+                    ifYouDo = Effects.DrawCards(1)
+                ),
                 descriptionOverride = "You may discard a card. If you do, draw a card."
             )
         ))
