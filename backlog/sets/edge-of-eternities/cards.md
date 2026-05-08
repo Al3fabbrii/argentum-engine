@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 125 / 261
+**Implemented:** 126 / 261
 
 ---
 
@@ -204,7 +204,7 @@
 - [ ] Space-Time Anomaly
 - [ ] Specimen Freighter
 - [x] Squire's Lightblade
-- [ ] Starbreach Whale
+- [x] Starbreach Whale
 - [ ] Starfield Shepherd
 - [ ] Starfield Vocalist
 - [x] Starfighter Pilot

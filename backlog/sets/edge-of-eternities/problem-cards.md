@@ -16,7 +16,6 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Rayblade Trooper
 - [ ] Codecracker Hound
 - [ ] Quantum Riddler
-- [ ] Starbreach Whale
 - [ ] Starfield Vocalist
 - [ ] Starwinder
 - [ ] Perigee Beckoner
