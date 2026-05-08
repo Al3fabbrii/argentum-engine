@@ -16,7 +16,7 @@ import io.kotest.matchers.collections.shouldNotBeEmpty
 class ScaffoldingSmokeTest : FunSpec({
 
     test("active player on main phase can play a Forest from hand") {
-        val driver = EnumerationFixtures.mainPhaseOfActivePlayer()
+        val driver = EnumerationFixtures.allForestsMainPhase()
 
         val actions = driver.enumerateFor(driver.player1)
 
@@ -25,7 +25,7 @@ class ScaffoldingSmokeTest : FunSpec({
     }
 
     test("opponent on active player's main phase cannot play a Forest") {
-        val driver = EnumerationFixtures.mainPhaseOfActivePlayer()
+        val driver = EnumerationFixtures.allForestsMainPhase()
 
         val actions = driver.enumerateFor(driver.player2)
 
@@ -39,7 +39,7 @@ class ScaffoldingSmokeTest : FunSpec({
         // The view's name-resolution path is what makes the matchers possible.
         // Pick any PlayLand action and confirm its name round-trips to a card
         // that the active player actually has in hand.
-        val driver = EnumerationFixtures.mainPhaseOfActivePlayer()
+        val driver = EnumerationFixtures.allForestsMainPhase()
         val actions = driver.enumerateFor(driver.player1)
 
         val playLand = actions.playLandActions().first()
