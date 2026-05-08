@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 124 / 261
+**Implemented:** 125 / 261
 
 ---
 
@@ -196,7 +196,7 @@
 - [ ] Selfcraft Mechan
 - [x] Shattered Wings
 - [ ] Singularity Rupture
-- [ ] Sinister Cryologist
+- [x] Sinister Cryologist
 - [ ] Skystinger
 - [x] Slagdrill Scrapper
 - [x] Sledge-Class Seedship
