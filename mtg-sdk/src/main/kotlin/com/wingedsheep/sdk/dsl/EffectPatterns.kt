@@ -249,8 +249,8 @@ object EffectPatterns {
 
     fun factOrFiction(
         count: Int = 5,
-        keepZone: com.wingedsheep.sdk.core.Zone = com.wingedsheep.sdk.core.Zone.HAND,
-        otherZone: com.wingedsheep.sdk.core.Zone = com.wingedsheep.sdk.core.Zone.GRAVEYARD,
+        keepZone: Zone = Zone.HAND,
+        otherZone: Zone = Zone.GRAVEYARD,
         keepLabel: String = "Hand",
         otherLabel: String = "Graveyard"
     ): CompositeEffect =
@@ -425,6 +425,24 @@ object EffectPatterns {
             AddCountersEffect(
                 counterType = Counters.PLUS_ONE_PLUS_ONE,
                 count = n,
+                target = EffectTarget.PipelineTarget(CREATED_TOKENS, 0)
+            )
+        )
+    )
+
+    /**
+     * Incubate X (CR 701.53), where X is a [DynamicAmount] resolved at trigger/spell
+     * resolution time (e.g., the triggering spell's mana value for Chrome Host Seedshark).
+     *
+     * Same shape as [incubate] but uses [com.wingedsheep.sdk.scripting.effects.AddDynamicCountersEffect]
+     * so the +1/+1 counter count is evaluated against the live [com.wingedsheep.engine.handlers.EffectContext].
+     */
+    fun incubate(amount: DynamicAmount): CompositeEffect = CompositeEffect(
+        listOf(
+            CreatePredefinedTokenEffect(tokenType = "Incubator", count = 1),
+            com.wingedsheep.sdk.scripting.effects.AddDynamicCountersEffect(
+                counterType = Counters.PLUS_ONE_PLUS_ONE,
+                amount = amount,
                 target = EffectTarget.PipelineTarget(CREATED_TOKENS, 0)
             )
         )

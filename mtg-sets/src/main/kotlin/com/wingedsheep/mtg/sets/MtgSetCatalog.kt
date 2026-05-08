@@ -11,11 +11,13 @@ import com.wingedsheep.mtg.sets.definitions.fdn.FoundationsSet
 import com.wingedsheep.mtg.sets.definitions.fin.FinalFantasySet
 import com.wingedsheep.mtg.sets.definitions.inv.InvasionSet
 import com.wingedsheep.mtg.sets.definitions.mid.InnistradMidnightHuntSet
+import com.wingedsheep.mtg.sets.definitions.vow.InnistradCrimsonVowSet
 import com.wingedsheep.mtg.sets.definitions.ktk.KhansOfTarkirSet
 import com.wingedsheep.mtg.sets.definitions.lgn.LegionsSet
 import com.wingedsheep.mtg.sets.definitions.ecl.LorwynEclipsedSet
 import com.wingedsheep.mtg.sets.definitions.lci.LostCavernsOfIxalanSet
 import com.wingedsheep.mtg.sets.definitions.mkm.MurdersAtKarlovManorSet
+import com.wingedsheep.mtg.sets.definitions.mom.MarchOfTheMachineSet
 import com.wingedsheep.mtg.sets.definitions.one.PhyrexiaAllWillBeOneSet
 import com.wingedsheep.mtg.sets.definitions.ons.OnslaughtSet
 import com.wingedsheep.mtg.sets.definitions.por.PortalSet
@@ -45,6 +47,7 @@ object MtgSetCatalog {
         PhyrexiaAllWillBeOneSet,
         BrothersWarSet,
         InnistradMidnightHuntSet,
+        InnistradCrimsonVowSet,
         MurdersAtKarlovManorSet,
         WildsOfEldrainSet,
         LostCavernsOfIxalanSet,

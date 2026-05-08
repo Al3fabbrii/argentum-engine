@@ -17,8 +17,12 @@ import com.wingedsheep.mtg.sets.definitions.por.PortalSet
 import com.wingedsheep.mtg.sets.definitions.ecl.LorwynEclipsedSet
 import com.wingedsheep.mtg.sets.definitions.lci.LostCavernsOfIxalanSet
 import com.wingedsheep.mtg.sets.definitions.fdn.FoundationsSet
+import com.wingedsheep.mtg.sets.definitions.inv.InvasionSet
+import com.wingedsheep.mtg.sets.definitions.mom.MarchOfTheMachineSet
 import com.wingedsheep.mtg.sets.definitions.one.PhyrexiaAllWillBeOneSet
 import com.wingedsheep.mtg.sets.definitions.scg.ScourgeSet
+import com.wingedsheep.mtg.sets.definitions.vow.InnistradCrimsonVowSet
+import com.wingedsheep.mtg.sets.definitions.mid.InnistradMidnightHuntSet
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.engine.state.ComponentContainer
 import com.wingedsheep.engine.state.GameState
@@ -78,7 +82,11 @@ abstract class ScenarioTestBase : FunSpec() {
         register(LorwynEclipsedSet.cards); register(LorwynEclipsedSet.basicLands)
         register(LostCavernsOfIxalanSet.cards)
         register(FoundationsSet.cards)
+        register(InvasionSet.cards)
+        register(MarchOfTheMachineSet.cards)
         register(PhyrexiaAllWillBeOneSet.cards)
+        register(InnistradCrimsonVowSet.cards)
+        register(InnistradMidnightHuntSet.cards)
     }
     protected val actionProcessor = ActionProcessor(cardRegistry)
     protected val stateTransformer = ClientStateTransformer(cardRegistry)

@@ -110,6 +110,7 @@ import com.wingedsheep.sdk.scripting.effects.CounterAllOnStackEffect
 import com.wingedsheep.sdk.scripting.effects.CounterCondition
 import com.wingedsheep.sdk.scripting.effects.CounterDestination
 import com.wingedsheep.sdk.scripting.effects.CounterEffect
+import com.wingedsheep.sdk.scripting.effects.ReturnSpellToOwnersHandEffect
 import com.wingedsheep.sdk.scripting.effects.CounterTarget
 import com.wingedsheep.sdk.scripting.effects.CounterTargetSource
 import com.wingedsheep.sdk.scripting.effects.ChangeSpellTargetEffect
@@ -1093,6 +1094,13 @@ object Effects {
      */
     fun Incubate(n: Int): Effect = EffectPatterns.incubate(n)
 
+    /**
+     * Incubate X (CR 701.53), where the +1/+1 counter count is a [DynamicAmount]
+     * resolved at resolution time (e.g., the triggering spell's mana value).
+     */
+    fun Incubate(amount: com.wingedsheep.sdk.scripting.values.DynamicAmount): Effect =
+        EffectPatterns.incubate(amount)
+
     // =========================================================================
     // Protection Effects
     // =========================================================================
@@ -1279,6 +1287,14 @@ object Effects {
      */
     fun CounterAbility(): Effect =
         CounterEffect(target = CounterTarget.Ability)
+
+    /**
+     * Return target spell to its owner's hand.
+     *
+     * Distinct from a counter — "this spell can't be countered" does not
+     * prevent the bounce. Used by cards like Hullbreaker Horror.
+     */
+    fun ReturnSpellToOwnersHand(): Effect = ReturnSpellToOwnersHandEffect
 
     /**
      * Counter all spells and abilities your opponents control on the stack.

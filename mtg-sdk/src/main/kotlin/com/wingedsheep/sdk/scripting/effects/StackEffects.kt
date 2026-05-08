@@ -528,3 +528,28 @@ data class MarkSpellExileWithCountersEffect(
 
     override fun applyTextReplacement(replacer: TextReplacer): Effect = this
 }
+
+// =============================================================================
+// Stack Effects — Return Spell to Hand
+// =============================================================================
+
+/**
+ * Remove a target spell from the stack and put it into its owner's hand.
+ *
+ * This is **not** a counter (CR 701.27 / 701.5b). The spell does not resolve, but
+ * "this spell can't be countered" does not prevent the move — only effects that
+ * literally counter the spell are blocked. Used by cards like Hullbreaker Horror
+ * ("Return target spell you don't control to its owner's hand") and the bounce
+ * mode of Aetherize-style effects on the stack.
+ *
+ * The targeted spell is identified via [EffectTarget.ContextTarget] from
+ * [com.wingedsheep.engine.handlers.EffectContext.targets]. If the spell is no
+ * longer on the stack at resolution, the effect does nothing.
+ */
+@SerialName("ReturnSpellToOwnersHand")
+@Serializable
+data object ReturnSpellToOwnersHandEffect : Effect {
+    override val description: String = "Return target spell to its owner's hand"
+
+    override fun applyTextReplacement(replacer: TextReplacer): Effect = this
+}

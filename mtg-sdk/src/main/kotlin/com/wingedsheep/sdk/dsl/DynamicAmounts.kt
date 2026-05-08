@@ -277,4 +277,7 @@ object DynamicAmounts {
 
     fun numberOfBlockers(): DynamicAmount =
         DynamicAmount.EntityProperty(EntityReference.Triggering, EntityNumericProperty.BlockerCount)
+
+    fun triggeringManaValue(): DynamicAmount =
+        DynamicAmount.EntityProperty(EntityReference.Triggering, EntityNumericProperty.ManaValue)
 }

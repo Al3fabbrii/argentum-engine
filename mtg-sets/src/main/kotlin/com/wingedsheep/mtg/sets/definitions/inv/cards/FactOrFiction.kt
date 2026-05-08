@@ -24,8 +24,7 @@ val FactOrFiction = card("Fact or Fiction") {
 
     metadata {
         rarity = Rarity.UNCOMMON
-        artist = "Ron Spencer"
-        flavorText = "What you believe to be true and what is actually true are rarely the same."
-        imageUri = "https://cards.scryfall.io/normal/front/9/c/9c0f7e15-3b3a-4f9b-9e63-32ada6e1e9a5.jpg"
+        artist = "Terese Nielsen"
+        imageUri = "https://cards.scryfall.io/normal/front/7/f/7fd4d018-dcf3-4439-8445-02d66e44f7d3.jpg?1562920780"
     }
 }

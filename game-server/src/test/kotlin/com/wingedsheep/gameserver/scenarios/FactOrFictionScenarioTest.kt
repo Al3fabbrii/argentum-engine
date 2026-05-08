@@ -1,5 +1,7 @@
 package com.wingedsheep.gameserver.scenarios
 
+import com.wingedsheep.engine.core.ChooseOptionDecision
+import com.wingedsheep.engine.core.OptionChosenResponse
 import com.wingedsheep.engine.core.SelectCardsDecision
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.gameserver.ScenarioTestBase
@@ -19,16 +21,18 @@ import io.kotest.matchers.types.shouldBeInstanceOf
  *   "Reveal the top five cards of your library. An opponent separates those cards
  *    into two piles. Put one pile into your hand and the other into your graveyard."
  *
- * The implementation models the binary partition as a single
- * `SelectFromCollectionEffect` with `Chooser.Opponent` and labelled bins —
- * the opponent's act of selecting "the Graveyard pile" IS the partition.
+ * Two-step resolution:
+ *   1. Opponent partitions the five revealed cards into two piles (any sizes,
+ *      including empty — CR 700.3d).
+ *   2. The caster (FoF's controller) chooses which pile goes to their hand;
+ *      the other goes to their graveyard.
  */
 class FactOrFictionScenarioTest : ScenarioTestBase() {
 
     init {
         context("Fact or Fiction") {
 
-            test("opponent partitions five cards; selected pile goes to graveyard, rest to hand") {
+            test("opponent partitions; caster picks the larger pile for the hand") {
                 val game = scenario()
                     .withPlayers("Player1", "Player2")
                     .withCardInHand(1, "Fact or Fiction")
@@ -45,59 +49,66 @@ class FactOrFictionScenarioTest : ScenarioTestBase() {
 
                 val initialHand = game.handSize(1) // includes Fact or Fiction itself
 
-                val cast = game.castSpell(1, "Fact or Fiction")
-                withClue("Fact or Fiction should cast: ${cast.error}") {
-                    cast.error shouldBe null
-                }
-
+                game.castSpell(1, "Fact or Fiction").error shouldBe null
                 game.resolveStack()
 
-                val decision = game.getPendingDecision()
-                withClue("Resolution should pause for the opponent's partition decision") {
-                    decision.shouldNotBeNull()
-                }
-                val select = decision.shouldBeInstanceOf<SelectCardsDecision>()
-                withClue("The opponent makes the partition (CR 700.3 / FoF rules)") {
-                    select.playerId shouldBe game.player2Id
+                // Step 1 — opponent partitions.
+                val partition = game.getPendingDecision()
+                    .shouldNotBeNull()
+                    .shouldBeInstanceOf<SelectCardsDecision>()
+                withClue("Opponent makes the partition (CR 700.3 / FoF rules)") {
+                    partition.playerId shouldBe game.player2Id
                 }
                 withClue("All five revealed cards should be options") {
-                    select.options.size shouldBe 5
+                    partition.options.size shouldBe 5
                 }
-                withClue("Opponent must be able to put zero cards in the graveyard pile (CR 700.3d)") {
-                    select.minSelections shouldBe 0
-                }
-                withClue("Opponent must be able to put all five in the graveyard pile") {
-                    select.maxSelections shouldBe 5
-                }
-                withClue("Bins should be labelled so the opponent knows which side is which") {
-                    select.selectedLabel shouldBe "Graveyard"
-                    select.remainderLabel shouldBe "Hand"
+                withClue("Either pile may be empty (CR 700.3d)") {
+                    partition.minSelections shouldBe 0
+                    partition.maxSelections shouldBe 5
                 }
 
-                // Opponent picks Mountain and Forest for the graveyard pile.
-                val graveyardPile = select.options.filter { id -> nameOf(game, id) in setOf("Mountain", "Forest") }
-                graveyardPile.size shouldBe 2
+                // Opponent puts Mountain + Forest in pile 1; Plains, Swamp, Island form pile 2.
+                val pileA = partition.options.filter { id -> nameOf(game, id) in setOf("Mountain", "Forest") }
+                pileA.size shouldBe 2
+                game.selectCards(pileA)
 
-                game.selectCards(graveyardPile)
-
-                withClue("Selected pile lands in P1's graveyard") {
-                    game.isInGraveyard(1, "Mountain") shouldBe true
-                    game.isInGraveyard(1, "Forest") shouldBe true
-                    game.graveyardSize(1) shouldBe 3 // Mountain, Forest, FoF itself
+                // Step 2 — caster (P1) picks which pile to keep.
+                val pickPile = game.getPendingDecision()
+                    .shouldNotBeNull()
+                    .shouldBeInstanceOf<ChooseOptionDecision>()
+                withClue("The caster — not the opponent — picks which pile is which") {
+                    pickPile.playerId shouldBe game.player1Id
                 }
-                withClue("Remainder pile lands in P1's hand") {
+                withClue("Two pile options are presented") {
+                    pickPile.options.size shouldBe 2
+                }
+                withClue("Each option previews the cards in that pile") {
+                    val cardsByOption = pickPile.optionCardIds.shouldNotBeNull()
+                    cardsByOption[0]?.toSet() shouldBe pileA.toSet()
+                    cardsByOption[1]?.size shouldBe 3
+                }
+
+                // Caster keeps the 3-card pile (Pile 2).
+                game.submitDecision(OptionChosenResponse(pickPile.id, 1))
+
+                withClue("Chosen (3-card) pile lands in P1's hand") {
                     game.isInHand(1, "Plains") shouldBe true
                     game.isInHand(1, "Swamp") shouldBe true
                     game.isInHand(1, "Island") shouldBe true
                     // Original hand was [Fact or Fiction]; after cast it left, then 3 cards arrived.
                     game.handSize(1) shouldBe initialHand - 1 + 3
                 }
+                withClue("Other pile (Mountain, Forest) lands in P1's graveyard alongside FoF") {
+                    game.isInGraveyard(1, "Mountain") shouldBe true
+                    game.isInGraveyard(1, "Forest") shouldBe true
+                    game.graveyardSize(1) shouldBe 3
+                }
                 withClue("Library should be empty (all five top cards consumed)") {
                     game.librarySize(1) shouldBe 0
                 }
             }
 
-            test("empty graveyard pile is legal (CR 700.3d) — opponent sends everything to hand") {
+            test("caster may keep pile 1 instead — pile assignment is the caster's choice") {
                 val game = scenario()
                     .withPlayers("Player1", "Player2")
                     .withCardInHand(1, "Fact or Fiction")
@@ -114,11 +125,60 @@ class FactOrFictionScenarioTest : ScenarioTestBase() {
                 game.castSpell(1, "Fact or Fiction").error shouldBe null
                 game.resolveStack()
 
-                val select = game.getPendingDecision().shouldBeInstanceOf<SelectCardsDecision>()
-                select.minSelections shouldBe 0
+                val partition = game.getPendingDecision().shouldBeInstanceOf<SelectCardsDecision>()
+                // Opponent puts Mountain + Forest in pile 1.
+                val pileA = partition.options.filter { id -> nameOf(game, id) in setOf("Mountain", "Forest") }
+                game.selectCards(pileA)
 
-                // Opponent picks NO cards for the graveyard pile.
+                val pickPile = game.getPendingDecision().shouldBeInstanceOf<ChooseOptionDecision>()
+                // Caster keeps pile 1 (Mountain, Forest) instead.
+                game.submitDecision(OptionChosenResponse(pickPile.id, 0))
+
+                withClue("Pile 1 (Mountain, Forest) lands in P1's hand") {
+                    game.isInHand(1, "Mountain") shouldBe true
+                    game.isInHand(1, "Forest") shouldBe true
+                }
+                withClue("The other pile (Plains, Swamp, Island) lands in P1's graveyard with FoF") {
+                    val gyNames = game.state.getGraveyard(game.player1Id).mapNotNull { id ->
+                        game.state.getEntity(id)?.get<CardComponent>()?.name
+                    }
+                    gyNames shouldContainExactlyInAnyOrder listOf(
+                        "Fact or Fiction", "Plains", "Swamp", "Island"
+                    )
+                }
+            }
+
+            test("empty pile is legal (CR 700.3d) — caster can still choose to keep all five") {
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardInHand(1, "Fact or Fiction")
+                    .withLandsOnBattlefield(1, "Island", 4)
+                    .withCardInLibrary(1, "Mountain")
+                    .withCardInLibrary(1, "Forest")
+                    .withCardInLibrary(1, "Plains")
+                    .withCardInLibrary(1, "Swamp")
+                    .withCardInLibrary(1, "Island")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                game.castSpell(1, "Fact or Fiction").error shouldBe null
+                game.resolveStack()
+
+                val partition = game.getPendingDecision().shouldBeInstanceOf<SelectCardsDecision>()
+                partition.minSelections shouldBe 0
+
+                // Opponent makes pile 1 empty; pile 2 holds all five.
                 game.skipSelection()
+
+                val pickPile = game.getPendingDecision().shouldBeInstanceOf<ChooseOptionDecision>()
+                pickPile.playerId shouldBe game.player1Id
+                val byOption = pickPile.optionCardIds.shouldNotBeNull()
+                byOption[0]?.size shouldBe 0
+                byOption[1]?.size shouldBe 5
+
+                // Caster keeps the five-card pile.
+                game.submitDecision(OptionChosenResponse(pickPile.id, 1))
 
                 withClue("All five revealed cards should be in P1's hand") {
                     listOf("Mountain", "Forest", "Plains", "Swamp", "Island").forEach { name ->
@@ -131,7 +191,7 @@ class FactOrFictionScenarioTest : ScenarioTestBase() {
                 }
             }
 
-            test("empty hand pile is legal — opponent sends everything to graveyard") {
+            test("opponent can dump everything into one pile and force caster to take it or burn it") {
                 val game = scenario()
                     .withPlayers("Player1", "Player2")
                     .withCardInHand(1, "Fact or Fiction")
@@ -148,21 +208,22 @@ class FactOrFictionScenarioTest : ScenarioTestBase() {
                 game.castSpell(1, "Fact or Fiction").error shouldBe null
                 game.resolveStack()
 
-                val select = game.getPendingDecision().shouldBeInstanceOf<SelectCardsDecision>()
+                val partition = game.getPendingDecision().shouldBeInstanceOf<SelectCardsDecision>()
+                // Opponent puts ALL five revealed cards into pile 1.
+                game.selectCards(partition.options)
 
-                // Opponent puts ALL revealed cards in the graveyard pile.
-                game.selectCards(select.options)
+                val pickPile = game.getPendingDecision().shouldBeInstanceOf<ChooseOptionDecision>()
+                // Caster keeps the five-card pile (pile 1) — the empty pile would have been pointless.
+                game.submitDecision(OptionChosenResponse(pickPile.id, 0))
 
-                val gyNames = game.state.getGraveyard(game.player1Id).mapNotNull { id ->
-                    game.state.getEntity(id)?.get<CardComponent>()?.name
+                withClue("All revealed cards land in P1's hand") {
+                    listOf("Mountain", "Forest", "Plains", "Swamp", "Island").forEach { name ->
+                        game.isInHand(1, name) shouldBe true
+                    }
                 }
-                withClue("All revealed cards plus FoF itself should be in the graveyard") {
-                    gyNames shouldContainExactlyInAnyOrder listOf(
-                        "Fact or Fiction", "Mountain", "Forest", "Plains", "Swamp", "Island"
-                    )
+                withClue("Only Fact or Fiction itself should be in the graveyard") {
+                    game.graveyardSize(1) shouldBe 1
                 }
-                // Hand had only FoF before cast; nothing came back.
-                game.handSize(1) shouldBe 0
             }
         }
     }
