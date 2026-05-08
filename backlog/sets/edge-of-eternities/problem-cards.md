@@ -15,9 +15,9 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Haliya, Guided by Light
 - [x] Knight Luminary
 - [ ] Rayblade Trooper
-- [ ] Weftblade Enhancer
+- [x] Weftblade Enhancer
 - [ ] Codecracker Hound
-- [ ] Mechanozoa
+- [x] Mechanozoa
 - [ ] Quantum Riddler
 - [ ] Sinister Cryologist
 - [ ] Starbreach Whale

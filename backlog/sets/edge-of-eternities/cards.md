@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 123 / 261
+**Implemented:** 124 / 261
 
 ---
 
@@ -134,7 +134,7 @@
 - [ ] Luxknight Breacher
 - [x] Mechan Assembler
 - [x] Mechan Navigator
-- [ ] Mechanozoa
+- [x] Mechanozoa
 - [ ] Mechan Shieldmate
 - [x] Melded Moxite
 - [ ] Meltstrider Eulogist
