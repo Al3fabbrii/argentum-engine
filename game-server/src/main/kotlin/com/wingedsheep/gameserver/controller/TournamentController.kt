@@ -32,7 +32,8 @@ class TournamentController(
         val format: String,
         val setNames: List<String>,
         val boosterCount: Int,
-        val gamesPerMatch: Int
+        val gamesPerMatch: Int,
+        val deckFormat: String? = null
     )
 
     @GetMapping("/{lobbyId}/status")
@@ -71,7 +72,8 @@ class TournamentController(
                     format = lobby.format.name,
                     setNames = lobby.setNames,
                     boosterCount = lobby.boosterCount,
-                    gamesPerMatch = lobby.gamesPerMatch
+                    gamesPerMatch = lobby.gamesPerMatch,
+                    deckFormat = lobby.deckFormat?.name
                 )
             }
 

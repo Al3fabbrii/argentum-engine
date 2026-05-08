@@ -3,6 +3,11 @@ package com.wingedsheep.gameserver.deck
 import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.mtg.sets.definitions.por.PortalSet
 import com.wingedsheep.sdk.core.DeckFormat
+import com.wingedsheep.sdk.core.ManaCost
+import com.wingedsheep.sdk.core.Subtype
+import com.wingedsheep.sdk.core.Supertype
+import com.wingedsheep.sdk.model.CardDefinition
+import com.wingedsheep.sdk.model.Deck
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
@@ -14,8 +19,57 @@ class DeckValidatorTest : FunSpec({
     val registry = CardRegistry().apply {
         register(PortalSet.cards)
         register(PortalSet.basicLands)
+
+        // Commander-format fixtures. Portal has no legendary creatures, so register a small
+        // hand-crafted pool with controlled color identity for the commander tests below.
+        register(CardDefinition.creature(
+            name = "Test Mono-Green Commander",
+            manaCost = ManaCost.parse("{1}{G}"),
+            subtypes = setOf(Subtype("Elf")),
+            power = 2,
+            toughness = 2,
+            supertypes = setOf(Supertype.LEGENDARY),
+        ))
+        register(CardDefinition.creature(
+            name = "Test Non-Legendary",
+            manaCost = ManaCost.parse("{2}"),
+            subtypes = setOf(Subtype("Beast")),
+            power = 3,
+            toughness = 3,
+        ))
+        register(CardDefinition.creature(
+            name = "Test Green Bear",
+            manaCost = ManaCost.parse("{1}{G}"),
+            subtypes = setOf(Subtype("Bear")),
+            power = 2,
+            toughness = 2,
+        ))
+        register(CardDefinition.creature(
+            name = "Test Red Goblin",
+            manaCost = ManaCost.parse("{R}"),
+            subtypes = setOf(Subtype("Goblin")),
+            power = 1,
+            toughness = 1,
+        ))
+        register(CardDefinition.planeswalker(
+            name = "Test Walker With Override",
+            manaCost = ManaCost.parse("{2}{G}"),
+            subtypes = setOf(Subtype("Test")),
+            startingLoyalty = 3,
+            oracleText = "Test Walker With Override can be your commander.",
+        ))
     }
     val validator = DeckValidator(registry)
+
+    /**
+     * Build a Commander-shaped Deck of the given commander padded with Forests up to the
+     * 100-card library + commander total. Useful for asserting a single rule in isolation
+     * without having to spell out 99 entries per test.
+     */
+    fun commanderDeckOf(commander: String, extras: List<String> = emptyList()): Deck {
+        val padded = extras + List(99 - extras.size) { "Forest" }
+        return Deck(cards = padded, commander = commander)
+    }
 
     test("empty deck reports too-few-cards error") {
         val result = validator.validate(emptyMap())
@@ -149,5 +203,116 @@ class DeckValidatorTest : FunSpec({
             cardName = "Bog Imp"
         )
         rule shouldBe null
+    }
+
+    // ---------------------------------------------------------------------------
+    // Commander rules — eligibility, color identity, deck shape via Deck overload
+    // ---------------------------------------------------------------------------
+
+    test("Commander Deck with legal commander and on-identity cards passes") {
+        val deck = commanderDeckOf("Test Mono-Green Commander")
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.none {
+            it.code in setOf("INVALID_COMMANDER", "COLOR_IDENTITY_VIOLATION", "MISSING_COMMANDER")
+        } shouldBe true
+        result.totalCards shouldBe 100
+    }
+
+    test("Commander Deck without a commander surfaces no error from the legacy Map path") {
+        // Map overload still enforces the 100-card singleton shape but must NOT raise
+        // MISSING_COMMANDER — the legacy submission surface doesn't carry a commander, and
+        // existing callers shouldn't suddenly start failing.
+        val result = validator.validate(mapOf("Forest" to 100), DeckFormat.COMMANDER)
+        result.errors.none { it.code == "MISSING_COMMANDER" } shouldBe true
+    }
+
+    test("Commander Deck overload without a commander raises MISSING_COMMANDER") {
+        val deck = Deck(cards = List(100) { "Forest" }, commander = null)
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.map { it.code } shouldContain "MISSING_COMMANDER"
+    }
+
+    test("non-legendary commander is rejected with INVALID_COMMANDER") {
+        val deck = commanderDeckOf("Test Non-Legendary")
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.valid shouldBe false
+        val invalid = result.errors.single { it.code == "INVALID_COMMANDER" }
+        invalid.cardName shouldBe "Test Non-Legendary"
+        // No identity check should fire when the commander itself isn't legal — the comparison
+        // would be misleading.
+        result.errors.none { it.code == "COLOR_IDENTITY_VIOLATION" } shouldBe true
+    }
+
+    test("planeswalker commander with override clause is accepted") {
+        val deck = commanderDeckOf("Test Walker With Override")
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.none { it.code == "INVALID_COMMANDER" } shouldBe true
+    }
+
+    test("off-color card under a mono-green commander raises COLOR_IDENTITY_VIOLATION") {
+        // Mono-green commander, deck contains a red goblin — that's a color-identity break.
+        val deck = commanderDeckOf("Test Mono-Green Commander", extras = listOf("Test Red Goblin"))
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.valid shouldBe false
+        val violation = result.errors.single { it.code == "COLOR_IDENTITY_VIOLATION" }
+        violation.cardName shouldBe "Test Red Goblin"
+        violation.message shouldContainString "Red"
+    }
+
+    test("on-color cards under a mono-green commander pass identity check") {
+        val deck = commanderDeckOf(
+            "Test Mono-Green Commander",
+            extras = List(4) { "Test Green Bear" },
+        )
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.none { it.code == "COLOR_IDENTITY_VIOLATION" } shouldBe true
+    }
+
+    test("on-color basics (Forest under green commander) pass identity check") {
+        val deck = commanderDeckOf("Test Mono-Green Commander")
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.none { it.code == "COLOR_IDENTITY_VIOLATION" } shouldBe true
+    }
+
+    test("off-color basics (Mountain under green commander) raise COLOR_IDENTITY_VIOLATION") {
+        // Mountains contribute red to color identity via their Mountain subtype (CR 903.4 —
+        // basic land types are associated with their colors). A 99-Mountain deck under a
+        // mono-green commander must therefore fail identity, not pass.
+        val deck = Deck(
+            cards = List(99) { "Mountain" },
+            commander = "Test Mono-Green Commander",
+        )
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.valid shouldBe false
+        val violation = result.errors.single { it.code == "COLOR_IDENTITY_VIOLATION" }
+        violation.cardName shouldBe "Mountain"
+        violation.message shouldContainString "Red"
+    }
+
+    test("non-commander formats ignore the Deck.commander field") {
+        // If someone submits a Standard list via the Deck overload with a stray commander, the
+        // commander rules don't apply — Standard's profile stays in charge.
+        val deck = Deck(
+            cards = List(60) { "Mountain" },
+            commander = "Test Mono-Green Commander",  // ignored by Standard validation
+        )
+        val result = validator.validate(deck, DeckFormat.STANDARD)
+        result.errors.none {
+            it.code in setOf("INVALID_COMMANDER", "COLOR_IDENTITY_VIOLATION", "MISSING_COMMANDER")
+        } shouldBe true
+    }
+
+    test("commander appearing again in main deck trips the singleton cap") {
+        // CR 903.5b: the commander begins in the command zone and the deck is singleton, so
+        // the commander cannot also appear in the 99. We surface this as TOO_MANY_COPIES via
+        // the merged-counts check rather than a bespoke error.
+        val deck = Deck(
+            cards = listOf("Test Mono-Green Commander") + List(98) { "Forest" },
+            commander = "Test Mono-Green Commander",
+        )
+        val result = validator.validate(deck, DeckFormat.COMMANDER)
+        result.errors.any {
+            it.code == "TOO_MANY_COPIES" && it.cardName == "Test Mono-Green Commander"
+        } shouldBe true
     }
 })

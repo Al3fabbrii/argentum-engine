@@ -10,6 +10,7 @@ import type { ReplayData } from '@/replay/reconstructSnapshots.ts'
 import { QuickGameLobbyOverlay } from './QuickGameLobbyOverlay'
 import { useDeckLibrary } from '@/store/deckLibrary'
 import { DeckPicker } from './DeckPicker'
+import { labelForFormat } from '@/utils/deckLegality'
 import styles from './GameUI.module.css'
 
 type GameMode = 'normal' | 'tournament'
@@ -23,6 +24,7 @@ interface PublicTournamentSummary {
   setNames: string[]
   boosterCount: number
   gamesPerMatch: number
+  deckFormat?: string | null
 }
 
 interface PublicQuickGameSummary {
@@ -31,6 +33,7 @@ interface PublicQuickGameSummary {
   maxPlayers: number
   setCode: string | null
   hostName: string | null
+  format?: string | null
 }
 
 type PublicLobbyEntry =
@@ -463,14 +466,20 @@ function publicLobbyName(entry: PublicLobbyEntry): string {
 function publicLobbyMeta(entry: PublicLobbyEntry): string {
   if (entry.kind === 'tournament') {
     if (entry.format === 'PREMADE_DECKS') {
-      const base = `Premade Decks · ${entry.playerCount}/${entry.maxPlayers} players`
-      return entry.gamesPerMatch > 1 ? `${base} · ${entry.gamesPerMatch} games per matchup` : base
+      const parts = ['Premade Decks']
+      if (entry.deckFormat) parts.push(labelForFormat(entry.deckFormat))
+      parts.push(`${entry.playerCount}/${entry.maxPlayers} players`)
+      if (entry.gamesPerMatch > 1) parts.push(`${entry.gamesPerMatch} games per matchup`)
+      return parts.join(' · ')
     }
     const base = `${formatTournamentFormat(entry.format)} · ${entry.boosterCount} ${entry.format === 'DRAFT' ? 'packs' : 'boosters'} · ${entry.playerCount}/${entry.maxPlayers} players`
     return entry.gamesPerMatch > 1 ? `${base} · ${entry.gamesPerMatch} games per matchup` : base
   }
   const setLabel = entry.setCode ?? 'Random set'
-  return `Quick Game · ${setLabel} · ${entry.playerCount}/${entry.maxPlayers} players`
+  const parts = ['Quick Game', setLabel]
+  if (entry.format) parts.push(labelForFormat(entry.format))
+  parts.push(`${entry.playerCount}/${entry.maxPlayers} players`)
+  return parts.join(' · ')
 }
 
 function formatTournamentFormat(format: PublicTournamentSummary['format']): string {

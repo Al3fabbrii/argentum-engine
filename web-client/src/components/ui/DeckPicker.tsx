@@ -20,7 +20,11 @@
  *   POST /api/decks/validate  — authoritative validation pass when a list is non-empty
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useDeckLibrary, type SavedDeck } from '@/store/deckLibrary'
+import {
+  useDeckLibrary,
+  mergeCommanderIntoCards,
+  type SavedDeck,
+} from '@/store/deckLibrary'
 import {
   labelForFormat,
   useDeckLegalFormats,
@@ -231,7 +235,14 @@ export function DeckPicker({
         return parseDeckText(pasteText)
       case 'saved': {
         const saved = decks.find((d) => d.id === selectedSavedId)
-        return saved?.cards ?? {}
+        if (!saved) return {}
+        // Saved decks store the commander separately from `cards` (per the
+        // `SavedDeck.commander` contract — and matching CR 903.6a). Merge it
+        // back so consumers that just want "the full deck list" see all 100
+        // cards. Quick Game / Premade-Decks tournament submission flows feed
+        // the result straight into the lobby payload, so without this the
+        // server would receive 99 cards and the commander would be missing.
+        return mergeCommanderIntoCards(saved.cards, saved.commander ?? null)
       }
       case 'examples':
         // Examples become a deck via the picker's Paste preview as soon as the user clicks one.
@@ -301,10 +312,14 @@ export function DeckPicker({
   }
 
   // Server-authoritative legality. Single batched POST covers every saved deck; the result is
-  // a deckId → format[] map keyed by format name (uppercase).
+  // a deckId → format[] map keyed by format name (uppercase). Commander is merged in so
+  // count-based format checks (e.g. exactly 100 for Commander) see the full deck — saved
+  // decks keep the commander out of `cards` per `SavedDeck.commander`.
   const legalityInput = useMemo(() => {
     const out: Record<string, Record<string, number>> = {}
-    for (const d of decks) out[d.id] = d.cards
+    for (const d of decks) {
+      out[d.id] = mergeCommanderIntoCards(d.cards, d.commander ?? null)
+    }
     return out
   }, [decks])
   const legalityMap = useDeckLegalFormats(legalityInput)
@@ -344,7 +359,10 @@ export function DeckPicker({
               if (selectedSavedId === id) setSelectedSavedId(null)
             }}
             onEdit={(d) => {
-              setPasteText(formatDeckText(d.cards))
+              // Show the full deck in the paste editor — including the commander,
+              // which is stored separately on `SavedDeck` but should appear in the
+              // text the user can edit.
+              setPasteText(formatDeckText(mergeCommanderIntoCards(d.cards, d.commander ?? null)))
               setPendingName(d.name)
               setTab('paste')
             }}
@@ -519,7 +537,8 @@ function SavedDecksPanel({
       )}
       <ul className={styles.savedList}>
         {decks.map((d) => {
-          const total = Object.values(d.cards).reduce((a, b) => a + b, 0)
+          const fullCards = mergeCommanderIntoCards(d.cards, d.commander ?? null)
+          const total = Object.values(fullCards).reduce((a, b) => a + b, 0)
           const legalIn = legalityMap[d.id] ?? []
           return (
             <li

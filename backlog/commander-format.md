@@ -4,6 +4,72 @@ Add Commander format support to the Argentum Engine. Commander is a 100-card sin
 legendary creature commander, 40 starting life, and a 21-commander-damage loss condition. Phase 1 targets **1v1
 Commander** only — multiplayer (3-4 player free-for-all) is its own project.
 
+## Status (2026-05-08)
+
+Deck-construction layer + deckbuilder UI shipped ahead of the engine work. The runtime engine (command zone setup,
+casting from command, commander tax, zone-change redirect, commander damage SBA) is still untouched.
+
+**Done**
+
+- ✅ **1.7 — Deck validator commander rules.** `DeckValidator.validate(Deck, format)` overload enforces commander
+  eligibility (legendary creatures + planeswalkers + "can be your commander" override clause), color-identity
+  subset, and `MISSING_COMMANDER` for commander-shape formats. Legacy `Map<String, Int>` overload preserved for
+  back-compat.
+- ✅ **`Deck.commander: String?` field** in `mtg-sdk` (default null; backward-compatible across all existing tests
+  and call sites).
+- ✅ **`MtgaDeckFormat` parser/serializer** with explicit `Commander` section + format-gated first-card fallback
+  for paste-imports from Moxfield / Archidekt / Arena.
+- ✅ **`DecksController.validate`** accepts an optional `commander` and routes to the `Deck` overload when present.
+- ✅ **`DeckFormat.isCommanderShape`** helper (Commander, Brawl, Standard Brawl).
+- ✅ **`CommanderEligibility`** in game-server (legendary creature, planeswalker with override clause, or any card
+  with explicit "can be your commander" oracle text).
+- ✅ **Phase 2 — color identity (most of it).** `CardDefinition.colorIdentity` now reads CR 903.4 properly:
+  mana cost colors **+** oracle-text mana symbols (incl. hybrid `{W/U}`, `{2/G}`, Phyrexian `{W/P}`) **+** basic
+  land subtypes (Plains→W, Island→U, Swamp→B, Mountain→R, Forest→G — applies to dual lands like Tundra too).
+- ✅ **1.8 partial — deckbuilder UI.**
+  - Crown toggle button on each row in commander-shape formats; gated to legendary creatures + planeswalkers,
+    server-side `CommanderEligibility` is the authoritative gate.
+  - Active commander row gets a gold border + filled crown badge.
+  - Commander hoists to a dedicated **Commander** group at the top of the deck list, regardless of card type.
+  - `SavedDeck.commander?` persisted in localStorage; restored on load, cleared on new / import / non-commander
+    format / card removal.
+  - Validation request threads `commander` to the server so identity violations show live as the user designates.
+  - Color filter chips on the left rail render real mana SVG icons (W/U/B/R/G/C) instead of colored dots.
+
+**Pending follow-ups (this section)**
+
+These surfaced during the deck-construction work and are scoped tightly enough to land independently of the
+larger Phase 1 engine plan.
+
+- [ ] **Color indicators (rule 204).** `CardDefinition` has no field for them; `colorIdentity` therefore can't
+  fold them in. Affects MDFC backs and the small set of cards that have an indicator without a colored mana
+  symbol. There's a TODO in the `colorIdentity` getter — when an `indicator: Set<Color>?` (or similar) field is
+  added to `CardDefinition`, union it into the identity computation. Tests live in
+  `mtg-sdk/.../model/ColorIdentityTest.kt`; add an "indicator without mana cost contributes to identity" case
+  alongside the existing ones.
+- [ ] **Wire `commander` through deck-submission paths.** `Deck.commander` is plumbed end-to-end for
+  `/api/decks/validate`, but the lobby / quick-game / tournament submission DTOs still send flat
+  `Record<string, number>` payloads. Until they're updated, those flows can't enforce commander color identity at
+  submit time. Specifically:
+  - `web-client/src/types/messages.ts` — `SubmitQuickGameLobbyDeckMessage`, `SubmitSealedDeckMessage`, etc.: add
+    optional `commander?: string`.
+  - `game-server/.../handler/QuickGameLobbyHandler.kt:101, 270` and `LobbyHandler.kt:1829` — switch to the
+    `Deck` overload when the client supplies a commander.
+  - Quick Game lobby UI / Custom-Decks-Tournament UI — pass through the saved deck's `commander` field on
+    submission. Today they default to null and validation runs in legacy mode.
+- [ ] **Update the now-stale "structural rules" comment** in `DeckValidator.profileFor` (line ~140). Color
+  identity and commander eligibility are now enforced when a `Deck` is supplied. Only **partner / Background /
+  Friends Forever pairs** remain as a TODO at the deck-construction layer (Phase 4 territory, but the comment
+  should reflect current scope).
+- [ ] **Engine command-zone instantiation (Phase 1.2 entry point).** `GameInitializer.kt:139` currently iterates
+  `Deck.cards` into the library. The data model now carries a `commander` field, but the engine still ignores
+  it. Wiring this is the natural next step before any Phase 1.3+ work (cast from command, tax, damage, redirect)
+  starts paying off.
+
+Everything below this section is the original Phase 1 → Phase 4 plan, unchanged.
+
+---
+
 ## Engine survey (what already exists)
 
 - **Multiplayer:** `GameState.initial()` (`rules-engine/.../state/GameState.kt:458`) and `GameInitializer`

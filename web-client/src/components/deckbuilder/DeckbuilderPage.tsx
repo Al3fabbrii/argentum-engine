@@ -11,8 +11,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useDeckLibrary, type SavedDeck } from '@/store/deckLibrary'
-import { ManaCost } from '@/components/ui/ManaSymbols'
+import {
+  useDeckLibrary,
+  mergeCommanderIntoCards,
+  stripCommanderFromCards,
+  type SavedDeck,
+} from '@/store/deckLibrary'
+import { ManaCost, ManaSymbol } from '@/components/ui/ManaSymbols'
 import { HoverCardPreview } from '@/components/ui/HoverCardPreview'
 import { getCardImageUrl } from '@/utils/cardImages'
 import {
@@ -189,20 +194,52 @@ export function DeckbuilderPage() {
   const [deckName, setDeckName] = useState('Untitled deck')
   const [deckCards, setDeckCards] = useState<Record<string, number>>({})
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null)
+  // Designated commander for Commander/Brawl/Standard Brawl decks. Null when no commander has
+  // been picked yet, or when the current format doesn't use a commander. The deckbuilder UI
+  // exposes a crown toggle on each row to set/clear this — see DeckListPanel below.
+  const [commander, setCommander] = useState<string | null>(null)
 
-  // Hydrate from URL deckId once decks are loaded.
+  // Hydrate from URL deckId once decks are loaded. Also push the saved deck's stamped
+  // format into the URL — without it, `activeFormat` stays whatever was in the search
+  // params (often `null`), and the "clear commander when not a commander format" effect
+  // would immediately wipe a just-loaded commander designation.
+  //
+  // Guarded by a ref so the effect runs at most once per actual `deckId` change. Without
+  // this, react-router's `setSearchParams` reference changes on every URL update — which
+  // includes typing into the search filter. Each keystroke would otherwise re-trigger
+  // hydration and overwrite in-progress edits with whatever's persisted in localStorage.
+  const lastHydratedDeckIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (!hydrated || !deckId) return
+    if (lastHydratedDeckIdRef.current === deckId) return
+    lastHydratedDeckIdRef.current = deckId
     const existing = getDeck(deckId)
     if (existing) {
       setDeckName(existing.name)
-      setDeckCards(existing.cards)
+      setDeckCards(mergeCommanderIntoCards(existing.cards, existing.commander ?? null))
+      setCommander(existing.commander ?? null)
       setActiveDeckId(existing.id)
+      if (existing.format) {
+        setSearchParams(
+          (prev) => {
+            const params = new URLSearchParams(prev)
+            const next = setFormatToken(params.get('q') ?? '', existing.format!)
+            if (next) params.set('q', next)
+            else params.delete('q')
+            return params
+          },
+          { replace: true },
+        )
+      }
     }
+    // setSearchParams is intentionally excluded — see the comment above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, deckId, getDeck])
 
   // Import-from-text modal visibility.
   const [importOpen, setImportOpen] = useState(false)
+  // Bulk-edit (export + edit text) modal visibility.
+  const [bulkEditOpen, setBulkEditOpen] = useState(false)
   // Saved-decks browser overlay visibility.
   const [decksBrowserOpen, setDecksBrowserOpen] = useState(false)
 
@@ -250,6 +287,25 @@ export function DeckbuilderPage() {
     return m ? m[1]!.toUpperCase() : null
   }, [query])
 
+  // True when the active format uses a designated commander (CR 903.5b for Commander; same
+  // shape for Brawl and Standard Brawl). Mirrors `DeckFormat.isCommanderShape` on the server.
+  const isCommanderFormat = useMemo(
+    () => activeFormat === 'COMMANDER' || activeFormat === 'BRAWL' || activeFormat === 'STANDARD_BRAWL',
+    [activeFormat],
+  )
+
+  // Clear the commander designation when:
+  //  - the user switches to a non-commander format (the field would otherwise be ignored
+  //    by validation but stay visually marked, which is confusing), or
+  //  - the designated commander gets removed from the deck list entirely.
+  // Both conditions are quiet: we don't surface a toast, the crown just goes away.
+  useEffect(() => {
+    if (!isCommanderFormat && commander !== null) setCommander(null)
+  }, [isCommanderFormat, commander])
+  useEffect(() => {
+    if (commander && !(commander in deckCards)) setCommander(null)
+  }, [commander, deckCards])
+
   const predicate = useMemo(() => parseQuery(query), [query])
   const filtered = useMemo(() => {
     const result = catalog.filter(predicate)
@@ -277,12 +333,32 @@ export function DeckbuilderPage() {
     const ctrl = new AbortController()
     validateAbortRef.current = ctrl
     const handle = window.setTimeout(() => {
+      // The server's `Deck.cards` is documented as the library only — it does NOT include
+      // the commander (CR 903.6a: the commander begins in the command zone). The validator
+      // adds the commander on top of `cards`, so if we include the designated commander in
+      // `deckList` it gets counted twice. Strip it out at the boundary; the internal UI
+      // model still keeps the commander in `deckCards` so the crown sits on a real row.
+      const sendCommander = isCommanderFormat && commander
+      const deckListForValidation = sendCommander
+        ? Object.fromEntries(
+            Object.entries(deckCards).flatMap(([name, count]) => {
+              if (name !== commander) return [[name, count]]
+              const remaining = count - 1
+              return remaining > 0 ? [[name, remaining]] : []
+            }),
+          )
+        : deckCards
       fetch('/api/decks/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          deckList: deckCards,
+          deckList: deckListForValidation,
           ...(activeFormat ? { format: activeFormat } : {}),
+          // Threading commander through the validation payload lets the server apply the
+          // commander rules (eligibility + color identity) live as the user designates one.
+          // Only sent for commander-shape formats — for Standard/Modern/etc. it'd be ignored
+          // anyway, but keeping the wire payload minimal avoids stale fields surfacing later.
+          ...(sendCommander ? { commander } : {}),
         }),
         signal: ctrl.signal,
       })
@@ -296,14 +372,29 @@ export function DeckbuilderPage() {
       window.clearTimeout(handle)
       ctrl.abort()
     }
-  }, [deckCards, activeFormat])
+  }, [deckCards, activeFormat, isCommanderFormat, commander])
+
+  // Map card-name → set of violation codes produced by the latest validation pass. Used to
+  // light up specific rows in the deck list (color identity, singleton, format-illegal copies)
+  // without re-implementing those rules on the client. Keys are case-sensitive card names —
+  // identical to the entries in `deckCards`, so `rowViolations.get(entry.name)` is a direct hit.
+  const rowViolations = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+    for (const issue of validation?.errors ?? []) {
+      if (!issue.cardName) continue
+      const codes = map.get(issue.cardName) ?? new Set<string>()
+      codes.add(issue.code)
+      map.set(issue.cardName, codes)
+    }
+    return map
+  }, [validation])
 
   // ----- Mutations -----
 
   const addCard = (card: CardSummary) => {
     setDeckCards((prev) => {
       const current = prev[card.name] ?? 0
-      const max = card.basicLand ? Infinity : 4
+      const max = effectiveCopyCap(card, isCommanderFormat)
       if (current >= max) return prev
       return { ...prev, [card.name]: current + 1 }
     })
@@ -332,16 +423,22 @@ export function DeckbuilderPage() {
   const handleNew = () => {
     setDeckName('Untitled deck')
     setDeckCards({})
+    setCommander(null)
     setActiveDeckId(null)
     navigate(`/deckbuilder${searchSuffix()}`)
   }
 
   const handleSave = () => {
+    // Per `SavedDeck.commander`: the commander is stored separately from `cards` (the
+    // library), matching the server's `Deck.cards` convention. Strip it out on save so
+    // reloading + re-validating doesn't double-count.
+    const designated = isCommanderFormat ? commander : null
     const saved = saveDeck({
       ...(activeDeckId ? { id: activeDeckId } : {}),
       name: deckName.trim() || 'Untitled deck',
-      cards: deckCards,
+      cards: stripCommanderFromCards(deckCards, designated),
       ...(activeFormat ? { format: activeFormat } : {}),
+      ...(designated ? { commander: designated } : {}),
     })
     setActiveDeckId(saved.id)
     if (saved.id !== deckId) navigate(`/deckbuilder/${saved.id}${searchSuffix()}`, { replace: true })
@@ -350,10 +447,12 @@ export function DeckbuilderPage() {
   const handleSaveAs = () => {
     const name = window.prompt('New deck name', `${deckName} (copy)`)
     if (!name) return
+    const designated = isCommanderFormat ? commander : null
     const saved = saveDeck({
       name: name.trim(),
-      cards: deckCards,
+      cards: stripCommanderFromCards(deckCards, designated),
       ...(activeFormat ? { format: activeFormat } : {}),
+      ...(designated ? { commander: designated } : {}),
     })
     setDeckName(saved.name)
     setActiveDeckId(saved.id)
@@ -369,9 +468,22 @@ export function DeckbuilderPage() {
 
   const handleLoadSaved = (deck: SavedDeck) => {
     setDeckName(deck.name)
-    setDeckCards(deck.cards)
+    setDeckCards(mergeCommanderIntoCards(deck.cards, deck.commander ?? null))
+    setCommander(deck.commander ?? null)
     setActiveDeckId(deck.id)
-    navigate(`/deckbuilder/${deck.id}${searchSuffix()}`)
+    // Restore the deck's stamped format into the URL alongside the existing search
+    // params. Without this, `activeFormat` stays whatever was selected before, and
+    // the "clear commander when not a commander format" effect would immediately
+    // wipe a just-loaded commander designation. Done in one navigate call so we
+    // don't race against the async `setSearchParams` update.
+    const params = new URLSearchParams(searchParams)
+    if (deck.format) {
+      const nextQ = setFormatToken(params.get('q') ?? '', deck.format)
+      if (nextQ) params.set('q', nextQ)
+      else params.delete('q')
+    }
+    const suffix = params.toString()
+    navigate(`/deckbuilder/${deck.id}${suffix ? `?${suffix}` : ''}`)
     setDecksBrowserOpen(false)
   }
 
@@ -388,8 +500,15 @@ export function DeckbuilderPage() {
     if (deck.id === activeDeckId) handleNew()
   }
 
-  const handleImport = (cards: Record<string, number>, suggestedName: string | null) => {
+  const handleImport = (
+    cards: Record<string, number>,
+    suggestedName: string | null,
+    importedCommander: string | null,
+  ) => {
     setDeckCards(cards)
+    // The commander designation rides along when the source list had a Commander
+    // section; otherwise reset so a stale value from the previous deck doesn't leak.
+    setCommander(importedCommander)
     setActiveDeckId(null)
     if (suggestedName) setDeckName(suggestedName)
     navigate(`/deckbuilder${searchSuffix()}`)
@@ -412,6 +531,13 @@ export function DeckbuilderPage() {
         <button className={styles.iconButton} onClick={() => setImportOpen(true)}>
           Import deck
         </button>
+        <button
+          className={styles.iconButton}
+          onClick={() => setBulkEditOpen(true)}
+          disabled={Object.keys(deckCards).length === 0}
+        >
+          Bulk edit / export
+        </button>
         <button className={styles.iconButton} onClick={handleNew}>
           New deck
         </button>
@@ -423,6 +549,21 @@ export function DeckbuilderPage() {
           hasExisting={Object.keys(deckCards).length > 0}
           onCancel={() => setImportOpen(false)}
           onImport={handleImport}
+        />
+      )}
+
+      {bulkEditOpen && (
+        <BulkEditDeckModal
+          deckCards={deckCards}
+          commander={commander}
+          catalog={catalog}
+          catalogIndex={catalogIndex}
+          onClose={() => setBulkEditOpen(false)}
+          onApply={(cards, nextCommander) => {
+            setDeckCards(cards)
+            setCommander(nextCommander)
+            setBulkEditOpen(false)
+          }}
         />
       )}
 
@@ -494,6 +635,13 @@ export function DeckbuilderPage() {
           activeFormat={activeFormat}
           onAdd={addCard}
           onRemove={removeCard}
+          commander={commander}
+          showCommanderControls={isCommanderFormat}
+          onToggleCommander={(name) =>
+            setCommander((prev) => (prev === name ? null : name))
+          }
+          rowViolations={rowViolations}
+          isCommanderFormat={isCommanderFormat}
         />
 
         <BasicLandsPanel
@@ -568,7 +716,7 @@ export function DeckbuilderPage() {
 }
 
 // ---------------------------------------------------------------------------
-// Import-deck modal (MTG Arena format)
+// Import-deck modal — accepts plain text, MTG Arena, and Moxfield formats.
 // ---------------------------------------------------------------------------
 
 const IMPORT_PLACEHOLDER = `Deck
@@ -588,20 +736,30 @@ function ImportDeckModal({
   catalog: CardSummary[]
   hasExisting: boolean
   onCancel: () => void
-  onImport: (cards: Record<string, number>, suggestedName: string | null) => void
+  onImport: (
+    cards: Record<string, number>,
+    suggestedName: string | null,
+    commander: string | null,
+  ) => void
 }) {
   const [text, setText] = useState('')
 
   // Re-parse on every keystroke. The catalog is fixed for the modal lifetime,
-  // so only the text input drives the preview.
+  // so only the text input drives the preview. Commander entries are merged
+  // into the main entries so they show up in the catalogue resolution and
+  // land in the imported deck list (the commander itself is also a card in
+  // the deck — see designation logic below).
   const preview = useMemo(() => {
     if (text.trim() === '') return null
     const parsed = parseArenaDeckList(text)
-    const resolved = resolveAgainstCatalog(parsed.entries, catalog)
+    const resolved = resolveAgainstCatalog(
+      [...parsed.commander, ...parsed.entries],
+      catalog,
+    )
     return { parsed, resolved }
   }, [text, catalog])
 
-  const canImport = !!preview && preview.resolved.matchedCards > 0
+  const canImport = !!preview && preview.resolved.totalCards > 0
 
   const handleConfirm = () => {
     if (!preview || !canImport) return
@@ -611,7 +769,19 @@ function ImportDeckModal({
     ) {
       return
     }
-    onImport(preview.resolved.deckCards, null)
+    // Merge implemented cards with unimplemented ones so the imported deck
+    // reflects the full intended list. Unknown cards render as placeholder
+    // rows in the deck list and are flagged by the validator.
+    const merged = { ...preview.resolved.deckCards, ...preview.resolved.unmatchedCards }
+    // First entry under a `Commander` header becomes the designation. Use the
+    // resolved/canonical card name when we matched it (so casing matches the
+    // catalogue); fall back to the raw name otherwise.
+    const commanderEntry = preview.parsed.commander[0] ?? null
+    const commanderName = commanderEntry
+      ? catalog.find((c) => c.name.toLowerCase() === commanderEntry.name.toLowerCase())?.name
+        ?? commanderEntry.name
+      : null
+    onImport(merged, null, commanderName)
   }
 
   return (
@@ -619,16 +789,18 @@ function ImportDeckModal({
       <div className={styles.importBackdrop} onClick={onCancel} />
       <div className={styles.importDialog} role="dialog" aria-label="Import deck">
         <div className={styles.importHeader}>
-          <strong>Import deck (MTG Arena format)</strong>
+          <strong>Import deck</strong>
           <button className={styles.linkButton} onClick={onCancel} type="button">
             Close
           </button>
         </div>
         <p className={styles.importHint}>
-          Paste a deck list. Each line is <code>count name</code>, optionally followed by{' '}
-          <code>(SET) NUM</code>. Lines starting with <code>//</code> are ignored. Use{' '}
-          <code>Deck</code> / <code>Sideboard</code> headers to delimit sections — only the main
-          deck is imported.
+          Paste a deck list in <strong>plain text</strong>, <strong>MTG Arena</strong>, or{' '}
+          <strong>Moxfield</strong> format — the parser detects all three. Each line is{' '}
+          <code>count name</code>, optionally followed by <code>(SET) NUM</code> and Moxfield
+          decorations (<code>*F*</code>, <code>*A*</code>, <code>#tag</code>). Section headers like{' '}
+          <code>Deck</code>, <code>Sideboard</code>, <code>Commander</code> are recognised; lines
+          starting with <code>//</code> or <code>#</code> are comments.
         </p>
         <textarea
           className={styles.importTextarea}
@@ -650,7 +822,7 @@ function ImportDeckModal({
             type="button"
           >
             Import
-            {preview ? ` (${preview.resolved.matchedCards} cards)` : ''}
+            {preview ? ` (${preview.resolved.totalCards} cards)` : ''}
           </button>
         </div>
       </div>
@@ -674,7 +846,7 @@ function ImportPreview({
         <span>
           <strong>{resolved.matchedCards}</strong> matched
           {resolved.totalCards !== resolved.matchedCards
-            ? ` of ${resolved.totalCards}`
+            ? ` of ${resolved.totalCards} (${resolved.totalCards - resolved.matchedCards} placeholder)`
             : ''}
         </span>
         {parsed.sideboard.length > 0 && (
@@ -687,7 +859,9 @@ function ImportPreview({
 
       {resolved.unmatched.length > 0 && (
         <details className={styles.importDetails} open>
-          <summary>Unknown card names ({resolved.unmatched.length})</summary>
+          <summary>
+            Not implemented yet ({resolved.unmatched.length}) — imported as placeholders
+          </summary>
           <ul>
             {resolved.unmatched.map((u) => (
               <li key={`${u.entry.line}-${u.entry.raw}`}>
@@ -725,6 +899,248 @@ function ImportPreview({
       )}
     </div>
   )
+}
+
+// ---------------------------------------------------------------------------
+// Bulk-edit modal — editable MTG Arena text view of the current deck.
+// Doubles as an export modal: copy-to-clipboard works whether the user has
+// edited the text or not.
+// ---------------------------------------------------------------------------
+
+type ExportFormat = 'plain' | 'arena' | 'moxfield'
+
+const EXPORT_FORMATS: Array<{ value: ExportFormat; label: string; hint: string }> = [
+  { value: 'plain', label: 'Plain text', hint: 'Just count and name — most compatible.' },
+  { value: 'arena', label: 'MTG Arena', hint: 'Includes (SET) and collector number for Arena import.' },
+  { value: 'moxfield', label: 'Moxfield', hint: 'Same as Arena. Foil/alter/tag flags are preserved on import but not emitted (we don’t track them).' },
+]
+
+function BulkEditDeckModal({
+  deckCards,
+  commander,
+  catalog,
+  catalogIndex,
+  onClose,
+  onApply,
+}: {
+  deckCards: Record<string, number>
+  commander: string | null
+  catalog: CardSummary[]
+  catalogIndex: Record<string, CardSummary>
+  onClose: () => void
+  onApply: (cards: Record<string, number>, commander: string | null) => void
+}) {
+  const [format, setFormat] = useState<ExportFormat>('arena')
+
+  const rendered = useMemo(
+    () => formatDeck(deckCards, catalogIndex, format, commander),
+    [deckCards, catalogIndex, format, commander]
+  )
+  const [text, setText] = useState(rendered.text)
+  const [copied, setCopied] = useState(false)
+
+  // Parse-and-resolve mirrors the import flow so both modals stay consistent.
+  // The parser is format-agnostic and accepts plain / Arena / Moxfield input.
+  // Commander entries are merged into the resolved set so the user sees them
+  // in the matched/unmatched preview just like main-deck cards.
+  const preview = useMemo(() => {
+    if (text.trim() === '') return null
+    const parsed = parseArenaDeckList(text)
+    const resolved = resolveAgainstCatalog(
+      [...parsed.commander, ...parsed.entries],
+      catalog,
+    )
+    return { parsed, resolved }
+  }, [text, catalog])
+
+  const dirty = text !== rendered.text
+  const canApply = !!preview && preview.resolved.totalCards > 0
+
+  const handleFormatChange = (next: ExportFormat) => {
+    if (next === format) return
+    if (
+      dirty &&
+      !window.confirm('Switching format will discard your edits. Continue?')
+    ) {
+      return
+    }
+    setFormat(next)
+    const re = formatDeck(deckCards, catalogIndex, next, commander)
+    setText(re.text)
+  }
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Clipboard blocked — user can still select and copy by hand.
+    }
+  }
+
+  const handleApply = () => {
+    if (!preview || !canApply) return
+    if (!window.confirm('Replace your current deck contents with this list?')) return
+    const merged = { ...preview.resolved.deckCards, ...preview.resolved.unmatchedCards }
+    const commanderEntry = preview.parsed.commander[0] ?? null
+    const nextCommander = commanderEntry
+      ? catalog.find((c) => c.name.toLowerCase() === commanderEntry.name.toLowerCase())?.name
+        ?? commanderEntry.name
+      : null
+    onApply(merged, nextCommander)
+  }
+
+  const formatHint = EXPORT_FORMATS.find((f) => f.value === format)?.hint ?? ''
+
+  return (
+    <>
+      <div className={styles.importBackdrop} onClick={onClose} />
+      <div className={styles.importDialog} role="dialog" aria-label="Bulk edit / export deck">
+        <div className={styles.importHeader}>
+          <strong>Bulk edit / export deck</strong>
+          <button className={styles.linkButton} onClick={onClose} type="button">
+            Close
+          </button>
+        </div>
+        <div className={styles.formatSwitcher}>
+          <span className={styles.formatSwitcherLabel}>Format</span>
+          {EXPORT_FORMATS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              className={`${styles.formatSwitcherChip} ${
+                f.value === format ? styles.formatSwitcherChipActive : ''
+              }`}
+              onClick={() => handleFormatChange(f.value)}
+              title={f.hint}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <p className={styles.importHint}>
+          {formatHint} Paste lists from any of the three formats — the parser detects them all.
+          Edit the text and click <strong>Save changes</strong> to apply, or <strong>Copy</strong>{' '}
+          to export.
+        </p>
+        <textarea
+          className={styles.importTextarea}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          spellCheck={false}
+          autoFocus
+        />
+        {preview && <ImportPreview preview={preview} />}
+        <div className={styles.importActions}>
+          <button className={styles.secondaryButton} onClick={onClose} type="button">
+            Cancel
+          </button>
+          <button
+            className={styles.secondaryButton}
+            onClick={handleCopy}
+            type="button"
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+          <button
+            className={styles.primaryButton}
+            onClick={handleApply}
+            disabled={!canApply || !dirty}
+            type="button"
+          >
+            Save changes
+            {preview && dirty ? ` (${preview.resolved.totalCards} cards)` : ''}
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/**
+ * Render `deckCards` as MTG Arena deck-list text. Lands are placed in a
+ * trailing block. Unknown (not-implemented) cards mix into the spell block
+ * since we have no type info; their names are emitted plain so the text
+ * round-trips through `parseArenaDeckList` without confusing the parser.
+ */
+/**
+ * Render `deckCards` as deck-list text in one of three formats:
+ *   - `plain`:    `<count> <name>` only (most permissive importers).
+ *   - `arena`:    Adds `(SET) <collector>` when known. Uses `Deck` header.
+ *   - `moxfield`: Same wire shape as Arena for our subset (we don't track
+ *                 foils/alters/tags). Lines round-trip through Moxfield's
+ *                 bulk-edit input.
+ *
+ * The designated commander, if any, is emitted in its own `Commander` section
+ * and excluded from the main `Deck` block — that way re-importing produces
+ * the same `(deckCards, commander)` pair without double-counting. The parser
+ * also recognises plain-text exports without the `Commander` header (it falls
+ * through to `Deck`), so any tool downstream can still consume the output.
+ *
+ * Lands are placed in a trailing block so the spell curve is easy to scan.
+ * Unknown (not-implemented) cards mix into the spell block since we have no
+ * type info; their names are emitted plain so the text round-trips through
+ * the parser without confusion.
+ */
+function formatDeck(
+  deck: Record<string, number>,
+  catalog: Record<string, CardSummary>,
+  format: ExportFormat,
+  commander: string | null = null,
+): { text: string; totalCards: number; unknownCards: number } {
+  type Entry = { name: string; count: number; card: CardSummary | undefined }
+  const spells: Entry[] = []
+  const lands: Entry[] = []
+  let commanderEntry: Entry | null = null
+  let totalCards = 0
+  let unknownCards = 0
+  for (const [name, count] of Object.entries(deck)) {
+    if (count <= 0) continue
+    totalCards += count
+    const card = catalog[name]
+    if (!card) unknownCards += count
+    const entry: Entry = { name, count, card }
+    if (commander && name === commander) {
+      // Lift the commander out of the main block so re-import doesn't double
+      // it. We still keep its full count (typically 1) in the Commander
+      // section — partner pairs are uncommon enough that we render whatever
+      // count is in the deck rather than special-casing.
+      commanderEntry = entry
+      continue
+    }
+    if (card?.cardTypes.includes('LAND')) lands.push(entry)
+    else spells.push(entry)
+  }
+  spells.sort((a, b) => a.name.localeCompare(b.name))
+  lands.sort((a, b) => a.name.localeCompare(b.name))
+
+  const includePrinting = format !== 'plain'
+  const renderLine = (e: Entry): string => {
+    const base = `${e.count} ${e.name}`
+    if (!includePrinting || !e.card?.setCode) return base
+    const set = `(${e.card.setCode.toUpperCase()})`
+    return e.card.collectorNumber
+      ? `${base} ${set} ${e.card.collectorNumber}`
+      : `${base} ${set}`
+  }
+
+  const lines: string[] = []
+  if (commanderEntry) {
+    lines.push('Commander')
+    lines.push(renderLine(commanderEntry))
+    lines.push('')
+  }
+  // Plain text often omits headers; include `Deck` only for Arena/Moxfield
+  // where the section marker is the convention. Either way the parser
+  // accepts both shapes.
+  if (format !== 'plain') lines.push('Deck')
+  for (const e of spells) lines.push(renderLine(e))
+  if (lands.length > 0) {
+    if (lines.length > 0 && lines[lines.length - 1] !== '') lines.push('')
+    for (const e of lands) lines.push(renderLine(e))
+  }
+  return { text: lines.join('\n') + '\n', totalCards, unknownCards }
 }
 
 // ---------------------------------------------------------------------------
@@ -840,21 +1256,28 @@ function SavedDecksBrowser({
   }, [onClose])
 
   // Server-authoritative legality map (deckId → format names). The hook batches all decks
-  // into one POST and re-uses cache for unchanged decks.
+  // into one POST and re-uses cache for unchanged decks. Commander is folded into the
+  // card map so the count-based legality checks (e.g. exactly 100 for Commander) see the
+  // full deck — saved-deck storage keeps it separate per `SavedDeck.commander`.
   const legalityInput = useMemo(() => {
     const out: Record<string, Record<string, number>> = {}
-    for (const d of decks) out[d.id] = d.cards
+    for (const d of decks) {
+      out[d.id] = mergeCommanderIntoCards(d.cards, d.commander ?? null)
+    }
     return out
   }, [decks])
   const legalityMap = useDeckLegalFormats(legalityInput)
 
   // Pre-compute per-deck metadata once. Doing this up front keeps sort/filter
-  // O(n) for hundreds of decks even when the user types fast.
+  // O(n) for hundreds of decks even when the user types fast. Card totals and
+  // colour pips include the commander so the user-visible numbers match what
+  // they'd actually play with.
   const enriched = useMemo(
     () =>
       decks.map((d) => {
-        const total = Object.values(d.cards).reduce((a, b) => a + b, 0)
-        const colors = deckColors(d.cards, catalog)
+        const fullCards = mergeCommanderIntoCards(d.cards, d.commander ?? null)
+        const total = Object.values(fullCards).reduce((a, b) => a + b, 0)
+        const colors = deckColors(fullCards, catalog)
         const legalFormats = legalityMap[d.id] ?? []
         return { deck: d, total, colors, legalFormats }
       }),
@@ -1310,21 +1733,24 @@ function FilterSection({
             return (
               <button
                 key={letter}
-                className={`${styles.chip} ${active ? styles.chipActive : ''}`}
+                className={`${styles.chip} ${styles.chipMana} ${active ? styles.chipActive : ''}`}
                 onClick={() => toggleColorLetter(letter)}
                 type="button"
+                aria-label={label}
+                title={label}
               >
-                {label}
+                <ManaSymbol symbol={label} size={16} />
               </button>
             )
           })}
           <button
-            className={`${styles.chip} ${hasToken(query, 'is:colorless') ? styles.chipActive : ''}`}
+            className={`${styles.chip} ${styles.chipMana} ${hasToken(query, 'is:colorless') ? styles.chipActive : ''}`}
             onClick={() => toggle('is:colorless')}
             type="button"
+            aria-label="Colourless"
             title="Colourless cards"
           >
-            C
+            <ManaSymbol symbol="C" size={16} />
           </button>
         </div>
       </section>
@@ -1891,14 +2317,27 @@ function DeckListPanel({
   activeFormat,
   onAdd,
   onRemove,
+  commander,
+  showCommanderControls,
+  onToggleCommander,
+  rowViolations,
+  isCommanderFormat,
 }: {
   deckCards: Record<string, number>
   catalog: Record<string, CardSummary>
   activeFormat: string | null
   onAdd: (card: CardSummary) => void
   onRemove: (name: string) => void
+  commander: string | null
+  showCommanderControls: boolean
+  onToggleCommander: (name: string) => void
+  rowViolations: Map<string, Set<string>>
+  isCommanderFormat: boolean
 }) {
-  const grouped = useMemo(() => groupForDeckList(deckCards, catalog), [deckCards, catalog])
+  const grouped = useMemo(
+    () => groupForDeckList(deckCards, catalog, commander),
+    [deckCards, catalog, commander],
+  )
   const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
   const [hoverName, setHoverName] = useState<string | null>(null)
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null)
@@ -1938,11 +2377,69 @@ function DeckListPanel({
               !!entry.card?.legalFormats &&
               entry.card.legalFormats.length > 0 &&
               !entry.card.legalFormats.includes(activeFormat.toUpperCase())
+            const unknown = !entry.card
+            const isCommanderRow = showCommanderControls && commander === entry.name
+            // Eligible commanders: legendary creatures or planeswalkers. The server's
+            // CommanderEligibility is the authoritative gate (it also accepts the rare
+            // "can be your commander" oracle override on non-legendary creatures and oddities
+            // like Faceless One); this UI hint covers the 99% case so users don't crown a card
+            // the validator will immediately reject. The cursed override-clause cards still
+            // round-trip via paste-import or hand-edit if anyone ever needs them.
+            const canBeCommander = !!entry.card && (
+              (entry.card.supertypes.includes('LEGENDARY') && entry.card.cardTypes.includes('CREATURE')) ||
+              entry.card.cardTypes.includes('PLANESWALKER')
+            )
+            // Pull this row's violations out of the validation response. We surface two of
+            // them as inline visuals in the deck list (color identity outside the commander's;
+            // exceeding the per-format copy cap); the rest are still listed in the right-rail
+            // issues panel. The commander row itself is never marked as a copy violation —
+            // it's the deck's commander, not a duplicate (TOO_MANY_COPIES would only fire if
+            // the user *also* added it as a main-deck card, in which case the regular row
+            // gets the mark and the commander row stays clean).
+            const violationCodes = rowViolations.get(entry.name)
+            const offIdentity = violationCodes?.has('COLOR_IDENTITY_VIOLATION') ?? false
+            const tooManyCopies =
+              !isCommanderRow && (violationCodes?.has('TOO_MANY_COPIES') ?? false)
+            const violation = offIdentity || tooManyCopies
+            // Cap-aware `+` button. effectiveCopyCap mirrors the server's per-format limit so
+            // the user literally cannot exceed it; in commander-shape formats this is what
+            // blocks adding a second copy of any non-basic non-override card.
+            const cap = entry.card
+              ? effectiveCopyCap(entry.card, isCommanderFormat)
+              : Number.POSITIVE_INFINITY
+            const atCap = entry.count >= cap
+            const rowClasses = [
+              styles.deckRow,
+              illegal ? styles.deckRowIllegal : '',
+              unknown ? styles.deckRowUnknown : '',
+              isCommanderRow ? styles.deckRowCommander : '',
+              violation ? styles.deckRowViolation : '',
+            ]
+              .filter(Boolean)
+              .join(' ')
+            const violationReasons: string[] = []
+            if (offIdentity && commander) {
+              violationReasons.push(`Outside ${commander}'s color identity`)
+            }
+            if (tooManyCopies) {
+              violationReasons.push(
+                isCommanderFormat
+                  ? `${activeFormat} is singleton — only 1 copy allowed`
+                  : `Too many copies for ${activeFormat ?? 'this format'}`,
+              )
+            }
+            const rowTitle = unknown
+              ? 'Not implemented yet — placeholder only'
+              : illegal
+              ? `Not legal in ${activeFormat}`
+              : violationReasons.length > 0
+              ? violationReasons.join(' · ')
+              : undefined
             return (
               <div
                 key={entry.name}
-                className={`${styles.deckRow} ${illegal ? styles.deckRowIllegal : ''}`}
-                title={illegal ? `Not legal in ${activeFormat}` : undefined}
+                className={rowClasses}
+                title={rowTitle}
                 onMouseEnter={(e) => handleEnter(entry, e)}
                 onMouseMove={handleMove}
                 onMouseLeave={handleLeave}
@@ -1958,16 +2455,62 @@ function DeckListPanel({
                 </button>
                 <button
                   className={styles.deckRowStep}
-                  onClick={() => entry.card && onAdd(entry.card)}
-                  disabled={!entry.card}
+                  onClick={() => entry.card && !atCap && onAdd(entry.card)}
+                  disabled={!entry.card || atCap}
                   aria-label={`Increase ${entry.name}`}
-                  title="Add one"
+                  title={
+                    unknown
+                      ? 'Card not implemented'
+                      : atCap
+                      ? isCommanderFormat
+                        ? 'Singleton format — only 1 copy allowed'
+                        : `At copy limit (${cap})`
+                      : 'Add one'
+                  }
                   type="button"
                 >
                   +
                 </button>
                 <span className={styles.deckRowCount}>{entry.count}×</span>
-                <span className={styles.deckRowName}>{entry.name}</span>
+                <span className={styles.deckRowName}>
+                  {entry.name}
+                  {unknown && <span className={styles.deckRowUnknownTag}>not implemented</span>}
+                </span>
+                {showCommanderControls && (
+                  // Crown toggle. Always rendered in commander-shape formats so the column
+                  // stays aligned across rows; the button is disabled for unknown cards and
+                  // for cards that aren't legendary creatures or planeswalkers (the eligible
+                  // commander types). Active row gets a filled-gold crown, others get a faint
+                  // outline they can click to designate.
+                  <button
+                    type="button"
+                    className={`${styles.deckRowCrown} ${
+                      isCommanderRow ? styles.deckRowCrownActive : ''
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!unknown && canBeCommander) onToggleCommander(entry.name)
+                    }}
+                    disabled={unknown || !canBeCommander}
+                    aria-pressed={isCommanderRow}
+                    aria-label={
+                      isCommanderRow
+                        ? `Unset ${entry.name} as commander`
+                        : `Set ${entry.name} as commander`
+                    }
+                    title={
+                      unknown
+                        ? 'Card not implemented'
+                        : !canBeCommander
+                        ? 'Only legendary creatures or planeswalkers can be commanders'
+                        : isCommanderRow
+                        ? 'Commander — click to unset'
+                        : 'Set as commander'
+                    }
+                  >
+                    ♛
+                  </button>
+                )}
                 <span className={styles.deckRowCost}>
                   <ManaCost cost={entry.card?.manaCost || null} size={11} />
                 </span>
@@ -2123,6 +2666,50 @@ function colorKey(letter: string): string {
 }
 
 /**
+ * Per-card deck-size override parsed from oracle text. Mirrors `DeckValidator.parseDeckSizeOverride`
+ * on the server so the client `+` button respects "A deck can have any number / up to N cards
+ * named X" without round-tripping to the server.
+ */
+function parseDeckSizeOverride(card: CardSummary): number | null {
+  const text = card.oracleText ?? ''
+  if (!text) return null
+  const anyNumber = /A deck can have any number of cards named ([^.]+)\./i.exec(text)
+  if (anyNumber && anyNumber[1]?.trim().toLowerCase() === card.name.toLowerCase()) {
+    return Number.POSITIVE_INFINITY
+  }
+  const upTo = /A deck can have up to (one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards named ([^.]+)\./i.exec(text)
+  if (upTo && upTo[2]?.trim().toLowerCase() === card.name.toLowerCase()) {
+    const word = upTo[1]!.toLowerCase()
+    const map: Record<string, number> = {
+      one: 1, two: 2, three: 3, four: 4, five: 5,
+      six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+    }
+    if (word in map) return map[word]!
+    const parsed = Number.parseInt(word, 10)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
+/**
+ * Maximum legal copies of [card] for a given format. Mirrors `DeckValidator.copyLimitFor`:
+ *  - basics are unlimited;
+ *  - "any number / up to N" oracle override wins next;
+ *  - commander-shape formats (Commander/Brawl/Standard Brawl) cap non-basics at 1;
+ *  - everything else caps at 4.
+ *
+ * The result drives both the `+`-button enabled state and the `addCard` mutation, so the user
+ * literally cannot exceed the cap from the deckbuilder UI. Server validation remains the
+ * authoritative gate (e.g. for paste-imports that bypass these affordances).
+ */
+function effectiveCopyCap(card: CardSummary, isCommanderShape: boolean): number {
+  if (card.basicLand) return Number.POSITIVE_INFINITY
+  const override = parseDeckSizeOverride(card)
+  if (override !== null) return override
+  return isCommanderShape ? 1 : 4
+}
+
+/**
  * Adapter: build `DeckEntry[]` from the standalone deckbuilder's deck +
  * catalog and call the shared `suggestBasicLands`. The standalone builder
  * doesn't know its target format, so no minDeckSize floor is applied — basics
@@ -2223,21 +2810,34 @@ interface DeckGroup {
   entries: Array<{ name: string; count: number; card: CardSummary | undefined }>
 }
 
-function groupForDeckList(deck: Record<string, number>, catalog: Record<string, CardSummary>): DeckGroup[] {
+function groupForDeckList(
+  deck: Record<string, number>,
+  catalog: Record<string, CardSummary>,
+  commander: string | null,
+): DeckGroup[] {
   const spells: DeckGroup['entries'] = []
   const lands: DeckGroup['entries'] = []
+  // Commander row (if any). Pulled out of the spell/land buckets and rendered as its own
+  // group at the top of the list — even if the commander is technically a creature/planeswalker
+  // that would otherwise sort under Spells, it should always lead the deck list visually.
+  let commanderEntry: DeckGroup['entries'][number] | null = null
   for (const [name, count] of Object.entries(deck)) {
     if (count <= 0) continue
     const card = catalog[name]
     // Basic lands have their own dedicated panel; skip them here to avoid duplication.
     if (card?.basicLand) continue
     const entry = { name, count, card }
+    if (commander !== null && name === commander) {
+      commanderEntry = entry
+      continue
+    }
     if (card?.cardTypes.includes('LAND')) lands.push(entry)
     else spells.push(entry)
   }
   spells.sort(byCmcThenName)
   lands.sort(byCmcThenName)
   const groups: DeckGroup[] = []
+  if (commanderEntry) groups.push({ label: 'Commander', entries: [commanderEntry] })
   if (spells.length > 0) groups.push({ label: 'Spells', entries: spells })
   if (lands.length > 0) groups.push({ label: 'Lands', entries: lands })
   return groups

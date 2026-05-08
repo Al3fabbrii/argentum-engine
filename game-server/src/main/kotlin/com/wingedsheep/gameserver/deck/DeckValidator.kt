@@ -1,8 +1,10 @@
 package com.wingedsheep.gameserver.deck
 
 import com.wingedsheep.engine.registry.CardRegistry
+import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.DeckFormat
 import com.wingedsheep.sdk.model.CardDefinition
+import com.wingedsheep.sdk.model.Deck
 import org.springframework.stereotype.Component
 
 /**
@@ -36,6 +38,43 @@ class DeckValidator(
     fun validate(
         deckList: Map<String, Int>,
         format: DeckFormat? = null,
+    ): DeckValidationResult = runValidation(
+        deckList = deckList,
+        format = format,
+        commander = null,
+        commanderAware = false,
+    )
+
+    /**
+     * Validate a [Deck] — the structured form that carries an explicit commander. For
+     * commander-shaped formats this enables the full set of commander rules (eligibility,
+     * color identity, library + command zone size). For other formats the [Deck.commander]
+     * field is ignored.
+     *
+     * The library and the commander are merged into a single counts map for copy-cap and
+     * format-legality checks (so e.g. submitting the commander a second time inside [Deck.cards]
+     * trips the singleton cap).
+     */
+    fun validate(deck: Deck, format: DeckFormat? = null): DeckValidationResult {
+        val commander = deck.commander
+        val counts = deck.cards.groupingBy { it }.eachCount().toMutableMap()
+        if (commander != null) {
+            counts.merge(commander, 1, Int::plus)
+        }
+        return runValidation(counts, format, commander = commander, commanderAware = true)
+    }
+
+    /**
+     * @param commanderAware true when the caller has opted into commander rules (the [Deck]
+     *   overload). Only commander-aware calls raise MISSING_COMMANDER for a null commander —
+     *   the legacy [Map] overload doesn't surface a commander field, so silently skipping
+     *   keeps existing submission paths working until they migrate to [Deck].
+     */
+    private fun runValidation(
+        deckList: Map<String, Int>,
+        format: DeckFormat?,
+        commander: String?,
+        commanderAware: Boolean,
     ): DeckValidationResult {
         val errors = mutableListOf<DeckValidationIssue>()
         val warnings = mutableListOf<DeckValidationIssue>()
@@ -98,12 +137,82 @@ class DeckValidator(
             }
         }
 
+        if (format != null && format.isCommanderShape && commanderAware) {
+            validateCommanderRules(commander, countsByBaseName, format, errors)
+        }
+
         return DeckValidationResult(
             valid = errors.isEmpty(),
             totalCards = totalCards,
             errors = errors,
             warnings = warnings
         )
+    }
+
+    /**
+     * Enforces the commander-specific rules layered on top of the constructed baseline:
+     * a designated commander is required, it must be a legal commander (CR 903.3), and every
+     * other card's color identity must fit within the commander's (CR 903.4).
+     *
+     * Called only when [format] is commander-shaped. When [commander] is null, only the
+     * MISSING_COMMANDER error is raised — color-identity checks need a known commander to
+     * compare against. Callers using the legacy [Map] entry point pass null and skip identity
+     * enforcement until the surrounding flow is updated to provide a [Deck].
+     */
+    private fun validateCommanderRules(
+        commander: String?,
+        countsByBaseName: Map<String, Int>,
+        format: DeckFormat,
+        errors: MutableList<DeckValidationIssue>,
+    ) {
+        if (commander == null) {
+            errors += DeckValidationIssue(
+                code = "MISSING_COMMANDER",
+                message = "${format.displayName} decks require a designated commander",
+                cardName = null,
+            )
+            return
+        }
+        val commanderCard = cardRegistry.getCard(commander)
+        if (commanderCard == null) {
+            // UNKNOWN_CARD already raised by the main loop if the commander is also missing
+            // from the registry — no second error needed.
+            return
+        }
+        if (!CommanderEligibility.isLegalCommander(commanderCard)) {
+            errors += DeckValidationIssue(
+                code = "INVALID_COMMANDER",
+                message = "${commanderCard.name} cannot be a ${format.displayName} commander",
+                cardName = commanderCard.name,
+            )
+            // Identity check against an illegal commander would be misleading — bail.
+            return
+        }
+
+        val allowed: Set<Color> = commanderCard.colorIdentity
+        for ((cardName, _) in countsByBaseName) {
+            if (cardName == commanderCard.name) continue
+            val card = cardRegistry.getCard(cardName) ?: continue
+            val violating = card.colorIdentity - allowed
+            if (violating.isNotEmpty()) {
+                errors += DeckValidationIssue(
+                    code = "COLOR_IDENTITY_VIOLATION",
+                    message = colorIdentityMessage(cardName, violating, commanderCard.name, allowed),
+                    cardName = cardName,
+                )
+            }
+        }
+    }
+
+    private fun colorIdentityMessage(
+        cardName: String,
+        violating: Set<Color>,
+        commanderName: String,
+        allowed: Set<Color>,
+    ): String {
+        val violatingLabel = violating.joinToString(", ") { it.displayName }
+        val allowedLabel = if (allowed.isEmpty()) "colorless" else allowed.joinToString(", ") { it.displayName }
+        return "$cardName ($violatingLabel) is outside $commanderName's color identity ($allowedLabel)"
     }
 
     /**
@@ -137,9 +246,10 @@ class DeckValidator(
 
     private fun profileFor(format: DeckFormat?): FormatProfile = when (format) {
         DeckFormat.COMMANDER, DeckFormat.BRAWL -> FormatProfile(
-            // 100-card singleton. Commander has additional structural rules (color-identity,
-            // partner pairs, designated commander) that the deck submission surface here can't
-            // enforce — those still need to be checked at game-start time.
+            // 100-card singleton. Commander eligibility and color identity are enforced by
+            // validateCommanderRules() when the caller supplies a Deck (with explicit
+            // commander). Partner / Background pairs are not yet supported — that's the
+            // remaining structural rule a future revision needs to handle.
             minSize = SINGLETON_HUNDRED_DECK_SIZE,
             exactSize = SINGLETON_HUNDRED_DECK_SIZE,
             maxCopiesNonBasic = 1,

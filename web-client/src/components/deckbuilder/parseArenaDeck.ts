@@ -1,14 +1,18 @@
 /**
- * Parser for MTG Arena deck-list format.
+ * Multi-format deck-list parser. Accepts MTG Arena, Moxfield, and plain-text
+ * formats interchangeably so the user can paste whatever their other tool spits
+ * out. Recognised line shapes:
  *
- * Each entry looks like:
- *   `4 Lightning Bolt (LEA) 161`
- *   `2 Counterspell`
+ *   `4 Lightning Bolt`                     plain
+ *   `4x Lightning Bolt`                    plain (Moxfield-style "x")
+ *   `4 Lightning Bolt (LEA) 161`           Arena
+ *   `1 Cardname (SET) *F* *A* 42 #tag`     Moxfield bulk-edit (foil/alter/tags)
+ *   `SB: 2 Counterspell`                   MTGO sideboard prefix (Moxfield)
  *
- * Section headers (`Deck`, `Sideboard`, `Companion`, `Commander`) are
- * recognised so we can ignore everything after the sideboard. Blank lines and
- * `//` / `#` comments are skipped. The number of copies and the card name are
- * required; set code and collector number are optional and used as tiebreakers.
+ * Section headers (case-insensitive) include `Deck` / `Mainboard` / `Main Deck`
+ * / `Maindeck`, `Sideboard` / `Side` / `SB`, `Commander` / `Commanders` / `EDH`,
+ * `Companion`, and `About` (the latter three are skipped — only the main deck
+ * is imported). Blank lines and lines starting with `//` or `#` are ignored.
  */
 import type { CardSummary } from './cardFilter'
 
@@ -28,27 +32,78 @@ export interface ParseResult {
   entries: ParsedEntry[]
   /** Sideboard entries (recognised but not imported into the working deck). */
   sideboard: ParsedEntry[]
+  /**
+   * Commander entries — cards listed under a `Commander` / `Commanders` /
+   * `EDH` header. Most decks have exactly one; partner pairs etc. produce two.
+   */
+  commander: ParsedEntry[]
   /** Lines that looked like card entries but couldn't be parsed. */
   errors: Array<{ line: number; raw: string; reason: string }>
 }
 
-const ENTRY_RE = /^(\d+)\s+(.+?)(?:\s+\(([A-Za-z0-9]{2,5})\)(?:\s+(\S+))?)?\s*$/
+// Count + optional 'x' suffix (e.g. `4` or `4x`), name (lazy), optional
+// `(SET) collector` suffix. The line is pre-stripped of Moxfield decorations
+// (`*F*`, `*A*`, `#tag`, trailing `*`) before this regex runs.
+const ENTRY_RE = /^(\d+)x?\s+(.+?)(?:\s+\(([A-Za-z0-9]{2,5})\)(?:\s+(\S+))?)?\s*$/
 
-const SECTION_HEADERS: Record<string, 'main' | 'side' | 'ignore'> = {
+type Section = 'main' | 'side' | 'commander' | 'ignore'
+
+const SECTION_HEADERS: Record<string, Section> = {
   deck: 'main',
   maindeck: 'main',
+  'main deck': 'main',
   main: 'main',
+  mainboard: 'main',
   sideboard: 'side',
+  'side board': 'side',
+  side: 'side',
+  sb: 'side',
+  commander: 'commander',
+  commanders: 'commander',
+  edh: 'commander',
   companion: 'ignore',
-  commander: 'ignore',
+  about: 'ignore',
+}
+
+/**
+ * Strip Moxfield-style decorations from a card line so the simpler entry
+ * regex can match across formats. Returns the cleaned line and a flag for the
+ * `SB:` sideboard prefix that some Moxfield/MTGO exports use per-line.
+ */
+function preprocessLine(raw: string): { line: string; sideboard: boolean } {
+  let line = raw
+  let sideboard = false
+
+  // Per-line MTGO/Moxfield sideboard prefix (e.g. `SB: 2 Counterspell`).
+  const sbMatch = line.match(/^SB:\s*/i)
+  if (sbMatch) {
+    sideboard = true
+    line = line.slice(sbMatch[0].length)
+  }
+
+  // Moxfield trailing tags: ` #tag`, ` #!globaltag`. Strip from the end as
+  // long as the trailing token still looks like a tag, so a card whose name
+  // contains `#` somewhere internally isn't accidentally truncated.
+  while (true) {
+    const m = line.match(/\s+#!?\S+\s*$/)
+    if (!m) break
+    line = line.slice(0, m.index).trimEnd()
+  }
+
+  // Moxfield foil / alter flags can appear anywhere between name and number.
+  // Format is `*F*` / `*A*` (case-insensitive).
+  line = line.replace(/\s+\*[A-Za-z]\*/g, '').trim()
+
+  return { line, sideboard }
 }
 
 export function parseArenaDeckList(text: string): ParseResult {
   const entries: ParsedEntry[] = []
   const sideboard: ParsedEntry[] = []
+  const commander: ParsedEntry[] = []
   const errors: ParseResult['errors'] = []
 
-  let section: 'main' | 'side' | 'ignore' = 'main'
+  let section: Section = 'main'
 
   const rawLines = text.split(/\r?\n/)
   for (let i = 0; i < rawLines.length; i++) {
@@ -63,9 +118,12 @@ export function parseArenaDeckList(text: string): ParseResult {
       continue
     }
 
-    if (section === 'ignore') continue
+    const { line: cleaned, sideboard: lineIsSideboard } = preprocessLine(trimmed)
+    const targetSection: Section = lineIsSideboard ? 'side' : section
 
-    const match = ENTRY_RE.exec(trimmed)
+    if (targetSection === 'ignore') continue
+
+    const match = ENTRY_RE.exec(cleaned)
     if (!match) {
       errors.push({ line: i + 1, raw: trimmed, reason: 'unrecognised line format' })
       continue
@@ -83,11 +141,12 @@ export function parseArenaDeckList(text: string): ParseResult {
       ...(match[3] ? { setCode: match[3].toUpperCase() } : {}),
       ...(match[4] ? { collectorNumber: match[4] } : {}),
     }
-    if (section === 'side') sideboard.push(entry)
+    if (targetSection === 'side') sideboard.push(entry)
+    else if (targetSection === 'commander') commander.push(entry)
     else entries.push(entry)
   }
 
-  return { entries, sideboard, errors }
+  return { entries, sideboard, commander, errors }
 }
 
 export interface ResolvedEntry {
@@ -101,6 +160,12 @@ export interface ResolveResult {
   resolved: ResolvedEntry[]
   /** Aggregated {name → count} of successfully matched entries. */
   deckCards: Record<string, number>
+  /**
+   * Aggregated {name → count} of unmatched entries (cards not in the catalogue).
+   * Kept separate so callers can choose whether to include unimplemented cards
+   * as placeholder rows in the imported deck.
+   */
+  unmatchedCards: Record<string, number>
   /** Total cards across resolved entries (matched copies only). */
   matchedCards: number
   /** Total cards in the parsed list, matched or not. */
@@ -127,6 +192,7 @@ export function resolveAgainstCatalog(
 
   const resolved: ResolvedEntry[] = []
   const deckCards: Record<string, number> = {}
+  const unmatchedCards: Record<string, number> = {}
   const truncated: ResolveResult['truncated'] = []
   let matchedCards = 0
   let totalCards = 0
@@ -136,6 +202,10 @@ export function resolveAgainstCatalog(
     const card = byName.get(entry.name.toLowerCase()) ?? null
     if (!card) {
       resolved.push({ entry, match: null })
+      // Aggregate unmatched copies under the as-typed name, capped at 4 since
+      // we can't tell whether the card is a basic land without a catalogue hit.
+      const previous = unmatchedCards[entry.name] ?? 0
+      unmatchedCards[entry.name] = Math.min(previous + entry.count, 4)
       continue
     }
     const setMismatch =
@@ -160,5 +230,5 @@ export function resolveAgainstCatalog(
   }
 
   const unmatched = resolved.filter((r) => r.match === null)
-  return { resolved, deckCards, matchedCards, totalCards, unmatched, truncated }
+  return { resolved, deckCards, unmatchedCards, matchedCards, totalCards, unmatched, truncated }
 }

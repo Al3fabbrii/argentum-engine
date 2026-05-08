@@ -18,6 +18,12 @@ export interface SavedDeck {
   format?: string
   /** Optional — the set code the deck was built against, if any. */
   setCode?: string
+  /**
+   * Optional — designated commander for Commander/Brawl/Standard Brawl decks. Stored
+   * separately from `cards` (the commander begins in the command zone, not the library).
+   * Populated by the deckbuilder when the user marks a row with the crown toggle.
+   */
+  commander?: string
   updatedAt: number
 }
 
@@ -63,6 +69,42 @@ function generateId(): string {
   return `deck-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+/**
+ * Merge a designated commander into a card map. Used when reading a `SavedDeck`
+ * for gameplay or rendering: storage keeps the commander out of `cards` (per the
+ * `SavedDeck.commander` contract — and matching the server's `Deck.cards`
+ * convention, CR 903.6a), so any consumer that just wants "the full deck list"
+ * needs to put it back.
+ *
+ * Idempotent — won't double-count if the commander is already in `cards` (e.g.
+ * legacy decks saved before the strip-on-save convention landed).
+ */
+export function mergeCommanderIntoCards(
+  cards: Record<string, number>,
+  commander: string | null | undefined,
+): Record<string, number> {
+  if (!commander) return cards
+  if (cards[commander]) return cards
+  return { ...cards, [commander]: 1 }
+}
+
+/**
+ * Inverse of [mergeCommanderIntoCards]: subtract the designated commander from
+ * a card map. Used at storage / server boundaries where `cards` must exclude the
+ * commander. Idempotent — does nothing when the commander isn't present.
+ */
+export function stripCommanderFromCards(
+  cards: Record<string, number>,
+  commander: string | null | undefined,
+): Record<string, number> {
+  if (!commander || !(commander in cards)) return cards
+  const next = { ...cards }
+  const remaining = (next[commander] ?? 0) - 1
+  if (remaining > 0) next[commander] = remaining
+  else delete next[commander]
+  return next
+}
+
 export const useDeckLibrary = create<DeckLibraryState>((set, get) => ({
   decks: [],
   hydrated: false,
@@ -82,6 +124,7 @@ export const useDeckLibrary = create<DeckLibraryState>((set, get) => ({
       cards: input.cards,
       ...(input.format !== undefined ? { format: input.format } : {}),
       ...(input.setCode !== undefined ? { setCode: input.setCode } : {}),
+      ...(input.commander !== undefined ? { commander: input.commander } : {}),
       updatedAt: now,
     }
     const decks = existing

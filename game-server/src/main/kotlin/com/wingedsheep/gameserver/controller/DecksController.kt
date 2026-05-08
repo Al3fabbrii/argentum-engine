@@ -6,6 +6,7 @@ import com.wingedsheep.gameserver.deck.DeckValidator
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.sdk.core.DeckFormat
 import com.wingedsheep.sdk.model.CardDefinition
+import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.model.MtgSet
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -62,7 +63,14 @@ class DecksController(
 
     data class ValidateRequest(
         val deckList: Map<String, Int>,
-        val format: DeckFormat? = null
+        val format: DeckFormat? = null,
+        /**
+         * Optional designated commander for Commander/Brawl/Standard Brawl decks. When present
+         * (and the format is commander-shaped) the validator runs the full commander rule set:
+         * eligibility, color identity, and structural shape with the commander in the command
+         * zone instead of the library.
+         */
+        val commander: String? = null,
     )
 
     @GetMapping("/cards")
@@ -79,8 +87,19 @@ class DecksController(
     fun getExamples(): List<ExampleDeckDTO> = EXAMPLE_DECKS
 
     @PostMapping("/validate")
-    fun validate(@RequestBody request: ValidateRequest): DeckValidationResult =
-        deckValidator.validate(request.deckList, request.format)
+    fun validate(@RequestBody request: ValidateRequest): DeckValidationResult {
+        // Route through the Deck overload only when the caller has supplied a commander —
+        // an absent field means the (legacy) Map-based validation path, which doesn't enforce
+        // commander rules. The deckList already carries flat card counts; the Deck overload
+        // re-explodes the map into Deck.cards, which gives the validator the same total
+        // counts a Map call would (the commander entry is added on top, matching the
+        // singleton-cap and totalCards expectations).
+        if (request.commander != null) {
+            val cards = request.deckList.flatMap { (name, count) -> List(count) { name } }
+            return deckValidator.validate(Deck(cards = cards, commander = request.commander), request.format)
+        }
+        return deckValidator.validate(request.deckList, request.format)
+    }
 
     /**
      * Returns, for each submitted deck list, the set of formats it is fully legal in. This is

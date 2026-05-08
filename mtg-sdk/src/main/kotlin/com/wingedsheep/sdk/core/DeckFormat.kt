@@ -39,6 +39,17 @@ enum class DeckFormat {
         else -> name.lowercase().replaceFirstChar { it.uppercase() }
     }
 
+    /**
+     * True for singleton formats with a designated commander (Commander, Brawl, Standard Brawl).
+     * These formats add structural rules beyond the constructed baseline: a commander card lives
+     * in the command zone, every other card's color identity must fit within the commander's,
+     * and (for partner-less decks) the commander itself must be a legal commander.
+     */
+    val isCommanderShape: Boolean get() = when (this) {
+        COMMANDER, BRAWL, STANDARD_BRAWL -> true
+        else -> false
+    }
+
     companion object {
         fun fromScryfallKey(key: String): DeckFormat? =
             entries.firstOrNull { it.scryfallKey == key.lowercase() }

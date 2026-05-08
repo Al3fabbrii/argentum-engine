@@ -92,11 +92,39 @@ data class CardDefinition(
 
     val colors: Set<Color> get() = manaCost.colors
 
+    /**
+     * Color identity per CR 903.4: the colors of any mana symbols in the card's mana cost or
+     * rules text, plus any colors defined by characteristic-defining abilities or color
+     * indicators. Used by Commander/Brawl deck-construction to determine which cards may share
+     * a deck with a given commander.
+     *
+     * Implementation:
+     *  - Mana cost contributes its colored symbols (covered by [ManaCost.colors]).
+     *  - Oracle text is scanned for `{W}`, `{U}`, `{B}`, `{R}`, `{G}` symbols, plus hybrid
+     *    (`{W/U}`, `{2/W}`) and Phyrexian (`{W/P}`) variants. This catches activated abilities
+     *    with off-color activation costs (e.g. an artifact whose only colored symbol lives in
+     *    `{2}{B}, {T}: …` adds black to its identity).
+     *  - Basic land subtypes contribute their associated color: Plains→W, Island→U, Swamp→B,
+     *    Mountain→R, Forest→G. This applies to any land with the subtype, not just to cards
+     *    with the basic supertype, so dual lands like Tundra (Land — Plains Island) correctly
+     *    pick up both colors.
+     *
+     * Not yet modelled: explicit color indicators (rule 204) — there's no field on
+     * [CardDefinition] for them today. When that's added, fold the indicator's colors in here.
+     */
     val colorIdentity: Set<Color>
         get() {
             val identity = manaCost.colors.toMutableSet()
-            // Color identity also includes colors in rules text (e.g., activation costs)
-            // For now, we just use mana cost colors
+            if (oracleText.isNotBlank()) {
+                for (match in COLOR_SYMBOL_REGEX.findAll(oracleText)) {
+                    for (ch in match.groupValues[1]) {
+                        Color.fromSymbol(ch)?.let(identity::add)
+                    }
+                }
+            }
+            for (subtype in typeLine.subtypes) {
+                BASIC_LAND_SUBTYPE_TO_COLOR[subtype]?.let(identity::add)
+            }
             return identity
         }
 
@@ -175,6 +203,29 @@ data class CardDefinition(
     }
 
     companion object {
+        /**
+         * Captures color letters inside any mana-symbol braces in oracle text. The pattern
+         * matches a single `{...}` group whose contents contain at least one of W/U/B/R/G,
+         * then we pull every color letter from the captured contents — that handles hybrid
+         * (`{W/U}`, `{2/G}`), Phyrexian (`{W/P}`), and plain colored mana (`{W}`) in one pass.
+         * Generic, X, and colorless symbols don't match (they have no color letters).
+         */
+        private val COLOR_SYMBOL_REGEX = Regex("""\{([^}]*[WUBRG][^}]*)\}""")
+
+        /**
+         * Basic land subtypes contribute their associated color to identity per CR 903.4 — the
+         * land's intrinsic mana ability counts as a colored mana symbol in the rules text. The
+         * map covers any land carrying these subtypes, not only basics, so dual lands like
+         * Tundra (Land — Plains Island) correctly pick up both colors.
+         */
+        private val BASIC_LAND_SUBTYPE_TO_COLOR: Map<Subtype, Color> = mapOf(
+            Subtype.PLAINS to Color.WHITE,
+            Subtype.ISLAND to Color.BLUE,
+            Subtype.SWAMP to Color.BLACK,
+            Subtype.MOUNTAIN to Color.RED,
+            Subtype.FOREST to Color.GREEN,
+        )
+
         fun creature(
             name: String,
             manaCost: ManaCost,

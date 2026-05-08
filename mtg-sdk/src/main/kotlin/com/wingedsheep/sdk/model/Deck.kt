@@ -21,30 +21,39 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Deck(
     /**
-     * Card names in the deck.
-     * Duplicates are allowed (e.g., 4x Lightning Bolt).
+     * Card names in the main deck (the library at game start).
+     * Duplicates are allowed (e.g., 4x Lightning Bolt). Does NOT include the commander —
+     * for Commander/Brawl decks the commander begins in the command zone (CR 903.6a),
+     * not in the library.
      */
-    val cards: List<String>
+    val cards: List<String>,
+    /**
+     * Optional commander card name. Set for Commander/Brawl/Standard Brawl decks; null
+     * otherwise. The commander is stored separately because it begins the game in the
+     * command zone, not the library.
+     */
+    val commander: String? = null,
 ) {
     /**
-     * Number of cards in the deck.
+     * Total number of cards in the deck (library + command zone).
      */
-    val size: Int get() = cards.size
+    val size: Int get() = cards.size + (if (commander != null) 1 else 0)
 
     /**
      * Check if the deck is empty.
      */
-    val isEmpty: Boolean get() = cards.isEmpty()
+    val isEmpty: Boolean get() = cards.isEmpty() && commander == null
 
     /**
-     * Count occurrences of a specific card.
+     * Count occurrences of a specific card in the main deck (library).
+     * Does not include the commander — use [size] or check [commander] directly.
      */
     fun countOf(cardName: String): Int = cards.count { it == cardName }
 
     /**
-     * Get unique card names in the deck.
+     * Get unique card names in the deck (main deck + commander, if any).
      */
-    fun uniqueCards(): Set<String> = cards.toSet()
+    fun uniqueCards(): Set<String> = cards.toSet() + listOfNotNull(commander)
 
     companion object {
         /**
