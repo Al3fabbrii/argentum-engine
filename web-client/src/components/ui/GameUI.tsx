@@ -92,6 +92,7 @@ function ConnectionOverlay({
   const [showReplays, setShowReplays] = useState(false)
   const [publicLobbies, setPublicLobbies] = useState<PublicLobbyEntry[]>([])
   const [publicLobbiesError, setPublicLobbiesError] = useState<string | null>(null)
+  const [onlinePlayers, setOnlinePlayers] = useState<number | null>(null)
 
   const confirmName = () => {
     if (playerName.trim()) {
@@ -130,15 +131,17 @@ function ConnectionOverlay({
   useEffect(() => {
     if (sessionId || lobbyState) {
       setPublicLobbies([])
+      setOnlinePlayers(null)
       return
     }
 
     let cancelled = false
     const loadPublicLobbies = async () => {
       try {
-        const [tournamentsRes, quickGamesRes] = await Promise.all([
+        const [tournamentsRes, quickGamesRes, onlineRes] = await Promise.all([
           fetch('/api/tournaments/public'),
           fetch('/api/quick-games/public'),
+          fetch('/api/players/online'),
         ])
         if (!tournamentsRes.ok) throw new Error(`Tournaments: ${tournamentsRes.status}`)
         if (!quickGamesRes.ok) throw new Error(`Quick games: ${quickGamesRes.status}`)
@@ -151,6 +154,10 @@ function ConnectionOverlay({
           ]
           setPublicLobbies(merged)
           setPublicLobbiesError(null)
+        }
+        if (onlineRes.ok) {
+          const online = await onlineRes.json() as { count: number }
+          if (!cancelled) setOnlinePlayers(online.count)
         }
       } catch {
         if (!cancelled) {
@@ -210,7 +217,7 @@ function ConnectionOverlay({
     )
   }
 
-  const showPublicLobbies = !sessionId && !lobbyState && (publicLobbies.length > 0 || publicLobbiesError)
+  const showPublicLobbies = !sessionId && !lobbyState && (publicLobbies.length > 0 || publicLobbiesError || (onlinePlayers ?? 0) > 0)
 
   return (
     <div className={styles.connectionOverlay} style={{ backgroundImage: `url(${randomBackground})` }}>
@@ -353,6 +360,7 @@ function ConnectionOverlay({
           <PublicLobbyList
             lobbies={publicLobbies}
             error={publicLobbiesError}
+            onlinePlayers={onlinePlayers}
             onJoin={(entry) => {
               setJoinSessionId(entry.lobbyId)
               if (entry.kind === 'tournament') setGameMode('tournament')
@@ -380,23 +388,35 @@ function ConnectionOverlay({
 function PublicLobbyList({
   lobbies,
   error,
+  onlinePlayers,
   onJoin,
 }: {
   lobbies: PublicLobbyEntry[]
   error: string | null
+  onlinePlayers: number | null
   onJoin: (entry: PublicLobbyEntry) => void
 }) {
-  if (lobbies.length === 0 && !error) return null
+  if (lobbies.length === 0 && !error && (onlinePlayers ?? 0) === 0) return null
 
   return (
     <div className={styles.publicTournamentPanel}>
       <div className={styles.publicTournamentHeader}>
         <span className={styles.publicTournamentTitle}>Public Lobbies</span>
-        {lobbies.length > 0 && (
-          <span className={styles.publicTournamentCount}>{lobbies.length}</span>
-        )}
+        <div className={styles.publicTournamentHeaderRight}>
+          {onlinePlayers !== null && onlinePlayers > 0 && (
+            <span className={styles.onlinePlayersBadge}>
+              <span className={styles.onlinePlayersDot} />
+              {onlinePlayers} online
+            </span>
+          )}
+          {lobbies.length > 0 && (
+            <span className={styles.publicTournamentCount}>{lobbies.length}</span>
+          )}
+        </div>
       </div>
-      {error && lobbies.length === 0 ? (
+      {lobbies.length === 0 && !error ? (
+        <p className={styles.publicTournamentEmpty}>No public lobbies right now.</p>
+      ) : error && lobbies.length === 0 ? (
         <p className={styles.publicTournamentEmpty}>{error}</p>
       ) : (
         lobbies.map((entry) => (
