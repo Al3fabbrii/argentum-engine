@@ -24,7 +24,8 @@ class QuickGameController(
         val playerCount: Int,
         val maxPlayers: Int,
         val setCode: String?,
-        val hostName: String?
+        val hostName: String?,
+        val format: String? = null
     )
 
     @GetMapping("/public")
@@ -39,7 +40,8 @@ class QuickGameController(
                     playerCount = lobby.players.count { !it.isAi },
                     maxPlayers = QuickGameLobby.MAX_PLAYERS,
                     setCode = lobby.setCode ?: host?.setCode,
-                    hostName = host?.playerName
+                    hostName = host?.playerName,
+                    format = lobby.format?.name
                 )
             }
         return ResponseEntity.ok(publicLobbies)

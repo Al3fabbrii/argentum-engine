@@ -8,6 +8,13 @@ import { HoverCardPreview } from '../ui/HoverCardPreview'
 import { useDfcHoverFlip } from '../ui/useDfcHoverFlip'
 import { SetSynergiesButton, type Archetype } from '../draft/SetSynergiesOverlay'
 import { DeckbuilderChatPanel } from './DeckbuilderChatPanel'
+import {
+  detectProducedColors,
+  suggestBasicLands,
+  type BasicLand,
+  type DeckEntry,
+  type LandColor,
+} from '@/utils/landSuggestion'
 
 /**
  * Deck Builder overlay for sealed draft mode.
@@ -215,7 +222,7 @@ function DeckBuilder({ state }: { state: DeckBuildingState }) {
     // Non-basic lands in deck
     for (const card of cardInfos) {
       if (!card.typeLine.toLowerCase().includes('land')) continue
-      const produced = detectManaProduction(card)
+      const produced = detectProducedColors({ typeLine: card.typeLine, oracleText: card.oracleText ?? null })
       for (const c of produced) {
         landColors[c] = (landColors[c] ?? 0) + 1
       }
@@ -1529,227 +1536,56 @@ function getCardColors(card: SealedCardInfo): Set<string> {
   return colors
 }
 
-/**
- * Detect which colors of mana a card can produce, based on available card info.
- * Checks land subtypes in typeLine and "Add {X}" patterns in oracleText.
- */
-function detectManaProduction(card: SealedCardInfo): string[] {
-  const colors: string[] = []
-  const typeLine = card.typeLine.toLowerCase()
-  const text = (card.oracleText || '').toLowerCase()
-
-  // Check basic land subtypes in typeLine (e.g., "Land — Plains Forest")
-  if (typeLine.includes('plains')) colors.push('W')
-  if (typeLine.includes('island')) colors.push('U')
-  if (typeLine.includes('swamp')) colors.push('B')
-  if (typeLine.includes('mountain')) colors.push('R')
-  if (typeLine.includes('forest')) colors.push('G')
-
-  // Check oracle text for mana production ("Add {G}", "add {R}{R}", etc.)
-  if (text.includes('add')) {
-    if (text.includes('{w}')) colors.push('W')
-    if (text.includes('{u}')) colors.push('U')
-    if (text.includes('{b}')) colors.push('B')
-    if (text.includes('{r}')) colors.push('R')
-    if (text.includes('{g}')) colors.push('G')
-    if (text.includes('any color')) colors.push('W', 'U', 'B', 'R', 'G')
-  }
-
-  return [...new Set(colors)]
+const BASIC_LAND_COLOR: Record<string, LandColor> = {
+  Plains: 'W', Island: 'U', Swamp: 'B', Mountain: 'R', Forest: 'G',
 }
 
 /**
- * Curve-aware weight multiplier for colored pips based on Frank Karsten's data.
- * Cheap spells need more reliable color access than expensive ones. In a 40-card
- * deck with 17 lands, a single pip at CMC 2 needs ~10 sources while CMC 5+ needs ~7.
- * We model this as a multiplier on each pip's demand weight.
+ * Build curve-aware basic-land suggestions from sealed deck state and apply
+ * them via `setLandCount`. Thin adapter over the shared `suggestBasicLands`.
  */
-function cmcWeight(cmc: number): number {
-  if (cmc <= 1) return 1.6    // 1-drops: hardest to cast on curve
-  if (cmc === 2) return 1.35  // 2-drops: still need early color access
-  if (cmc === 3) return 1.1   // 3-drops: baseline
-  if (cmc === 4) return 0.95  // 4-drops: slightly easier
-  return 0.8                  // 5+: you'll draw into sources
-}
-
-/**
- * Multi-pip weight per Karsten: double-pip spells need disproportionately more sources.
- * In a 17-land/40-card deck at CMC 3: 1 pip ~9 sources, 2 pips ~13, 3 pips ~16.
- * Weights: 1 pip = 1.0, 2 pips = 2.9, 3 pips = 5.3
- */
-function multiPipWeight(pips: number): number {
-  if (pips <= 0) return 0
-  if (pips === 1) return 1.0
-  if (pips === 2) return 2.9
-  if (pips === 3) return 5.3
-  return 5.3 + (pips - 3) * 2.0  // extrapolate for 4+
-}
-
-/**
- * Determine target total land count based on deck's mana curve.
- * Aggro (low avg CMC) wants 16, midrange 17, control 18.
- */
-function targetLandCount(cards: SealedCardInfo[]): number {
-  const spells = cards.filter((c) => !c.typeLine.toLowerCase().includes('land'))
-  if (spells.length === 0) return 17
-  const totalCmc = spells.reduce((sum, c) => sum + getCmc(c), 0)
-  const avgCmc = totalCmc / spells.length
-  // Base land ratio for a 40-card deck: avgCmc ~2.0 → 40%, ~2.8 → 42.5%, ~3.5+ → 45%
-  let landRatio: number
-  if (avgCmc < 2.3) landRatio = 0.4
-  else if (avgCmc < 3.2) landRatio = 0.425
-  else landRatio = 0.45
-  // Scale total lands based on actual spell count and land ratio
-  const totalDeckSize = Math.max(Math.round(spells.length / (1 - landRatio)), 40)
-  return Math.round(totalDeckSize * landRatio)
-}
-
 function suggestLands(
   state: DeckBuildingState,
-  spellCount: number,
+  _spellCount: number,
   setLandCount: (name: string, count: number) => void,
 ) {
-  const MIN_DECK_SIZE = 40
-  const COLORS = ['W', 'U', 'B', 'R', 'G'] as const
-  const colorToLand: Record<string, string> = { W: 'Plains', U: 'Island', B: 'Swamp', R: 'Mountain', G: 'Forest' }
   const basicLandNames = new Set(state.basicLands.map((l) => l.name))
 
-  // Resolve card info for all deck cards
-  const cardInfos: SealedCardInfo[] = []
-  for (const cardName of state.deck) {
-    const info = state.cardPool.find((c) => c.name === cardName)
-    if (info) cardInfos.push(info)
+  // Tally deck cards into name → count, skipping basics (they're driven by landCounts).
+  const counts = new Map<string, number>()
+  for (const name of state.deck) counts.set(name, (counts.get(name) ?? 0) + 1)
+
+  const entries: DeckEntry[] = []
+  for (const [name, count] of counts) {
+    const info = state.cardPool.find((c) => c.name === name)
+    if (!info) continue
+    const isBasic = basicLandNames.has(info.name)
+    if (isBasic) continue
+    const isLand = info.typeLine.toLowerCase().includes('land')
+    entries.push({
+      name: info.name,
+      manaCost: info.manaCost ?? '',
+      cmc: getCmc(info),
+      isLand,
+      isBasicLand: false,
+      producedColors: detectProducedColors({
+        typeLine: info.typeLine,
+        oracleText: info.oracleText ?? null,
+      }),
+      count,
+    })
   }
 
-  // Step 1: Categorize deck cards — identify non-basic lands and mana sources
-  let nonBasicLandCount = 0
-  let nonLandManaSourceCount = 0
-  const existingSources: Record<string, number> = { W: 0, U: 0, B: 0, R: 0, G: 0 }
+  const availableBasics: BasicLand[] = state.basicLands
+    .map((l) => {
+      const color = BASIC_LAND_COLOR[l.name]
+      return color ? { name: l.name, color } : null
+    })
+    .filter((b): b is BasicLand => b !== null)
 
-  for (const info of cardInfos) {
-    const isLand = info.typeLine.toLowerCase().includes('land') && !basicLandNames.has(info.name)
-    const producedColors = detectManaProduction(info)
+  const result = suggestBasicLands({ entries, availableBasics, minDeckSize: 40 })
 
-    if (isLand) {
-      nonBasicLandCount++
-      for (const c of producedColors) existingSources[c] = (existingSources[c] ?? 0) + 1.0
-    } else if (producedColors.length > 0) {
-      nonLandManaSourceCount++
-      // Mana dork / mana rock: half credit for color sources
-      for (const c of producedColors) existingSources[c] = (existingSources[c] ?? 0) + 0.5
-    }
-  }
-
-  // Step 2: Calculate target basic lands based on curve, non-basic lands, and min deck size
-  // Mana-producing non-lands (rocks, dorks) partially reduce the land target:
-  // every 2 mana rocks ≈ 1 fewer land needed
-  const manaRockReduction = Math.floor(nonLandManaSourceCount / 2)
-  const curveBasedTotal = targetLandCount(cardInfos)
-  const ratioBasedLands = curveBasedTotal - nonBasicLandCount - manaRockReduction
-  const minBasedLands = MIN_DECK_SIZE - spellCount
-  const targetBasicLands = Math.max(ratioBasedLands, minBasedLands, 0)
-  if (targetBasicLands === 0) {
-    for (const land of state.basicLands) setLandCount(land.name, 0)
-    return
-  }
-
-  // Step 3: Curve-aware weighted color demand
-  // Each card's colored pips are weighted by both multi-pip intensity (Karsten)
-  // and CMC urgency (cheap spells demand more reliable color access).
-  const demand: Record<string, number> = { W: 0, U: 0, B: 0, R: 0, G: 0 }
-  for (const info of cardInfos) {
-    if (info.typeLine.toLowerCase().includes('land')) continue
-    const cost = info.manaCost || ''
-    const cmc = getCmc(info)
-    const cWeight = cmcWeight(cmc)
-    const pipsPerColor: Record<string, number> = { W: 0, U: 0, B: 0, R: 0, G: 0 }
-    const matches = cost.match(/\{([^}]+)\}/g) || []
-    for (const match of matches) {
-      const inner = match.slice(1, -1)
-      if (inner in pipsPerColor) pipsPerColor[inner] = (pipsPerColor[inner] ?? 0) + 1
-    }
-    for (const c of COLORS) {
-      const pips = pipsPerColor[c] ?? 0
-      if (pips > 0) {
-        demand[c] = (demand[c] ?? 0) + multiPipWeight(pips) * cWeight
-      }
-    }
-  }
-
-  const totalDemand = Object.values(demand).reduce((a, b) => a + b, 0)
-
-  if (totalDemand === 0) {
-    // Colorless deck — give all to first available land type
-    const availableLands = state.basicLands.map((l) => l.name)
-    for (const land of availableLands) setLandCount(land, 0)
-    if (availableLands.length > 0) setLandCount(availableLands[0]!, targetBasicLands)
-    return
-  }
-
-  // Step 4: Adjust demand based on existing mana sources (non-basic lands, dorks)
-  const targetTotalLands = targetBasicLands + nonBasicLandCount
-  const sourceScale = targetTotalLands > 0 ? totalDemand / targetTotalLands : 0
-  const adjustedDemand: Record<string, number> = {}
-  for (const c of COLORS) {
-    adjustedDemand[c] = Math.max(0, (demand[c] ?? 0) - (existingSources[c] ?? 0) * sourceScale)
-  }
-  const totalAdjustedDemand = Object.values(adjustedDemand).reduce((a, b) => a + b, 0)
-
-  // If existing sources cover everything, fall back to raw demand distribution
-  const distributionDemand = totalAdjustedDemand > 0 ? adjustedDemand : demand
-  const distributionTotal = totalAdjustedDemand > 0 ? totalAdjustedDemand : totalDemand
-
-  // Step 5: Distribute basic lands proportionally to demand
-  const landCounts: Record<string, number> = {}
-  let assigned = 0
-  const entries = COLORS.filter((c) => (distributionDemand[c] ?? 0) > 0).sort(
-    (a, b) => (distributionDemand[b] ?? 0) - (distributionDemand[a] ?? 0),
-  )
-
-  for (const color of entries) {
-    const landName = colorToLand[color]
-    if (!landName) continue
-    const share = Math.round(((distributionDemand[color] ?? 0) / distributionTotal) * targetBasicLands)
-    landCounts[landName] = share
-    assigned += share
-  }
-
-  // Fix rounding errors — adjust the largest share
-  if (assigned !== targetBasicLands && entries.length > 0) {
-    const topLand = entries[0] ? colorToLand[entries[0]] : undefined
-    if (topLand && landCounts[topLand] != null) {
-      landCounts[topLand] = (landCounts[topLand] ?? 0) + targetBasicLands - assigned
-    }
-  }
-
-  // Step 6: Enforce minimum 3 sources for any color with cards in the deck.
-  // Splash colors with fewer than 3 total sources (basics + non-basics) are bumped up,
-  // stealing from the most over-represented color if needed.
-  for (const color of entries) {
-    const landName = colorToLand[color]
-    if (!landName) continue
-    const basics = landCounts[landName] ?? 0
-    const totalSources = basics + (existingSources[color] ?? 0)
-    if (totalSources < 3) {
-      const needed = Math.ceil(3 - totalSources)
-      landCounts[landName] = basics + needed
-      // Steal from the color with the most basics (that isn't this one)
-      const donor = entries
-        .filter((c) => c !== color)
-        .sort((a, b) => (landCounts[colorToLand[b] ?? ''] ?? 0) - (landCounts[colorToLand[a] ?? ''] ?? 0))[0]
-      if (donor) {
-        const donorLand = colorToLand[donor]
-        if (donorLand && (landCounts[donorLand] ?? 0) > needed) {
-          landCounts[donorLand] = (landCounts[donorLand] ?? 0) - needed
-        }
-      }
-    }
-  }
-
-  // Apply — reset all to 0 first, then set computed values
-  for (const land of state.basicLands) {
-    setLandCount(land.name, landCounts[land.name] ?? 0)
-  }
+  for (const land of state.basicLands) setLandCount(land.name, result[land.name] ?? 0)
 }
 
 function matchesSearch(card: SealedCardInfo, query: string): boolean {

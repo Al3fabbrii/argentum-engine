@@ -1,5 +1,6 @@
 package com.wingedsheep.gameserver.lobby
 
+import com.wingedsheep.sdk.core.DeckFormat
 import com.wingedsheep.sdk.model.EntityId
 import java.util.UUID
 
@@ -29,6 +30,11 @@ class QuickGameLobby(
      * is no second seat for a stranger to join.
      */
     @Volatile var isPublic: Boolean = false,
+    /**
+     * Optional deck-format restriction. When set, every submitted deck is validated against the
+     * format's per-card legality. Null = no restriction (existing behaviour). Host-controlled.
+     */
+    @Volatile var format: DeckFormat? = null,
 ) {
     val players: MutableList<QuickGameLobbyPlayer> = mutableListOf()
 

@@ -964,6 +964,29 @@ function LobbyOverlay({
                 </button>
               </div>
             </div>
+            {isPremade && (
+              <div className={styles.settingsRow}>
+                <span className={styles.settingsLabel}>Deck format</span>
+                <select
+                  value={lobbyState.settings.deckFormat ?? ''}
+                  onChange={(e) =>
+                    updateLobbySettings({ deckFormat: (e.target.value || '') as never })
+                  }
+                  className={styles.settingsSelect}
+                  title="Restrict submitted decks to a constructed format. None = no restriction."
+                >
+                  <option value="">No restriction</option>
+                  <option value="STANDARD">Standard</option>
+                  <option value="PIONEER">Pioneer</option>
+                  <option value="MODERN">Modern</option>
+                  <option value="PAUPER">Pauper</option>
+                  <option value="LEGACY">Legacy</option>
+                  <option value="VINTAGE">Vintage</option>
+                  <option value="COMMANDER">Commander</option>
+                  <option value="PREMODERN">Premodern</option>
+                </select>
+              </div>
+            )}
           </div>
         )}
 
@@ -1109,10 +1132,16 @@ function PremadeDeckPickerPanel({ lobbyState }: { lobbyState: LobbyState }) {
   const totalCards = Object.values(pendingDeck).reduce((a, b) => a + b, 0)
   const canSubmit = isValid && totalCards >= 40
 
+  const deckFormat = lobbyState.settings.deckFormat
   return (
     <div className={styles.settingsPanel}>
       <div className={styles.settingsRow} style={{ alignItems: 'flex-start', flexDirection: 'column', gap: 12 }}>
         <span className={styles.settingsLabel}>Your Deck</span>
+        {deckFormat && (
+          <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>
+            Format restriction: <strong>{deckFormat[0]! + deckFormat.slice(1).toLowerCase()}</strong> — only cards legal in this format will be accepted.
+          </span>
+        )}
         <DeckPicker
           tabs={['saved', 'examples', 'paste']}
           onDeckChange={setPendingDeck}

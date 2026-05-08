@@ -212,7 +212,12 @@ sealed interface ClientMessage {
         val gamesPerMatch: Int? = null,
         val pickTimeSeconds: Int? = null,     // Draft only
         val picksPerRound: Int? = null,       // Draft only: 1 or 2
-        val isPublic: Boolean? = null
+        val isPublic: Boolean? = null,
+        /**
+         * Deck-construction format restriction (Standard/Modern/Commander/...). String form of
+         * [com.wingedsheep.sdk.core.DeckFormat]; "" or "NONE" clears the restriction.
+         */
+        val deckFormat: String? = null
     ) : ClientMessage
 
     /**
@@ -352,7 +357,8 @@ sealed interface ClientMessage {
     data class CreateQuickGameLobby(
         val vsAi: Boolean = false,
         val setCode: String? = null,
-        val isPublic: Boolean = false
+        val isPublic: Boolean = false,
+        val format: com.wingedsheep.sdk.core.DeckFormat? = null
     ) : ClientMessage
 
     /** Join an existing quick-game lobby by its short code. */
@@ -394,4 +400,12 @@ sealed interface ClientMessage {
     @Serializable
     @SerialName("setQuickGameLobbyPublic")
     data class SetQuickGameLobbyPublic(val isPublic: Boolean) : ClientMessage
+
+    /**
+     * Set the deck-format restriction for the lobby (host-only). Null = no restriction.
+     * Re-validates every player's submitted deck and un-readies anyone who becomes invalid.
+     */
+    @Serializable
+    @SerialName("setQuickGameLobbyFormat")
+    data class SetQuickGameLobbyFormat(val format: com.wingedsheep.sdk.core.DeckFormat?) : ClientMessage
 }

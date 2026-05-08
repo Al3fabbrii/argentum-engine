@@ -4,7 +4,9 @@ import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.gameserver.deck.DeckValidationResult
 import com.wingedsheep.gameserver.deck.DeckValidator
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
+import com.wingedsheep.sdk.core.DeckFormat
 import com.wingedsheep.sdk.model.CardDefinition
+import com.wingedsheep.sdk.model.MtgSet
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -27,7 +29,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/decks")
 class DecksController(
     private val cardRegistry: CardRegistry,
-    private val deckValidator: DeckValidator
+    private val deckValidator: DeckValidator,
+    private val activeSets: List<MtgSet>
 ) {
 
     data class CardSummaryDTO(
@@ -46,7 +49,8 @@ class DecksController(
         val power: String? = null,
         val toughness: String? = null,
         val imageUri: String? = null,
-        val keywords: List<String> = emptyList()
+        val keywords: List<String> = emptyList(),
+        val legalFormats: List<String> = emptyList()
     )
 
     data class ExampleDeckDTO(
@@ -57,7 +61,8 @@ class DecksController(
     )
 
     data class ValidateRequest(
-        val deckList: Map<String, Int>
+        val deckList: Map<String, Int>,
+        val format: DeckFormat? = null
     )
 
     @GetMapping("/cards")
@@ -75,7 +80,19 @@ class DecksController(
 
     @PostMapping("/validate")
     fun validate(@RequestBody request: ValidateRequest): DeckValidationResult =
-        deckValidator.validate(request.deckList)
+        deckValidator.validate(request.deckList, request.format)
+
+    @GetMapping("/formats")
+    fun getFormats(): List<FormatInfo> =
+        DeckFormat.entries.map { FormatInfo(it.name, it.displayName) }
+
+    data class FormatInfo(val id: String, val name: String)
+
+    @GetMapping("/sets")
+    fun getSets(): List<SetInfoDTO> =
+        activeSets.map { SetInfoDTO(it.code, it.displayName) }
+
+    data class SetInfoDTO(val code: String, val name: String)
 
     private fun CardDefinition.toSummary(): CardSummaryDTO = CardSummaryDTO(
         name = name,
@@ -93,7 +110,8 @@ class DecksController(
         power = creatureStats?.power?.toString(),
         toughness = creatureStats?.toughness?.toString(),
         imageUri = metadata.imageUri,
-        keywords = keywords.map { it.name }.sorted()
+        keywords = keywords.map { it.name }.sorted(),
+        legalFormats = legalFormats.map { it.name }.sorted()
     )
 
     companion object {

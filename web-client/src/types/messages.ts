@@ -852,6 +852,8 @@ export interface LobbySettings {
   readonly picksPerRound: number  // Draft only: 1 or 2 (Pick 2 mode)
   readonly gamesPerMatch: number
   readonly isPublic: boolean
+  /** Optional deck-construction format restriction (Standard/Modern/Commander/...). */
+  readonly deckFormat?: DeckFormat | null
 }
 
 export type TournamentFormat = 'SEALED' | 'DRAFT' | 'WINSTON_DRAFT' | 'GRID_DRAFT' | 'PREMADE_DECKS'
@@ -1336,6 +1338,7 @@ export type ClientMessage =
   | SetQuickGameLobbyReadyMessage
   | SetQuickGameLobbySetCodeMessage
   | SetQuickGameLobbyPublicMessage
+  | SetQuickGameLobbyFormatMessage
 
 /**
  * Connect to the server with a player name.
@@ -1637,6 +1640,8 @@ export interface UpdateLobbySettingsMessage {
   readonly pickTimeSeconds?: number
   readonly picksPerRound?: number
   readonly isPublic?: boolean
+  /** Deck-construction format. Empty string (or 'NONE') clears the restriction. */
+  readonly deckFormat?: DeckFormat | '' | null
 }
 
 // Tournament Client Messages
@@ -1817,6 +1822,8 @@ export function createUpdateLobbySettingsMessage(
     gamesPerMatch?: number
     pickTimeSeconds?: number
     picksPerRound?: number
+    isPublic?: boolean
+    deckFormat?: DeckFormat | '' | null
   }
 ): UpdateLobbySettingsMessage {
   return { type: 'updateLobbySettings', ...settings }
@@ -1991,6 +1998,16 @@ export interface QuickGameLobbyPlayerView {
   readonly setCode: string | null
 }
 
+export type DeckFormat =
+  | 'STANDARD'
+  | 'PIONEER'
+  | 'MODERN'
+  | 'LEGACY'
+  | 'VINTAGE'
+  | 'COMMANDER'
+  | 'PAUPER'
+  | 'PREMODERN'
+
 export interface QuickGameLobbyStateMessage {
   readonly type: 'quickGameLobbyState'
   readonly lobbyId: string
@@ -2000,6 +2017,7 @@ export interface QuickGameLobbyStateMessage {
   readonly youPlayerId: string
   readonly canStart: boolean
   readonly isPublic: boolean
+  readonly format?: DeckFormat | null
 }
 
 export interface QuickGameLobbyClosedMessage {
@@ -2017,6 +2035,7 @@ export interface CreateQuickGameLobbyMessage {
   readonly vsAi?: boolean
   readonly setCode?: string
   readonly isPublic?: boolean
+  readonly format?: DeckFormat
 }
 
 export interface JoinQuickGameLobbyMessage {
@@ -2048,12 +2067,23 @@ export interface SetQuickGameLobbyPublicMessage {
   readonly isPublic: boolean
 }
 
-export function createCreateQuickGameLobbyMessage(vsAi?: boolean, setCode?: string, isPublic?: boolean): CreateQuickGameLobbyMessage {
+export interface SetQuickGameLobbyFormatMessage {
+  readonly type: 'setQuickGameLobbyFormat'
+  readonly format: DeckFormat | null
+}
+
+export function createCreateQuickGameLobbyMessage(
+  vsAi?: boolean,
+  setCode?: string,
+  isPublic?: boolean,
+  format?: DeckFormat,
+): CreateQuickGameLobbyMessage {
   return {
     type: 'createQuickGameLobby',
     ...(vsAi ? { vsAi } : {}),
     ...(setCode ? { setCode } : {}),
     ...(isPublic ? { isPublic } : {}),
+    ...(format ? { format } : {}),
   }
 }
 export function createJoinQuickGameLobbyMessage(lobbyId: string): JoinQuickGameLobbyMessage {
@@ -2073,6 +2103,9 @@ export function createSetQuickGameLobbySetCodeMessage(setCode: string | null): S
 }
 export function createSetQuickGameLobbyPublicMessage(isPublic: boolean): SetQuickGameLobbyPublicMessage {
   return { type: 'setQuickGameLobbyPublic', isPublic }
+}
+export function createSetQuickGameLobbyFormatMessage(format: DeckFormat | null): SetQuickGameLobbyFormatMessage {
+  return { type: 'setQuickGameLobbyFormat', format }
 }
 
 export function isQuickGameLobbyStateMessage(msg: ServerMessage): msg is QuickGameLobbyStateMessage {

@@ -175,7 +175,14 @@ class TournamentLobby(
     var pickTimeSeconds: Int = 45,    // Draft only
     var picksPerRound: Int = 1,       // Draft only: cards to pick each round (1 or 2)
     var gamesPerMatch: Int = 1,
-    var isPublic: Boolean = false
+    var isPublic: Boolean = false,
+    /**
+     * Optional deck-construction format (Standard, Modern, Commander, …) used to restrict which
+     * cards a player may include. Currently only enforced for [TournamentFormat.PREMADE_DECKS] —
+     * limited formats (Sealed/Draft) play out of the generated pool and ignore this. Null = no
+     * restriction.
+     */
+    var deckFormat: com.wingedsheep.sdk.core.DeckFormat? = null
 ) {
 
     /**
@@ -1311,7 +1318,8 @@ class TournamentLobby(
                 pickTimeSeconds = pickTimeSeconds,
                 picksPerRound = picksPerRound,
                 gamesPerMatch = gamesPerMatch,
-                isPublic = isPublic
+                isPublic = isPublic,
+                deckFormat = deckFormat?.name
             ),
             isHost = isHost(forPlayerId)
         )

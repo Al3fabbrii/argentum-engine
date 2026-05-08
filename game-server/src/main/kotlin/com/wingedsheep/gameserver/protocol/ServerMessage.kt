@@ -389,7 +389,9 @@ sealed interface ServerMessage {
         val pickTimeSeconds: Int = 45,      // Draft only
         val picksPerRound: Int = 1,         // Draft only: 1 or 2 (Pick 2 mode)
         val gamesPerMatch: Int = 1,
-        val isPublic: Boolean = false
+        val isPublic: Boolean = false,
+        /** Optional deck-construction format (Standard/Modern/Commander/...). Null = no restriction. */
+        val deckFormat: String? = null
     )
 
     /**
@@ -916,7 +918,8 @@ sealed interface ServerMessage {
         val players: List<QuickGameLobbyPlayerView>,
         val youPlayerId: EntityId,
         val canStart: Boolean,
-        val isPublic: Boolean = false
+        val isPublic: Boolean = false,
+        val format: com.wingedsheep.sdk.core.DeckFormat? = null
     ) : ServerMessage
 
     /**

@@ -8,7 +8,7 @@
  * model — every state change comes from the server as a fresh `quickGameLobbyState` message,
  * so we just store and re-render.
  */
-import type { QuickGameLobbyStateMessage } from '@/types'
+import type { DeckFormat, QuickGameLobbyStateMessage } from '@/types'
 import {
   createCreateQuickGameLobbyMessage,
   createJoinQuickGameLobbyMessage,
@@ -17,6 +17,7 @@ import {
   createSetQuickGameLobbyReadyMessage,
   createSetQuickGameLobbySetCodeMessage,
   createSetQuickGameLobbyPublicMessage,
+  createSetQuickGameLobbyFormatMessage,
 } from '@/types'
 import type { SliceCreator } from './types'
 import { getWebSocket } from './shared'
@@ -26,13 +27,14 @@ export interface QuickGameLobbySliceState {
 }
 
 export interface QuickGameLobbySliceActions {
-  createQuickGameLobby: (vsAi?: boolean, setCode?: string, isPublic?: boolean) => void
+  createQuickGameLobby: (vsAi?: boolean, setCode?: string, isPublic?: boolean, format?: DeckFormat) => void
   joinQuickGameLobby: (lobbyId: string) => void
   leaveQuickGameLobby: () => void
   submitQuickGameLobbyDeck: (deckList: Record<string, number>) => void
   setQuickGameLobbyReady: (ready: boolean) => void
   setQuickGameLobbySetCode: (setCode: string | null) => void
   setQuickGameLobbyPublic: (isPublic: boolean) => void
+  setQuickGameLobbyFormat: (format: DeckFormat | null) => void
 }
 
 export type QuickGameLobbySlice = QuickGameLobbySliceState & QuickGameLobbySliceActions
@@ -40,8 +42,8 @@ export type QuickGameLobbySlice = QuickGameLobbySliceState & QuickGameLobbySlice
 export const createQuickGameLobbySlice: SliceCreator<QuickGameLobbySlice> = (set) => ({
   quickGameLobbyState: null,
 
-  createQuickGameLobby: (vsAi, setCode, isPublic) => {
-    getWebSocket()?.send(createCreateQuickGameLobbyMessage(vsAi, setCode, isPublic))
+  createQuickGameLobby: (vsAi, setCode, isPublic, format) => {
+    getWebSocket()?.send(createCreateQuickGameLobbyMessage(vsAi, setCode, isPublic, format))
   },
 
   joinQuickGameLobby: (lobbyId) => {
@@ -67,5 +69,9 @@ export const createQuickGameLobbySlice: SliceCreator<QuickGameLobbySlice> = (set
 
   setQuickGameLobbyPublic: (isPublic) => {
     getWebSocket()?.send(createSetQuickGameLobbyPublicMessage(isPublic))
+  },
+
+  setQuickGameLobbyFormat: (format) => {
+    getWebSocket()?.send(createSetQuickGameLobbyFormatMessage(format))
   },
 })

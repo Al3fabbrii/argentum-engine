@@ -28,6 +28,13 @@ import {
   resolveAgainstCatalog,
   type ResolveResult,
 } from './parseArenaDeck'
+import {
+  detectProducedColors,
+  suggestBasicLands,
+  type BasicLand,
+  type DeckEntry,
+  type LandColor,
+} from '@/utils/landSuggestion'
 import styles from './DeckbuilderPage.module.css'
 
 // ---------------------------------------------------------------------------
@@ -62,28 +69,20 @@ const TYPE_TOKENS = [
 
 const RARITY_TOKENS = ['common', 'uncommon', 'rare', 'mythic']
 
-const SET_NAMES: Record<string, string> = {
-  POR: 'Portal',
-  ONS: 'Onslaught',
-  SCG: 'Scourge',
-  LGN: 'Legions',
-  KTK: 'Khans of Tarkir',
-  ONE: 'Phyrexia: All Will Be One',
-  DOM: 'Dominaria',
-  DMU: 'Dominaria United',
-  BLB: 'Bloomburrow',
-  BRO: "The Brothers' War",
-  DFT: 'Aetherdrift',
-  EOE: 'Edge of Eternities',
-  ECL: 'Lorwyn Eclipsed',
-  LCI: 'The Lost Caverns of Ixalan',
-  MKM: 'Murders at Karlov Manor',
-  FDN: 'Foundations',
-  DSK: 'Duskmourn: House of Horror',
-  MID: 'Innistrad: Midnight Hunt',
-  SPM: 'Marvel’s Spider-Man',
-  WOE: 'Wilds of Eldraine',
-}
+// Deck-construction formats with Scryfall-sourced legality data. Order is
+// roughly newest-to-oldest by card pool size, matching what most players expect.
+const FORMAT_TOKENS: Array<{ value: string; label: string }> = [
+  { value: 'standard', label: 'Standard' },
+  { value: 'pioneer', label: 'Pioneer' },
+  { value: 'modern', label: 'Modern' },
+  { value: 'pauper', label: 'Pauper' },
+  { value: 'legacy', label: 'Legacy' },
+  { value: 'vintage', label: 'Vintage' },
+  { value: 'commander', label: 'Commander' },
+  { value: 'premodern', label: 'Premodern' },
+]
+
+type SetInfo = { code: string; name: string }
 
 type SortMode = 'name' | 'cmc' | 'color' | 'rarity'
 
@@ -166,6 +165,24 @@ export function DeckbuilderPage() {
     }
   }, [])
 
+  // Set code → display name, fetched from the server (active sets only).
+  const [setNames, setSetNames] = useState<Record<string, string>>({})
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/decks/sets')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: SetInfo[]) => {
+        if (cancelled) return
+        const map: Record<string, string> = {}
+        for (const s of list) map[s.code] = s.name
+        setSetNames(map)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const catalogIndex: Record<string, CardSummary> = useMemo(() => {
     const out: Record<string, CardSummary> = {}
     for (const c of catalog) out[c.name] = c
@@ -230,6 +247,13 @@ export function DeckbuilderPage() {
     [setSearchParams]
   )
 
+  // Pull the active format token (if any) so we can pass it to the validator and stamp it
+  // onto saved decks. Single-select by construction (FormatSection enforces that).
+  const activeFormat = useMemo(() => {
+    const m = query.match(/(?:^|\s)format:([^\s]+)/i)
+    return m ? m[1]!.toUpperCase() : null
+  }, [query])
+
   const predicate = useMemo(() => parseQuery(query), [query])
   const filtered = useMemo(() => {
     const result = catalog.filter(predicate)
@@ -260,7 +284,10 @@ export function DeckbuilderPage() {
       fetch('/api/decks/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deckList: deckCards }),
+        body: JSON.stringify({
+          deckList: deckCards,
+          ...(activeFormat ? { format: activeFormat } : {}),
+        }),
         signal: ctrl.signal,
       })
         .then((r) => (r.ok ? r.json() : null))
@@ -273,7 +300,7 @@ export function DeckbuilderPage() {
       window.clearTimeout(handle)
       ctrl.abort()
     }
-  }, [deckCards])
+  }, [deckCards, activeFormat])
 
   // ----- Mutations -----
 
@@ -297,6 +324,15 @@ export function DeckbuilderPage() {
     })
   }
 
+  const setCardCount = useCallback((name: string, count: number) => {
+    setDeckCards((prev) => {
+      const next = { ...prev }
+      if (count <= 0) delete next[name]
+      else next[name] = count
+      return next
+    })
+  }, [])
+
   const handleNew = () => {
     setDeckName('Untitled deck')
     setDeckCards({})
@@ -309,6 +345,7 @@ export function DeckbuilderPage() {
       ...(activeDeckId ? { id: activeDeckId } : {}),
       name: deckName.trim() || 'Untitled deck',
       cards: deckCards,
+      ...(activeFormat ? { format: activeFormat } : {}),
     })
     setActiveDeckId(saved.id)
     if (saved.id !== deckId) navigate(`/deckbuilder/${saved.id}${searchSuffix()}`, { replace: true })
@@ -317,7 +354,11 @@ export function DeckbuilderPage() {
   const handleSaveAs = () => {
     const name = window.prompt('New deck name', `${deckName} (copy)`)
     if (!name) return
-    const saved = saveDeck({ name: name.trim(), cards: deckCards })
+    const saved = saveDeck({
+      name: name.trim(),
+      cards: deckCards,
+      ...(activeFormat ? { format: activeFormat } : {}),
+    })
     setDeckName(saved.name)
     setActiveDeckId(saved.id)
     navigate(`/deckbuilder/${saved.id}${searchSuffix()}`, { replace: true })
@@ -408,7 +449,7 @@ export function DeckbuilderPage() {
           activeDeckId={activeDeckId}
           onOpen={() => setDecksBrowserOpen(true)}
         />
-        <FilterSection query={query} onQueryChange={setQuery} catalog={catalog} />
+        <FilterSection query={query} onQueryChange={setQuery} catalog={catalog} setNames={setNames} />
       </aside>
 
       {/* Center */}
@@ -448,6 +489,14 @@ export function DeckbuilderPage() {
         </div>
 
         <DeckListPanel deckCards={deckCards} catalog={catalogIndex} onRemove={removeCard} />
+
+        <BasicLandsPanel
+          catalog={catalog}
+          deckCards={deckCards}
+          onAdd={addCard}
+          onRemove={removeCard}
+          onSuggest={() => suggestLandsForDeck(deckCards, catalogIndex, catalog, setCardCount)}
+        />
 
         <div className={styles.summary}>
           <div className={styles.summaryRow}>
@@ -1152,10 +1201,12 @@ function FilterSection({
   query,
   onQueryChange,
   catalog,
+  setNames,
 }: {
   query: string
   onQueryChange: (next: string) => void
   catalog: CardSummary[]
+  setNames: Record<string, string>
 }) {
   const toggle = (token: string) => onQueryChange(toggleToken(query, token))
 
@@ -1267,6 +1318,8 @@ function FilterSection({
         </div>
       </section>
 
+      <FormatSection query={query} onQueryChange={onQueryChange} />
+
       <section className={styles.section}>
         <h2 className={styles.sectionLabel}>Mana value</h2>
         <RangeRow
@@ -1334,7 +1387,7 @@ function FilterSection({
             <option value="">All sets</option>
             {setCodes.map((code) => (
               <option key={code} value={code}>
-                {SET_NAMES[code] ? `${SET_NAMES[code]} (${code})` : code}
+                {setNames[code] ? `${setNames[code]} (${code})` : code}
               </option>
             ))}
           </select>
@@ -1351,6 +1404,64 @@ function FilterSection({
         </button>
       </section>
     </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Format filter (Standard / Modern / Legacy / …)
+// ---------------------------------------------------------------------------
+
+/**
+ * Mutually-exclusive format selector. Picking a format adds `format:<name>` to the query;
+ * picking again clears it. Only one format token is ever active so the deckbuilder tracks
+ * "what format am I building for" cleanly.
+ */
+function FormatSection({
+  query,
+  onQueryChange,
+}: {
+  query: string
+  onQueryChange: (next: string) => void
+}) {
+  const activeFormat = useMemo(() => {
+    const m = query.match(/(?:^|\s)format:([^\s]+)/i)
+    return m ? m[1]!.toLowerCase() : ''
+  }, [query])
+
+  const select = (value: string) => {
+    // Strip any existing format token first so switching is atomic.
+    const stripped = query
+      .split(/\s+/)
+      .filter((t) => !/^-?format:/i.test(t))
+      .join(' ')
+    if (activeFormat === value) {
+      onQueryChange(stripped.trim())
+      return
+    }
+    const next = stripped ? `${stripped.trim()} format:${value}` : `format:${value}`
+    onQueryChange(next)
+  }
+
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionLabel}>Format</h2>
+      <div className={styles.filterRow}>
+        {FORMAT_TOKENS.map(({ value, label }) => {
+          const active = activeFormat === value
+          return (
+            <button
+              key={value}
+              className={`${styles.chip} ${active ? styles.chipActive : ''}`}
+              onClick={() => select(value)}
+              type="button"
+              title={`Show only cards legal in ${label}`}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 
@@ -1810,6 +1921,184 @@ function DeckListPanel({
 }
 
 // ---------------------------------------------------------------------------
+// Basic-lands quick-add panel (right rail)
+// ---------------------------------------------------------------------------
+
+const BASIC_LAND_ORDER = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest']
+const BASIC_LAND_COLOR: Record<string, string> = {
+  Plains: 'W',
+  Island: 'U',
+  Swamp: 'B',
+  Mountain: 'R',
+  Forest: 'G',
+}
+function BasicLandsPanel({
+  catalog,
+  deckCards,
+  onAdd,
+  onRemove,
+  onSuggest,
+}: {
+  catalog: CardSummary[]
+  deckCards: Record<string, number>
+  onAdd: (card: CardSummary) => void
+  onRemove: (name: string) => void
+  onSuggest: () => void
+}) {
+  // Pick one printing per basic land name. Prefer the entry flagged basicLand
+  // but fall back to anything in the catalog with a matching name so the panel
+  // still works on a partially loaded catalog.
+  const basics = useMemo(() => {
+    const byName = new Map<string, CardSummary>()
+    for (const c of catalog) {
+      if (!BASIC_LAND_ORDER.includes(c.name)) continue
+      if (!byName.has(c.name) || c.basicLand) byName.set(c.name, c)
+    }
+    return BASIC_LAND_ORDER
+      .map((name) => byName.get(name))
+      .filter((c): c is CardSummary => Boolean(c))
+  }, [catalog])
+
+  const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
+  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null)
+
+  if (basics.length === 0) return null
+
+  const hasDeck = Object.keys(deckCards).length > 0
+
+  return (
+    <div className={styles.basicLands}>
+      <div className={styles.basicLandsHeader}>
+        <span className={styles.deckGroupLabel} style={{ margin: 0 }}>
+          Basic Lands
+        </span>
+        <button
+          className={styles.basicLandsSuggest}
+          onClick={onSuggest}
+          disabled={!hasDeck}
+          title="Auto-fill basic lands from your deck's mana curve and color requirements"
+          type="button"
+        >
+          Suggest
+        </button>
+      </div>
+      {basics.map((card) => {
+        const count = deckCards[card.name] ?? 0
+        const color = BASIC_LAND_COLOR[card.name]
+        return (
+          <div
+            key={card.name}
+            className={styles.basicLandRow}
+            onMouseEnter={(e) => {
+              setHoverCard(card)
+              setHoverPos({ x: e.clientX, y: e.clientY })
+            }}
+            onMouseMove={(e) => setHoverPos({ x: e.clientX, y: e.clientY })}
+            onMouseLeave={() => {
+              setHoverCard(null)
+              setHoverPos(null)
+            }}
+          >
+            <span className={styles.basicLandCount}>{count}</span>
+            <span
+              className={styles.colorDot}
+              style={{ background: color ? COLOR_DOT[colorKey(color)] : '#888' }}
+              aria-hidden
+            />
+            <span className={styles.basicLandName}>{card.name}</span>
+            <div className={styles.basicLandButtons}>
+              <button
+                className={styles.basicLandBtn}
+                onClick={() => onRemove(card.name)}
+                disabled={count <= 0}
+                aria-label={`Remove ${card.name}`}
+                type="button"
+              >
+                −
+              </button>
+              <button
+                className={styles.basicLandBtnAdd}
+                onClick={() => onAdd(card)}
+                aria-label={`Add ${card.name}`}
+                type="button"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        )
+      })}
+      {hoverCard && (
+        <HoverCardPreview
+          name={hoverCard.name}
+          imageUri={hoverCard.imageUri ?? null}
+          pos={hoverPos}
+        />
+      )}
+    </div>
+  )
+}
+
+function colorKey(letter: string): string {
+  switch (letter) {
+    case 'W': return 'WHITE'
+    case 'U': return 'BLUE'
+    case 'B': return 'BLACK'
+    case 'R': return 'RED'
+    case 'G': return 'GREEN'
+    default: return ''
+  }
+}
+
+/**
+ * Adapter: build `DeckEntry[]` from the standalone deckbuilder's deck +
+ * catalog and call the shared `suggestBasicLands`. The standalone builder
+ * doesn't know its target format, so no minDeckSize floor is applied — basics
+ * scale purely off the spell curve. The validation panel surfaces undersized
+ * decks so the user can re-run Suggest after adding more spells.
+ */
+function suggestLandsForDeck(
+  deck: Record<string, number>,
+  catalog: Record<string, CardSummary>,
+  catalogList: CardSummary[],
+  setCount: (name: string, count: number) => void,
+) {
+  const basicByName = new Map<string, CardSummary>()
+  for (const c of catalogList) {
+    if (BASIC_LAND_ORDER.includes(c.name) && (!basicByName.has(c.name) || c.basicLand)) {
+      basicByName.set(c.name, c)
+    }
+  }
+  if (basicByName.size === 0) return
+
+  const availableBasics: BasicLand[] = BASIC_LAND_ORDER
+    .filter((name) => basicByName.has(name))
+    .map((name) => ({ name, color: BASIC_LAND_COLOR[name] as LandColor }))
+
+  const entries: DeckEntry[] = []
+  for (const [name, count] of Object.entries(deck)) {
+    if (count <= 0) continue
+    const card = catalog[name]
+    if (!card || card.basicLand) continue
+    entries.push({
+      name: card.name,
+      manaCost: card.manaCost,
+      cmc: card.cmc,
+      isLand: card.cardTypes.includes('LAND'),
+      isBasicLand: false,
+      producedColors: detectProducedColors({
+        subtypes: card.subtypes,
+        oracleText: card.oracleText ?? null,
+      }),
+      count,
+    })
+  }
+
+  const result = suggestBasicLands({ entries, availableBasics })
+  for (const basic of availableBasics) setCount(basic.name, result[basic.name] ?? 0)
+}
+
+// ---------------------------------------------------------------------------
 // Stats / helpers
 // ---------------------------------------------------------------------------
 
@@ -1868,6 +2157,8 @@ function groupForDeckList(deck: Record<string, number>, catalog: Record<string, 
   for (const [name, count] of Object.entries(deck)) {
     if (count <= 0) continue
     const card = catalog[name]
+    // Basic lands have their own dedicated panel; skip them here to avoid duplication.
+    if (card?.basicLand) continue
     const entry = { name, count, card }
     if (card?.cardTypes.includes('LAND')) lands.push(entry)
     else spells.push(entry)

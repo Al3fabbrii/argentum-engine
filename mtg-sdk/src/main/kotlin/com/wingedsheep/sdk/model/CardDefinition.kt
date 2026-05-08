@@ -79,7 +79,8 @@ data class CardDefinition(
     val setCode: String? = null,
     val backFace: CardDefinition? = null,  // For double-faced cards
     val metadata: ScryfallMetadata = ScryfallMetadata(),  // Scryfall metadata for web client
-    val startingLoyalty: Int? = null  // For planeswalkers
+    val startingLoyalty: Int? = null,  // For planeswalkers
+    val legalFormats: Set<DeckFormat> = emptySet()  // Formats in which the card is legal (Scryfall-sourced)
 ) {
     init {
         if (typeLine.isCreature) {

@@ -16,6 +16,7 @@ import com.wingedsheep.gameserver.session.GameSession
 import com.wingedsheep.gameserver.session.PlayerSession
 import com.wingedsheep.gameserver.session.SessionRegistry
 import com.wingedsheep.engine.registry.CardRegistry
+import com.wingedsheep.sdk.core.DeckFormat
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.WebSocketSession
@@ -70,7 +71,37 @@ class QuickGameLobbyHandler(
             is ClientMessage.SetQuickGameLobbyReady -> handleSetReady(session, message)
             is ClientMessage.SetQuickGameLobbySetCode -> handleSetSetCode(session, message)
             is ClientMessage.SetQuickGameLobbyPublic -> handleSetPublic(session, message)
+            is ClientMessage.SetQuickGameLobbyFormat -> handleSetFormat(session, message)
             else -> {}
+        }
+    }
+
+    private fun handleSetFormat(session: WebSocketSession, message: ClientMessage.SetQuickGameLobbyFormat) {
+        val playerSession = sessionRegistry.getPlayerSession(session.id) ?: run {
+            sender.sendError(session, ErrorCode.NOT_CONNECTED, "Not connected"); return
+        }
+        val lobby = lobbyRepository.findContainingPlayer(playerSession.playerId) ?: run {
+            sender.sendError(session, ErrorCode.GAME_NOT_FOUND, "Not in a lobby"); return
+        }
+        lobbyRepository.withLock(lobby.lobbyId) { current ->
+            if (current == null) return@withLock
+            val host = current.players.firstOrNull { !it.isAi }
+            if (host?.playerId != playerSession.playerId) {
+                sender.sendError(session, ErrorCode.INVALID_ACTION, "Only the host can change the format")
+                return@withLock
+            }
+            if (current.format == message.format) return@withLock
+            current.format = message.format
+            // Re-validate every submitted deck under the new format. Submissions that no longer
+            // pass un-ready the player so they have to update their deck or accept a new format.
+            for (player in current.players) {
+                if (player.isAi) continue
+                val deck = player.deckList ?: continue
+                if (deck.isEmpty()) continue // Random pool — format restriction doesn't apply.
+                val result = deckValidator.validate(deck, message.format)
+                if (!result.valid) player.ready = false
+            }
+            broadcastState(current)
         }
     }
 
@@ -130,7 +161,8 @@ class QuickGameLobbyHandler(
             vsAi = message.vsAi,
             setCode = message.setCode,
             // AI lobbies are single-player — never publicly listed.
-            isPublic = message.isPublic && !message.vsAi
+            isPublic = message.isPublic && !message.vsAi,
+            format = message.format
         )
         lobby.players += QuickGameLobbyPlayer(
             playerId = playerSession.playerId,
@@ -235,7 +267,7 @@ class QuickGameLobbyHandler(
         }
         // Empty deck = "random pool" — skip validation.
         if (message.deckList.isNotEmpty()) {
-            val result = deckValidator.validate(message.deckList)
+            val result = deckValidator.validate(message.deckList, lobby.format)
             if (!result.valid) {
                 sender.sendError(
                     session,
@@ -375,7 +407,8 @@ class QuickGameLobbyHandler(
             players = lobby.players.map { it.toView() },
             youPlayerId = playerId,
             canStart = lobby.allReady(),
-            isPublic = lobby.isPublic
+            isPublic = lobby.isPublic,
+            format = lobby.format
         )
         sender.send(session, msg)
     }
@@ -404,7 +437,8 @@ class QuickGameLobbyHandler(
                 players = lobby.players.map { it.toView() },
                 youPlayerId = player.playerId,
                 canStart = lobby.allReady(),
-                isPublic = lobby.isPublic
+                isPublic = lobby.isPublic,
+                format = lobby.format
             )
             sender.send(ws, msg)
         }

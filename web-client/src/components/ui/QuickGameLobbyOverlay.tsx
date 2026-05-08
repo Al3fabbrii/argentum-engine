@@ -12,10 +12,21 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
-import type { QuickGameLobbyPlayerView } from '@/types'
+import type { DeckFormat, QuickGameLobbyPlayerView } from '@/types'
 import { randomBackground } from '@/utils/background.ts'
 import { DeckPicker } from './DeckPicker'
 import styles from './GameUI.module.css'
+
+const FORMAT_OPTIONS: Array<{ value: DeckFormat; label: string }> = [
+  { value: 'STANDARD', label: 'Standard' },
+  { value: 'PIONEER', label: 'Pioneer' },
+  { value: 'MODERN', label: 'Modern' },
+  { value: 'PAUPER', label: 'Pauper' },
+  { value: 'LEGACY', label: 'Legacy' },
+  { value: 'VINTAGE', label: 'Vintage' },
+  { value: 'COMMANDER', label: 'Commander' },
+  { value: 'PREMODERN', label: 'Premodern' },
+]
 
 export function QuickGameLobbyOverlay() {
   const lobby = useGameStore((s) => s.quickGameLobbyState)
@@ -24,6 +35,7 @@ export function QuickGameLobbyOverlay() {
   const setReady = useGameStore((s) => s.setQuickGameLobbyReady)
   const setSetCode = useGameStore((s) => s.setQuickGameLobbySetCode)
   const setPublic = useGameStore((s) => s.setQuickGameLobbyPublic)
+  const setFormat = useGameStore((s) => s.setQuickGameLobbyFormat)
   const leave = useGameStore((s) => s.leaveQuickGameLobby)
 
   // Throttle deck submissions: the picker fires several times per keystroke, but we only
@@ -142,6 +154,49 @@ export function QuickGameLobbyOverlay() {
                   Public
                 </button>
               </div>
+            </div>
+            <div className={styles.settingsRow}>
+              <span className={styles.settingsLabel}>Format</span>
+              <select
+                value={lobby.format ?? ''}
+                onChange={(e) => {
+                  if (!isHost) return
+                  const v = e.target.value
+                  setFormat(v ? (v as DeckFormat) : null)
+                }}
+                disabled={!isHost}
+                title={isHost ? 'Restrict decks to a constructed format. None = no restriction.' : 'Only the host can change the format'}
+                className={styles.settingsButton}
+                style={{ minWidth: 140 }}
+              >
+                <option value="">No restriction</option>
+                {FORMAT_OPTIONS.map((f) => (
+                  <option key={f.value} value={f.value}>{f.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {lobby.vsAi && (
+          <div className={styles.settingsPanel}>
+            <div className={styles.settingsRow}>
+              <span className={styles.settingsLabel}>Format</span>
+              <select
+                value={lobby.format ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setFormat(v ? (v as DeckFormat) : null)
+                }}
+                title="Restrict decks to a constructed format. None = no restriction."
+                className={styles.settingsButton}
+                style={{ minWidth: 140 }}
+              >
+                <option value="">No restriction</option>
+                {FORMAT_OPTIONS.map((f) => (
+                  <option key={f.value} value={f.value}>{f.label}</option>
+                ))}
+              </select>
             </div>
           </div>
         )}

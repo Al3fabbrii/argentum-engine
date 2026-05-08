@@ -1790,6 +1790,16 @@ class LobbyHandler(
         message.pickTimeSeconds?.let { lobby.pickTimeSeconds = it.coerceIn(15, 180) }
         message.picksPerRound?.let { lobby.picksPerRound = it.coerceIn(1, 2) }
         message.isPublic?.let { lobby.isPublic = it }
+        message.deckFormat?.let { value ->
+            // Empty string or sentinel "NONE" clears the restriction. Unknown values are silently
+            // ignored so a future client/server skew can't break older lobbies.
+            lobby.deckFormat = if (value.isBlank() || value.equals("NONE", ignoreCase = true)) {
+                null
+            } else {
+                runCatching { com.wingedsheep.sdk.core.DeckFormat.valueOf(value.uppercase()) }
+                    .getOrNull() ?: lobby.deckFormat
+            }
+        }
 
         ctx.broadcastLobbyUpdate(lobby)
         lobbyRepository.saveLobby(lobby)
@@ -1814,8 +1824,9 @@ class LobbyHandler(
 
         // For PREMADE_DECKS, the deck didn't come from a generated card pool — validate
         // against the registry (≥40 cards, 4-of, all cards must resolve) before storing it.
+        // If the host has set a deck-construction format, also enforce per-card legality.
         if (lobby.format == TournamentFormat.PREMADE_DECKS) {
-            val validation = deckValidator.validate(deckList)
+            val validation = deckValidator.validate(deckList, lobby.deckFormat)
             if (!validation.valid) {
                 val msg = validation.errors.firstOrNull()?.message ?: "Invalid deck"
                 sender.sendError(session, ErrorCode.INVALID_DECK, msg)

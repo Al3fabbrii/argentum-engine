@@ -56,6 +56,8 @@ export interface CardSummary {
   toughness?: string | null
   imageUri?: string | null
   keywords?: string[]
+  /** Server-stamped legal formats (uppercase: STANDARD, MODERN, COMMANDER, …). */
+  legalFormats?: string[]
 }
 
 export type CardPredicate = (card: CardSummary) => boolean
@@ -191,6 +193,10 @@ function predicateForToken(tok: Token): CardPredicate {
     case 'kw':
     case 'keyword':
       return matchKeyword(value)
+    case 'f':
+    case 'format':
+    case 'legal':
+      return matchFormat(value)
     default:
       // Unknown key — fall back to name match on the original key+value pair.
       return matchName(`${key}${op}${value}`)
@@ -346,6 +352,18 @@ function matchKeyword(value: string): CardPredicate {
   const target = ci(value)
   if (!target) return ALWAYS
   return (c) => !!c.keywords && c.keywords.some((k) => ci(k) === target)
+}
+
+/**
+ * `format:standard` matches cards legal in Standard, etc. Cards with no recorded legality
+ * data (custom/test cards) are excluded so the deckbuilder only surfaces cards we can
+ * actually validate as legal — the alternative would silently mix unverifiable cards into
+ * a "Standard" deck.
+ */
+function matchFormat(value: string): CardPredicate {
+  const target = value.toUpperCase().trim()
+  if (!target) return ALWAYS
+  return (c) => !!c.legalFormats && c.legalFormats.includes(target)
 }
 
 /**

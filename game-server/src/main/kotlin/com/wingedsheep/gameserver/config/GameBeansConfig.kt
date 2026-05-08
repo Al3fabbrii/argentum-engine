@@ -8,6 +8,7 @@ import com.wingedsheep.mtg.sets.MtgSetCatalog
 import com.wingedsheep.mtg.sets.definitions.custom.JustOneGlassToken
 import com.wingedsheep.mtg.sets.definitions.custom.SekshaasEarlySleeper
 import com.wingedsheep.mtg.sets.definitions.por.PortalSet
+import com.wingedsheep.mtg.sets.legality.LegalityData
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.MtgSet
@@ -23,16 +24,19 @@ class GameBeansConfig(
         MtgSetCatalog.all.filter { gameProperties.sets.isEnabled(it.code) }
 
     @Bean
+    fun activeMtgSets(): List<MtgSet> = activeSets()
+
+    @Bean
     fun cardRegistry(): CardRegistry = CardRegistry().apply {
         register(PredefinedTokens.allTokens)
         for (set in activeSets()) {
-            register(set.cards.stamp(set.code))
-            register(set.basicLands)
-            set.basicLandsFallback?.let { register(it.basicLands) }
+            register(set.cards.stamp(set.code).withLegalities())
+            register(set.basicLands.withLegalities())
+            set.basicLandsFallback?.let { register(it.basicLands.withLegalities()) }
         }
         // Easter egg card — injected into Rick's deck at game start
-        register(SekshaasEarlySleeper)
-        register(JustOneGlassToken)
+        register(LegalityData.stamp(SekshaasEarlySleeper))
+        register(LegalityData.stamp(JustOneGlassToken))
     }
 
     @Bean
@@ -59,6 +63,9 @@ class GameBeansConfig(
 
 private fun List<CardDefinition>.stamp(setCode: String): List<CardDefinition> =
     map { if (it.setCode == null) it.copy(setCode = setCode) else it }
+
+private fun List<CardDefinition>.withLegalities(): List<CardDefinition> =
+    map { LegalityData.stamp(it) }
 
 private fun MtgSet.toBoosterSetConfig(): BoosterGenerator.SetConfig =
     BoosterGenerator.SetConfig(

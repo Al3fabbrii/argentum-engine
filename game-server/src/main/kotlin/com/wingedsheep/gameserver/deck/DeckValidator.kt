@@ -1,6 +1,7 @@
 package com.wingedsheep.gameserver.deck
 
 import com.wingedsheep.engine.registry.CardRegistry
+import com.wingedsheep.sdk.core.DeckFormat
 import org.springframework.stereotype.Component
 
 /**
@@ -21,7 +22,10 @@ class DeckValidator(
     private val cardRegistry: CardRegistry
 ) {
 
-    fun validate(deckList: Map<String, Int>): DeckValidationResult {
+    fun validate(
+        deckList: Map<String, Int>,
+        format: DeckFormat? = null,
+    ): DeckValidationResult {
         val errors = mutableListOf<DeckValidationIssue>()
         val warnings = mutableListOf<DeckValidationIssue>()
 
@@ -50,6 +54,15 @@ class DeckValidator(
                 errors += DeckValidationIssue(
                     code = "TOO_MANY_COPIES",
                     message = "$count copies of $cardName — limit is $MAX_COPIES_NON_BASIC for non-basic cards",
+                    cardName = cardName
+                )
+            }
+            // Format legality. Cards with no recorded legality (custom test cards, missing Scryfall
+            // data) are accepted silently — only an explicit "this card is not in $format" rejects.
+            if (format != null && card.legalFormats.isNotEmpty() && format !in card.legalFormats) {
+                errors += DeckValidationIssue(
+                    code = "NOT_LEGAL_IN_FORMAT",
+                    message = "$cardName is not legal in ${format.displayName}",
                     cardName = cardName
                 )
             }

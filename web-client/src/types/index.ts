@@ -290,7 +290,9 @@ export type {
   SetQuickGameLobbyReadyMessage,
   SetQuickGameLobbySetCodeMessage,
   SetQuickGameLobbyPublicMessage,
+  SetQuickGameLobbyFormatMessage,
   OnlinePlayersCountMessage,
+  DeckFormat,
 } from './messages'
 export {
   isConnectedMessage,
@@ -390,6 +392,7 @@ export {
   createSetQuickGameLobbyReadyMessage,
   createSetQuickGameLobbySetCodeMessage,
   createSetQuickGameLobbyPublicMessage,
+  createSetQuickGameLobbyFormatMessage,
   isQuickGameLobbyStateMessage,
   isQuickGameLobbyClosedMessage,
 } from './messages'
