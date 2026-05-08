@@ -18,15 +18,26 @@ enum class DeckFormat {
     LEGACY,
     VINTAGE,
     COMMANDER,
+    BRAWL,            // 100-card singleton (Arena/Historic Brawl). Scryfall key: "brawl".
+    STANDARD_BRAWL,   // 60-card singleton, Standard pool.            Scryfall key: "standardbrawl".
     PAUPER,
     PREMODERN;
 
-    /** Lower-case identifier matching Scryfall's `legalities.<key>` field. */
-    val scryfallKey: String get() = name.lowercase()
+    /**
+     * Lower-case identifier matching Scryfall's `legalities.<key>` field. Most enum names map
+     * directly (`STANDARD` → `"standard"`); `STANDARD_BRAWL` is special-cased because Scryfall
+     * concatenates words.
+     */
+    val scryfallKey: String get() = when (this) {
+        STANDARD_BRAWL -> "standardbrawl"
+        else -> name.lowercase()
+    }
 
     /** Human-readable label for UI surfaces. */
-    val displayName: String
-        get() = name.lowercase().replaceFirstChar { it.uppercase() }
+    val displayName: String get() = when (this) {
+        STANDARD_BRAWL -> "Standard Brawl"
+        else -> name.lowercase().replaceFirstChar { it.uppercase() }
+    }
 
     companion object {
         fun fromScryfallKey(key: String): DeckFormat? =

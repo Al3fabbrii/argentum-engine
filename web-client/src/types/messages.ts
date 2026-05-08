@@ -2005,6 +2005,8 @@ export type DeckFormat =
   | 'LEGACY'
   | 'VINTAGE'
   | 'COMMANDER'
+  | 'BRAWL'
+  | 'STANDARD_BRAWL'
   | 'PAUPER'
   | 'PREMODERN'
 

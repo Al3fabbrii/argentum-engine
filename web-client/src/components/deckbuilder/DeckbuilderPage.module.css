@@ -837,9 +837,9 @@
 
 .deckRow {
   display: grid;
-  grid-template-columns: 22px 1fr auto auto;
+  grid-template-columns: 18px 18px 22px 1fr auto;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 2px 4px;
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
@@ -848,6 +848,60 @@
 
 .deckRow:hover {
   background: rgba(255, 255, 255, 0.04);
+}
+
+.deckRowIllegal .deckRowName,
+.deckRowIllegal .deckRowCount {
+  color: #ff8888;
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 136, 136, 0.6);
+}
+
+.deckRowIllegal {
+  background: rgba(255, 80, 80, 0.06);
+}
+
+.formatPickerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.formatPickerLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+}
+
+.formatPickerSelect {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 4px 6px;
+  font-size: 0.8rem;
+}
+
+.formatBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.formatBadge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(108, 192, 74, 0.14);
+  color: #8ed171;
+  border: 1px solid rgba(108, 192, 74, 0.3);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-weight: 600;
 }
 
 .deckRowCount {
@@ -869,18 +923,29 @@
   gap: 1px;
 }
 
-.deckRowRemove {
-  background: transparent;
-  border: none;
+.deckRowStep {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
   font-size: 0.85rem;
-  padding: 0 4px;
+  padding: 0;
   line-height: 1;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.deckRowRemove:hover {
-  color: #ff8888;
+.deckRowStep:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.deckRowStep:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .basicLands {

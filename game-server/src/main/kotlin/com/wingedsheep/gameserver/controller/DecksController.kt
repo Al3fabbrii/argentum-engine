@@ -82,6 +82,33 @@ class DecksController(
     fun validate(@RequestBody request: ValidateRequest): DeckValidationResult =
         deckValidator.validate(request.deckList, request.format)
 
+    /**
+     * Returns, for each submitted deck list, the set of formats it is fully legal in. This is
+     * the authoritative source for the deckbuilder's saved-deck legality badges and the lobby
+     * picker's "legal in this format" filter — both of which used to compute legality on the
+     * client. We run [DeckValidator.validate] against every [DeckFormat] and include only the
+     * formats that come back valid (per-card legality + format-specific construction rules).
+     *
+     * Batched on purpose: the saved-decks browser renders 50+ deck cards at once, and per-deck
+     * round-trips would dominate the open-overlay latency. Pass an empty map to get an empty
+     * map back.
+     */
+    @PostMapping("/legal-formats")
+    fun legalFormats(@RequestBody request: LegalFormatsRequest): Map<String, List<String>> {
+        if (request.decks.isEmpty()) return emptyMap()
+        return request.decks.mapValues { (_, deckList) ->
+            DeckFormat.entries
+                .asSequence()
+                .filter { format -> deckValidator.validate(deckList, format).valid }
+                .map { it.name }
+                .toList()
+        }
+    }
+
+    data class LegalFormatsRequest(
+        val decks: Map<String, Map<String, Int>> = emptyMap()
+    )
+
     @GetMapping("/formats")
     fun getFormats(): List<FormatInfo> =
         DeckFormat.entries.map { FormatInfo(it.name, it.displayName) }

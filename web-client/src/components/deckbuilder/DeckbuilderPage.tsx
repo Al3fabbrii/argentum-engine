@@ -35,6 +35,11 @@ import {
   type DeckEntry,
   type LandColor,
 } from '@/utils/landSuggestion'
+import {
+  labelForFormat,
+  DECK_FORMATS,
+  useDeckLegalFormats,
+} from '@/utils/deckLegality'
 import styles from './DeckbuilderPage.module.css'
 
 // ---------------------------------------------------------------------------
@@ -69,18 +74,9 @@ const TYPE_TOKENS = [
 
 const RARITY_TOKENS = ['common', 'uncommon', 'rare', 'mythic']
 
-// Deck-construction formats with Scryfall-sourced legality data. Order is
-// roughly newest-to-oldest by card pool size, matching what most players expect.
-const FORMAT_TOKENS: Array<{ value: string; label: string }> = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'pioneer', label: 'Pioneer' },
-  { value: 'modern', label: 'Modern' },
-  { value: 'pauper', label: 'Pauper' },
-  { value: 'legacy', label: 'Legacy' },
-  { value: 'vintage', label: 'Vintage' },
-  { value: 'commander', label: 'Commander' },
-  { value: 'premodern', label: 'Premodern' },
-]
+// Deck-construction formats with Scryfall-sourced legality data. Pulled from the shared
+// helper so the deckbuilder's picker and the lobby filtering stay in lockstep.
+const FORMAT_TOKENS = DECK_FORMATS
 
 type SetInfo = { code: string; name: string }
 
@@ -486,9 +482,19 @@ export function DeckbuilderPage() {
             onChange={(e) => setDeckName(e.target.value)}
             placeholder="Deck name"
           />
+          <DeckFormatPicker
+            activeFormat={activeFormat}
+            onChange={(value) => setQuery(setFormatToken(query, value))}
+          />
         </div>
 
-        <DeckListPanel deckCards={deckCards} catalog={catalogIndex} onRemove={removeCard} />
+        <DeckListPanel
+          deckCards={deckCards}
+          catalog={catalogIndex}
+          activeFormat={activeFormat}
+          onAdd={addCard}
+          onRemove={removeCard}
+        />
 
         <BasicLandsPanel
           catalog={catalog}
@@ -735,6 +741,12 @@ function SavedDecksSummary({
   onOpen: () => void
 }) {
   const active = useMemo(() => decks.find((d) => d.id === activeDeckId) ?? null, [decks, activeDeckId])
+  const legalityInput = useMemo(
+    () => (active ? { [active.id]: active.cards } : {}),
+    [active]
+  )
+  const legalityMap = useDeckLegalFormats(legalityInput)
+  const activeFormats = active ? (legalityMap[active.id] ?? []) : []
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionLabel}>My decks</h2>
@@ -744,6 +756,9 @@ function SavedDecksSummary({
             <>
               <span className={styles.savedSummaryLabel}>Editing</span>
               <span className={styles.savedSummaryName}>{active.name}</span>
+              {activeFormats.length > 0 && (
+                <FormatLegalityBadges formats={activeFormats} />
+              )}
             </>
           ) : (
             <>
@@ -767,6 +782,30 @@ function SavedDecksSummary({
     </section>
   )
 }
+
+/**
+ * Renders the formats a saved deck is legal in as small pill badges. Empty list = the deck has
+ * cards with unknown legality (test/custom cards) or no constructed format admits it; in both
+ * cases we render nothing so the saved-deck row stays compact.
+ */
+function FormatLegalityBadges({ formats }: { formats: string[] }) {
+  if (formats.length === 0) return null
+  // Order matches FORMAT_TOKENS so the badges always read in the same sequence.
+  const order = new Map(FORMAT_TOKENS.map((f, i) => [f.value.toUpperCase(), i]))
+  const sorted = [...formats].sort(
+    (a, b) => (order.get(a) ?? 99) - (order.get(b) ?? 99)
+  )
+  return (
+    <span className={styles.formatBadges}>
+      {sorted.map((f) => (
+        <span key={f} className={styles.formatBadge} title={`Legal in ${labelForFormat(f)}`}>
+          {labelForFormat(f)}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 
 type DecksBrowserSort = 'updated' | 'name' | 'size' | 'colors'
 
@@ -800,6 +839,15 @@ function SavedDecksBrowser({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  // Server-authoritative legality map (deckId → format names). The hook batches all decks
+  // into one POST and re-uses cache for unchanged decks.
+  const legalityInput = useMemo(() => {
+    const out: Record<string, Record<string, number>> = {}
+    for (const d of decks) out[d.id] = d.cards
+    return out
+  }, [decks])
+  const legalityMap = useDeckLegalFormats(legalityInput)
+
   // Pre-compute per-deck metadata once. Doing this up front keeps sort/filter
   // O(n) for hundreds of decks even when the user types fast.
   const enriched = useMemo(
@@ -807,9 +855,10 @@ function SavedDecksBrowser({
       decks.map((d) => {
         const total = Object.values(d.cards).reduce((a, b) => a + b, 0)
         const colors = deckColors(d.cards, catalog)
-        return { deck: d, total, colors }
+        const legalFormats = legalityMap[d.id] ?? []
+        return { deck: d, total, colors, legalFormats }
       }),
-    [decks, catalog]
+    [decks, catalog, legalityMap]
   )
 
   const filtered = useMemo(() => {
@@ -936,12 +985,13 @@ function SavedDecksBrowser({
                 : 'No decks match the current filters.'}
             </div>
           ) : (
-            filtered.map(({ deck, total, colors }) => (
+            filtered.map(({ deck, total, colors, legalFormats }) => (
               <DeckCard
                 key={deck.id}
                 deck={deck}
                 total={total}
                 colors={colors}
+                legalFormats={legalFormats}
                 isActive={deck.id === activeDeckId}
                 onLoad={onLoad}
                 onRename={onRename}
@@ -959,6 +1009,7 @@ function DeckCard({
   deck,
   total,
   colors,
+  legalFormats,
   isActive,
   onLoad,
   onRename,
@@ -967,6 +1018,7 @@ function DeckCard({
   deck: SavedDeck
   total: number
   colors: string[]
+  legalFormats: string[]
   isActive: boolean
   onLoad: (d: SavedDeck) => void
   onRename: (d: SavedDeck) => void
@@ -1006,6 +1058,7 @@ function DeckCard({
         <div className={styles.deckCardMeta}>
           <span>{updated}</span>
         </div>
+        {legalFormats.length > 0 && <FormatLegalityBadges formats={legalFormats} />}
       </div>
       <div className={styles.deckCardActions} onClick={(e) => e.stopPropagation()}>
         <button
@@ -1318,8 +1371,6 @@ function FilterSection({
         </div>
       </section>
 
-      <FormatSection query={query} onQueryChange={onQueryChange} />
-
       <section className={styles.section}>
         <h2 className={styles.sectionLabel}>Mana value</h2>
         <RangeRow
@@ -1408,61 +1459,51 @@ function FilterSection({
 }
 
 // ---------------------------------------------------------------------------
-// Format filter (Standard / Modern / Legacy / …)
+// Format selector (right rail) — drives validation, deck-list red-flagging,
+// and the catalog's `format:` filter token.
 // ---------------------------------------------------------------------------
 
 /**
- * Mutually-exclusive format selector. Picking a format adds `format:<name>` to the query;
- * picking again clears it. Only one format token is ever active so the deckbuilder tracks
- * "what format am I building for" cleanly.
+ * Compact format picker for the right rail. Edits the same `format:<name>` query token used
+ * by the catalog filter so a single source of truth governs both "build target" and "browse
+ * by legal-in-format". `null` value clears the token.
  */
-function FormatSection({
-  query,
-  onQueryChange,
+function DeckFormatPicker({
+  activeFormat,
+  onChange,
 }: {
-  query: string
-  onQueryChange: (next: string) => void
+  activeFormat: string | null
+  onChange: (value: string | null) => void
 }) {
-  const activeFormat = useMemo(() => {
-    const m = query.match(/(?:^|\s)format:([^\s]+)/i)
-    return m ? m[1]!.toLowerCase() : ''
-  }, [query])
-
-  const select = (value: string) => {
-    // Strip any existing format token first so switching is atomic.
-    const stripped = query
-      .split(/\s+/)
-      .filter((t) => !/^-?format:/i.test(t))
-      .join(' ')
-    if (activeFormat === value) {
-      onQueryChange(stripped.trim())
-      return
-    }
-    const next = stripped ? `${stripped.trim()} format:${value}` : `format:${value}`
-    onQueryChange(next)
-  }
-
+  const value = activeFormat ? activeFormat.toLowerCase() : ''
   return (
-    <section className={styles.section}>
-      <h2 className={styles.sectionLabel}>Format</h2>
-      <div className={styles.filterRow}>
-        {FORMAT_TOKENS.map(({ value, label }) => {
-          const active = activeFormat === value
-          return (
-            <button
-              key={value}
-              className={`${styles.chip} ${active ? styles.chipActive : ''}`}
-              onClick={() => select(value)}
-              type="button"
-              title={`Show only cards legal in ${label}`}
-            >
-              {label}
-            </button>
-          )
-        })}
-      </div>
-    </section>
+    <label className={styles.formatPickerRow} title="Pick a format to validate this deck against and highlight illegal cards.">
+      <span className={styles.formatPickerLabel}>Format</span>
+      <select
+        className={styles.formatPickerSelect}
+        value={value}
+        onChange={(e) => onChange(e.target.value || null)}
+      >
+        <option value="">No format</option>
+        {FORMAT_TOKENS.map(({ value: v, label }) => (
+          <option key={v} value={v}>{label}</option>
+        ))}
+      </select>
+    </label>
   )
+}
+
+/**
+ * Atomic update of the `format:<name>` token in the query. Picking the same value twice
+ * still works because we always strip-then-add. `null` clears the token.
+ */
+function setFormatToken(query: string, value: string | null): string {
+  const stripped = query
+    .split(/\s+/)
+    .filter((t) => t.length > 0 && !/^-?format:/i.test(t))
+    .join(' ')
+  if (!value) return stripped
+  return stripped ? `${stripped} format:${value}` : `format:${value}`
 }
 
 // ---------------------------------------------------------------------------
@@ -1847,10 +1888,14 @@ function resolveImageUrl(card: CardSummary): string {
 function DeckListPanel({
   deckCards,
   catalog,
+  activeFormat,
+  onAdd,
   onRemove,
 }: {
   deckCards: Record<string, number>
   catalog: Record<string, CardSummary>
+  activeFormat: string | null
+  onAdd: (card: CardSummary) => void
   onRemove: (name: string) => void
 }) {
   const grouped = useMemo(() => groupForDeckList(deckCards, catalog), [deckCards, catalog])
@@ -1872,6 +1917,14 @@ function DeckListPanel({
     setHoverPos(null)
   }
 
+  useEffect(() => {
+    if (hoverName && !(hoverName in deckCards)) {
+      setHoverName(null)
+      setHoverCard(null)
+      setHoverPos(null)
+    }
+  }, [deckCards, hoverName])
+
   return (
     <div className={styles.deckList}>
       {grouped.map((group) => (
@@ -1879,29 +1932,48 @@ function DeckListPanel({
           <h3 className={styles.deckGroupLabel}>
             {group.label} ({group.entries.reduce((a, e) => a + e.count, 0)})
           </h3>
-          {group.entries.map((entry) => (
-            <div
-              key={entry.name}
-              className={styles.deckRow}
-              onMouseEnter={(e) => handleEnter(entry, e)}
-              onMouseMove={handleMove}
-              onMouseLeave={handleLeave}
-            >
-              <span className={styles.deckRowCount}>{entry.count}×</span>
-              <span className={styles.deckRowName}>{entry.name}</span>
-              <span className={styles.deckRowCost}>
-                <ManaCost cost={entry.card?.manaCost || null} size={11} />
-              </span>
-              <button
-                className={styles.deckRowRemove}
-                onClick={() => onRemove(entry.name)}
-                aria-label={`Remove ${entry.name}`}
-                type="button"
+          {group.entries.map((entry) => {
+            const illegal =
+              activeFormat !== null &&
+              !!entry.card?.legalFormats &&
+              entry.card.legalFormats.length > 0 &&
+              !entry.card.legalFormats.includes(activeFormat.toUpperCase())
+            return (
+              <div
+                key={entry.name}
+                className={`${styles.deckRow} ${illegal ? styles.deckRowIllegal : ''}`}
+                title={illegal ? `Not legal in ${activeFormat}` : undefined}
+                onMouseEnter={(e) => handleEnter(entry, e)}
+                onMouseMove={handleMove}
+                onMouseLeave={handleLeave}
               >
-                ✕
-              </button>
-            </div>
-          ))}
+                <button
+                  className={styles.deckRowStep}
+                  onClick={() => onRemove(entry.name)}
+                  aria-label={`Decrease ${entry.name}`}
+                  title="Remove one"
+                  type="button"
+                >
+                  −
+                </button>
+                <button
+                  className={styles.deckRowStep}
+                  onClick={() => entry.card && onAdd(entry.card)}
+                  disabled={!entry.card}
+                  aria-label={`Increase ${entry.name}`}
+                  title="Add one"
+                  type="button"
+                >
+                  +
+                </button>
+                <span className={styles.deckRowCount}>{entry.count}×</span>
+                <span className={styles.deckRowName}>{entry.name}</span>
+                <span className={styles.deckRowCost}>
+                  <ManaCost cost={entry.card?.manaCost || null} size={11} />
+                </span>
+              </div>
+            )
+          })}
         </div>
       ))}
       {grouped.length === 0 && (

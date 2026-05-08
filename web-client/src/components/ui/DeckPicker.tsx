@@ -21,6 +21,10 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDeckLibrary, type SavedDeck } from '@/store/deckLibrary'
+import {
+  labelForFormat,
+  useDeckLegalFormats,
+} from '@/utils/deckLegality'
 import styles from './DeckPicker.module.css'
 
 type Tab = 'saved' | 'examples' | 'paste' | 'random'
@@ -44,6 +48,13 @@ export interface DeckPickerProps {
    * Premade Decks tournament lobby uses `['saved', 'examples', 'paste']` (no Random).
    */
   tabs?: ReadonlyArray<Tab>
+  /**
+   * Optional deck-construction format the picker is constrained to. When set:
+   *   - Saved decks are filtered to only those legal in this format.
+   *   - Validation requests pass the format so per-card legality errors surface.
+   * Null/undefined = no restriction.
+   */
+  format?: string | null
 }
 
 interface CardSummary {
@@ -58,6 +69,7 @@ interface CardSummary {
   rarity: string
   setCode: string | null
   collectorNumber: string | null
+  legalFormats?: string[]
 }
 
 interface ExampleDeck {
@@ -131,6 +143,7 @@ export function DeckPicker({
   availableSets = [],
   disabled = false,
   tabs = ALL_TABS,
+  format = null,
 }: DeckPickerProps) {
   const decks = useDeckLibrary((s) => s.decks)
   const hydrate = useDeckLibrary((s) => s.hydrate)
@@ -246,7 +259,10 @@ export function DeckPicker({
     fetch('/api/decks/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deckList: currentDeck }),
+      body: JSON.stringify({
+        deckList: currentDeck,
+        ...(format ? { format } : {}),
+      }),
       signal: ctrl.signal,
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -265,7 +281,7 @@ export function DeckPicker({
     return () => {
       ctrl.abort()
     }
-  }, [currentDeck, onValidityChange])
+  }, [currentDeck, onValidityChange, format])
 
   const stats = useMemo(() => computeStats(currentDeck, cards), [currentDeck, cards])
   const totalCards = Object.values(currentDeck).reduce((a, b) => a + b, 0)
@@ -284,6 +300,27 @@ export function DeckPicker({
     setTab('saved')
   }
 
+  // Server-authoritative legality. Single batched POST covers every saved deck; the result is
+  // a deckId → format[] map keyed by format name (uppercase).
+  const legalityInput = useMemo(() => {
+    const out: Record<string, Record<string, number>> = {}
+    for (const d of decks) out[d.id] = d.cards
+    return out
+  }, [decks])
+  const legalityMap = useDeckLegalFormats(legalityInput)
+
+  // Saved decks filtered by the lobby's format (when set). While the legality response is in
+  // flight we leave the unfiltered list visible so the picker doesn't briefly empty out.
+  const visibleDecks = useMemo(() => {
+    if (!format) return decks
+    const target = format.toUpperCase()
+    return decks.filter((d) => {
+      const legal = legalityMap[d.id]
+      if (!legal) return true
+      return legal.includes(target)
+    })
+  }, [decks, format, legalityMap])
+
   return (
     <div className={styles.picker}>
       <div className={styles.tabs}>
@@ -296,7 +333,10 @@ export function DeckPicker({
       <div className={styles.panel}>
         {tab === 'saved' && (
           <SavedDecksPanel
-            decks={decks}
+            decks={visibleDecks}
+            legalityMap={legalityMap}
+            format={format}
+            hiddenCount={decks.length - visibleDecks.length}
             selectedId={selectedSavedId}
             onSelect={setSelectedSavedId}
             onDelete={(id) => {
@@ -447,39 +487,68 @@ function TabButton({
 }
 
 function SavedDecksPanel({
-  decks, selectedId, onSelect, onDelete, onEdit,
+  decks, legalityMap, format, hiddenCount, selectedId, onSelect, onDelete, onEdit,
 }: {
   decks: SavedDeck[]
+  legalityMap: Record<string, string[]>
+  format: string | null
+  hiddenCount: number
   selectedId: string | null
   onSelect: (id: string) => void
   onDelete: (id: string) => void
   onEdit: (d: SavedDeck) => void
 }) {
   if (decks.length === 0) {
+    if (format && hiddenCount > 0) {
+      return (
+        <p className={styles.helperText}>
+          None of your saved decks are legal in {labelForFormat(format.toUpperCase())}.
+          Use the Paste tab to build one.
+        </p>
+      )
+    }
     return <p className={styles.helperText}>No saved decks yet. Use the Paste tab to enter a list, then Save it.</p>
   }
   return (
-    <ul className={styles.savedList}>
-      {decks.map((d) => {
-        const total = Object.values(d.cards).reduce((a, b) => a + b, 0)
-        return (
-          <li
-            key={d.id}
-            className={`${styles.savedItem} ${selectedId === d.id ? styles.savedItemSelected : ''}`}
-            onClick={() => onSelect(d.id)}
-          >
-            <div className={styles.savedItemMeta}>
-              <span className={styles.savedItemName}>{d.name}</span>
-              <span className={styles.savedItemCount}>{total} cards</span>
-            </div>
-            <div className={styles.savedItemActions}>
-              <button className={styles.linkButton} onClick={(e) => { e.stopPropagation(); onEdit(d) }} type="button">Edit</button>
-              <button className={styles.dangerButton} onClick={(e) => { e.stopPropagation(); onDelete(d.id) }} type="button">Delete</button>
-            </div>
-          </li>
-        )
-      })}
-    </ul>
+    <>
+      {format && hiddenCount > 0 && (
+        <p className={styles.helperText}>
+          Showing {decks.length} deck{decks.length === 1 ? '' : 's'} legal in {labelForFormat(format.toUpperCase())} ·
+          hiding {hiddenCount} that {hiddenCount === 1 ? 'is not' : 'are not'} legal.
+        </p>
+      )}
+      <ul className={styles.savedList}>
+        {decks.map((d) => {
+          const total = Object.values(d.cards).reduce((a, b) => a + b, 0)
+          const legalIn = legalityMap[d.id] ?? []
+          return (
+            <li
+              key={d.id}
+              className={`${styles.savedItem} ${selectedId === d.id ? styles.savedItemSelected : ''}`}
+              onClick={() => onSelect(d.id)}
+            >
+              <div className={styles.savedItemMeta}>
+                <span className={styles.savedItemName}>{d.name}</span>
+                <span className={styles.savedItemCount}>{total} cards</span>
+                {legalIn.length > 0 && (
+                  <span className={styles.savedItemFormats}>
+                    {legalIn.map((f) => (
+                      <span key={f} className={styles.savedItemFormatBadge}>
+                        {labelForFormat(f)}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </div>
+              <div className={styles.savedItemActions}>
+                <button className={styles.linkButton} onClick={(e) => { e.stopPropagation(); onEdit(d) }} type="button">Edit</button>
+                <button className={styles.dangerButton} onClick={(e) => { e.stopPropagation(); onDelete(d.id) }} type="button">Delete</button>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    </>
   )
 }
 

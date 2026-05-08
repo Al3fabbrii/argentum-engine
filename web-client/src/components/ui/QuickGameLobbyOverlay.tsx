@@ -25,6 +25,8 @@ const FORMAT_OPTIONS: Array<{ value: DeckFormat; label: string }> = [
   { value: 'LEGACY', label: 'Legacy' },
   { value: 'VINTAGE', label: 'Vintage' },
   { value: 'COMMANDER', label: 'Commander' },
+  { value: 'BRAWL', label: 'Brawl' },
+  { value: 'STANDARD_BRAWL', label: 'Standard Brawl' },
   { value: 'PREMODERN', label: 'Premodern' },
 ]
 
@@ -224,6 +226,7 @@ export function QuickGameLobbyOverlay() {
           initialSetCode={you?.setCode ?? null}
           availableSets={availableSets}
           disabled={youReady}
+          format={lobby.format ?? null}
         />
 
         <div className={styles.actionsRow}>

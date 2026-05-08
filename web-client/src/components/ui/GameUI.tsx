@@ -983,6 +983,8 @@ function LobbyOverlay({
                   <option value="LEGACY">Legacy</option>
                   <option value="VINTAGE">Vintage</option>
                   <option value="COMMANDER">Commander</option>
+                  <option value="BRAWL">Brawl</option>
+                  <option value="STANDARD_BRAWL">Standard Brawl</option>
                   <option value="PREMODERN">Premodern</option>
                 </select>
               </div>
@@ -1146,6 +1148,7 @@ function PremadeDeckPickerPanel({ lobbyState }: { lobbyState: LobbyState }) {
           tabs={['saved', 'examples', 'paste']}
           onDeckChange={setPendingDeck}
           onValidityChange={setIsValid}
+          format={deckFormat ?? null}
         />
         <button
           onClick={() => submitLobbyDeck(pendingDeck)}

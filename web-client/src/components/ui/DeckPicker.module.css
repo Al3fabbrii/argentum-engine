@@ -98,6 +98,25 @@
   color: var(--text-muted);
 }
 
+.savedItemFormats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.savedItemFormatBadge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(108, 192, 74, 0.14);
+  color: #8ed171;
+  border: 1px solid rgba(108, 192, 74, 0.3);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-weight: 600;
+}
+
 .savedItemActions {
   display: flex;
   gap: var(--space-1);
