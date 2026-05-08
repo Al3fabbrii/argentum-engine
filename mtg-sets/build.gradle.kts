@@ -25,3 +25,13 @@ tasks.register<JavaExec>("syncLegality") {
     mainClass.set("com.wingedsheep.mtg.sets.legality.SyncLegalitiesKt")
     workingDir = rootProject.projectDir
 }
+
+// Offline sync from a Scryfall bulk-data dump. Pass the dump path via --args.
+// Run with: ./gradlew :mtg-sets:syncLegalityFromDump --args="/path/to/all-cards.json"
+tasks.register<JavaExec>("syncLegalityFromDump") {
+    description = "Populate legalities.json from a local Scryfall bulk-data dump."
+    group = "build"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.wingedsheep.mtg.sets.legality.SyncLegalitiesFromDumpKt")
+    workingDir = rootProject.projectDir
+}

@@ -6558,194 +6558,1418 @@
     "COMMANDER",
     "PREMODERN"
   ],
-  "Hurricane": [],
-  "Hushwood Verge": [],
-  "Huskburster Swarm": [],
-  "Hystrodon": [],
-  "Icecave Crasher": [],
-  "Icefeather Aven": [],
-  "Icy Blast": [],
-  "Icy Manipulator": [],
-  "Illusion Spinners": [],
-  "Illvoi Galeblade": [],
-  "Illvoi Light Jammer": [],
-  "Illvoi Operative": [],
-  "Imagecrafter": [],
-  "Imperial Hellkite": [],
-  "Impolite Entrance": [],
-  "Improvised Armor": [],
-  "Impulse": [],
-  "In Bolas's Clutches": [],
-  "Incremental Growth": [],
-  "Infernal Caretaker": [],
-  "Infest": [],
-  "Information Dealer": [],
-  "Ingenious Thief": [],
-  "Innkeeper's Talent": [],
-  "Inspirit": [],
-  "Insurrection": [],
-  "Into the Flood Maw": [],
-  "Intrepid Rabbit": [],
-  "Intrepid Tenderfoot": [],
-  "Invasive Maneuvers": [],
-  "Invigorating Boon": [],
-  "Invoke the Divine": [],
-  "Iridescent Vinelasher": [],
-  "Iron-Shield Elf": [],
-  "Ironfist Crusher": [],
-  "Island": [],
-  "Isolated Chapel": [],
-  "Ivorytusk Fortress": [],
-  "Ixidor's Will": [],
-  "Ixidor, Reality Sculptor": [],
-  "Jackdaw Savior": [],
-  "Jareth, Leonine Titan": [],
-  "Jaya Ballard": [],
-  "Jaya's Immolating Inferno": [],
-  "Jeering Instigator": [],
-  "Jeskai Ascendancy": [],
-  "Jeskai Banner": [],
-  "Jeskai Charm": [],
-  "Jeskai Elder": [],
-  "Jeskai Student": [],
-  "Jeskai Windscout": [],
-  "Jhoira's Familiar": [],
-  "Jhoira, Weatherlight Captain": [],
-  "Jodah, Archmage Eternal": [],
-  "Jolly Gerbils": [],
-  "Josu Vess, Lich Knight": [],
-  "Jousting Lance": [],
-  "Juggernaut": [],
-  "Jungle Hollow": [],
-  "Jungle Lion": [],
-  "Junkblade Bruiser": [],
-  "Kaboom!": [],
-  "Kamahl's Druidic Vow": [],
-  "Kamahl's Summons": [],
-  "Kamahl, Fist of Krosa": [],
-  "Karn's Temporal Sundering": [],
-  "Karn, Scion of Urza": [],
-  "Karona's Zealot": [],
-  "Karona, False God": [],
-  "Karplusan Forest": [],
-  "Kastral, the Windcrested": [],
-  "Kavaron Harrier": [],
-  "Kavaron Turbodrone": [],
-  "Kazarov, Sengir Pureblood": [],
-  "Keen-Eyed Archers": [],
-  "Keen-Eyed Curator": [],
-  "Keeneye Aven": [],
-  "Keep Out": [],
-  "Keeper of the Nine Gales": [],
-  "Keldon Overseer": [],
-  "Keldon Raider": [],
-  "Keldon Warcaller": [],
-  "Kheru Bloodsucker": [],
-  "Kheru Dreadmaw": [],
-  "Kheru Lich Lord": [],
-  "Kheru Spellsnatcher": [],
-  "Kill Shot": [],
-  "Kilnmouth Dragon": [],
-  "Kin-Tree Invocation": [],
-  "Kin-Tree Warden": [],
-  "Kinbinding": [],
-  "Kindle the Inner Flame": [],
-  "Kindlespark Duo": [],
-  "King's Assassin": [],
-  "Kinsbaile Aspirant": [],
-  "Kinscaer Sentry": [],
-  "Kirol, Attentive First-Year": [],
-  "Kithkeeper": [],
-  "Kitnap": [],
-  "Kitsa, Otterball Elite": [],
-  "Knight Errant": [],
-  "Knight of Grace": [],
-  "Knight of Malice": [],
-  "Knight of New Benalia": [],
-  "Knightfisher": [],
-  "Krosan Cloudscraper": [],
-  "Krosan Colossus": [],
-  "Krosan Drover": [],
-  "Krosan Druid": [],
-  "Krosan Groundshaker": [],
-  "Krosan Tusker": [],
-  "Krosan Vorine": [],
-  "Krosan Warchief": [],
-  "Krumar Bond-Kin": [],
-  "Kulrath Mystic": [],
-  "Kulrath Zealot": [],
-  "Kurgadon": [],
-  "Kwende, Pride of Femeref": [],
-  "Last Chance": [],
-  "Lasting Tarfire": [],
-  "Lava Axe": [],
-  "Lava Flow": [],
-  "Lavaborn Muse": [],
-  "Lavaleaper": [],
-  "Lavamancer's Skill": [],
-  "Lay Waste": [],
-  "Leaping Master": [],
-  "Leery Fogbeast": [],
-  "Lens of Clarity": [],
-  "Lethal Vapors": [],
-  "Lich's Mastery": [],
-  "Liege of the Axe": [],
-  "Lifecreed Duo": [],
-  "Lightless Evangel": [],
-  "Lightning Rift": [],
-  "Lightshell Duo": [],
-  "Lilypad Village": [],
-  "Lilysplash Mentor": [],
-  "Liminal Hold": [],
-  "Lingering Death": [],
-  "Lingering Phantom": [],
-  "Lizard Warrior": [],
-  "Llanowar Elves": [],
-  "Llanowar Envoy": [],
-  "Llanowar Scout": [],
-  "Llanowar Wastes": [],
-  "Lluwen, Imperfect Naturalist": [],
-  "Loch Mare": [],
-  "Lofty Dreams": [],
-  "Lonely Sandbar": [],
-  "Long River Lurker": [],
-  "Long River's Pull": [],
-  "Long-Term Plans": [],
-  "Longshot Squad": [],
-  "Longstalk Brawl": [],
-  "Lost in Space": [],
-  "Lowland Tracker": [],
-  "Lumen-Class Frigate": [],
-  "Luminollusk": [],
-  "Lumra, Bellow of the Woods": [],
-  "Lunar Convocation": [],
-  "Lupinflower Village": [],
-  "Lush Portico": [],
-  "Lyra Dawnbringer": [],
-  "Lys Alana Dignitary": [],
-  "Lys Alana Informant": [],
-  "Mabel's Mettle": [],
-  "Mabel, Heir to Cragflame": [],
-  "Macetail Hystrodon": [],
-  "Mage's Guile": [],
-  "Magma Sliver": [],
-  "Maha, Its Feathers Night": [],
-  "Malcolm, Alluring Scoundrel": [],
-  "Mammoth Spider": [],
-  "Man-o'-War": [],
-  "Mana Echoes": [],
-  "Manifold Mouse": [],
-  "Mantis Rider": [],
-  "Maralen, Fae Ascendant": [],
-  "Mardu Ascendancy": [],
-  "Mardu Banner": [],
-  "Mardu Blazebringer": [],
-  "Mardu Charm": [],
-  "Mardu Hateblade": [],
-  "Mardu Heart-Piercer": [],
-  "Mardu Hordechief": [],
-  "Mardu Roughrider": [],
-  "Mardu Skullhunter": [],
+  "Hurricane": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Hushwood Verge": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Huskburster Swarm": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Hystrodon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Icecave Crasher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Icefeather Aven": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Icy Blast": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Icy Manipulator": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Illusion Spinners": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Illvoi Galeblade": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Illvoi Light Jammer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Illvoi Operative": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Imagecrafter": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Imperial Hellkite": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Impolite Entrance": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Improvised Armor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Impulse": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "In Bolas's Clutches": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Incremental Growth": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Infernal Caretaker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Infest": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Information Dealer": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Ingenious Thief": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Innkeeper's Talent": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Inspirit": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Insurrection": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Into the Flood Maw": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Intrepid Rabbit": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Intrepid Tenderfoot": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Invasive Maneuvers": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Invigorating Boon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Invoke the Divine": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Iridescent Vinelasher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Iron-Shield Elf": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ironfist Crusher": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Island": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Isolated Chapel": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ivorytusk Fortress": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ixidor's Will": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Ixidor, Reality Sculptor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Jackdaw Savior": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jareth, Leonine Titan": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Jaya Ballard": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jaya's Immolating Inferno": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jeering Instigator": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jeskai Ascendancy": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jeskai Banner": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jeskai Charm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jeskai Elder": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jeskai Student": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jeskai Windscout": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jhoira's Familiar": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jhoira, Weatherlight Captain": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jodah, Archmage Eternal": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jolly Gerbils": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Josu Vess, Lich Knight": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Jousting Lance": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Juggernaut": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jungle Hollow": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Jungle Lion": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Junkblade Bruiser": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kaboom!": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Kamahl's Druidic Vow": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kamahl's Summons": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Kamahl, Fist of Krosa": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Karn's Temporal Sundering": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Karn, Scion of Urza": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Karona's Zealot": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Karona, False God": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Karplusan Forest": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Kastral, the Windcrested": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kavaron Harrier": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kavaron Turbodrone": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kazarov, Sengir Pureblood": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Keen-Eyed Archers": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Keen-Eyed Curator": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Keeneye Aven": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Keep Out": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Keeper of the Nine Gales": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Keldon Overseer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Keldon Raider": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Keldon Warcaller": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kheru Bloodsucker": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kheru Dreadmaw": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kheru Lich Lord": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kheru Spellsnatcher": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kill Shot": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kilnmouth Dragon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Kin-Tree Invocation": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kin-Tree Warden": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kinbinding": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kindle the Inner Flame": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kindlespark Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "King's Assassin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kinsbaile Aspirant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kinscaer Sentry": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kirol, Attentive First-Year": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kithkeeper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kitnap": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Kitsa, Otterball Elite": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Knight Errant": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Knight of Grace": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Knight of Malice": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Knight of New Benalia": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Knightfisher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Krosan Cloudscraper": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Krosan Colossus": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Krosan Drover": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Krosan Druid": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Krosan Groundshaker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Krosan Tusker": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Krosan Vorine": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Krosan Warchief": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Krumar Bond-Kin": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kulrath Mystic": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kulrath Zealot": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Kurgadon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Kwende, Pride of Femeref": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Last Chance": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lasting Tarfire": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lava Axe": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Lava Flow": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lavaborn Muse": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Lavaleaper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lavamancer's Skill": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Lay Waste": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Leaping Master": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Leery Fogbeast": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Lens of Clarity": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lethal Vapors": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Lich's Mastery": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Liege of the Axe": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Lifecreed Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lightless Evangel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lightning Rift": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Lightshell Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lilypad Village": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lilysplash Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Liminal Hold": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lingering Death": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Lingering Phantom": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lizard Warrior": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Llanowar Elves": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Llanowar Envoy": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Llanowar Scout": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Llanowar Wastes": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Lluwen, Imperfect Naturalist": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Loch Mare": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lofty Dreams": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lonely Sandbar": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Long River Lurker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Long River's Pull": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Long-Term Plans": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Longshot Squad": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Longstalk Brawl": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lost in Space": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Lowland Tracker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Lumen-Class Frigate": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Luminollusk": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lumra, Bellow of the Woods": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lunar Convocation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lupinflower Village": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lush Portico": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lyra Dawnbringer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lys Alana Dignitary": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Lys Alana Informant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mabel's Mettle": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mabel, Heir to Cragflame": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Macetail Hystrodon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mage's Guile": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Magma Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Maha, Its Feathers Night": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Malcolm, Alluring Scoundrel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mammoth Spider": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Man-o'-War": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mana Echoes": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Manifold Mouse": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mantis Rider": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Maralen, Fae Ascendant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Ascendancy": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Banner": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mardu Blazebringer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Charm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Hateblade": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mardu Heart-Piercer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Hordechief": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mardu Roughrider": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mardu Skullhunter": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
   "Mardu Warshrieker": [
     "PIONEER",
     "MODERN",
@@ -7116,528 +8340,3895 @@
     "PAUPER",
     "PREMODERN"
   ],
-  "Mistform Mask": [],
-  "Mistform Mutant": [],
-  "Mistform Seaswift": [],
-  "Mistform Shrieker": [],
-  "Mistform Skyreaver": [],
-  "Mistform Sliver": [],
-  "Mistform Stalker": [],
-  "Mistform Ultimus": [],
-  "Mistform Wakecaster": [],
-  "Mistform Wall": [],
-  "Mistform Warchief": [],
-  "Mistmeadow Council": [],
-  "Mm'menon, Uthros Exile": [],
-  "Mobilization": [],
-  "Mobilize": [],
-  "Mockingbird": [],
-  "Molecular Modifier": [],
-  "Molting Snakeskin": [],
-  "Monastery Flock": [],
-  "Monastery Swiftspear": [],
-  "Monoist Circuit-Feeder": [],
-  "Monoist Sentry": [],
-  "Monstrous Growth": [],
-  "Moon Sprite": [],
-  "Moon-Vigil Adherents": [],
-  "Moonglove Extractor": [],
-  "Moonlit Lamenter": [],
-  "Moonrise Cleric": [],
-  "Moonshadow": [],
-  "Moonstone Harbinger": [],
-  "Morcant's Eyes": [],
-  "Morcant's Loyalist": [],
-  "Morningtide's Light": [],
-  "Mornsong Aria": [],
-  "Mossborn Hydra": [],
-  "Mountain": [],
-  "Mountain Goat": [],
-  "Mouse Trapper": [],
-  "Mouth of the Storm": [],
-  "Mox Amber": [],
-  "Muck Rats": [],
-  "Mudbutton Cursetosser": [],
-  "Mudflat Village": [],
-  "Muerra, Trash Tactician": [],
-  "Muldrotha, the Gravetide": [],
-  "Multani, Yavimaya's Avatar": [],
-  "Murderous Cut": [],
-  "Mutable Explorer": [],
-  "Mystic Denial": [],
-  "Mystic Monastery": [],
-  "Mystic of the Hidden Way": [],
-  "Mythic Proportions": [],
-  "Naban, Dean of Iteration": [],
-  "Nameless Inversion": [],
-  "Nameless One": [],
-  "Nanoform Sentinel": [],
-  "Nantuko Husk": [],
-  "Nantuko Vigilante": [],
-  "Narset, Enlightened Master": [],
-  "Naru Meha, Master Wizard": [],
-  "Natural Order": [],
-  "Natural Spring": [],
-  "Naturalize": [],
-  "Nature's Cloak": [],
-  "Nature's Lore": [],
-  "Nature's Ruin": [],
-  "Nature's Spiral": [],
-  "Navigator's Compass": [],
-  "Nebula Dragon": [],
-  "Necropolis Fiend": [],
-  "Needle Storm": [],
-  "Needleshot Gourna": [],
-  "Nefashu": [],
-  "Negate": [],
-  "Nettle Guard": [],
-  "Nightmare Sower": [],
-  "Nightwhorl Hermit": [],
-  "No More Lies": [],
-  "Noble Templar": [],
-  "Nocturnal Hunger": [],
-  "Noggle Robber": [],
-  "Noggle the Mind": [],
-  "Nomad Outpost": [],
-  "Nosy Goblin": [],
-  "Nova Cleric": [],
-  "Noxious Ghoul": [],
-  "Noxious Toad": [],
-  "Nutrient Block": [],
-  "Oakhollow Village": [],
-  "Oath of Teferi": [],
-  "Oblation": [],
-  "Oko, Lorwyn Liege": [],
-  "Omen": [],
-  "Omni-Changeling": [],
-  "On Serra's Wings": [],
-  "One with Nature": [],
-  "Opt": [],
-  "Optimistic Scavenger": [],
-  "Opulent Palace": [],
-  "Orcish Vandal": [],
-  "Ordeal of Nylea": [],
-  "Oreplate Pangolin": [],
-  "Origin of Spider-Man": [],
-  "Osteomancer Adept": [],
-  "Otterball Antics": [],
-  "Ouroboroid": [],
-  "Overgrown Tomb": [],
-  "Overprotect": [],
-  "Oversold Cemetery": [],
-  "Overwhelming Instinct": [],
-  "Owl Familiar": [],
-  "Pacifism": [],
-  "Panther Warriors": [],
-  "Parallel Thoughts": [],
-  "Pardic Wanderer": [],
-  "Parting Gust": [],
-  "Patchwork Banner": [],
-  "Path of Peace": [],
-  "Patriarch's Bidding": [],
-  "Patron of the Wild": [],
-  "Pawpatch Formation": [],
-  "Pawpatch Recruit": [],
-  "Pearl Lake Ancient": [],
-  "Pearl of Wisdom": [],
-  "Pearlspear Courier": [],
-  "Peer Pressure": [],
-  "Peerless Recycling": [],
-  "Pegasus Courser": [],
-  "Pemmin's Aura": [],
-  "Perfect Intimidation": [],
-  "Persistent Marshstalker": [],
-  "Personal Tutor": [],
-  "Personify": [],
-  "Pestered Wellguard": [],
-  "Phage the Untouchable": [],
-  "Phantom Warrior": [],
-  "Phyrexian Scriptures": [],
-  "Pierce the Sky": [],
-  "Piety Charm": [],
-  "Pileated Provisioner": [],
-  "Pillaging Horde": [],
-  "Pine Walker": [],
-  "Pinnacle Kill-Ship": [],
-  "Pinpoint Avalanche": [],
-  "Pitiless Fists": [],
-  "Plains": [],
-  "Planar Guide": [],
-  "Plant Elemental": [],
-  "Plasma Bolt": [],
-  "Plated Sliver": [],
-  "Playful Shove": [],
-  "Plumecreed Escort": [],
-  "Plumecreed Mentor": [],
-  "Polliwallop": [],
-  "Polluted Delta": [],
-  "Pond Prophet": [],
-  "Ponyback Brigade": [],
-  "Portent of Calamity": [],
-  "Powerstone Shard": [],
-  "Precognition Field": [],
-  "Prideful Feastling": [],
-  "Primal Boost": [],
-  "Primal Whisperer": [],
-  "Primeval Force": [],
-  "Primevals' Glorious Rebirth": [],
-  "Primitive Etchings": [],
-  "Primoc Escapee": [],
-  "Primordial Wurm": [],
-  "Prismabasher": [],
-  "Prismatic Undercurrents": [],
-  "Profane Prayers": [],
-  "Prosperity": [],
-  "Protective Response": [],
-  "Proteus Machine": [],
-  "Prowling Pangolin": [],
-  "Psychic Trance": [],
-  "Psychic Whorl": [],
-  "Puca's Eye": [],
-  "Pulsar Squadron Ace": [],
-  "Pummeler for Hire": [],
-  "Putrid Raptor": [],
-  "Pyroclasm": [],
-  "Pyrostatic Pillar": [],
-  "Pyrrhic Strike": [],
-  "Python": [],
-  "Quaketusk Boar": [],
-  "Quick Sliver": [],
-  "Quicksilver Dragon": [],
-  "Quiet Contemplation": [],
-  "Rabbit Response": [],
-  "Rabid Gnaw": [],
-  "Raccoon Rallier": [],
-  "Radiant Strike": [],
-  "Radiating Lightning": [],
-  "Raff Capashen, Ship's Mage": [],
-  "Raging Cougar": [],
-  "Raging Goblin": [],
-  "Raging Minotaur": [],
-  "Raiders' Spoils": [],
-  "Raiding Schemes": [],
-  "Rain of Blades": [],
-  "Rain of Salt": [],
-  "Rain of Tears": [],
-  "Raise Dead": [],
-  "Rakshasa Deathdealer": [],
-  "Rakshasa Vizier": [],
-  "Rakshasa's Secret": [],
-  "Ral, Crackling Wit": [],
-  "Rampaging Cyclops": [],
-  "Rat Colony": [],
-  "Rattleclaw Mystic": [],
-  "Raucous Theater": [],
-  "Raven Guild Initiate": [],
-  "Raven Guild Master": [],
-  "Ravenous Baloth": [],
-  "Ravine Raider": [],
-  "Razorverge Thicket": [],
-  "Read the Runes": [],
-  "Reaping Willow": [],
-  "Reaping the Graves": [],
-  "Reckless One": [],
-  "Reckless Ransacking": [],
-  "Recuperate": [],
-  "Redwood Treefolk": [],
-  "Regal Unicorn": [],
-  "Relic Runner": [],
-  "Reluctant Dounguard": [],
-  "Reminisce": [],
-  "Remnant Elemental": [],
-  "Renewed Faith": [],
-  "Renewing Dawn": [],
-  "Repel Calamity": [],
-  "Reptilian Recruiter": [],
-  "Requiting Hex": [],
-  "Reroute Systems": [],
-  "Rescue": [],
-  "Retched Wretch": [],
-  "Retribution of the Ancients": [],
-  "Reward the Faithful": [],
-  "Rhys, the Evermore": [],
-  "Ride Down": [],
-  "Ridgetop Raptor": [],
-  "Rig for War": [],
-  "Righteous Cause": [],
-  "Rime Chill": [],
-  "Rimefire Torque": [],
-  "Rimekin Recluse": [],
-  "Riptide Biologist": [],
-  "Riptide Chronologist": [],
-  "Riptide Director": [],
-  "Riptide Entrancer": [],
-  "Riptide Laboratory": [],
-  "Riptide Mangler": [],
-  "Riptide Replicator": [],
-  "Riptide Shapeshifter": [],
-  "Riptide Survivor": [],
-  "Risky Move": [],
-  "Rite of Belzenlok": [],
-  "Rite of the Serpent": [],
-  "Riverguard's Reflexes": [],
-  "Riverwheel Aerialists": [],
-  "Roar of Challenge": [],
-  "Rock Jockey": [],
-  "Rockface Village": [],
-  "Rockshard Elemental": [],
-  "Rona, Disciple of Gix": [],
-  "Rooftop Percher": [],
-  "Root Elemental": [],
-  "Root Sliver": [],
-  "Rorix Bladewing": [],
-  "Rotlung Reanimator": [],
-  "Rottenmouth Viper": [],
-  "Rotting Mastodon": [],
-  "Roughshod Duo": [],
-  "Rowan Treefolk": [],
-  "Rugged Highlands": [],
-  "Rummaging Wizard": [],
-  "Run Amok": [],
-  "Run Away Together": [],
-  "Run Wild": [],
-  "Rush of Battle": [],
-  "Rush of Knowledge": [],
-  "Rust Harvester": [],
-  "Rust-Shield Rampager": [],
-  "Ruthless Negotiation": [],
-  "Ruthless Ripper": [],
-  "Sacred Foundry": [],
-  "Sacred Knight": [],
-  "Sacred Nectar": [],
-  "Safewright Cavalry": [],
-  "Sage Aven": [],
-  "Sage of Lat-Nam": [],
-  "Sage of the Inward Eye": [],
-  "Sage-Eye Harrier": [],
-  "Sagu Archer": [],
-  "Sagu Mauler": [],
-  "Salt Road Patrol": [],
-  "Salvation Swan": [],
-  "Sami's Curiosity": [],
-  "Sanar, Innovative First-Year": [],
-  "Sanctum Spirit": [],
-  "Sandskin": [],
-  "Sandsteppe Citadel": [],
-  "Sapling Nursery": [],
-  "Saproling Migration": [],
-  "Sarkhan, the Dragonspeaker": [],
-  "Savage Knuckleblade": [],
-  "Savage Punch": [],
-  "Savor": [],
-  "Sazacap's Brew": [],
-  "Sazh's Chocobo": [],
-  "Scaldkin": [],
-  "Scales of Shale": [],
-  "Scarblade Scout": [],
-  "Scarblade's Malice": [],
-  "Scattershot": [],
-  "Scavenger's Talent": [],
-  "Scion of Darkness": [],
-  "Scion of Glaciers": [],
-  "Scorching Spear": [],
-  "Scorching Winds": [],
-  "Scornful Egotist": [],
-  "Scour for Scrap": [],
-  "Scoured Barrens": [],
-  "Scout the Borders": [],
-  "Scrapshooter": [],
-  "Screaming Seahawk": [],
-  "Screeching Buzzard": [],
-  "Scrounge for Eternity": [],
-  "Scuzzback Scrounger": [],
-  "Sea's Claim": [],
-  "Seachrome Coast": [],
-  "Seal Away": [],
-  "Seam Rip": [],
-  "Sear": [],
-  "Searing Flesh": [],
-  "Seaside Haven": [],
-  "Season of Gathering": [],
-  "Season of Loss": [],
-  "Season of Weaving": [],
-  "Season of the Bold": [],
-  "Season of the Burrow": [],
-  "Seasoned Marshal": [],
-  "Seasoned Warrenguard": [],
-  "Secluded Starforge": [],
-  "Secluded Steppe": [],
-  "Secret Plans": [],
-  "See the Unwritten": [],
-  "Seedborn Muse": [],
-  "Seedglaive Mentor": [],
-  "Seedpod Squire": [],
-  "Seedship Agrarian": [],
-  "Seedship Broodtender": [],
-  "Seedship Impact": [],
-  "Seek the Horizon": [],
-  "Seeker of the Way": [],
-  "Seismic Shift": [],
-  "Selfless Safewright": [],
-  "Sentinel of the Pearl Trident": [],
-  "Sergeant-at-Arms": [],
-  "Serpent Assassin": [],
-  "Serpent Warrior": [],
-  "Serpentine Basilisk": [],
-  "Serra Angel": [],
-  "Serra Disciple": [],
-  "Set Adrift": [],
-  "Settle the Score": [],
-  "Severed Legion": [],
-  "Shade's Breath": [],
-  "Shadow Urchin": [],
-  "Shadowy Backstreet": [],
-  "Shalai, Voice of Plenty": [],
-  "Shaleskin Bruiser": [],
-  "Shaleskin Plower": [],
-  "Shambling Attendants": [],
-  "Shanna, Sisay's Legacy": [],
-  "Shardmage's Rescue": [],
-  "Shared Triumph": [],
-  "Shatter": [],
-  "Shattered Wings": [],
-  "Sheltered by Ghosts": [],
-  "Shepherd of Rot": [],
-  "Shield of the Realm": [],
-  "Shieldmage Elder": [],
-  "Shifting Sliver": [],
-  "Shimmercreep": [],
-  "Shimmerwilds Growth": [],
-  "Shinestriker": [],
-  "Shivan Fire": [],
-  "Shivan Reef": [],
-  "Shock": [],
-  "Shore Lurker": [],
-  "Shore Up": [],
-  "Shoreline Looter": [],
-  "Shoreline Ranger": [],
-  "Short Bow": [],
-  "Short Sword": [],
-  "Shrike Force": [],
-  "Sidisi's Pet": [],
-  "Sidisi, Brood Tyrant": [],
-  "Siege Rhino": [],
-  "Siege-Gang Commander": [],
-  "Siegecraft": [],
-  "Sigil of the New Dawn": [],
-  "Silent Specter": [],
-  "Silklash Spider": [],
-  "Silver Knight": [],
-  "Silvergill Mentor": [],
-  "Silvergill Peddler": [],
-  "Silvos, Rogue Elemental": [],
-  "Singing Bell Strike": [],
-  "Sinister Monolith": [],
-  "Sizzling Changeling": [],
-  "Skeletal Crocodile": [],
-  "Skeletal Snake": [],
-  "Skinthinner": [],
-  "Skirk Alarmist": [],
-  "Skirk Commando": [],
-  "Skirk Drill Sergeant": [],
-  "Skirk Fire Marshal": [],
-  "Skirk Marauder": [],
-  "Skirk Outrider": [],
-  "Skirk Prospector": [],
-  "Skirk Volcanist": [],
-  "Skittering Surveyor": [],
-  "Skittish Valesk": [],
-  "Skizzik": [],
-  "Skrelv, Defector Mite": [],
-  "Skulltap": [],
-  "Skyskipper Duo": [],
-  "Skyward Spider": [],
-  "Slagdrill Scrapper": [],
-  "Slate of Ancestry": [],
-  "Sledge-Class Seedship": [],
-  "Sleep-Cursed Faerie": [],
-  "Slice and Dice": [],
-  "Slimefoot, the Stowaway": [],
-  "Slinn Voda, the Rising Deep": [],
-  "Slipstream Eel": [],
-  "Sliver Overlord": [],
-  "Slumbering Walker": [],
-  "Smite the Monstrous": [],
-  "Smoke Teller": [],
-  "Smokespew Invoker": [],
-  "Smother": [],
-  "Snakeskin Veil": [],
-  "Snapping Drake": [],
-  "Snapping Thragg": [],
-  "Snarling Undorak": [],
-  "Snowhorn Rider": [],
-  "Solar Blast": [],
-  "Sonar Strike": [],
-  "Song of Freyalise": [],
-  "Sootfeather Flock": [],
-  "Sorcerer's Wand": [],
-  "Sorcerous Sight": [],
-  "Sorin, Solemn Visitor": [],
-  "Soul Collector": [],
-  "Soul Immolation": [],
-  "Soul Partition": [],
-  "Soul Salvage": [],
-  "Soul Shred": [],
-  "Soulbright Seeker": [],
-  "Soulless One": [],
-  "Sourbread Auntie": [],
-  "Spark Spray": [],
-  "Sparksmith": [],
-  "Sparring Construct": [],
-  "Spectral Sliver": [],
-  "Spell Pierce": [],
-  "Spell Snare": [],
-  "Spellbook Vendor": [],
-  "Spellgyre": [],
-  "Spined Basher": [],
-  "Spined Wurm": [],
-  "Spinerock Tyrant": [],
-  "Spiral into Solitude": [],
-  "Spiritual Guardian": [],
-  "Spitfire Handler": [],
-  "Spitting Earth": [],
-  "Spitting Gourna": [],
-  "Splash Lasher": [],
-  "Splash Portal": [],
-  "Spore Swarm": [],
-  "Sporecrown Thallid": [],
-  "Spotted Griffin": [],
-  "Springbloom Druid": [],
-  "Springleaf Drum": [],
-  "Sprouting Vines": [],
-  "Spry and Mighty": [],
-  "Spurred Wolverine": [],
-  "Spy Network": [],
-  "Squawkroaster": [],
-  "Squee, the Immortal": [],
-  "Squire's Lightblade": [],
-  "Stabilizer": [],
-  "Stag Beetle": [],
-  "Stalactite Dagger": [],
-  "Stalking Tiger": [],
-  "Standardize": [],
-  "Star Charter": [],
-  "Starfall Invocation": [],
-  "Starfighter Pilot": [],
-  "Starforged Sword": [],
-  "Stargaze": [],
-  "Starlight": [],
-  "Starlight Invoker": [],
-  "Starlit Angel": [],
-  "Starlit Sanctum": [],
-  "Starlit Soothsayer": [],
-  "Starscape Cleric": [],
-  "Starseer Mentor": [],
-  "Starstorm": [],
-  "Steadfastness": [],
-  "Steam Vents": [],
-  "Steampath Charger": [],
-  "Steel Leaf Champion": [],
-  "Steely Resolve": [],
-  "Stern Marshal": [],
-  "Stickytongue Sentinel": [],
-  "Stifle": [],
-  "Sting-Slinger": [],
+  "Mistform Mask": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mistform Mutant": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Seaswift": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mistform Shrieker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Skyreaver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mistform Stalker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Ultimus": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Wakecaster": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistform Wall": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mistform Warchief": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mistmeadow Council": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mm'menon, Uthros Exile": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mobilization": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Mobilize": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mockingbird": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Molecular Modifier": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Molting Snakeskin": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Monastery Flock": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Monastery Swiftspear": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Monoist Circuit-Feeder": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Monoist Sentry": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Monstrous Growth": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Moon Sprite": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Moon-Vigil Adherents": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Moonglove Extractor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Moonlit Lamenter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Moonrise Cleric": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Moonshadow": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Moonstone Harbinger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Morcant's Eyes": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Morcant's Loyalist": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Morningtide's Light": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mornsong Aria": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mossborn Hydra": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mountain": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mountain Goat": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Mouse Trapper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mouth of the Storm": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mox Amber": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Muck Rats": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mudbutton Cursetosser": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mudflat Village": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Muerra, Trash Tactician": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Muldrotha, the Gravetide": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Multani, Yavimaya's Avatar": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Murderous Cut": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mutable Explorer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mystic Denial": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mystic Monastery": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Mystic of the Hidden Way": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Mythic Proportions": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Naban, Dean of Iteration": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nameless Inversion": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Nameless One": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Nanoform Sentinel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Nantuko Husk": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nantuko Vigilante": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Narset, Enlightened Master": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Naru Meha, Master Wizard": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Natural Order": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Natural Spring": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Naturalize": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nature's Cloak": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nature's Lore": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nature's Ruin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nature's Spiral": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Navigator's Compass": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Nebula Dragon": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Necropolis Fiend": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Needle Storm": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Needleshot Gourna": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nefashu": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Negate": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Nettle Guard": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Nightmare Sower": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nightwhorl Hermit": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "No More Lies": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Noble Templar": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nocturnal Hunger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Noggle Robber": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Noggle the Mind": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nomad Outpost": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nosy Goblin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Nova Cleric": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Noxious Ghoul": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Noxious Toad": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Nutrient Block": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Oakhollow Village": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Oath of Teferi": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Oblation": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Oko, Lorwyn Liege": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Omen": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Omni-Changeling": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "On Serra's Wings": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "One with Nature": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Opt": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Optimistic Scavenger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Opulent Palace": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Orcish Vandal": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Ordeal of Nylea": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Oreplate Pangolin": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Origin of Spider-Man": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Osteomancer Adept": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Otterball Antics": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ouroboroid": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Overgrown Tomb": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Overprotect": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Oversold Cemetery": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Overwhelming Instinct": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Owl Familiar": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Pacifism": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Panther Warriors": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Parallel Thoughts": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Pardic Wanderer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Parting Gust": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Patchwork Banner": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Path of Peace": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Patriarch's Bidding": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Patron of the Wild": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Pawpatch Formation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pawpatch Recruit": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pearl Lake Ancient": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pearl of Wisdom": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Pearlspear Courier": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Peer Pressure": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Peerless Recycling": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pegasus Courser": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Pemmin's Aura": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Perfect Intimidation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Persistent Marshstalker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Personal Tutor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Personify": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pestered Wellguard": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Phage the Untouchable": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Phantom Warrior": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Phyrexian Scriptures": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pierce the Sky": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Piety Charm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Pileated Provisioner": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Pillaging Horde": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pine Walker": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pinnacle Kill-Ship": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Pinpoint Avalanche": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Pitiless Fists": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Plains": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Planar Guide": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Plant Elemental": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Plasma Bolt": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Plated Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Playful Shove": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Plumecreed Escort": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Plumecreed Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Polliwallop": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Polluted Delta": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Pond Prophet": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Ponyback Brigade": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Portent of Calamity": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Powerstone Shard": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Precognition Field": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Prideful Feastling": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Primal Boost": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Primal Whisperer": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Primeval Force": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Primevals' Glorious Rebirth": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Primitive Etchings": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Primoc Escapee": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Primordial Wurm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Prismabasher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Prismatic Undercurrents": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Profane Prayers": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Prosperity": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Protective Response": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Proteus Machine": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Prowling Pangolin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Psychic Trance": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Psychic Whorl": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Puca's Eye": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pulsar Squadron Ace": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Pummeler for Hire": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Putrid Raptor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Pyroclasm": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Pyrostatic Pillar": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Pyrrhic Strike": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Python": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Quaketusk Boar": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Quick Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Quicksilver Dragon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Quiet Contemplation": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rabbit Response": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rabid Gnaw": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Raccoon Rallier": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Radiant Strike": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Radiating Lightning": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Raff Capashen, Ship's Mage": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Raging Cougar": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Raging Goblin": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Raging Minotaur": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Raiders' Spoils": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Raiding Schemes": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rain of Blades": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rain of Salt": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rain of Tears": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Raise Dead": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Rakshasa Deathdealer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rakshasa Vizier": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rakshasa's Secret": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Ral, Crackling Wit": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rampaging Cyclops": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rat Colony": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rattleclaw Mystic": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Raucous Theater": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Raven Guild Initiate": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Raven Guild Master": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Ravenous Baloth": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Ravine Raider": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Razorverge Thicket": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Read the Runes": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Reaping Willow": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Reaping the Graves": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Reckless One": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Reckless Ransacking": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Recuperate": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Redwood Treefolk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Regal Unicorn": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Relic Runner": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Reluctant Dounguard": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Reminisce": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Remnant Elemental": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Renewed Faith": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Renewing Dawn": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Repel Calamity": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Reptilian Recruiter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Requiting Hex": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Reroute Systems": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rescue": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Retched Wretch": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Retribution of the Ancients": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Reward the Faithful": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rhys, the Evermore": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ride Down": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ridgetop Raptor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Rig for War": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Righteous Cause": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rime Chill": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rimefire Torque": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rimekin Recluse": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Riptide Biologist": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Riptide Chronologist": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Director": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Entrancer": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Laboratory": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Mangler": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Replicator": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Shapeshifter": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Riptide Survivor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Risky Move": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rite of Belzenlok": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rite of the Serpent": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Riverguard's Reflexes": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Riverwheel Aerialists": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Roar of Challenge": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rock Jockey": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Rockface Village": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rockshard Elemental": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rona, Disciple of Gix": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rooftop Percher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Root Elemental": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Root Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rorix Bladewing": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rotlung Reanimator": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rottenmouth Viper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rotting Mastodon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Roughshod Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rowan Treefolk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rugged Highlands": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rummaging Wizard": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Run Amok": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Run Away Together": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Run Wild": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Rush of Battle": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Rush of Knowledge": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Rust Harvester": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Rust-Shield Rampager": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Ruthless Negotiation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ruthless Ripper": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sacred Foundry": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sacred Knight": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sacred Nectar": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Safewright Cavalry": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sage Aven": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sage of Lat-Nam": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sage of the Inward Eye": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sage-Eye Harrier": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sagu Archer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sagu Mauler": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Salt Road Patrol": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Salvation Swan": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sami's Curiosity": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sanar, Innovative First-Year": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sanctum Spirit": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sandskin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sandsteppe Citadel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sapling Nursery": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Saproling Migration": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sarkhan, the Dragonspeaker": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Savage Knuckleblade": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Savage Punch": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Savor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sazacap's Brew": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sazh's Chocobo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scaldkin": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scales of Shale": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scarblade Scout": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scarblade's Malice": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scattershot": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Scavenger's Talent": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scion of Darkness": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Scion of Glaciers": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scorching Spear": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scorching Winds": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scornful Egotist": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Scour for Scrap": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scoured Barrens": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scout the Borders": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Scrapshooter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Screaming Seahawk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Screeching Buzzard": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Scrounge for Eternity": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Scuzzback Scrounger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sea's Claim": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Seachrome Coast": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seal Away": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seam Rip": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sear": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Searing Flesh": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Seaside Haven": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Season of Gathering": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Season of Loss": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Season of Weaving": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Season of the Bold": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Season of the Burrow": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seasoned Marshal": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Seasoned Warrenguard": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Secluded Starforge": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Secluded Steppe": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Secret Plans": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "See the Unwritten": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seedborn Muse": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Seedglaive Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seedpod Squire": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Seedship Agrarian": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seedship Broodtender": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seedship Impact": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seek the Horizon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Seeker of the Way": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Seismic Shift": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Selfless Safewright": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sentinel of the Pearl Trident": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sergeant-at-Arms": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Serpent Assassin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Serpent Warrior": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Serpentine Basilisk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Serra Angel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Serra Disciple": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Set Adrift": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Settle the Score": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Severed Legion": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Shade's Breath": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shadow Urchin": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shadowy Backstreet": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shalai, Voice of Plenty": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shaleskin Bruiser": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shaleskin Plower": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Shambling Attendants": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Shanna, Sisay's Legacy": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shardmage's Rescue": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shared Triumph": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shatter": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Shattered Wings": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sheltered by Ghosts": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shepherd of Rot": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Shield of the Realm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shieldmage Elder": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shifting Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shimmercreep": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shimmerwilds Growth": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shinestriker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shivan Fire": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Shivan Reef": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Shock": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Shore Lurker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Shore Up": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Shoreline Looter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Shoreline Ranger": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Short Bow": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Short Sword": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Shrike Force": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sidisi's Pet": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sidisi, Brood Tyrant": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Siege Rhino": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Siege-Gang Commander": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Siegecraft": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sigil of the New Dawn": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Silent Specter": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Silklash Spider": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Silver Knight": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Silvergill Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Silvergill Peddler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Silvos, Rogue Elemental": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Singing Bell Strike": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sinister Monolith": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sizzling Changeling": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Skeletal Crocodile": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Skeletal Snake": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Skinthinner": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Alarmist": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Skirk Commando": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Drill Sergeant": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Fire Marshal": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Skirk Marauder": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Outrider": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Prospector": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skirk Volcanist": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Skittering Surveyor": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Skittish Valesk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Skizzik": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Skrelv, Defector Mite": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Skulltap": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Skyskipper Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Skyward Spider": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Slagdrill Scrapper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Slate of Ancestry": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Sledge-Class Seedship": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sleep-Cursed Faerie": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Slice and Dice": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Slimefoot, the Stowaway": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Slinn Voda, the Rising Deep": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Slipstream Eel": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sliver Overlord": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Slumbering Walker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Smite the Monstrous": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Smoke Teller": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Smokespew Invoker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Smother": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Snakeskin Veil": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Snapping Drake": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Snapping Thragg": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Snarling Undorak": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Snowhorn Rider": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Solar Blast": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sonar Strike": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Song of Freyalise": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sootfeather Flock": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sorcerer's Wand": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sorcerous Sight": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sorin, Solemn Visitor": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Soul Collector": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Soul Immolation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Soul Partition": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Soul Salvage": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Soul Shred": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Soulbright Seeker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Soulless One": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Sourbread Auntie": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spark Spray": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sparksmith": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Sparring Construct": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Spectral Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Spell Pierce": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Spell Snare": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spellbook Vendor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spellgyre": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spined Basher": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Spined Wurm": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Spinerock Tyrant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spiral into Solitude": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Spiritual Guardian": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spitfire Handler": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Spitting Earth": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Spitting Gourna": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Splash Lasher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Splash Portal": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spore Swarm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sporecrown Thallid": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spotted Griffin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Springbloom Druid": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Springleaf Drum": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sprouting Vines": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Spry and Mighty": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Spurred Wolverine": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Spy Network": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Squawkroaster": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Squee, the Immortal": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Squire's Lightblade": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Stabilizer": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Stag Beetle": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Stalactite Dagger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Stalking Tiger": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Standardize": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Star Charter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starfall Invocation": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starfighter Pilot": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Starforged Sword": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Stargaze": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starlight": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Starlight Invoker": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Starlit Angel": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starlit Sanctum": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Starlit Soothsayer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Starscape Cleric": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starseer Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Starstorm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Steadfastness": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Steam Vents": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Steampath Charger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Steel Leaf Champion": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Steely Resolve": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Stern Marshal": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Stickytongue Sentinel": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Stifle": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Sting-Slinger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
   "Stocking the Pantry": [
     "STANDARD",
     "PIONEER",
@@ -7842,354 +12433,2578 @@
     "COMMANDER",
     "PAUPER"
   ],
-  "Sun-Dappled Celebrant": [],
-  "Sunderflock": [],
-  "Sunfire Balm": [],
-  "Sunset Saboteur": [],
-  "Sunshower Druid": [],
-  "Sunspine Lynx": [],
-  "Sunstar Expansionist": [],
-  "Sunstar Lightsmith": [],
-  "Sunstrike Legionnaire": [],
-  "Supreme Inquisitor": [],
-  "Surly Farrier": [],
-  "Surrak Dragonclaw": [],
-  "Suspension Field": [],
-  "Susurian Dirgecraft": [],
-  "Swamp": [],
-  "Swarm Culler": [],
-  "Swarm of Bloodflies": [],
-  "Swat": [],
-  "Swat Away": [],
-  "Swift Kick": [],
-  "Swiftwater Cliffs": [],
-  "Swooping Talon": [],
-  "Sygg's Command": [],
-  "Sygg, Wanderwine Wisdom": [],
-  "Sylvan Awakening": [],
-  "Sylvan Tutor": [],
-  "Symbiotic Beast": [],
-  "Symbiotic Elf": [],
-  "Symbiotic Wurm": [],
-  "Symbol of Unsummoning": [],
-  "Synapse Sliver": [],
-  "Syncopate": [],
-  "Syphon Mind": [],
-  "Syphon Soul": [],
-  "Syr Vondam, the Lucent": [],
-  "Systems Override": [],
-  "Taigam's Scheming": [],
-  "Take Out the Trash": [],
-  "Take Up Arms": [],
-  "Tam, Mindful First-Year": [],
-  "Tangle Tumbler": [],
-  "Tanufel Rimespeaker": [],
-  "Taster of Wares": [],
-  "Tatyova, Benthic Druid": [],
-  "Taunt": [],
-  "Taunting Elf": [],
-  "Teapot Slinger": [],
-  "Teferi, Hero of Dominaria": [],
-  "Teferi, Temporal Pilgrim": [],
-  "Tempest Angler": [],
-  "Tempest Djinn": [],
-  "Temple Garden": [],
-  "Temple of the False God": [],
-  "Temporal Cleansing": [],
-  "Temporal Fissure": [],
-  "Temporary Truce": [],
-  "Tempting Wurm": [],
-  "Temur Ascendancy": [],
-  "Temur Banner": [],
-  "Temur Charger": [],
-  "Temur Charm": [],
-  "Tend the Sprigs": [],
-  "Tender Wildguide": [],
-  "Tendrils of Agony": [],
-  "Tephraderm": [],
-  "Territorial Allosaurus": [],
-  "Teshar, Ancestor's Apostle": [],
-  "Tetsuko Umezawa, Fugitive": [],
-  "Thallid Omnivore": [],
-  "Thallid Soothsayer": [],
-  "Thawbringer": [],
-  "The Antiquities War": [],
-  "The Dominion Bracelet": [],
-  "The Eldest Reborn": [],
-  "The First Eruption": [],
-  "The Flame of Keld": [],
-  "The Infamous Cruelclaw": [],
-  "The Mending of Dominaria": [],
-  "The Mirari Conjecture": [],
-  "Theft of Dreams": [],
-  "Thing from the Deep": [],
-  "Thirst for Identity": [],
-  "Thistledown Players": [],
-  "Thorn Elemental": [],
-  "Thornplate Intimidator": [],
-  "Thornspire Verge": [],
-  "Thornvault Forager": [],
-  "Thornwood Falls": [],
-  "Thought Shucker": [],
-  "Thought-Stalker Warlock": [],
-  "Thoughtbound Primoc": [],
-  "Thoughtweft Charge": [],
-  "Thoughtweft Imbuer": [],
-  "Thoughtweft Lieutenant": [],
-  "Thousand Winds": [],
-  "Thran Temporal Gateway": [],
-  "Thrashing Mudspawn": [],
-  "Threaten": [],
-  "Three Tree City": [],
-  "Three Tree Mascot": [],
-  "Three Tree Rootweaver": [],
-  "Three Tree Scribe": [],
-  "Throttle": [],
-  "Thunder of Hooves": [],
-  "Thundercloud Elemental": [],
-  "Thundering Falls": [],
-  "Thundering Wurm": [],
-  "Thundermare": [],
-  "Thundertrap Trainer": [],
-  "Tiana, Ship's Caretaker": [],
-  "Tidal Surge": [],
-  "Tidecaller Mentor": [],
-  "Tifa Lockhart": [],
-  "Timberwatch Elf": [],
-  "Time Ebb": [],
-  "Time of Ice": [],
-  "Timely Hordemate": [],
-  "Timid Shieldbearer": [],
-  "Titanic Bulvox": [],
-  "Tolarian Scholar": [],
-  "Tolarian Terror": [],
-  "Tomb of the Spirit Dragon": [],
-  "Torgaar, Famine Incarnate": [],
-  "Tormenting Voice": [],
-  "Torrent of Fire": [],
-  "Totem Speaker": [],
-  "Touch of Brilliance": [],
-  "Towering Baloth": [],
-  "Toxin Sliver": [],
-  "Trade Secrets": [],
-  "Tragic Poet": [],
-  "Trail of Mystery": [],
-  "Tranquil Cove": [],
-  "Tranquil Thicket": [],
-  "Trap Digger": [],
-  "Trap Essence": [],
-  "Traveling Chocobo": [],
-  "Traxos, Scourge of Kroog": [],
-  "Treasure Cruise": [],
-  "Treeguard Duo": [],
-  "Treespring Lorian": [],
-  "Treetop Defense": [],
-  "Treetop Scout": [],
-  "Treetop Sentries": [],
-  "Tribal Forcemage": [],
-  "Tribal Golem": [],
-  "Tribal Unity": [],
-  "Tributary Vaulter": [],
-  "Trickery Charm": [],
-  "Triumph of Gerrard": [],
-  "True Believer": [],
-  "Trumpet Blast": [],
-  "Trystan's Command": [],
-  "Trystan, Callous Cultivator": [],
-  "Tusked Colossodon": [],
-  "Tuskguard Captain": [],
-  "Tweeze": [],
-  "Twilight Diviner": [],
-  "Twinflame Travelers": [],
-  "Twisted Abomination": [],
-  "Two-Headed Giant": [],
-  "Ugin's Nexus": [],
-  "Umbral Collar Zealot": [],
-  "Unburden": [],
-  "Unbury": [],
-  "Uncharted Haven": [],
-  "Uncontrolled Infestation": [],
-  "Undead Gladiator": [],
-  "Undead Warchief": [],
-  "Undercity Sewers": [],
-  "Underground Mortuary": [],
-  "Underground River": [],
-  "Undying Beast": [],
-  "Unexpected Assistance": [],
-  "Unforgiving Aim": [],
-  "Unholy Grotto": [],
-  "Unified Strike": [],
-  "Unspeakable Symbol": [],
-  "Unstable Hulk": [],
-  "Untamed Kavu": [],
-  "Untamed Wilds": [],
-  "Unwelcome Sprite": [],
-  "Unwind": [],
-  "Unyielding Krumar": [],
-  "Upwelling": [],
-  "Urgoros, the Empty One": [],
-  "Urza's Ruinous Blast": [],
-  "Urza's Tome": [],
-  "Uthros Scanship": [],
-  "Utter End": [],
-  "Valduk, Keeper of the Flame": [],
-  "Valley Dasher": [],
-  "Valley Flamecaller": [],
-  "Valley Floodcaller": [],
-  "Valley Mightcaller": [],
-  "Valley Questcaller": [],
-  "Valley Rally": [],
-  "Valley Rotcaller": [],
-  "Valorous Charge": [],
-  "Vampiric Feast": [],
-  "Vampiric Touch": [],
-  "Venerable Lammasu": [],
-  "Venerable Monk": [],
-  "Vengeance": [],
-  "Vengeful Dead": [],
-  "Venomspout Brackus": [],
-  "Verdant Force": [],
-  "Verix Bladewing": [],
-  "Veteran Guardmouse": [],
-  "Veteran Survivor": [],
-  "Vexing Beetle": [],
-  "Vibrance": [],
-  "Vicious Offering": [],
-  "Vile Deacon": [],
-  "Villainous Wealth": [],
-  "Vinebred Brawler": [],
-  "Vinereap Mentor": [],
-  "Virtue's Ruin": [],
-  "Virulent Emissary": [],
-  "Virus Beetle": [],
-  "Visara the Dreadful": [],
-  "Vitality Charm": [],
-  "Vodalian Arcanist": [],
-  "Voice of the Woods": [],
-  "Voidmage Apprentice": [],
-  "Voidmage Prodigy": [],
-  "Volcanic Dragon": [],
-  "Volcanic Hammer": [],
-  "Voltaic Servant": [],
-  "Voracious Tome-Skimmer": [],
-  "Vote Out": [],
-  "Vren, the Relentless": [],
-  "Walking Desecration": [],
-  "Wall of Deceit": [],
-  "Wall of Granite": [],
-  "Wall of Hope": [],
-  "Wall of Mulch": [],
-  "Wall of Swords": [],
-  "Wanderbrine Preacher": [],
-  "Wanderbrine Trapper": [],
-  "Wandertale Mentor": [],
-  "Wanderwine Distracter": [],
-  "Wanderwine Farewell": [],
-  "War Behemoth": [],
-  "War Squeak": [],
-  "War-Name Aspirant": [],
-  "Warbreak Trumpeter": [],
-  "Warcry Phoenix": [],
-  "Ward Sliver": [],
-  "Warden of the Eye": [],
-  "Warlord's Fury": [],
-  "Warped Researcher": [],
-  "Warren Elder": [],
-  "Warren Torchmaster": [],
-  "Warren Warleader": [],
-  "Warrior's Charge": [],
-  "Wary Farmer": [],
-  "Watcher of the Roost": [],
-  "Waterspout Warden": [],
-  "Waterwhirl": [],
-  "Watery Grave": [],
-  "Wave of Indifference": [],
-  "Wax-Wane Witness": [],
-  "Wear Down": [],
-  "Weathered Wayfarer": [],
-  "Weatherlight": [],
-  "Weave Fate": [],
-  "Weaver of Lies": [],
-  "Wedgelight Rammer": [],
-  "Weight of Memory": [],
-  "Weird Harvest": [],
-  "Wellwisher": [],
-  "Wetland Sambar": [],
-  "Wheel and Deal": [],
-  "Whipcorder": [],
-  "Whipgrass Entangler": [],
-  "Whiptail Wurm": [],
-  "Whirlwind Adept": [],
-  "Whiskerquill Scribe": [],
-  "Whiskervale Forerunner": [],
-  "Whisper, Blood Liturgist": [],
-  "White Knight": [],
-  "Wick's Patrol": [],
-  "Wick, the Whorled Mind": [],
-  "Wicked Pact": [],
-  "Wild Onslaught": [],
-  "Wild Unraveling": [],
-  "Wildfire Howl": [],
-  "Wildvine Pummeler": [],
-  "Willbender": [],
-  "Willow Dryad": [],
-  "Wind Drake": [],
-  "Wind-Scarred Crag": [],
-  "Windborn Muse": [],
-  "Windgrace Acolyte": [],
-  "Winds of Change": [],
-  "Windstorm": [],
-  "Windswept Heath": [],
-  "Wing Shards": [],
-  "Wingbeat Warrior": [],
-  "Wingmate Roc": [],
-  "Winnowing": [],
-  "Winter's Grasp": [],
-  "Winterflame": [],
-  "Wipe Clean": [],
-  "Wirewood Channeler": [],
-  "Wirewood Elf": [],
-  "Wirewood Guardian": [],
-  "Wirewood Herald": [],
-  "Wirewood Hivemaster": [],
-  "Wirewood Lodge": [],
-  "Wirewood Pride": [],
-  "Wirewood Savage": [],
-  "Wirewood Symbiote": [],
-  "Wishing Well": [],
-  "Wistfulness": [],
-  "Withered Wretch": [],
-  "Withering Gaze": [],
-  "Withering Hex": [],
-  "Witness of the Ages": [],
-  "Wizard's Lightning": [],
-  "Wizard's Retort": [],
-  "Wood Elves": [],
-  "Woodcloaker": [],
-  "Wooded Foothills": [],
-  "Woodland Cemetery": [],
-  "Woolly Loxodon": [],
-  "Words of War": [],
-  "Words of Waste": [],
-  "Words of Wilding": [],
-  "Words of Wind": [],
-  "Words of Worship": [],
-  "Wrath of God": [],
-  "Wretched Anurid": [],
-  "Wurmwall Sweeper": [],
-  "Xantid Swarm": [],
-  "Yargle, Glutton of Urborg": [],
-  "Yavimaya Coast": [],
-  "Yavimaya Sapherd": [],
-  "Yawgmoth's Vile Offering": [],
-  "Ygra, Eater of All": [],
-  "Zahid, Djinn of the Lamp": [],
-  "Zealous Display": [],
-  "Zealous Inquisitor": [],
-  "Zhalfirin Void": [],
-  "Zombie Brute": [],
-  "Zombie Cutthroat": [],
-  "Zookeeper Mechan": [],
-  "Zoraline, Cosmos Caller": [],
-  "Zurgo Helmsmasher": []
+  "Sun-Dappled Celebrant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sunderflock": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sunfire Balm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Sunset Saboteur": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sunshower Druid": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Sunspine Lynx": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sunstar Expansionist": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sunstar Lightsmith": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sunstrike Legionnaire": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Supreme Inquisitor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Surly Farrier": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Surrak Dragonclaw": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Suspension Field": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Susurian Dirgecraft": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Swamp": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Swarm Culler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Swarm of Bloodflies": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Swat": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Swat Away": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Swift Kick": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Swiftwater Cliffs": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Swooping Talon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Sygg's Command": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sygg, Wanderwine Wisdom": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sylvan Awakening": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Sylvan Tutor": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Symbiotic Beast": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Symbiotic Elf": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Symbiotic Wurm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Symbol of Unsummoning": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Synapse Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Syncopate": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Syphon Mind": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Syphon Soul": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Syr Vondam, the Lucent": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Systems Override": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Taigam's Scheming": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Take Out the Trash": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Take Up Arms": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tam, Mindful First-Year": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tangle Tumbler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tanufel Rimespeaker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Taster of Wares": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tatyova, Benthic Druid": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Taunt": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Taunting Elf": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Teapot Slinger": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Teferi, Hero of Dominaria": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Teferi, Temporal Pilgrim": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tempest Angler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tempest Djinn": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Temple Garden": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Temple of the False God": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Temporal Cleansing": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Temporal Fissure": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Temporary Truce": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tempting Wurm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Temur Ascendancy": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Temur Banner": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Temur Charger": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Temur Charm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tend the Sprigs": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tender Wildguide": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tendrils of Agony": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tephraderm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Territorial Allosaurus": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Teshar, Ancestor's Apostle": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tetsuko Umezawa, Fugitive": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thallid Omnivore": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thallid Soothsayer": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thawbringer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "The Antiquities War": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Dominion Bracelet": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Eldest Reborn": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The First Eruption": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Flame of Keld": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Infamous Cruelclaw": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Mending of Dominaria": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "The Mirari Conjecture": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Theft of Dreams": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Thing from the Deep": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thirst for Identity": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thistledown Players": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thorn Elemental": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Thornplate Intimidator": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thornspire Verge": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thornvault Forager": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thornwood Falls": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thought Shucker": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thought-Stalker Warlock": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thoughtbound Primoc": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Thoughtweft Charge": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thoughtweft Imbuer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thoughtweft Lieutenant": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thousand Winds": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thran Temporal Gateway": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thrashing Mudspawn": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Threaten": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Three Tree City": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Three Tree Mascot": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Three Tree Rootweaver": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Three Tree Scribe": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Throttle": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Thunder of Hooves": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Thundercloud Elemental": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Thundering Falls": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thundering Wurm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Thundermare": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Thundertrap Trainer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tiana, Ship's Caretaker": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tidal Surge": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Tidecaller Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tifa Lockhart": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Timberwatch Elf": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Time Ebb": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Time of Ice": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Timely Hordemate": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Timid Shieldbearer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Titanic Bulvox": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Tolarian Scholar": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tolarian Terror": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tomb of the Spirit Dragon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Torgaar, Famine Incarnate": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tormenting Voice": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Torrent of Fire": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Totem Speaker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Touch of Brilliance": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Towering Baloth": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Toxin Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Trade Secrets": [
+    "LEGACY",
+    "VINTAGE",
+    "PREMODERN"
+  ],
+  "Tragic Poet": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Trail of Mystery": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tranquil Cove": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tranquil Thicket": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Trap Digger": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Trap Essence": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Traveling Chocobo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Traxos, Scourge of Kroog": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Treasure Cruise": [
+    "PIONEER",
+    "COMMANDER"
+  ],
+  "Treeguard Duo": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Treespring Lorian": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Treetop Defense": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Treetop Scout": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Treetop Sentries": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tribal Forcemage": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Tribal Golem": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Tribal Unity": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Tributary Vaulter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Trickery Charm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Triumph of Gerrard": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "True Believer": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Trumpet Blast": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Trystan's Command": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Trystan, Callous Cultivator": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Tusked Colossodon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tuskguard Captain": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Tweeze": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Twilight Diviner": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Twinflame Travelers": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Twisted Abomination": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Two-Headed Giant": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ugin's Nexus": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Umbral Collar Zealot": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Unburden": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Unbury": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Uncharted Haven": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Uncontrolled Infestation": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Undead Gladiator": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Undead Warchief": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Undercity Sewers": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Underground Mortuary": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Underground River": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Undying Beast": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Unexpected Assistance": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Unforgiving Aim": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Unholy Grotto": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Unified Strike": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Unspeakable Symbol": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Unstable Hulk": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Untamed Kavu": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Untamed Wilds": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Unwelcome Sprite": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Unwind": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Unyielding Krumar": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Upwelling": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Urgoros, the Empty One": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Urza's Ruinous Blast": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Urza's Tome": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Uthros Scanship": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Utter End": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valduk, Keeper of the Flame": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Dasher": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Valley Flamecaller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Floodcaller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Mightcaller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Questcaller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Rally": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valley Rotcaller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Valorous Charge": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vampiric Feast": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vampiric Touch": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Venerable Lammasu": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Venerable Monk": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Vengeance": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Vengeful Dead": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Venomspout Brackus": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Verdant Force": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Verix Bladewing": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Veteran Guardmouse": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Veteran Survivor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vexing Beetle": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Vibrance": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vicious Offering": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Vile Deacon": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Villainous Wealth": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vinebred Brawler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vinereap Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Virtue's Ruin": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Virulent Emissary": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Virus Beetle": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Visara the Dreadful": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Vitality Charm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Vodalian Arcanist": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Voice of the Woods": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Voidmage Apprentice": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Voidmage Prodigy": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Volcanic Dragon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Volcanic Hammer": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Voltaic Servant": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Voracious Tome-Skimmer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vote Out": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Vren, the Relentless": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Walking Desecration": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wall of Deceit": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wall of Granite": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wall of Hope": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wall of Mulch": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wall of Swords": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wanderbrine Preacher": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wanderbrine Trapper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wandertale Mentor": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wanderwine Distracter": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wanderwine Farewell": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "War Behemoth": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "War Squeak": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "War-Name Aspirant": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Warbreak Trumpeter": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Warcry Phoenix": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ward Sliver": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Warden of the Eye": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Warlord's Fury": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Warped Researcher": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Warren Elder": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Warren Torchmaster": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Warren Warleader": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Warrior's Charge": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wary Farmer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Watcher of the Roost": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Waterspout Warden": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Waterwhirl": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Watery Grave": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wave of Indifference": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wax-Wane Witness": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wear Down": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Weathered Wayfarer": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Weatherlight": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Weave Fate": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Weaver of Lies": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wedgelight Rammer": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Weight of Memory": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Weird Harvest": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wellwisher": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wetland Sambar": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wheel and Deal": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Whipcorder": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Whipgrass Entangler": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Whiptail Wurm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Whirlwind Adept": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Whiskerquill Scribe": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Whiskervale Forerunner": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Whisper, Blood Liturgist": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "White Knight": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wick's Patrol": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wick, the Whorled Mind": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wicked Pact": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wild Onslaught": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wild Unraveling": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wildfire Howl": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wildvine Pummeler": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Willbender": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Willow Dryad": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Wind Drake": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wind-Scarred Crag": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Windborn Muse": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Windgrace Acolyte": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Winds of Change": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Windstorm": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Windswept Heath": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wing Shards": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wingbeat Warrior": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wingmate Roc": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Winnowing": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Winter's Grasp": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Winterflame": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wipe Clean": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Channeler": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wirewood Elf": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Guardian": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Herald": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Hivemaster": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wirewood Lodge": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wirewood Pride": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Savage": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wirewood Symbiote": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wishing Well": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wistfulness": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Withered Wretch": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Withering Gaze": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Withering Hex": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Witness of the Ages": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wizard's Lightning": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wizard's Retort": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Wood Elves": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Woodcloaker": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wooded Foothills": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Woodland Cemetery": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Woolly Loxodon": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Words of War": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Words of Waste": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Words of Wilding": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Words of Wind": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Words of Worship": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wrath of God": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Wretched Anurid": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Wurmwall Sweeper": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Xantid Swarm": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Yargle, Glutton of Urborg": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Yavimaya Coast": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Yavimaya Sapherd": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Yawgmoth's Vile Offering": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Ygra, Eater of All": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Zahid, Djinn of the Lamp": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Zealous Display": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Zealous Inquisitor": [
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Zhalfirin Void": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Zombie Brute": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PREMODERN"
+  ],
+  "Zombie Cutthroat": [
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER",
+    "PREMODERN"
+  ],
+  "Zookeeper Mechan": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER",
+    "PAUPER"
+  ],
+  "Zoraline, Cosmos Caller": [
+    "STANDARD",
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ],
+  "Zurgo Helmsmasher": [
+    "PIONEER",
+    "MODERN",
+    "LEGACY",
+    "VINTAGE",
+    "COMMANDER"
+  ]
 }
