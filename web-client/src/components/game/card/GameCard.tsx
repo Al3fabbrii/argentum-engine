@@ -200,6 +200,13 @@ export function GameCard({
   const autoTapPreview = useGameStore((state) => state.autoTapPreview)
 
   const isTapped = suppressTapRotation ? false : (card.isTapped || forceTapped)
+  // Rooms (CR 709.5) are printed landscape; rotate the permanent +90° on the battlefield
+  // so the image reads landscape (the source orientation matches "tilt head right").
+  // Tap state stacks an additional +90° on top (= 180° upside-down portrait), preserving
+  // the standard "tap = +90° from current" semantic.
+  const isRoomLandscape = !faceDown && !!battlefield && card.isRoom === true
+  const totalRotateDeg = (isRoomLandscape ? 90 : 0) + (isTapped ? 90 : 0)
+  const needsLandscapeContainer = Math.abs(totalRotateDeg) % 180 === 90
   const isSelected = selectedCardId === card.id
   const isInAutoTapPreview = autoTapPreview?.includes(card.id) ?? false
   const isHovered = hoveredCardId === card.id
@@ -946,9 +953,9 @@ export function GameCard({
   // Check if currently being dragged (attacker, blocker, or hand card)
   const isBeingDragged = draggingBlockerId === card.id || draggingAttackerId === card.id || draggingCardId === card.id
 
-  // Container dimensions - expand width when tapped to prevent overlap
-  // Tapped cards rotate 90deg, so they need width = height to not overlap
-  const containerWidth = isTapped && battlefield ? height + 8 : width
+  // Container dimensions - expand width when the card sits sideways (tapped permanents
+  // and Rooms always-landscape) to prevent overlap with neighbours.
+  const containerWidth = needsLandscapeContainer && battlefield ? height + 8 : width
   const containerHeight = height
 
   const cardElement = (
@@ -973,7 +980,7 @@ export function GameCard({
         cursor,
         border: isBeheldPulsing ? '3px solid #eab308' : borderStyle,
         pointerEvents: 'auto',
-        transform: `${isTapped ? 'rotate(90deg)' : ''} ${isSelected && (!isInCombatMode || !isCombatRoleCard) ? 'translateY(-8px)' : ''}`,
+        transform: `${totalRotateDeg ? `rotate(${totalRotateDeg}deg)` : ''} ${isSelected && (!isInCombatMode || !isCombatRoleCard) ? 'translateY(-8px)' : ''}`,
         transformOrigin: 'center',
         // Commander gold *glow* — soft halo, deliberately no hard 1–2px rim so it doesn't read
         // like the playable-action outline. Inner halo sits close to the card for readable
@@ -1609,6 +1616,49 @@ export function GameCard({
         </div>
       )}
 
+      {/* Room (CR 709.5) door indicators — dim the locked half of the source image and
+          drop an upright lock chip on top. Source image is portrait with face[1] on top
+          and face[0] on bottom (Scryfall's stored orientation for landscape-printed Rooms).
+          The chip counter-rotates the parent so the text stays readable when the card lies
+          sideways or upside-down. */}
+      {!faceDown && battlefield && card.isRoom && card.cardFaces && card.cardFaces.length === 2 && (
+        <>
+          {card.cardFaces.map((face, faceIdx) => {
+            if (face.isUnlocked) return null
+            const isTopHalf = faceIdx === 1
+            return (
+              <div key={face.faceId} style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: isTopHalf ? 0 : '50%',
+                height: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                zIndex: 5,
+                borderRadius: isTopHalf ? '6px 6px 0 0' : '0 0 6px 6px',
+              }}>
+                <div style={{
+                  transform: totalRotateDeg ? `rotate(${-totalRotateDeg}deg)` : undefined,
+                  backgroundColor: 'rgba(40, 20, 20, 0.92)',
+                  color: '#e89b9b',
+                  fontSize: responsive.badges.manaCostFontSize,
+                  padding: '2px 5px',
+                  borderRadius: 4,
+                  border: '1px solid rgba(200, 100, 100, 0.6)',
+                  lineHeight: 1,
+                }}>
+                  🔒
+                </div>
+              </div>
+            )
+          })}
+        </>
+      )}
+
       {/* DFC (double-faced card) indicator badge */}
       {!faceDown && battlefield && card.isDoubleFaced && (
         <div style={{
@@ -2076,8 +2126,9 @@ export function GameCard({
     )
   })() : null
 
-  // Wrap in container for tapped battlefield cards to prevent overlap
-  if (isTapped && battlefield) {
+  // Wrap in container for sideways battlefield cards (tapped permanents and Rooms) to
+  // prevent overlap with neighbours.
+  if (needsLandscapeContainer && battlefield) {
     return (
       <RenderProfiler id={profilerId}>
       <div style={{

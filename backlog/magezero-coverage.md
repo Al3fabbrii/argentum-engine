@@ -102,7 +102,7 @@ one enchantment (Unholy Annex) are double-faced / modal DFCs and depend on DFC s
 - [x] Shoot the Sheriff ×2 *(Outlaws of Thunder Junction)*
 
 ### Enchantments (4)
-- [ ] Unholy Annex // Ritual Chamber ×4 *(DFC modal room — requires DFC + rooms support)*
+- [x] Unholy Annex // Ritual Chamber ×4 *(split-layout Room — Phase 1–5 of Rooms mechanic)*
 
 ### Lands (24)
 - [x] Realm of Koh ×4 *(Avatar: The Last Airbender)*

@@ -287,6 +287,30 @@ export interface ClientCard {
    * whose `abilityId` isn't present in the legal actions for this card.
    */
   readonly planeswalkerAbilities?: readonly ClientPlaneswalkerAbility[] | null
+
+  /** True if this is a split-layout Room (CR 709.5). Drives split-card rendering + lock UI. */
+  readonly isRoom?: boolean
+
+  /**
+   * For split-layout cards (currently Rooms): one entry per face. `isUnlocked` reflects the live
+   * door state on the battlefield; in other zones it's always false.
+   */
+  readonly cardFaces?: readonly ClientCardFace[]
+
+  /** For Rooms on the stack: index into `cardFaces` of the face that was cast. */
+  readonly castFaceIndex?: number | null
+}
+
+/** One face of a split-layout card (CR 709). */
+export interface ClientCardFace {
+  /** Stable face id — currently the face's printed name. */
+  readonly faceId: string
+  readonly name: string
+  readonly manaCost: string
+  readonly typeLine: string
+  readonly oracleText: string
+  /** Door state on the battlefield; always false in other zones. */
+  readonly isUnlocked: boolean
 }
 
 /** One loyalty ability on a planeswalker (always-visible menu rendering). */

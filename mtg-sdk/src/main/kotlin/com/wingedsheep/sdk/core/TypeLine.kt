@@ -24,6 +24,7 @@ data class TypeLine(
     val isEquipment: Boolean get() = isArtifact && hasSubtype(Subtype.EQUIPMENT)
     val isVehicle: Boolean get() = isArtifact && hasSubtype(Subtype.VEHICLE)
     val isArtifactCreature: Boolean get() = isArtifact && isCreature
+    val isRoom: Boolean get() = isEnchantment && hasSubtype(Subtype.ROOM)
 
     val isBasicLand: Boolean get() = isLand && Supertype.BASIC in supertypes
     val isLegendary: Boolean get() = Supertype.LEGENDARY in supertypes

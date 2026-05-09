@@ -186,6 +186,14 @@ data class CardDefinition(
     val isPermanent: Boolean get() = typeLine.isPermanent
     val isDoubleFaced: Boolean get() = backFace != null
     val isSplit: Boolean get() = layout == CardLayout.SPLIT
+
+    /**
+     * True if this card is a Room (CR 709.5 + 205.3h). A Room is a split-layout enchantment whose
+     * shared type line carries the `Room` subtype (the type line is shared across faces per
+     * 709.5a). Drives the engine's Door / unlock logic and the client's split-card rendering.
+     */
+    val isRoom: Boolean
+        get() = isSplit && cardFaces.any { it.typeLine.isRoom }
     val isPlaneswalker: Boolean get() = CardType.PLANESWALKER in typeLine.cardTypes
     val isClass: Boolean get() = typeLine.isClass
     val isSaga: Boolean get() = typeLine.isSaga

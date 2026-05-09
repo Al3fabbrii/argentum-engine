@@ -61,6 +61,8 @@ export function useInteraction() {
             return a.sourceId === cardId
           case 'CrewVehicle':
             return a.vehicleId === cardId
+          case 'UnlockRoomDoor':
+            return a.roomId === cardId
           default:
             return false
         }

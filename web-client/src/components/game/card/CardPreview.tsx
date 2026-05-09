@@ -120,6 +120,13 @@ export function CardPreview() {
   if (hasStatModifications) extraHeight += 80 + GAP
   if (card.keywords.length > 0 || (card.abilityFlags && card.abilityFlags.length > 0)) extraHeight += 40 + GAP
 
+  // Rooms (CR 709.5) — display the printed-portrait image rotated landscape, and
+  // dim the locked half with an upright lock chip. Source image stores face[1] on top
+  // and face[0] on bottom; after +90° (CW) rotation that maps face[1] → right of
+  // visible, face[0] → left.
+  const isRoom = card.isRoom === true
+  const roomImageRotateDeg: 0 | 90 = isRoom ? 90 : 0
+
   // Mana cost overlay badge for the card image (only for hand cards)
   const previewOverlay = (
     <>
@@ -181,6 +188,40 @@ export function CardPreview() {
           <span>to flip</span>
         </div>
       )}
+      {isRoom && card.cardFaces && card.cardFaces.length === 2 && card.cardFaces.map((face, idx) => {
+        if (face.isUnlocked) return null
+        // After +90° image rotation: face[1] (source top half) → right of visible,
+        // face[0] (source bottom half) → left of visible.
+        const onRight = idx === 1
+        return (
+          <div key={face.faceId} style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            ...(onRight ? { right: 0 } : { left: 0 }),
+            width: '50%',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 6,
+          }}>
+            <div style={{
+              backgroundColor: 'rgba(40, 20, 20, 0.92)',
+              color: '#e89b9b',
+              fontSize: 18,
+              padding: '4px 8px',
+              borderRadius: 4,
+              border: '1px solid rgba(200, 100, 100, 0.6)',
+              lineHeight: 1,
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.5)',
+            }}>
+              🔒
+            </div>
+          </div>
+        )
+      })}
     </>
   )
 
@@ -191,6 +232,7 @@ export function CardPreview() {
       pos={hoverPosition}
       rulings={card.rulings}
       extraHeight={extraHeight}
+      imageRotateDeg={roomImageRotateDeg}
       overlay={previewOverlay}
     >
       {/* Stats box (for creatures with modifications) */}

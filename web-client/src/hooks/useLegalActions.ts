@@ -106,6 +106,8 @@ export function useCardActions(cardId: EntityId | null): LegalActionInfo[] {
           return a.sourceId === cardId
         case 'CrewVehicle':
           return a.vehicleId === cardId
+        case 'UnlockRoomDoor':
+          return a.roomId === cardId
         default:
           return false
       }
@@ -170,6 +172,8 @@ function getActionCardId(action: GameAction): EntityId | null {
       return action.sourceId
     case 'CrewVehicle':
       return action.vehicleId
+    case 'UnlockRoomDoor':
+      return action.roomId
     default:
       return null
   }

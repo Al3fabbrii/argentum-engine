@@ -309,7 +309,47 @@ data class ClientCard(
      * order. Lets the client show the full menu with unavailable abilities grayed out instead of
      * hiding them. Null for non-planeswalkers and for planeswalkers outside the battlefield.
      */
-    val planeswalkerAbilities: List<ClientPlaneswalkerAbility>? = null
+    val planeswalkerAbilities: List<ClientPlaneswalkerAbility>? = null,
+
+    /**
+     * Whether this card is a split-layout Room (CR 709.5 + 205.3h, "Enchantment — Room"). Drives
+     * split-card rendering in hand/stack/battlefield and the lock-state overlay on the
+     * battlefield. False for normal cards and for non-Room split layouts (Aftermath etc.).
+     */
+    val isRoom: Boolean = false,
+
+    /**
+     * For split-layout cards (currently Rooms): one entry per face with that face's name, mana
+     * cost, type line, oracle text, and (on the battlefield) whether the door is unlocked. Empty
+     * for normal single-face cards.
+     */
+    val cardFaces: List<ClientCardFace> = emptyList(),
+
+    /**
+     * For Rooms on the stack: index into [cardFaces] of the face that was cast. The stack should
+     * show only this face's name (CR 709.3b). Null for normal cards and for Rooms outside the
+     * stack.
+     */
+    val castFaceIndex: Int? = null
+)
+
+/**
+ * One face of a split-layout card (CR 709). Carries every per-face value the client needs to
+ * render either half of the card; for a Room on the battlefield, [isUnlocked] reflects the door
+ * state captured by [com.wingedsheep.engine.state.components.identity.RoomComponent].
+ *
+ * In zones other than the battlefield (hand, stack, graveyard, library, exile), [isUnlocked] is
+ * always `false` — there's no Room permanent yet, just a card with two halves.
+ */
+@Serializable
+data class ClientCardFace(
+    /** Stable face id — currently the face's printed name (matches RoomFaceId). */
+    val faceId: String,
+    val name: String,
+    val manaCost: String,
+    val typeLine: String,
+    val oracleText: String,
+    val isUnlocked: Boolean
 )
 
 /**

@@ -209,6 +209,8 @@ function cardIdForAction(info: LegalActionInfo): EntityId | undefined {
       return a.sourceId
     case 'CrewVehicle':
       return a.vehicleId
+    case 'UnlockRoomDoor':
+      return a.roomId
     default:
       return undefined
   }

@@ -583,6 +583,40 @@ sealed interface ClientEvent {
         val sourceName: String,
         override val description: String = "$sourceName changed $spellOrAbilityName's target from $oldTargetName to $newTargetName"
     ) : ClientEvent
+
+    // =========================================================================
+    // Room Events (CR 709.5)
+    // =========================================================================
+
+    @Serializable
+    @SerialName("doorUnlocked")
+    data class DoorUnlocked(
+        val roomId: EntityId,
+        val roomName: String,
+        val faceName: String,
+        val controllerId: EntityId,
+        val becameFullyUnlocked: Boolean,
+        val isYours: Boolean? = null,
+        override val description: String = when (isYours) {
+            true -> "You unlocked $faceName"
+            false -> "Opponent unlocked $faceName"
+            null -> "Unlocked $faceName"
+        }
+    ) : ClientEvent
+
+    @Serializable
+    @SerialName("roomFullyUnlocked")
+    data class RoomFullyUnlocked(
+        val roomId: EntityId,
+        val roomName: String,
+        val controllerId: EntityId,
+        val isYours: Boolean? = null,
+        override val description: String = when (isYours) {
+            true -> "You fully unlocked $roomName"
+            false -> "Opponent fully unlocked $roomName"
+            null -> "$roomName is fully unlocked"
+        }
+    ) : ClientEvent
 }
 
 /**
@@ -1051,9 +1085,24 @@ is PermanentsSacrificedEvent -> {
             is CreatureTypeChangedEvent,
             is BecomesTargetEvent,
             is SpellCopiedEvent,
-            is ClassLevelChangedEvent,
-            is RoomFullyUnlockedEvent,
-            is DoorUnlockedEvent,
+            is ClassLevelChangedEvent -> null
+
+            is RoomFullyUnlockedEvent -> ClientEvent.RoomFullyUnlocked(
+                roomId = event.roomId,
+                roomName = event.roomName,
+                controllerId = event.controllerId,
+                isYours = event.controllerId == viewingPlayerId
+            )
+
+            is DoorUnlockedEvent -> ClientEvent.DoorUnlocked(
+                roomId = event.roomId,
+                roomName = event.roomName,
+                faceName = event.faceName,
+                controllerId = event.controllerId,
+                becameFullyUnlocked = event.becameFullyUnlocked,
+                isYours = event.controllerId == viewingPlayerId
+            )
+
             is TurnHijackedEvent,
             is CommitCrimeEvent -> null
         }

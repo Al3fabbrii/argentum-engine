@@ -1034,8 +1034,38 @@ class ClientStateTransformer(
             backFaceTypeLine = dfcBackFace(container, cardDef)?.typeLine?.toString(),
             backFaceOracleText = dfcBackFace(container, cardDef)?.oracleText,
             backFaceImageUri = dfcBackFace(container, cardDef)?.metadata?.imageUri,
-            planeswalkerAbilities = buildPlaneswalkerAbilities(cardDef, zoneKey)
+            planeswalkerAbilities = buildPlaneswalkerAbilities(cardDef, zoneKey),
+            isRoom = cardDef?.isRoom == true,
+            cardFaces = buildClientCardFaces(container, cardDef),
+            castFaceIndex = spellOnStack?.faceIndex
         )
+    }
+
+    /**
+     * Build per-face DTOs for split-layout cards (currently Rooms). Returns an empty list for
+     * normal single-face cards. The [ClientCardFace.isUnlocked] flag reflects the live
+     * [RoomComponent] state for battlefield permanents and is `false` everywhere else (since
+     * lock state only exists once the Room is on the battlefield, per CR 709.5d).
+     */
+    private fun buildClientCardFaces(
+        container: com.wingedsheep.engine.state.ComponentContainer,
+        cardDef: CardDefinition?
+    ): List<ClientCardFace> {
+        if (cardDef == null || cardDef.layout != com.wingedsheep.sdk.model.CardLayout.SPLIT) return emptyList()
+        if (cardDef.cardFaces.isEmpty()) return emptyList()
+        val roomComp = container.get<com.wingedsheep.engine.state.components.identity.RoomComponent>()
+        return cardDef.cardFaces.map { face ->
+            val faceIdValue = face.name
+            val isUnlocked = roomComp?.unlocked?.any { it.value == faceIdValue } ?: false
+            ClientCardFace(
+                faceId = faceIdValue,
+                name = face.name,
+                manaCost = face.manaCost.toString(),
+                typeLine = face.typeLine.toString(),
+                oracleText = face.oracleText,
+                isUnlocked = isUnlocked
+            )
+        }
     }
 
     private fun buildPlaneswalkerAbilities(

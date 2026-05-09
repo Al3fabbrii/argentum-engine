@@ -274,6 +274,20 @@ function buildActionOptions(
     })
   })
 
+  // 8. Unlock Room door (CR 709.5e — sorcery-speed special action). Reuses 'activate'
+  // styling so it lives in the same visual cluster as activated abilities.
+  const unlockRoomActions = legalActions.filter((a) => a.action.type === 'UnlockRoomDoor')
+  unlockRoomActions.forEach((unlockAction, index) => {
+    options.push({
+      key: `unlock-room-${index}`,
+      label: unlockAction.description,
+      manaCost: unlockAction.manaCostString || null,
+      isAvailable: unlockAction.isAffordable !== false,
+      action: unlockAction,
+      actionType: 'activate',
+    })
+  })
+
   return options
 }
 
@@ -346,9 +360,13 @@ export function ActionMenu() {
     return (
       <div className={styles.container}>
         <div className={styles.panel}>
-          {/* Large card image */}
+          {/* Large card image — rotated landscape for Rooms (CR 709.5) */}
           {cardImageUrl && (
-            <CardImage imageUrl={cardImageUrl} cardName={cardInfo?.name ?? 'Card'} />
+            <CardImage
+              imageUrl={cardImageUrl}
+              cardName={cardInfo?.name ?? 'Card'}
+              rotateDeg={cardInfo?.isRoom ? 90 : 0}
+            />
           )}
 
           {/* Action buttons */}
@@ -609,15 +627,36 @@ function ActionButton({
 function CardImage({
   imageUrl,
   cardName,
+  rotateDeg = 0,
 }: {
   imageUrl: string
   cardName: string
+  rotateDeg?: 0 | 90 | 180 | 270
 }) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
 
+  // For sideways-printed layouts (Rooms), swap the container to landscape and absolutely
+  // position the image at its original portrait dimensions, rotated to fit. Same approach
+  // as HoverCardPreview's `imageRotateDeg`. Inline styles override the CSS-module dims.
+  const isLandscape = rotateDeg === 90 || rotateDeg === 270
+  const containerStyle: React.CSSProperties = isLandscape
+    ? { width: 279, height: 200 }
+    : {}
+  const imageStyle: React.CSSProperties = rotateDeg
+    ? {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: 200,
+        height: 279,
+        transform: `translate(-50%, -50%) rotate(${rotateDeg}deg)`,
+        objectFit: 'cover',
+      }
+    : {}
+
   return (
-    <div className={styles.cardImageContainer}>
+    <div className={styles.cardImageContainer} style={containerStyle}>
       {!imageLoaded && !imageError && (
         <div className={styles.loadingIndicator}>
           Loading...
@@ -632,6 +671,7 @@ function CardImage({
           src={imageUrl}
           alt={cardName}
           className={`${styles.cardImage} ${imageLoaded ? styles.cardImageLoaded : styles.cardImageLoading}`}
+          style={imageStyle}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
         />

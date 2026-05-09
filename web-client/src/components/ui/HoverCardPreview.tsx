@@ -18,13 +18,20 @@ export interface HoverCardPreviewProps {
   overlay?: ReactNode
   /** Estimated extra height from children, used for vertical positioning (default 0) */
   extraHeight?: number
+  /**
+   * Rotate the printed-portrait image by this angle to display it landscape (used by
+   * Rooms — CR 709.5 — where the printed orientation is sideways). Container dims swap
+   * accordingly so the rotated image fills the preview. Overlay content stays in
+   * container (post-rotation) coordinates and is *not* rotated by this prop.
+   */
+  imageRotateDeg?: 0 | 90 | 180 | 270
 }
 
 /**
  * Shared card hover preview — positions a large card image near the cursor.
  * Used by the game board, deck builder, and all draft overlays.
  */
-export function HoverCardPreview({ name, imageUri, imageSize = 'large', pos, rulings, children, overlay, extraHeight = 0 }: HoverCardPreviewProps) {
+export function HoverCardPreview({ name, imageUri, imageSize = 'large', pos, rulings, children, overlay, extraHeight = 0, imageRotateDeg = 0 }: HoverCardPreviewProps) {
   const [showRulings, setShowRulings] = useState(false)
   const [lastCardName, setLastCardName] = useState<string | null>(null)
 
@@ -43,8 +50,13 @@ export function HoverCardPreview({ name, imageUri, imageSize = 'large', pos, rul
   }, [name, lastCardName])
 
   const imageUrl = getCardImageUrl(name, imageUri, imageSize)
-  const previewWidth = PREVIEW_WIDTH
-  const previewHeight = Math.round(previewWidth * 1.4)
+  const portraitWidth = PREVIEW_WIDTH
+  const portraitHeight = Math.round(portraitWidth * 1.4)
+  // For sideways layouts (Rooms), the displayed container is landscape; the image element
+  // keeps its portrait pixel dims and rotates inside it.
+  const isLandscape = imageRotateDeg === 90 || imageRotateDeg === 270
+  const previewWidth = isLandscape ? portraitHeight : portraitWidth
+  const previewHeight = isLandscape ? portraitWidth : portraitHeight
   const hasRulings = rulings && rulings.length > 0
 
   // Estimate total height for positioning
@@ -105,7 +117,18 @@ export function HoverCardPreview({ name, imageUri, imageSize = 'large', pos, rul
         <img
           src={imageUrl}
           alt={name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          style={imageRotateDeg
+            ? {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: portraitWidth,
+                height: portraitHeight,
+                transform: `translate(-50%, -50%) rotate(${imageRotateDeg}deg)`,
+                objectFit: 'cover',
+              }
+            : { width: '100%', height: '100%', objectFit: 'cover' }
+          }
         />
         {overlay}
       </div>

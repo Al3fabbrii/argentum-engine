@@ -25,6 +25,7 @@ export type GameAction =
   | KeepHandAction
   | BottomCardsAction
   | ConcedeAction
+  | UnlockRoomDoorAction
 
 // =============================================================================
 // Priority Actions
@@ -109,6 +110,11 @@ export interface CastSpellAction {
   readonly modeDamageDistribution?: Record<number, Record<EntityId, number>>
   /** Creatures tapped to pay Conspire's optional additional cost (two distinct IDs) */
   readonly conspiredCreatures?: readonly EntityId[]
+  /**
+   * For split-layout cards (Rooms, etc.): index into the card's `cardFaces` of the face being
+   * cast. Required for SPLIT cards; null/omitted for normal single-face cards.
+   */
+  readonly faceIndex?: number | null
 }
 
 export type PaymentStrategy =
@@ -258,6 +264,23 @@ export interface BottomCardsAction {
 }
 
 // =============================================================================
+// Room Actions (CR 709.5e — special action, not the stack)
+// =============================================================================
+
+export interface UnlockRoomDoorAction {
+  readonly type: 'UnlockRoomDoor'
+  readonly playerId: EntityId
+  readonly roomId: EntityId
+  /**
+   * Face id of the locked door being unlocked. Backend `RoomFaceId` is a `@JvmInline value class`
+   * around a String, so kotlinx-serialization encodes it transparently as a JSON string.
+   * Currently the face's printed name (e.g., "Ritual Chamber").
+   */
+  readonly faceId: string
+  readonly paymentStrategy?: PaymentStrategy
+}
+
+// =============================================================================
 // Concession
 // =============================================================================
 
@@ -306,6 +329,8 @@ export function getActionSubject(action: GameAction): EntityId | null {
       return action.sourceId
     case 'CrewVehicle':
       return action.vehicleId
+    case 'UnlockRoomDoor':
+      return action.roomId
     default:
       return null
   }
