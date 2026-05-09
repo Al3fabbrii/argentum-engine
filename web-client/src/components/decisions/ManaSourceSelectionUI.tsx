@@ -1,9 +1,59 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useGameStore } from '@/store/gameStore.ts'
 import type { DecisionSelectionState } from '@/store/slices'
-import type { SelectManaSourcesDecision } from '@/types'
+import type { EntityId, ManaSourceOption, SelectManaSourcesDecision } from '@/types'
+import { parseManaCost } from '@/utils/manaCost'
 import { AbilityText } from '../ui/ManaSymbols'
 import styles from './DecisionUI.module.css'
+
+// Server serializes Color enums by name ("BLACK"), but cost symbols use pip letters ("B").
+const COLOR_NAME_TO_PIP: Record<string, string> = {
+  WHITE: 'W', BLUE: 'U', BLACK: 'B', RED: 'R', GREEN: 'G',
+}
+
+const toPip = (color: string): string => COLOR_NAME_TO_PIP[color] ?? color
+
+/**
+ * Greedy check: do the selected sources produce enough mana to cover `costSymbols`?
+ * Mirrors the engine's solver well enough for a UI hint — the server still re-solves
+ * on submit. Skips X (variable).
+ */
+function selectionCoversCost(
+  selectedIds: readonly EntityId[],
+  availableSources: readonly ManaSourceOption[],
+  costSymbols: readonly string[],
+): boolean {
+  const sourceById = new Map(availableSources.map((s) => [s.entityId, s]))
+  const coloredReqs: Record<string, number> = {}
+  let genericReq = 0
+  for (const s of costSymbols) {
+    if (s === 'X') continue
+    const num = parseInt(s, 10)
+    if (!isNaN(num)) genericReq += num
+    else coloredReqs[s] = (coloredReqs[s] ?? 0) + 1
+  }
+
+  for (const id of selectedIds) {
+    const src = sourceById.get(id)
+    if (!src) continue
+    const colors = (src.producesColors ?? []).map(toPip)
+    let consumed = false
+    for (const color of colors) {
+      if ((coloredReqs[color] ?? 0) > 0) {
+        coloredReqs[color]!--
+        consumed = true
+        break
+      }
+    }
+    if (!consumed && genericReq > 0) {
+      genericReq--
+    }
+  }
+
+  if (genericReq > 0) return false
+  for (const v of Object.values(coloredReqs)) if (v > 0) return false
+  return true
+}
 
 /**
  * Mana source selection UI for SelectManaSourcesDecision.
@@ -38,6 +88,21 @@ export function ManaSourceSelectionUI({
   }, [decision.id])
 
   const selectedCount = decisionSelectionState?.selectedOptions.length ?? 0
+  const selectedOptions = decisionSelectionState?.selectedOptions
+
+  const costSymbols = useMemo(
+    () => parseManaCost(decision.requiredCost),
+    [decision.requiredCost],
+  )
+  const isSelectionSufficient = useMemo(
+    () =>
+      selectionCoversCost(
+        selectedOptions ?? [],
+        decision.availableSources,
+        costSymbols,
+      ),
+    [selectedOptions, decision.availableSources, costSymbols],
+  )
 
   const handleAutoPay = () => {
     submitManaSourcesDecision([], true)
@@ -45,7 +110,7 @@ export function ManaSourceSelectionUI({
   }
 
   const handleConfirm = () => {
-    if (decisionSelectionState && selectedCount > 0) {
+    if (decisionSelectionState && isSelectionSufficient) {
       submitManaSourcesDecision(decisionSelectionState.selectedOptions, false)
       cancelDecisionSelection()
     }
@@ -71,26 +136,45 @@ export function ManaSourceSelectionUI({
           ? `${selectedCount} source${selectedCount !== 1 ? 's' : ''} selected`
           : 'Click lands to select'}
       </div>
+      {!isSelectionSufficient && (
+        <div className={styles.effectHint}>
+          Not enough mana selected
+        </div>
+      )}
 
       <div className={styles.buttonContainerSmall}>
-        <button onClick={handleAutoPay} className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}>
-          Auto Pay
-        </button>
-        {selectedCount > 0 && (
-          <button
-            onClick={handleConfirm}
-            className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
-          >
-            Confirm ({selectedCount})
-          </button>
-        )}
-        {decision.canDecline && (
-          <button
-            onClick={handleDecline}
-            className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
-          >
-            Decline
-          </button>
+        {decision.canDecline ? (
+          <>
+            <button
+              onClick={handleConfirm}
+              disabled={!isSelectionSufficient}
+              className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
+            >
+              Confirm
+            </button>
+            <button
+              onClick={handleDecline}
+              className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
+            >
+              Decline
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={handleAutoPay}
+              className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
+            >
+              Auto Pay
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={!isSelectionSufficient}
+              className={`${styles.confirmButton} ${styles.confirmButtonSmall}`}
+            >
+              Confirm ({selectedCount})
+            </button>
+          </>
         )}
       </div>
     </div>

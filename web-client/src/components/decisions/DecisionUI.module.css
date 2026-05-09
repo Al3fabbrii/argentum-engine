@@ -215,8 +215,11 @@
 
 .buttonContainerSmall {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-2);
   margin-top: var(--space-1);
+  width: 100%;
 }
 
 /* =========================================================================
@@ -282,6 +285,7 @@
   padding: var(--space-2) var(--space-5);
   font-size: var(--font-sm);
   border-radius: var(--radius-md);
+  min-width: auto;
 }
 
 @media (max-width: 639px) {
