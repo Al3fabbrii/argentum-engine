@@ -1,12 +1,8 @@
 package com.wingedsheep.gameserver.controller
 
-import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.gameserver.deck.DeckValidationResult
 import com.wingedsheep.gameserver.deck.DeckValidator
-import com.wingedsheep.mtg.sets.MtgSetCatalog
-import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.sdk.core.DeckFormat
-import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Deck
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,52 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 /**
- * REST endpoints supporting the deck picker UI and the standalone deckbuilder:
+ * Deck-scoped REST endpoints — operations that act on or describe deck lists:
  *
- * - `GET  /api/decks/cards`     — metadata for every card in the registry (picker stats + deckbuilder grid/search).
- * - `GET  /api/decks/examples`  — built-in example decks the picker offers as starting points.
- * - `POST /api/decks/validate`  — server-authoritative deck validation (count rules, unknown cards, ≥60).
+ * - `GET  /api/decks/examples`        — built-in example decks the picker offers as starting points.
+ * - `POST /api/decks/validate`        — server-authoritative deck validation (count rules, unknown cards, ≥60).
+ * - `POST /api/decks/legal-formats`   — batch legality check for the saved-deck browser.
+ * - `GET  /api/decks/formats`         — supported deck formats.
  *
- * The cards endpoint covers both the lightweight picker (which only reads name/cost/types/colors/cmc
- * for stats and validation) and the standalone deckbuilder (which additionally needs oracle text,
- * power/toughness, keywords, and an image URI for the card grid). Optional fields default to null/empty
- * so existing picker callers ignore them transparently.
+ * Catalog endpoints (cards / sets) live under their own resources at `/api/cards` and `/api/sets`
+ * respectively, since they describe the universe of cards rather than user-authored deck lists.
  */
 @RestController
 @RequestMapping("/api/decks")
 class DecksController(
-    private val cardRegistry: CardRegistry,
     private val deckValidator: DeckValidator,
 ) {
-
-    data class CardSummaryDTO(
-        val name: String,
-        val manaCost: String,
-        val cmc: Int,
-        val colors: List<String>,
-        // Scryfall-style color identity (CR 903.4): mana-cost colors plus oracle-text colored
-        // symbols plus basic-land-subtype colors, with the per-card override applied. Drives the
-        // deckbuilder's color filter — for deck construction "this card is red" means "its
-        // identity is red", not just "its printed cost has red". `colors` stays available for
-        // mana-curve and pip stats that genuinely care about printed cost.
-        val colorIdentity: List<String>,
-        val cardTypes: List<String>,
-        val supertypes: List<String>,
-        val subtypes: List<String>,
-        val basicLand: Boolean,
-        val rarity: String,
-        val setCode: String?,
-        val collectorNumber: String?,
-        val oracleText: String? = null,
-        val power: String? = null,
-        val toughness: String? = null,
-        val imageUri: String? = null,
-        val keywords: List<String> = emptyList(),
-        val legalFormats: List<String> = emptyList(),
-        val isDoubleFaced: Boolean = false,
-        val backFaceName: String? = null,
-        val backFaceImageUri: String? = null,
-    )
 
     data class ExampleDeckDTO(
         val id: String,
@@ -80,16 +45,6 @@ class DecksController(
          */
         val commander: String? = null,
     )
-
-    @GetMapping("/cards")
-    fun getCards(): List<CardSummaryDTO> =
-        cardRegistry.allCardNames()
-            .asSequence()
-            .filter { it !in TOKEN_NAMES }
-            .mapNotNull { cardRegistry.getCard(it) }
-            .map { it.toSummary() }
-            .sortedBy { it.name }
-            .toList()
 
     @GetMapping("/examples")
     fun getExamples(): List<ExampleDeckDTO> = EXAMPLE_DECKS
@@ -142,43 +97,7 @@ class DecksController(
 
     data class FormatInfo(val id: String, val name: String)
 
-    @GetMapping("/sets")
-    fun getSets(): List<SetInfoDTO> =
-        MtgSetCatalog.all.map { SetInfoDTO(it.code, it.displayName) }
-
-    data class SetInfoDTO(val code: String, val name: String)
-
-    private fun CardDefinition.toSummary(): CardSummaryDTO = CardSummaryDTO(
-        name = name,
-        manaCost = manaCost.toString(),
-        cmc = cmc,
-        colors = colors.map { it.name },
-        colorIdentity = colorIdentity.map { it.name },
-        cardTypes = typeLine.cardTypes.map { it.name },
-        supertypes = typeLine.supertypes.map { it.name },
-        subtypes = typeLine.subtypes.map { it.toString() },
-        basicLand = typeLine.isBasicLand,
-        rarity = metadata.rarity.name,
-        setCode = setCode,
-        collectorNumber = metadata.collectorNumber,
-        oracleText = oracleText.takeIf { it.isNotBlank() },
-        power = creatureStats?.power?.toString(),
-        toughness = creatureStats?.toughness?.toString(),
-        imageUri = metadata.imageUri,
-        keywords = keywords.map { it.name }.sorted(),
-        legalFormats = legalFormats.map { it.name }.sorted(),
-        isDoubleFaced = isDoubleFaced,
-        backFaceName = backFace?.name,
-        backFaceImageUri = backFace?.metadata?.imageUri,
-    )
-
     companion object {
-        // Predefined tokens are registered in the CardRegistry so the engine can resolve
-        // token abilities by name (e.g., a created Treasure → its mana ability), but they
-        // are not real cards and must not appear in the deckbuilder catalog.
-        private val TOKEN_NAMES: Set<String> =
-            PredefinedTokens.allTokens.flatMap { listOfNotNull(it.name, it.backFace?.name) }.toSet()
-
         // Bloomburrow-only tribal decks. Selesnya Rabbits, Rakdos Lizards, Golgari Squirrels,
         // and Simic Frogs are taken from the Bloomburrow Constructed Midweek Magic decklists
         // (https://mtgazone.com/midweek-magic-bloomburrow-constructed/). Boros Mice and Orzhov

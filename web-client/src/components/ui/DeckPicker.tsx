@@ -15,9 +15,9 @@
  * card resolution) and quick stats (color distribution, mana curve, type counts).
  *
  * Data dependencies:
- *   GET  /api/decks/cards     — slim metadata for every card (validation + stats)
- *   GET  /api/decks/examples  — the starter decks shown in the Examples tab
- *   POST /api/decks/validate  — authoritative validation pass when a list is non-empty
+ *   GET  /api/cards            — slim metadata for every card (validation + stats)
+ *   GET  /api/decks/examples   — the starter decks shown in the Examples tab
+ *   POST /api/decks/validate   — authoritative validation pass when a list is non-empty
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -213,7 +213,7 @@ export function DeckPicker({
   // Fetch card metadata + examples once.
   useEffect(() => {
     let cancelled = false
-    fetch('/api/decks/cards')
+    fetch('/api/cards')
       .then((r) => (r.ok ? r.json() : []))
       .then((list: CardSummary[]) => {
         if (cancelled) return

@@ -27,7 +27,9 @@ import {
   hasToken,
   addToken,
   removeToken,
+  isAdvancedQuery,
   type CardSummary,
+  type ParseError,
 } from './cardFilter'
 import {
   parseArenaDeckList,
@@ -156,7 +158,7 @@ export function DeckbuilderPage() {
   const [catalog, setCatalog] = useState<CardSummary[]>([])
   useEffect(() => {
     let cancelled = false
-    fetch('/api/decks/cards')
+    fetch('/api/cards')
       .then((r) => (r.ok ? r.json() : []))
       .then((list: CardSummary[]) => {
         if (!cancelled) setCatalog(list)
@@ -171,7 +173,7 @@ export function DeckbuilderPage() {
   const [setNames, setSetNames] = useState<Record<string, string>>({})
   useEffect(() => {
     let cancelled = false
-    fetch('/api/decks/sets')
+    fetch('/api/sets')
       .then((r) => (r.ok ? r.json() : []))
       .then((list: SetInfo[]) => {
         if (cancelled) return
@@ -307,7 +309,10 @@ export function DeckbuilderPage() {
     if (commander && !(commander in deckCards)) setCommander(null)
   }, [commander, deckCards])
 
-  const predicate = useMemo(() => parseQuery(query), [query])
+  const parseResult = useMemo(() => parseQuery(query, { withErrors: true }), [query])
+  const predicate = parseResult.predicate
+  const queryErrors = parseResult.errors
+  const advanced = useMemo(() => isAdvancedQuery(query), [query])
   const filtered = useMemo(() => {
     const result = catalog.filter(predicate)
     return sortCards(result, sortMode)
@@ -587,7 +592,13 @@ export function DeckbuilderPage() {
           activeDeckId={activeDeckId}
           onOpen={() => setDecksBrowserOpen(true)}
         />
-        <FilterSection query={query} onQueryChange={setQuery} catalog={catalog} setNames={setNames} />
+        <FilterSection
+          query={query}
+          onQueryChange={setQuery}
+          catalog={catalog}
+          setNames={setNames}
+          advanced={advanced}
+        />
       </aside>
 
       {/* Center */}
@@ -597,6 +608,7 @@ export function DeckbuilderPage() {
           onQueryChange={setQuery}
           sortMode={sortMode}
           onSortChange={setSortMode}
+          errors={queryErrors}
           resultLabel={
             catalog.length === 0
               ? 'Loading…'
@@ -1600,22 +1612,39 @@ function SearchBar({
   sortMode,
   onSortChange,
   resultLabel,
+  errors,
 }: {
   query: string
   onQueryChange: (next: string) => void
   sortMode: SortMode
   onSortChange: (m: SortMode) => void
   resultLabel: string
+  errors: ParseError[]
 }) {
   const [helpOpen, setHelpOpen] = useState(false)
+  const hasErrors = errors.length > 0
   return (
     <div className={styles.searchBar}>
-      <input
-        className={styles.searchInput}
-        placeholder='Search — try: c:r cmc<=3 t:creature, o:flying, -is:legendary'
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
+      <div className={styles.searchInputWrap}>
+        <input
+          className={hasErrors ? styles.searchInputError : styles.searchInput}
+          placeholder='Search — try: t:creature c:r cmc<=3, o:flying, (c:u or c:b) -is:legendary'
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          aria-invalid={hasErrors}
+          aria-describedby={hasErrors ? 'search-errors' : undefined}
+        />
+        {hasErrors && (
+          <ul id="search-errors" className={styles.searchErrors} role="alert">
+            {errors.map((e, i) => (
+              <li key={i}>
+                <code>{query.slice(e.span.start, e.span.end) || '·'}</code>
+                <span>{e.message}{e.suggestion ? ` ${e.suggestion}` : ''}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <button
         className={helpOpen ? styles.helpIconActive : styles.helpIcon}
         onClick={() => setHelpOpen((v) => !v)}
@@ -1647,21 +1676,30 @@ function SearchBar({
 function SearchHelp({ onClose, onInsert }: { onClose: () => void; onInsert: (t: string) => void }) {
   const examples: Array<{ syntax: string; desc: string }> = [
     { syntax: 'lightning', desc: 'name contains "lightning"' },
-    { syntax: 't:creature', desc: 'card type / supertype / subtype' },
-    { syntax: 't:goblin', desc: 'subtype (tribe) lookup' },
+    { syntax: '!"Lightning Bolt"', desc: 'exact card name' },
+    { syntax: 'name:/^bolt/', desc: 'regex on card name (case-insensitive by default)' },
+    { syntax: 't:creature', desc: 'type line — AND of words (try t:legendary creature elf)' },
     { syntax: 'o:flying', desc: 'oracle text contains' },
-    { syntax: 'c:r', desc: 'colour includes red (also wu, br, wubrg)' },
+    { syntax: 'c:r', desc: 'colour identity includes red' },
+    { syntax: 'c:azorius', desc: 'guild / shard / wedge name (azorius, bant, mardu, …)' },
     { syntax: 'c=wu', desc: 'colours are exactly white + blue' },
     { syntax: 'c<=rw', desc: 'colours are a subset of red / white' },
+    { syntax: 'c>=2', desc: 'colour count comparison' },
     { syntax: 'c:colorless', desc: 'no colours' },
+    { syntax: 'mana:{2}{u}{u}', desc: 'mana cost symbols (multiset compare)' },
+    { syntax: 'mana>={r}{r}', desc: 'cost contains at least these symbols' },
     { syntax: 'cmc:3', desc: 'mana value (also <=, >=, <, >, !=)' },
+    { syntax: 'pow>tou', desc: 'cross-field compare (power vs. toughness)' },
     { syntax: 'pow>=4', desc: 'power (numeric only)' },
-    { syntax: 'tou<=2', desc: 'toughness' },
     { syntax: 'r:rare', desc: 'rarity (common / uncommon / rare / mythic)' },
     { syntax: 's:blb', desc: 'set code' },
-    { syntax: 'is:legendary', desc: 'shorthand: land/creature/spell/permanent/legendary/basic' },
+    { syntax: 'f:standard', desc: 'format legality' },
+    { syntax: 'is:legendary', desc: 'land/creature/spell/permanent/legendary/basic/dfc/vanilla/bear/historic' },
+    { syntax: 'layout:transform', desc: 'card layout (transform / mdfc / normal)' },
     { syntax: 'kw:flying', desc: 'keyword' },
-    { syntax: '-t:creature', desc: 'negate any term' },
+    { syntax: '-t:creature', desc: 'negate any term (also: not t:creature)' },
+    { syntax: 't:creature or t:planeswalker', desc: 'boolean OR' },
+    { syntax: '(c:u or c:b) t:creature', desc: 'grouping with parens' },
     { syntax: '"lord of"', desc: 'quote multi-word values' },
   ]
   return (
@@ -1675,7 +1713,9 @@ function SearchHelp({ onClose, onInsert }: { onClose: () => void; onInsert: (t: 
           </button>
         </div>
         <p className={styles.helpHint}>
-          Combine tokens with spaces (AND). Click an example to drop it into the search box.
+          Tokens combine with implicit AND. Use <code>or</code> for alternation,
+          parentheses for grouping, and <code>-</code> or <code>not</code> for negation.
+          Click an example to drop it into the search box.
         </p>
         <ul className={styles.helpList}>
           {examples.map((ex) => (
@@ -1704,13 +1744,25 @@ function FilterSection({
   onQueryChange,
   catalog,
   setNames,
+  advanced,
 }: {
   query: string
   onQueryChange: (next: string) => void
   catalog: CardSummary[]
   setNames: Record<string, string>
+  /**
+   * `true` when the query uses or / parens — features the flat chip helpers can't
+   * round-trip without rewriting expressions the user authored. We surface a hint
+   * banner and freeze chip toggles instead. The active-state detection still runs
+   * (chips stay visually inert because hasToken is whole-term and won't match
+   * anything inside parens), so the panel reads as "snapshot" rather than "stale".
+   */
+  advanced: boolean
 }) {
-  const toggle = (token: string) => onQueryChange(toggleToken(query, token))
+  const toggle = (token: string) => {
+    if (advanced) return
+    onQueryChange(toggleToken(query, token))
+  }
 
   // Numeric range filters parse current values out of the query so the boxes
   // round-trip with whatever the user typed.
@@ -1747,7 +1799,12 @@ function FilterSection({
   }
 
   return (
-    <>
+    <fieldset className={styles.filterFieldset} disabled={advanced}>
+      {advanced && (
+        <div className={styles.advancedBanner} role="status">
+          Advanced query — chips disabled. Edit the search bar directly.
+        </div>
+      )}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionLabel}>Colour</h2>
@@ -1927,7 +1984,7 @@ function FilterSection({
           Clear filters
         </button>
       </section>
-    </>
+    </fieldset>
   )
 }
 

@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":rules-engine"))
     implementation(project(":mtg-sdk"))
     implementation(project(":mtg-sets"))
+    implementation(project(":mtg-search"))
     implementation(project(":ai"))
     implementation(libs.bundles.kotlinxEcosystem)
     implementation(libs.bundles.springBootWeb)
