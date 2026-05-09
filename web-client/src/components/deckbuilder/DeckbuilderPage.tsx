@@ -2260,7 +2260,6 @@ function CardGrid({
   onShowMore: () => void
 }) {
   const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null)
   const dfc = useDfcHoverFlip(
     hoverCard
       ? {
@@ -2295,17 +2294,13 @@ function CardGrid({
               count={deckCards[card.name] ?? 0}
               onAdd={onAdd}
               onRemove={onRemove}
-              onHover={(c, e) => {
+              onHover={(c) => {
                 setHoverCard((prev) => {
                   if (prev?.name !== c.name) resetDfcFlip()
                   return c
                 })
-                if (e) setHoverPos({ x: e.clientX, y: e.clientY })
               }}
-              onLeave={() => {
-                setHoverCard(null)
-                setHoverPos(null)
-              }}
+              onLeave={() => setHoverCard(null)}
             />
           ))}
         </div>
@@ -2317,14 +2312,11 @@ function CardGrid({
           </div>
         )}
       </div>
-      {hoverCard && (
-        <HoverCardPreview
-          name={dfc.displayName ?? hoverCard.name}
-          imageUri={dfc.displayImageUri ?? hoverCard.imageUri ?? null}
-          pos={hoverPos}
-          overlay={dfc.hint}
-        />
-      )}
+      <HoverFollowPreview
+        name={hoverCard ? (dfc.displayName ?? hoverCard.name) : null}
+        imageUri={hoverCard ? (dfc.displayImageUri ?? hoverCard.imageUri ?? null) : null}
+        overlay={dfc.hint}
+      />
     </>
   )
 }
@@ -2341,7 +2333,7 @@ function CardTile({
   count: number
   onAdd: (c: CardSummary) => void
   onRemove: (name: string) => void
-  onHover: (c: CardSummary, e: React.MouseEvent | null) => void
+  onHover: (c: CardSummary) => void
   onLeave: () => void
 }) {
   // Lazy-load the image once the tile scrolls into view.
@@ -2384,8 +2376,7 @@ function CardTile({
       className={styles.cardTile}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      onMouseEnter={(e) => onHover(card, e)}
-      onMouseMove={(e) => onHover(card, e)}
+      onMouseEnter={() => onHover(card)}
       onMouseLeave={onLeave}
     >
       {visible ? (
@@ -2426,6 +2417,35 @@ function resolveImageUrl(card: CardSummary): string {
   return getCardImageUrl(card.name, card.imageUri ?? null, 'normal')
 }
 
+/**
+ * Floats a card preview that follows the cursor while a row/tile is hovered.
+ * The position state lives here, not on the parent panel — so mouse motion
+ * doesn't re-render the (potentially large) sibling list. The parent only
+ * re-renders when the *hovered card* changes.
+ */
+function HoverFollowPreview({
+  name,
+  imageUri,
+  overlay,
+}: {
+  name: string | null
+  imageUri: string | null
+  overlay?: React.ReactNode
+}) {
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
+  useEffect(() => {
+    if (!name) {
+      setPos(null)
+      return
+    }
+    const onMove = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY })
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [name])
+  if (!name || !pos) return null
+  return <HoverCardPreview name={name} imageUri={imageUri} pos={pos} overlay={overlay} />
+}
+
 // ---------------------------------------------------------------------------
 // Deck list panel (right rail)
 // ---------------------------------------------------------------------------
@@ -2459,7 +2479,6 @@ function DeckListPanel({
   )
   const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
   const [hoverName, setHoverName] = useState<string | null>(null)
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null)
   const dfc = useDfcHoverFlip(
     hoverCard
       ? {
@@ -2473,26 +2492,20 @@ function DeckListPanel({
   )
   const resetDfcFlip = dfc.resetFlip
 
-  const handleEnter = (entry: { name: string; card: CardSummary | undefined }, e: React.MouseEvent) => {
+  const handleEnter = (entry: { name: string; card: CardSummary | undefined }) => {
     if (hoverName !== entry.name) resetDfcFlip()
     setHoverName(entry.name)
     setHoverCard(entry.card ?? null)
-    setHoverPos({ x: e.clientX, y: e.clientY })
-  }
-  const handleMove = (e: React.MouseEvent) => {
-    setHoverPos({ x: e.clientX, y: e.clientY })
   }
   const handleLeave = () => {
     setHoverName(null)
     setHoverCard(null)
-    setHoverPos(null)
   }
 
   useEffect(() => {
     if (hoverName && !(hoverName in deckCards)) {
       setHoverName(null)
       setHoverCard(null)
-      setHoverPos(null)
     }
   }, [deckCards, hoverName])
 
@@ -2572,8 +2585,7 @@ function DeckListPanel({
                 key={entry.name}
                 className={rowClasses}
                 title={rowTitle}
-                onMouseEnter={(e) => handleEnter(entry, e)}
-                onMouseMove={handleMove}
+                onMouseEnter={() => handleEnter(entry)}
                 onMouseLeave={handleLeave}
               >
                 <button
@@ -2656,14 +2668,11 @@ function DeckListPanel({
           Click cards in the grid to add them.
         </p>
       )}
-      {hoverName && (
-        <HoverCardPreview
-          name={dfc.displayName ?? hoverName}
-          imageUri={dfc.displayImageUri ?? hoverCard?.imageUri ?? null}
-          pos={hoverPos}
-          overlay={dfc.hint}
-        />
-      )}
+      <HoverFollowPreview
+        name={hoverName ? (dfc.displayName ?? hoverName) : null}
+        imageUri={hoverName ? (dfc.displayImageUri ?? hoverCard?.imageUri ?? null) : null}
+        overlay={dfc.hint}
+      />
     </div>
   )
 }
@@ -2708,7 +2717,6 @@ function BasicLandsPanel({
   }, [catalog])
 
   const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null)
 
   if (basics.length === 0) return null
 
@@ -2737,15 +2745,8 @@ function BasicLandsPanel({
           <div
             key={card.name}
             className={styles.basicLandRow}
-            onMouseEnter={(e) => {
-              setHoverCard(card)
-              setHoverPos({ x: e.clientX, y: e.clientY })
-            }}
-            onMouseMove={(e) => setHoverPos({ x: e.clientX, y: e.clientY })}
-            onMouseLeave={() => {
-              setHoverCard(null)
-              setHoverPos(null)
-            }}
+            onMouseEnter={() => setHoverCard(card)}
+            onMouseLeave={() => setHoverCard(null)}
           >
             <span className={styles.basicLandCount}>{count}</span>
             {color ? (
@@ -2776,13 +2777,10 @@ function BasicLandsPanel({
           </div>
         )
       })}
-      {hoverCard && (
-        <HoverCardPreview
-          name={hoverCard.name}
-          imageUri={hoverCard.imageUri ?? null}
-          pos={hoverPos}
-        />
-      )}
+      <HoverFollowPreview
+        name={hoverCard?.name ?? null}
+        imageUri={hoverCard?.imageUri ?? null}
+      />
     </div>
   )
 }
