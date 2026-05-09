@@ -50,6 +50,45 @@
   color: var(--text-primary);
 }
 
+/* ------------- View toggle (topbar) -------------
+   Sits next to the title and flips the layout between the original "cards to add" view and the
+   Moxfield-style "deck centric" view. Same visual language as the segmented mana-mode control
+   below, but a touch larger because it's a primary topbar control. */
+.viewToggle {
+  display: inline-flex;
+  margin-left: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.viewToggleButton {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.viewToggleButton:last-child {
+  border-right: none;
+}
+
+.viewToggleButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.viewToggleButtonActive {
+  composes: viewToggleButton;
+  background: rgba(106, 163, 255, 0.22);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .left {
   grid-area: left;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -1159,6 +1198,22 @@
   box-shadow: inset 0 0 0 1px rgba(214, 185, 106, 0.45);
 }
 
+/* Sticky 0-count placeholder row — used for the basic-land rows synthesized into the Lands
+   group when the user hasn't added any of that basic yet. Stays clickable (the + button
+   ramps the count) but reads as muted so it's clearly "available to add" rather than "in
+   the deck." */
+.deckRowPlaceholder .deckRowCount,
+.deckRowPlaceholder .deckRowName,
+.deckRowPlaceholder .deckRowCost {
+  opacity: 0.45;
+}
+
+.deckRowPlaceholder:hover .deckRowCount,
+.deckRowPlaceholder:hover .deckRowName,
+.deckRowPlaceholder:hover .deckRowCost {
+  opacity: 0.85;
+}
+
 .deckRowCommander .deckRowName {
   color: #f0d68a;
   font-weight: 600;
@@ -1560,3 +1615,246 @@
   border-color: rgba(106, 163, 255, 0.55);
   color: #cfdfff;
 }
+
+/* ===========================================================================
+   Deck-centric view (Moxfield-style).
+   Center pane owns the deck as a multi-column grouped list. The right rail
+   is removed in this mode — the deck takes the full remaining width, and
+   adding cards happens through a search-and-add bar at the top of the pane. The page grid template
+   stays the same — only the contents of `center` and the right rail change.
+   =========================================================================== */
+
+/* Deck mode: drop the right rail entirely so the deck columns get the full width. The toggle
+   in the topbar is the only way to bring it back; everything that lived in the rail moved into
+   the centerDeck pane (header, search-and-add bar, footer with stats + save buttons). */
+.pageDeckMode {
+  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-areas:
+    'topbar topbar'
+    'left center';
+}
+
+.centerDeck {
+  grid-area: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+/* Search-and-add strip below the deck-name header. Single text input that pops a dropdown
+   of card-name matches; replaces the right-rail catalog grid in deck mode. The dropdown is
+   absolutely positioned so it doesn't push the deck columns down as the user types. */
+.addCardSearch {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.addCardInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.addCardInput:focus {
+  outline: none;
+  border-color: var(--accent-primary, #6aa3ff);
+  box-shadow: 0 0 0 2px rgba(106, 163, 255, 0.18);
+}
+
+.addCardInput::placeholder {
+  color: var(--text-muted);
+}
+
+.addCardBasicsButton {
+  background: rgba(106, 163, 255, 0.15);
+  color: #a8c5ff;
+  border: 1px solid rgba(106, 163, 255, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.addCardBasicsButton:hover:not(:disabled) {
+  background: rgba(106, 163, 255, 0.25);
+  color: #cfdfff;
+}
+
+.addCardBasicsButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.addCardDropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: var(--space-4);
+  right: var(--space-4);
+  max-height: 380px;
+  overflow-y: auto;
+  background: var(--bg-surface-3, #1c1f25);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.addCardResult {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.addCardResult:hover:not(:disabled) {
+  background: rgba(106, 163, 255, 0.14);
+}
+
+.addCardResult:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.addCardResultCount {
+  text-align: right;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
+.addCardResultName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.addCardResultCost {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+/* Deck name + format picker + count badge — the "header strip" at the top of the
+   deck-centric center pane. Mirrors the right-rail .deckHeader visually but lays
+   out horizontally because the center pane is wide. */
+.deckHeaderInline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.deckHeaderInline .nameInput {
+  flex: 0 1 360px;
+  min-width: 200px;
+}
+
+.deckHeaderInlineSpacer {
+  flex: 1;
+}
+
+.deckHeaderInlineCount {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollable deck body. Uses CSS multi-column so groups flow into 1–4 columns
+   based on available width, with each group treated as an indivisible block
+   (`break-inside: avoid`) so a "Creatures" group never gets split mid-list. */
+.deckCentric {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.deckCentricEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: var(--space-6);
+}
+
+.deckCentricColumns {
+  column-count: auto;
+  column-width: 280px;
+  column-gap: var(--space-4);
+}
+
+.deckCentricGroup {
+  break-inside: avoid;
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deckCentricGroupLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 0 0 4px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Footer strip below the deck columns: basic-lands quick-add + summary stats +
+   save/save-as/delete actions. Stack vertically on narrow widths, side-by-side
+   on wider ones. */
+.deckCentricFooter {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.3);
+  align-items: center;
+}
+
+/* The DeckSummary and DeckActionRow components own their own padding/borders in the right-rail
+   layout. In the deck-mode footer they sit side-by-side, so suppress the redundant top borders
+   and rely on the grid gap for separation. */
+.deckCentricFooter > .summary,
+.deckCentricFooter > .actionRow {
+  border-top: none;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .deckCentricFooter {
+    grid-template-columns: 1fr;
+  }
+}
+

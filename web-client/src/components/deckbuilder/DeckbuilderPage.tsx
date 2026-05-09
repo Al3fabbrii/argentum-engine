@@ -90,6 +90,11 @@ type SetInfo = { code: string; name: string }
 
 type SortMode = 'name' | 'cmc' | 'color' | 'rarity'
 
+// "cards" = original layout (catalog grid in center, deck list on right).
+// "deck"  = Moxfield-style: deck takes the wide center pane, multi-column grouped by type;
+//           catalog/search moves to the right rail. Persisted via `?view=deck`.
+type ViewMode = 'cards' | 'deck'
+
 const PAGE_SIZE = 120
 
 // Evergreen keywords most commonly used as filters. Surface as chips; the rest
@@ -275,6 +280,24 @@ export function DeckbuilderPage() {
           const params = new URLSearchParams(prev)
           if (next === 'name') params.delete('sort')
           else params.set('sort', next)
+          return params
+        },
+        { replace: true }
+      )
+    },
+    [setSearchParams]
+  )
+
+  // View mode toggle — Moxfield-style "deck centric" layout vs. the original "cards to add"
+  // layout. Persisted in the URL so refreshes / shared links keep the user's preference.
+  const viewMode: ViewMode = searchParams.get('view') === 'deck' ? 'deck' : 'cards'
+  const setViewMode = useCallback(
+    (next: ViewMode) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev)
+          if (next === 'deck') params.set('view', 'deck')
+          else params.delete('view')
           return params
         },
         { replace: true }
@@ -527,12 +550,36 @@ export function DeckbuilderPage() {
   const stats = useMemo(() => computeStats(deckCards, catalogIndex), [deckCards, catalogIndex])
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${viewMode === 'deck' ? styles.pageDeckMode : ''}`}>
       <header className={styles.topbar}>
         <button className={styles.iconButton} onClick={() => navigate('/')}>
           ← Back to menu
         </button>
         <h1 className={styles.title}>Deckbuilder</h1>
+        <div className={styles.viewToggle} role="group" aria-label="View mode">
+          <button
+            type="button"
+            className={
+              viewMode === 'cards' ? styles.viewToggleButtonActive : styles.viewToggleButton
+            }
+            onClick={() => setViewMode('cards')}
+            aria-pressed={viewMode === 'cards'}
+            title="Browse the catalog and click cards to add them"
+          >
+            Cards to add
+          </button>
+          <button
+            type="button"
+            className={
+              viewMode === 'deck' ? styles.viewToggleButtonActive : styles.viewToggleButton
+            }
+            onClick={() => setViewMode('deck')}
+            aria-pressed={viewMode === 'deck'}
+            title="See the deck grouped by type — Moxfield style"
+          >
+            Deck
+          </button>
+        </div>
         <div className={styles.topbarSpacer} />
         <button className={styles.iconButton} onClick={() => setImportOpen(true)}>
           Import deck
@@ -601,129 +648,232 @@ export function DeckbuilderPage() {
         />
       </aside>
 
-      {/* Center */}
-      <main className={styles.center}>
-        <SearchBar
-          query={query}
-          onQueryChange={setQuery}
-          sortMode={sortMode}
-          onSortChange={setSortMode}
-          errors={queryErrors}
-          resultLabel={
-            catalog.length === 0
-              ? 'Loading…'
-              : displayed.length === filtered.length
-              ? `${filtered.length} / ${catalog.length}`
-              : `Showing ${displayed.length} of ${filtered.length}`
-          }
-        />
-        <CardGrid
-          cards={displayed}
-          deckCards={deckCards}
-          onAdd={addCard}
-          onRemove={removeCard}
-          hasMore={displayed.length < filtered.length}
-          onShowMore={() => setVisibleCount((c) => c + PAGE_SIZE)}
-        />
-      </main>
+      {/* Center + right rail are swapped between view modes. In "cards" mode the catalog grid
+          owns the center pane and the deck list lives on the right (the original layout). In
+          "deck" mode (Moxfield-style) the deck takes the wide center as a multi-column grouped
+          list, and the catalog/search collapses to the right rail. */}
+      {viewMode === 'cards' ? (
+        <>
+          <main className={styles.center}>
+            <SearchBar
+              query={query}
+              onQueryChange={setQuery}
+              sortMode={sortMode}
+              onSortChange={setSortMode}
+              errors={queryErrors}
+              resultLabel={
+                catalog.length === 0
+                  ? 'Loading…'
+                  : displayed.length === filtered.length
+                  ? `${filtered.length} / ${catalog.length}`
+                  : `Showing ${displayed.length} of ${filtered.length}`
+              }
+            />
+            <CardGrid
+              cards={displayed}
+              deckCards={deckCards}
+              onAdd={addCard}
+              onRemove={removeCard}
+              hasMore={displayed.length < filtered.length}
+              onShowMore={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            />
+          </main>
 
-      {/* Right rail */}
-      <aside className={styles.right}>
-        <div className={styles.deckHeader}>
-          <input
-            className={styles.nameInput}
-            value={deckName}
-            onChange={(e) => setDeckName(e.target.value)}
-            placeholder="Deck name"
-          />
-          <DeckFormatPicker
-            activeFormat={activeFormat}
-            onChange={(value) => setQuery(setFormatToken(query, value))}
-          />
-        </div>
+          <aside className={styles.right}>
+            <div className={styles.deckHeader}>
+              <input
+                className={styles.nameInput}
+                value={deckName}
+                onChange={(e) => setDeckName(e.target.value)}
+                placeholder="Deck name"
+              />
+              <DeckFormatPicker
+                activeFormat={activeFormat}
+                onChange={(value) => setQuery(setFormatToken(query, value))}
+              />
+            </div>
 
-        <DeckListPanel
-          deckCards={deckCards}
-          catalog={catalogIndex}
-          activeFormat={activeFormat}
-          onAdd={addCard}
-          onRemove={removeCard}
-          commander={commander}
-          showCommanderControls={isCommanderFormat}
-          onToggleCommander={(name) =>
-            setCommander((prev) => (prev === name ? null : name))
-          }
-          rowViolations={rowViolations}
-          isCommanderFormat={isCommanderFormat}
-        />
+            <DeckListPanel
+              deckCards={deckCards}
+              catalog={catalogIndex}
+              activeFormat={activeFormat}
+              onAdd={addCard}
+              onRemove={removeCard}
+              commander={commander}
+              showCommanderControls={isCommanderFormat}
+              onToggleCommander={(name) =>
+                setCommander((prev) => (prev === name ? null : name))
+              }
+              rowViolations={rowViolations}
+              isCommanderFormat={isCommanderFormat}
+            />
 
-        <BasicLandsPanel
-          catalog={catalog}
-          deckCards={deckCards}
-          onAdd={addCard}
-          onRemove={removeCard}
-          onSuggest={() => suggestLandsForDeck(deckCards, catalogIndex, catalog, setCardCount)}
-        />
+            <BasicLandsPanel
+              catalog={catalog}
+              deckCards={deckCards}
+              onAdd={addCard}
+              onRemove={removeCard}
+              onSuggest={() => suggestLandsForDeck(deckCards, catalogIndex, catalog, setCardCount)}
+            />
 
-        <div className={styles.summary}>
-          <div className={styles.summaryRow}>
-            <span>{totalCards} cards</span>
-            <span className={statusClass(validation, totalCards)}>
-              {statusLabel(validation, totalCards)}
+            <DeckSummary
+              validation={validation}
+              totalCards={totalCards}
+              stats={stats}
+            />
+
+            <DeckActionRow
+              activeDeckId={activeDeckId}
+              isEmpty={Object.keys(deckCards).length === 0}
+              onSave={handleSave}
+              onSaveAs={handleSaveAs}
+              onDelete={handleDelete}
+            />
+          </aside>
+        </>
+      ) : (
+        <main className={styles.centerDeck}>
+          <div className={styles.deckHeaderInline}>
+            <input
+              className={styles.nameInput}
+              value={deckName}
+              onChange={(e) => setDeckName(e.target.value)}
+              placeholder="Deck name"
+            />
+            <DeckFormatPicker
+              activeFormat={activeFormat}
+              onChange={(value) => setQuery(setFormatToken(query, value))}
+            />
+            <div className={styles.deckHeaderInlineSpacer} />
+            <span className={styles.deckHeaderInlineCount}>
+              <span>{totalCards} cards</span>
+              <span className={statusClass(validation, totalCards)}>
+                {statusLabel(validation, totalCards)}
+              </span>
             </span>
           </div>
 
-          {validation && validation.errors.length > 0 && (
-            <ul className={styles.issues}>
-              {validation.errors.slice(0, 6).map((e, i) => (
-                <li key={i}>• {e.message}</li>
-              ))}
-              {validation.errors.length > 6 && <li>+{validation.errors.length - 6} more…</li>}
-            </ul>
-          )}
+          <AddCardSearch
+            catalog={catalog}
+            deckCards={deckCards}
+            isCommanderFormat={isCommanderFormat}
+            onAdd={addCard}
+            onSuggestBasics={() =>
+              suggestLandsForDeck(deckCards, catalogIndex, catalog, setCardCount)
+            }
+          />
 
-          {totalCards > 0 && stats.colorCounts.length > 0 && (
-            <>
-              <div className={styles.summaryRow}>
-                <span>Colours</span>
-                <span className={styles.colorPips}>
-                  {stats.colorCounts.map(([color, n]) => (
-                    <span key={color} className={styles.colorPip} title={`${color}: ${n}`}>
-                      <span className={styles.colorDot} style={{ background: COLOR_DOT[color] ?? '#888' }} />
-                      {n}
-                    </span>
-                  ))}
+          <DeckCentricView
+            deckCards={deckCards}
+            catalog={catalogIndex}
+            activeFormat={activeFormat}
+            onAdd={addCard}
+            onRemove={removeCard}
+            commander={commander}
+            showCommanderControls={isCommanderFormat}
+            onToggleCommander={(name) =>
+              setCommander((prev) => (prev === name ? null : name))
+            }
+            rowViolations={rowViolations}
+            isCommanderFormat={isCommanderFormat}
+          />
+
+          <div className={styles.deckCentricFooter}>
+            <DeckSummary
+              validation={validation}
+              totalCards={totalCards}
+              stats={stats}
+            />
+            <DeckActionRow
+              activeDeckId={activeDeckId}
+              isEmpty={Object.keys(deckCards).length === 0}
+              onSave={handleSave}
+              onSaveAs={handleSaveAs}
+              onDelete={handleDelete}
+            />
+          </div>
+        </main>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Shared deck summary + action row — used by both view modes so the buttons
+// and stats panels stay in lockstep regardless of where they're rendered.
+// ---------------------------------------------------------------------------
+
+function DeckSummary({
+  validation,
+  totalCards,
+  stats,
+}: {
+  validation: ValidationResult | null
+  totalCards: number
+  stats: ReturnType<typeof computeStats>
+}) {
+  return (
+    <div className={styles.summary}>
+      <div className={styles.summaryRow}>
+        <span>{totalCards} cards</span>
+        <span className={statusClass(validation, totalCards)}>
+          {statusLabel(validation, totalCards)}
+        </span>
+      </div>
+
+      {validation && validation.errors.length > 0 && (
+        <ul className={styles.issues}>
+          {validation.errors.slice(0, 6).map((e, i) => (
+            <li key={i}>• {e.message}</li>
+          ))}
+          {validation.errors.length > 6 && <li>+{validation.errors.length - 6} more…</li>}
+        </ul>
+      )}
+
+      {totalCards > 0 && stats.colorCounts.length > 0 && (
+        <>
+          <div className={styles.summaryRow}>
+            <span>Colours</span>
+            <span className={styles.colorPips}>
+              {stats.colorCounts.map(([color, n]) => (
+                <span key={color} className={styles.colorPip} title={`${color}: ${n}`}>
+                  <span className={styles.colorDot} style={{ background: COLOR_DOT[color] ?? '#888' }} />
+                  {n}
                 </span>
-              </div>
-              <ManaCurveBars curve={stats.curve} />
-            </>
-          )}
-        </div>
+              ))}
+            </span>
+          </div>
+          <ManaCurveBars curve={stats.curve} />
+        </>
+      )}
+    </div>
+  )
+}
 
-        <div className={styles.actionRow}>
-          <button
-            className={styles.primaryButton}
-            onClick={handleSave}
-            disabled={Object.keys(deckCards).length === 0}
-          >
-            {activeDeckId ? 'Save' : 'Save deck'}
-          </button>
-          <button
-            className={styles.secondaryButton}
-            onClick={handleSaveAs}
-            disabled={Object.keys(deckCards).length === 0}
-          >
-            Save as
-          </button>
-          <button
-            className={styles.dangerButton}
-            onClick={handleDelete}
-            disabled={!activeDeckId}
-          >
-            Delete
-          </button>
-        </div>
-      </aside>
+function DeckActionRow({
+  activeDeckId,
+  isEmpty,
+  onSave,
+  onSaveAs,
+  onDelete,
+}: {
+  activeDeckId: string | null
+  isEmpty: boolean
+  onSave: () => void
+  onSaveAs: () => void
+  onDelete: () => void
+}) {
+  return (
+    <div className={styles.actionRow}>
+      <button className={styles.primaryButton} onClick={onSave} disabled={isEmpty}>
+        {activeDeckId ? 'Save' : 'Save deck'}
+      </button>
+      <button className={styles.secondaryButton} onClick={onSaveAs} disabled={isEmpty}>
+        Save as
+      </button>
+      <button className={styles.dangerButton} onClick={onDelete} disabled={!activeDeckId}>
+        Delete
+      </button>
     </div>
   )
 }
@@ -2516,151 +2666,22 @@ function DeckListPanel({
           <h3 className={styles.deckGroupLabel}>
             {group.label} ({group.entries.reduce((a, e) => a + e.count, 0)})
           </h3>
-          {group.entries.map((entry) => {
-            const illegal =
-              activeFormat !== null &&
-              !!entry.card?.legalFormats &&
-              entry.card.legalFormats.length > 0 &&
-              !entry.card.legalFormats.includes(activeFormat.toUpperCase())
-            const unknown = !entry.card
-            const isCommanderRow = showCommanderControls && commander === entry.name
-            // Eligible commanders: legendary creatures or planeswalkers. The server's
-            // CommanderEligibility is the authoritative gate (it also accepts the rare
-            // "can be your commander" oracle override on non-legendary creatures and oddities
-            // like Faceless One); this UI hint covers the 99% case so users don't crown a card
-            // the validator will immediately reject. The cursed override-clause cards still
-            // round-trip via paste-import or hand-edit if anyone ever needs them.
-            const canBeCommander = !!entry.card && (
-              (entry.card.supertypes.includes('LEGENDARY') && entry.card.cardTypes.includes('CREATURE')) ||
-              entry.card.cardTypes.includes('PLANESWALKER')
-            )
-            // Pull this row's violations out of the validation response. We surface two of
-            // them as inline visuals in the deck list (color identity outside the commander's;
-            // exceeding the per-format copy cap); the rest are still listed in the right-rail
-            // issues panel. The commander row itself is never marked as a copy violation —
-            // it's the deck's commander, not a duplicate (TOO_MANY_COPIES would only fire if
-            // the user *also* added it as a main-deck card, in which case the regular row
-            // gets the mark and the commander row stays clean).
-            const violationCodes = rowViolations.get(entry.name)
-            const offIdentity = violationCodes?.has('COLOR_IDENTITY_VIOLATION') ?? false
-            const tooManyCopies =
-              !isCommanderRow && (violationCodes?.has('TOO_MANY_COPIES') ?? false)
-            const violation = offIdentity || tooManyCopies
-            // Cap-aware `+` button. effectiveCopyCap mirrors the server's per-format limit so
-            // the user literally cannot exceed it; in commander-shape formats this is what
-            // blocks adding a second copy of any non-basic non-override card.
-            const cap = entry.card
-              ? effectiveCopyCap(entry.card, isCommanderFormat)
-              : Number.POSITIVE_INFINITY
-            const atCap = entry.count >= cap
-            const rowClasses = [
-              styles.deckRow,
-              illegal ? styles.deckRowIllegal : '',
-              unknown ? styles.deckRowUnknown : '',
-              isCommanderRow ? styles.deckRowCommander : '',
-              violation ? styles.deckRowViolation : '',
-            ]
-              .filter(Boolean)
-              .join(' ')
-            const violationReasons: string[] = []
-            if (offIdentity && commander) {
-              violationReasons.push(`Outside ${commander}'s color identity`)
-            }
-            if (tooManyCopies) {
-              violationReasons.push(
-                isCommanderFormat
-                  ? `${activeFormat} is singleton — only 1 copy allowed`
-                  : `Too many copies for ${activeFormat ?? 'this format'}`,
-              )
-            }
-            const rowTitle = unknown
-              ? 'Not implemented yet — placeholder only'
-              : illegal
-              ? `Not legal in ${activeFormat}`
-              : violationReasons.length > 0
-              ? violationReasons.join(' · ')
-              : undefined
-            return (
-              <div
-                key={entry.name}
-                className={rowClasses}
-                title={rowTitle}
-                onMouseEnter={() => handleEnter(entry)}
-                onMouseLeave={handleLeave}
-              >
-                <button
-                  className={styles.deckRowStep}
-                  onClick={() => onRemove(entry.name)}
-                  aria-label={`Decrease ${entry.name}`}
-                  title="Remove one"
-                  type="button"
-                >
-                  −
-                </button>
-                <button
-                  className={styles.deckRowStep}
-                  onClick={() => entry.card && !atCap && onAdd(entry.card)}
-                  disabled={!entry.card || atCap}
-                  aria-label={`Increase ${entry.name}`}
-                  title={
-                    unknown
-                      ? 'Card not implemented'
-                      : atCap
-                      ? isCommanderFormat
-                        ? 'Singleton format — only 1 copy allowed'
-                        : `At copy limit (${cap})`
-                      : 'Add one'
-                  }
-                  type="button"
-                >
-                  +
-                </button>
-                <span className={styles.deckRowCount}>{entry.count}×</span>
-                <span className={styles.deckRowName}>
-                  {entry.name}
-                  {unknown && <span className={styles.deckRowUnknownTag}>not implemented</span>}
-                </span>
-                {showCommanderControls && (
-                  // Crown toggle. Always rendered in commander-shape formats so the column
-                  // stays aligned across rows; the button is disabled for unknown cards and
-                  // for cards that aren't legendary creatures or planeswalkers (the eligible
-                  // commander types). Active row gets a filled-gold crown, others get a faint
-                  // outline they can click to designate.
-                  <button
-                    type="button"
-                    className={`${styles.deckRowCrown} ${
-                      isCommanderRow ? styles.deckRowCrownActive : ''
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (!unknown && canBeCommander) onToggleCommander(entry.name)
-                    }}
-                    disabled={unknown || !canBeCommander}
-                    aria-pressed={isCommanderRow}
-                    aria-label={
-                      isCommanderRow
-                        ? `Unset ${entry.name} as commander`
-                        : `Set ${entry.name} as commander`
-                    }
-                    title={
-                      unknown
-                        ? 'Card not implemented'
-                        : !canBeCommander
-                        ? 'Only legendary creatures or planeswalkers can be commanders'
-                        : isCommanderRow
-                        ? 'Commander — click to unset'
-                        : 'Set as commander'
-                    }
-                  >
-                    ♛
-                  </button>
-                )}
-                <span className={styles.deckRowCost}>
-                  <ManaCost cost={entry.card?.manaCost || null} size={11} />
-                </span>
-              </div>
-            )
-          })}
+          {group.entries.map((entry) => (
+            <DeckRow
+              key={entry.name}
+              entry={entry}
+              activeFormat={activeFormat}
+              commander={commander}
+              showCommanderControls={showCommanderControls}
+              isCommanderFormat={isCommanderFormat}
+              rowViolations={rowViolations}
+              onAdd={onAdd}
+              onRemove={onRemove}
+              onToggleCommander={onToggleCommander}
+              onEnter={() => handleEnter(entry)}
+              onLeave={handleLeave}
+            />
+          ))}
         </div>
       ))}
       {grouped.length === 0 && (
@@ -2668,6 +2689,455 @@ function DeckListPanel({
           Click cards in the grid to add them.
         </p>
       )}
+      <HoverFollowPreview
+        name={hoverName ? (dfc.displayName ?? hoverName) : null}
+        imageUri={hoverName ? (dfc.displayImageUri ?? hoverCard?.imageUri ?? null) : null}
+        overlay={dfc.hint}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Single deck-list row. Extracted so both DeckListPanel (right-rail single
+// column) and DeckCentricView (multi-column Moxfield-style layout) render the
+// same +/-/count/name/crown/cost shape with the same validation visuals.
+// ---------------------------------------------------------------------------
+
+function DeckRow({
+  entry,
+  activeFormat,
+  commander,
+  showCommanderControls,
+  isCommanderFormat,
+  rowViolations,
+  onAdd,
+  onRemove,
+  onToggleCommander,
+  onEnter,
+  onLeave,
+}: {
+  entry: { name: string; count: number; card: CardSummary | undefined }
+  activeFormat: string | null
+  commander: string | null
+  showCommanderControls: boolean
+  isCommanderFormat: boolean
+  rowViolations: Map<string, Set<string>>
+  onAdd: (card: CardSummary) => void
+  onRemove: (name: string) => void
+  onToggleCommander: (name: string) => void
+  onEnter: () => void
+  onLeave: () => void
+}) {
+  const illegal =
+    activeFormat !== null &&
+    !!entry.card?.legalFormats &&
+    entry.card.legalFormats.length > 0 &&
+    !entry.card.legalFormats.includes(activeFormat.toUpperCase())
+  const unknown = !entry.card
+  const isCommanderRow = showCommanderControls && commander === entry.name
+  // Eligible commanders: legendary creatures or planeswalkers. The server's
+  // CommanderEligibility is the authoritative gate (it also accepts the rare
+  // "can be your commander" oracle override on non-legendary creatures and oddities
+  // like Faceless One); this UI hint covers the 99% case so users don't crown a card
+  // the validator will immediately reject. The cursed override-clause cards still
+  // round-trip via paste-import or hand-edit if anyone ever needs them.
+  const canBeCommander = !!entry.card && (
+    (entry.card.supertypes.includes('LEGENDARY') && entry.card.cardTypes.includes('CREATURE')) ||
+    entry.card.cardTypes.includes('PLANESWALKER')
+  )
+  // Pull this row's violations out of the validation response. We surface two of
+  // them as inline visuals in the deck list (color identity outside the commander's;
+  // exceeding the per-format copy cap); the rest are still listed in the right-rail
+  // issues panel. The commander row itself is never marked as a copy violation —
+  // it's the deck's commander, not a duplicate (TOO_MANY_COPIES would only fire if
+  // the user *also* added it as a main-deck card, in which case the regular row
+  // gets the mark and the commander row stays clean).
+  const violationCodes = rowViolations.get(entry.name)
+  const offIdentity = violationCodes?.has('COLOR_IDENTITY_VIOLATION') ?? false
+  const tooManyCopies =
+    !isCommanderRow && (violationCodes?.has('TOO_MANY_COPIES') ?? false)
+  const violation = offIdentity || tooManyCopies
+  // Cap-aware `+` button. effectiveCopyCap mirrors the server's per-format limit so
+  // the user literally cannot exceed it; in commander-shape formats this is what
+  // blocks adding a second copy of any non-basic non-override card.
+  const cap = entry.card
+    ? effectiveCopyCap(entry.card, isCommanderFormat)
+    : Number.POSITIVE_INFINITY
+  const atCap = entry.count >= cap
+  const rowClasses = [
+    styles.deckRow,
+    illegal ? styles.deckRowIllegal : '',
+    unknown ? styles.deckRowUnknown : '',
+    isCommanderRow ? styles.deckRowCommander : '',
+    violation ? styles.deckRowViolation : '',
+    // 0-count placeholder rows (sticky basic lands in deck-centric mode) read in a muted tone
+    // so they're clearly a "ramp from here" affordance rather than a normal deck entry.
+    entry.count <= 0 ? styles.deckRowPlaceholder : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+  const violationReasons: string[] = []
+  if (offIdentity && commander) {
+    violationReasons.push(`Outside ${commander}'s color identity`)
+  }
+  if (tooManyCopies) {
+    violationReasons.push(
+      isCommanderFormat
+        ? `${activeFormat} is singleton — only 1 copy allowed`
+        : `Too many copies for ${activeFormat ?? 'this format'}`,
+    )
+  }
+  const rowTitle = unknown
+    ? 'Not implemented yet — placeholder only'
+    : illegal
+    ? `Not legal in ${activeFormat}`
+    : violationReasons.length > 0
+    ? violationReasons.join(' · ')
+    : undefined
+
+  return (
+    <div
+      className={rowClasses}
+      title={rowTitle}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
+      <button
+        className={styles.deckRowStep}
+        onClick={() => onRemove(entry.name)}
+        disabled={entry.count <= 0}
+        aria-label={`Decrease ${entry.name}`}
+        title={entry.count <= 0 ? 'None to remove' : 'Remove one'}
+        type="button"
+      >
+        −
+      </button>
+      <button
+        className={styles.deckRowStep}
+        onClick={() => entry.card && !atCap && onAdd(entry.card)}
+        disabled={!entry.card || atCap}
+        aria-label={`Increase ${entry.name}`}
+        title={
+          unknown
+            ? 'Card not implemented'
+            : atCap
+            ? isCommanderFormat
+              ? 'Singleton format — only 1 copy allowed'
+              : `At copy limit (${cap})`
+            : 'Add one'
+        }
+        type="button"
+      >
+        +
+      </button>
+      <span className={styles.deckRowCount}>{entry.count}×</span>
+      <span className={styles.deckRowName}>
+        {entry.name}
+        {unknown && <span className={styles.deckRowUnknownTag}>not implemented</span>}
+      </span>
+      {showCommanderControls && (
+        <button
+          type="button"
+          className={`${styles.deckRowCrown} ${
+            isCommanderRow ? styles.deckRowCrownActive : ''
+          }`}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (!unknown && canBeCommander) onToggleCommander(entry.name)
+          }}
+          disabled={unknown || !canBeCommander}
+          aria-pressed={isCommanderRow}
+          aria-label={
+            isCommanderRow
+              ? `Unset ${entry.name} as commander`
+              : `Set ${entry.name} as commander`
+          }
+          title={
+            unknown
+              ? 'Card not implemented'
+              : !canBeCommander
+              ? 'Only legendary creatures or planeswalkers can be commanders'
+              : isCommanderRow
+              ? 'Commander — click to unset'
+              : 'Set as commander'
+          }
+        >
+          ♛
+        </button>
+      )}
+      <span className={styles.deckRowCost}>
+        <ManaCost cost={entry.card?.manaCost || null} size={11} />
+      </span>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Add-card search bar (deck-centric mode).
+//
+// A single text input with a popover dropdown of matching cards. Replaces the right-rail
+// catalog grid in deck mode — the catalog grid is poorly suited to the narrow rail and most
+// users in this view know the card name they want. Substring match on name with an exact
+// > prefix > substring sort so typing "bolt" surfaces "Lightning Bolt" before "Bolt of Keranos".
+// Clicking a result adds one copy (respecting the format's per-card cap); the input stays open
+// so multiple adds in a row don't require re-focusing.
+// ---------------------------------------------------------------------------
+
+function AddCardSearch({
+  catalog,
+  deckCards,
+  isCommanderFormat,
+  onAdd,
+  onSuggestBasics,
+}: {
+  catalog: CardSummary[]
+  deckCards: Record<string, number>
+  isCommanderFormat: boolean
+  onAdd: (card: CardSummary) => void
+  onSuggestBasics: () => void
+}) {
+  const [text, setText] = useState('')
+  const [open, setOpen] = useState(false)
+  const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const dfc = useDfcHoverFlip(
+    hoverCard
+      ? {
+          name: hoverCard.name,
+          imageUri: hoverCard.imageUri ?? null,
+          isDoubleFaced: hoverCard.isDoubleFaced ?? false,
+          backFaceName: hoverCard.backFaceName ?? null,
+          backFaceImageUri: hoverCard.backFaceImageUri ?? null,
+        }
+      : null,
+  )
+  const resetDfcFlip = dfc.resetFlip
+
+  const matches = useMemo(() => {
+    const t = text.trim().toLowerCase()
+    if (t.length < 1) return []
+    const out: CardSummary[] = []
+    for (const c of catalog) {
+      if (c.name.toLowerCase().includes(t)) out.push(c)
+    }
+    out.sort((a, b) => {
+      const al = a.name.toLowerCase()
+      const bl = b.name.toLowerCase()
+      const aRank = al === t ? 0 : al.startsWith(t) ? 1 : 2
+      const bRank = bl === t ? 0 : bl.startsWith(t) ? 1 : 2
+      if (aRank !== bRank) return aRank - bRank
+      return al.localeCompare(bl)
+    })
+    return out.slice(0, 14)
+  }, [catalog, text])
+
+  // Close dropdown when the user clicks outside the search container — the dropdown is
+  // absolutely positioned over the deck columns, so without this it'd intercept hovers on
+  // the deck rows after the user finishes searching.
+  useEffect(() => {
+    if (!open) return
+    const onDoc = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [open])
+
+  const handleAdd = (card: CardSummary) => {
+    onAdd(card)
+    // Keep the input focused but clear the dropdown so subsequent typing starts fresh — most
+    // users want to add one card at a time, then move on. They can still arrow back into the
+    // input or just keep typing.
+    inputRef.current?.focus()
+  }
+
+  return (
+    <div ref={containerRef} className={styles.addCardSearch}>
+      <input
+        ref={inputRef}
+        className={styles.addCardInput}
+        type="text"
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            setOpen(false)
+            inputRef.current?.blur()
+          } else if (e.key === 'Enter' && matches.length > 0) {
+            e.preventDefault()
+            handleAdd(matches[0]!)
+          }
+        }}
+        placeholder="Find and add cards to your deck…"
+        aria-label="Find and add cards to your deck"
+      />
+      <button
+        type="button"
+        className={styles.addCardBasicsButton}
+        onClick={onSuggestBasics}
+        disabled={Object.keys(deckCards).length === 0}
+        title="Auto-fill basic lands (Plains, Island, Swamp, Mountain, Forest) from your deck's mana curve and color requirements"
+      >
+        Suggest basic lands
+      </button>
+      {open && matches.length > 0 && (
+        <div className={styles.addCardDropdown} role="listbox">
+          {matches.map((card) => {
+            const cap = effectiveCopyCap(card, isCommanderFormat)
+            const current = deckCards[card.name] ?? 0
+            const atCap = current >= cap
+            return (
+              <button
+                key={card.name}
+                type="button"
+                role="option"
+                aria-selected={false}
+                className={styles.addCardResult}
+                onClick={() => handleAdd(card)}
+                onMouseEnter={() => {
+                  if (hoverCard?.name !== card.name) resetDfcFlip()
+                  setHoverCard(card)
+                }}
+                onMouseLeave={() => setHoverCard(null)}
+                disabled={atCap}
+                title={atCap ? 'At copy limit' : `Add ${card.name}`}
+              >
+                <span className={styles.addCardResultCount}>{current}×</span>
+                <span className={styles.addCardResultName}>{card.name}</span>
+                <span className={styles.addCardResultCost}>
+                  <ManaCost cost={card.manaCost || null} size={11} />
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <HoverFollowPreview
+        name={hoverCard ? (dfc.displayName ?? hoverCard.name) : null}
+        imageUri={hoverCard ? (dfc.displayImageUri ?? hoverCard.imageUri ?? null) : null}
+        overlay={dfc.hint}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Deck-centric view (Moxfield-style).
+//
+// Renders the deck as multiple columns, one bucket per card type. Uses CSS
+// columns so the bucket count auto-fits the available width (3 columns on a
+// typical desktop, 2 on a narrow window). Each group is a self-contained block
+// with `break-inside: avoid` so a Creatures group doesn't get split mid-list.
+// ---------------------------------------------------------------------------
+
+function DeckCentricView({
+  deckCards,
+  catalog,
+  activeFormat,
+  onAdd,
+  onRemove,
+  commander,
+  showCommanderControls,
+  onToggleCommander,
+  rowViolations,
+  isCommanderFormat,
+}: {
+  deckCards: Record<string, number>
+  catalog: Record<string, CardSummary>
+  activeFormat: string | null
+  onAdd: (card: CardSummary) => void
+  onRemove: (name: string) => void
+  commander: string | null
+  showCommanderControls: boolean
+  onToggleCommander: (name: string) => void
+  rowViolations: Map<string, Set<string>>
+  isCommanderFormat: boolean
+}) {
+  const grouped = useMemo(
+    () => groupByCardType(deckCards, catalog, commander),
+    [deckCards, catalog, commander],
+  )
+
+  const [hoverCard, setHoverCard] = useState<CardSummary | null>(null)
+  const [hoverName, setHoverName] = useState<string | null>(null)
+  const dfc = useDfcHoverFlip(
+    hoverCard
+      ? {
+          name: hoverCard.name,
+          imageUri: hoverCard.imageUri ?? null,
+          isDoubleFaced: hoverCard.isDoubleFaced ?? false,
+          backFaceName: hoverCard.backFaceName ?? null,
+          backFaceImageUri: hoverCard.backFaceImageUri ?? null,
+        }
+      : null,
+  )
+  const resetDfcFlip = dfc.resetFlip
+
+  const handleEnter = (entry: { name: string; card: CardSummary | undefined }) => {
+    if (hoverName !== entry.name) resetDfcFlip()
+    setHoverName(entry.name)
+    setHoverCard(entry.card ?? null)
+  }
+  const handleLeave = () => {
+    setHoverName(null)
+    setHoverCard(null)
+  }
+
+  useEffect(() => {
+    if (hoverName && !(hoverName in deckCards)) {
+      setHoverName(null)
+      setHoverCard(null)
+    }
+  }, [deckCards, hoverName])
+
+  // Use the raw deck size (not the grouped-bucket count) because the Lands group now always
+  // synthesizes the 5 basic-land rows even at count 0 — so an empty deck would otherwise still
+  // produce one non-empty group and we'd never show the empty state.
+  const isEmpty = Object.keys(deckCards).length === 0 && commander === null
+  if (isEmpty) {
+    return (
+      <div className={styles.deckCentricEmpty}>
+        Your deck is empty. Type a card name in the search bar above, or switch to{' '}
+        <strong>Cards to add</strong> to browse the catalog.
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.deckCentric}>
+      <div className={styles.deckCentricColumns}>
+        {grouped.map((group) => (
+          <div key={group.label} className={styles.deckCentricGroup}>
+            <h3 className={styles.deckCentricGroupLabel}>
+              {group.label} ({group.entries.reduce((a, e) => a + e.count, 0)})
+            </h3>
+            {group.entries.map((entry) => (
+              <DeckRow
+                key={entry.name}
+                entry={entry}
+                activeFormat={activeFormat}
+                commander={commander}
+                showCommanderControls={showCommanderControls}
+                isCommanderFormat={isCommanderFormat}
+                rowViolations={rowViolations}
+                onAdd={onAdd}
+                onRemove={onRemove}
+                onToggleCommander={onToggleCommander}
+                onEnter={() => handleEnter(entry)}
+                onLeave={handleLeave}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
       <HoverFollowPreview
         name={hoverName ? (dfc.displayName ?? hoverName) : null}
         imageUri={hoverName ? (dfc.displayImageUri ?? hoverCard?.imageUri ?? null) : null}
@@ -2960,6 +3430,109 @@ function groupForDeckList(
   if (commanderEntry) groups.push({ label: 'Commander', entries: [commanderEntry] })
   if (spells.length > 0) groups.push({ label: 'Spells', entries: spells })
   if (lands.length > 0) groups.push({ label: 'Lands', entries: lands })
+  return groups
+}
+
+// Bucket the deck by card type for the multi-column "deck centric" view. Each card lands in
+// exactly one bucket, picked by the first matching type in priority order — so an
+// artifact-creature shows up under Creatures (where players expect it), a creature-land under
+// Creatures, etc. Mirrors the convention Moxfield/Archidekt use. The commander, when
+// designated, is hoisted to its own group at the top regardless of its types.
+//
+// Basic lands are special: every basic gets a sticky row in the Lands group with `count` from
+// the deck (0 if absent). This way the user can always +/- a basic from the deck list itself,
+// and a basic at zero never disappears — Moxfield-style. Basics sit at the bottom of the Lands
+// group in canonical W/U/B/R/G order so they read as the deck's mana base footer.
+function groupByCardType(
+  deck: Record<string, number>,
+  catalog: Record<string, CardSummary>,
+  commander: string | null,
+): DeckGroup[] {
+  type BucketKey =
+    | 'Creatures'
+    | 'Planeswalkers'
+    | 'Battles'
+    | 'Instants'
+    | 'Sorceries'
+    | 'Artifacts'
+    | 'Enchantments'
+    | 'Lands'
+    | 'Other'
+  const buckets: Record<BucketKey, DeckGroup['entries']> = {
+    Creatures: [],
+    Planeswalkers: [],
+    Battles: [],
+    Instants: [],
+    Sorceries: [],
+    Artifacts: [],
+    Enchantments: [],
+    Lands: [],
+    Other: [],
+  }
+  let commanderEntry: DeckGroup['entries'][number] | null = null
+  const seenNames = new Set<string>()
+  for (const [name, count] of Object.entries(deck)) {
+    if (count <= 0) continue
+    const card = catalog[name]
+    seenNames.add(name)
+    const entry = { name, count, card }
+    if (commander !== null && name === commander) {
+      commanderEntry = entry
+      continue
+    }
+    if (!card) {
+      buckets.Other.push(entry)
+      continue
+    }
+    const t = card.cardTypes
+    if (t.includes('CREATURE')) buckets.Creatures.push(entry)
+    else if (t.includes('PLANESWALKER')) buckets.Planeswalkers.push(entry)
+    else if (t.includes('BATTLE')) buckets.Battles.push(entry)
+    else if (t.includes('INSTANT')) buckets.Instants.push(entry)
+    else if (t.includes('SORCERY')) buckets.Sorceries.push(entry)
+    else if (t.includes('ARTIFACT')) buckets.Artifacts.push(entry)
+    else if (t.includes('ENCHANTMENT')) buckets.Enchantments.push(entry)
+    else if (t.includes('LAND')) buckets.Lands.push(entry)
+    else buckets.Other.push(entry)
+  }
+  const order: BucketKey[] = [
+    'Creatures',
+    'Planeswalkers',
+    'Battles',
+    'Instants',
+    'Sorceries',
+    'Artifacts',
+    'Enchantments',
+    'Lands',
+    'Other',
+  ]
+  // Sort each bucket. Lands gets two-stage sort: non-basics by cmc/name, then basics in W/U/B/R/G
+  // order at the end — basics with count=0 still appear so the user can ramp them up directly
+  // from the deck list.
+  for (const key of order) {
+    if (key === 'Lands') {
+      buckets.Lands.sort(byCmcThenName)
+      // Filter out basics that may have been collected above (count > 0 ones); we re-add them
+      // in canonical order from the catalog so 0-count basics sit alongside the >0 ones.
+      const nonBasicLands = buckets.Lands.filter((e) => !e.card?.basicLand)
+      const basicEntries: DeckGroup['entries'] = []
+      for (const basicName of BASIC_LAND_ORDER) {
+        const card = catalog[basicName]
+        if (!card) continue
+        basicEntries.push({ name: basicName, count: deck[basicName] ?? 0, card })
+      }
+      buckets.Lands = [...nonBasicLands, ...basicEntries]
+    } else {
+      buckets[key].sort(byCmcThenName)
+    }
+  }
+  const groups: DeckGroup[] = []
+  if (commanderEntry) groups.push({ label: 'Commander', entries: [commanderEntry] })
+  for (const key of order) {
+    const entries = buckets[key]
+    if (entries.length === 0) continue
+    groups.push({ label: key, entries })
+  }
   return groups
 }
 
