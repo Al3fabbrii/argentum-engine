@@ -44,8 +44,9 @@ class GainControlByActivePlayerExecutor : EffectExecutor<GainControlByActivePlay
         val newControllerId = state.activePlayerId
             ?: return EffectResult.error(state, "No active player")
 
-        // If that player already controls the target, no-op
-        val currentControllerId = targetContainer.get<ControllerComponent>()?.playerId
+        // Use projected controller so floating-effect-based control changes are respected
+        val currentControllerId = state.projectedState.getController(targetId)
+            ?: targetContainer.get<ControllerComponent>()?.playerId
         if (currentControllerId == newControllerId) return EffectResult.success(state)
 
         // Remove any previous Layer.CONTROL floating effects from the same source on the same target
