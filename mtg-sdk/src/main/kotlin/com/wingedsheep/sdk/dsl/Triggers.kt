@@ -894,6 +894,20 @@ object Triggers {
     )
 
     // =========================================================================
+    // Crime Triggers (Outlaws of Thunder Junction)
+    // =========================================================================
+
+    /**
+     * Whenever you commit a crime.
+     * Used by Forsaken Miner: "Whenever you commit a crime, you may pay {B}.
+     * If you do, return this card from your graveyard to the battlefield."
+     */
+    val YouCommitCrime: TriggerSpec = TriggerSpec(
+        event = CommitCrimeEvent(Player.You),
+        binding = TriggerBinding.ANY
+    )
+
+    // =========================================================================
     // Gift Triggers
     // =========================================================================
 

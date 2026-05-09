@@ -657,6 +657,26 @@ sealed interface GameEvent : TextReplaceable<GameEvent> {
     }
 
     /**
+     * When a player commits a crime (Outlaws of Thunder Junction).
+     *
+     * Fires when [player] casts a spell, activates an ability, or puts a triggered ability
+     * on the stack with at least one initial target that is an opponent, a permanent / spell /
+     * ability an opponent controls, or a card in an opponent's graveyard. Fires at most once
+     * per spell or ability regardless of how many qualifying targets it has.
+     *
+     * Used by cards like Forsaken Miner: "Whenever you commit a crime, you may pay {B}…".
+     */
+    @SerialName("CommitCrimeEvent")
+    @Serializable
+    data class CommitCrimeEvent(
+        val player: Player = Player.You
+    ) : GameEvent {
+        override val description: String = "${player.description} commit a crime"
+
+        override fun applyTextReplacement(replacer: TextReplacer): GameEvent = this
+    }
+
+    /**
      * When a card is cycled.
      */
     @SerialName("CycleEvent")

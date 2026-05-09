@@ -110,6 +110,17 @@ object Filters {
     val GreenCreature: GameObjectFilter = GameObjectFilter.Creature.withColor(Color.GREEN)
 
     /**
+     * Outlaw creature — Assassin, Mercenary, Pirate, Rogue, or Warlock.
+     * See [Subtype.Companion.OUTLAW_TYPES] for the canonical list.
+     */
+    val OutlawCreature: GameObjectFilter = GameObjectFilter.Creature.withAnyOfSubtypes(Subtype.OUTLAW_TYPES)
+
+    /**
+     * Non-outlaw creature — has none of Assassin, Mercenary, Pirate, Rogue, Warlock.
+     */
+    val NonOutlawCreature: GameObjectFilter = GameObjectFilter.Creature.notAnyOfSubtypes(Subtype.OUTLAW_TYPES)
+
+    /**
      * Card with mana value at most N.
      */
     fun ManaValueAtMost(max: Int): GameObjectFilter = GameObjectFilter.Any.manaValueAtMost(max)

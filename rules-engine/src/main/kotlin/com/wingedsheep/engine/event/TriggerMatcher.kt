@@ -10,6 +10,7 @@ import com.wingedsheep.engine.core.GiftGivenEvent
 import com.wingedsheep.engine.core.RoomFullyUnlockedEvent
 import com.wingedsheep.engine.core.CardRevealedFromDrawEvent
 import com.wingedsheep.engine.core.CardsDrawnEvent
+import com.wingedsheep.engine.core.CommitCrimeEvent
 import com.wingedsheep.engine.core.CountersAddedEvent
 import com.wingedsheep.engine.core.DamageDealtEvent
 import com.wingedsheep.engine.core.LifeChangedEvent
@@ -188,6 +189,10 @@ class TriggerMatcher(
             is GameEvent.GiftGivenEvent -> {
                 event is GiftGivenEvent &&
                     matchesPlayer(trigger.player, event.controllerId, controllerId)
+            }
+            is GameEvent.CommitCrimeEvent -> {
+                event is CommitCrimeEvent &&
+                    matchesPlayer(trigger.player, event.playerId, controllerId)
             }
             is GameEvent.RoomFullyUnlockedEvent -> {
                 event is RoomFullyUnlockedEvent &&

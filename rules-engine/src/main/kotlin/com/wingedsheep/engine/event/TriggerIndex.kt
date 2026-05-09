@@ -65,6 +65,7 @@ enum class TriggerCategory {
     COUNTERS_ADDED,
     GIFT_GIVEN,
     TRANSFORM,
+    COMMIT_CRIME,
 }
 
 /**
@@ -178,6 +179,7 @@ class TriggerIndex(
                 is SdkGameEvent.CountersPlacedEvent -> listOf(TriggerCategory.COUNTERS_ADDED)
                 is SdkGameEvent.GiftGivenEvent -> listOf(TriggerCategory.GIFT_GIVEN)
                 is SdkGameEvent.TransformEvent -> listOf(TriggerCategory.TRANSFORM)
+                is SdkGameEvent.CommitCrimeEvent -> listOf(TriggerCategory.COMMIT_CRIME)
                 // These are handled by specialized detect methods, not the main loop
                 else -> emptyList()
             }
@@ -208,6 +210,7 @@ class TriggerIndex(
             is CountersAddedEvent -> COUNTERS_ADDED_LIST
             is GiftGivenEvent -> GIFT_GIVEN_LIST
             is com.wingedsheep.engine.core.TransformedEvent -> TRANSFORM_LIST
+            is com.wingedsheep.engine.core.CommitCrimeEvent -> COMMIT_CRIME_LIST
             else -> emptyList()
         }
 
@@ -230,5 +233,6 @@ class TriggerIndex(
         private val COUNTERS_ADDED_LIST = listOf(TriggerCategory.COUNTERS_ADDED)
         private val GIFT_GIVEN_LIST = listOf(TriggerCategory.GIFT_GIVEN)
         private val TRANSFORM_LIST = listOf(TriggerCategory.TRANSFORM)
+        private val COMMIT_CRIME_LIST = listOf(TriggerCategory.COMMIT_CRIME)
     }
 }

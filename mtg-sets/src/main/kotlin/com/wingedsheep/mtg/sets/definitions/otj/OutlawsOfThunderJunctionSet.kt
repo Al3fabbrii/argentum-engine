@@ -17,5 +17,7 @@ object OutlawsOfThunderJunctionSet : MtgSet {
 
     override val cards: List<CardDefinition> = listOf(
         BristlyBillSpineSower,
+        ForsakenMiner,
+        ShootTheSheriff,
     )
 }

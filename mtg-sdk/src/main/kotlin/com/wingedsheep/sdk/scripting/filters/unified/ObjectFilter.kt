@@ -295,6 +295,15 @@ data class GameObjectFilter(
         cardPredicates = cardPredicates + CardPredicate.HasAnyOfSubtypes(subtypes)
     )
 
+    /**
+     * Must have none of the given subtypes (e.g. "non-outlaw creature" for a
+     * group of outlaw subtypes). Composes [CardPredicate.Not] over
+     * [CardPredicate.HasAnyOfSubtypes], so it reuses existing evaluator support.
+     */
+    fun notAnyOfSubtypes(subtypes: List<Subtype>) = copy(
+        cardPredicates = cardPredicates + CardPredicate.Not(CardPredicate.HasAnyOfSubtypes(subtypes))
+    )
+
     /** Must have the subtype chosen on the source permanent */
     fun withChosenSubtype() = copy(
         cardPredicates = cardPredicates + CardPredicate.HasChosenSubtype

@@ -2,6 +2,7 @@ package com.wingedsheep.sdk.dsl
 
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Keyword
+import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.core.Zone
@@ -112,6 +113,13 @@ object Targets {
      */
     fun UpToCreatures(count: Int): TargetRequirement =
         TargetCreature(count = count, optional = true)
+
+    /**
+     * Target non-outlaw creature — i.e. a creature without any of Assassin,
+     * Mercenary, Pirate, Rogue, or Warlock subtypes (Outlaws of Thunder Junction).
+     */
+    val NonOutlawCreature: TargetRequirement =
+        TargetCreature(filter = TargetFilter(GameObjectFilter.Creature.notAnyOfSubtypes(Subtype.OUTLAW_TYPES)))
 
     // =========================================================================
     // Permanent Targeting

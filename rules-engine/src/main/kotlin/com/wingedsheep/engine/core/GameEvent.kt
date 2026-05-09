@@ -295,6 +295,20 @@ data class AbilityFizzledEvent(
     val reason: String
 ) : GameEvent
 
+/**
+ * A player committed a crime (CR Outlaws of Thunder Junction). Emitted at the same time
+ * as [SpellCastEvent], [AbilityActivatedEvent], or [AbilityTriggeredEvent] when at least
+ * one initial target is an opponent, a permanent/spell/ability an opponent controls, or
+ * a card in an opponent's graveyard. Emitted at most once per spell or ability.
+ */
+@Serializable
+@SerialName("CommitCrimeEvent")
+data class CommitCrimeEvent(
+    val playerId: EntityId,
+    val sourceEntityId: EntityId,
+    val sourceName: String
+) : GameEvent
+
 // =============================================================================
 // Combat Events
 // =============================================================================

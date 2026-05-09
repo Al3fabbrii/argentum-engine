@@ -253,6 +253,12 @@ class StackResolver(
 
         val events = mutableListOf<GameEvent>(SpellCastEvent(cardId, eventName, casterId, targetNames, xValue, wasKicked, totalManaSpent))
 
+        // Crime detection (CR Outlaws of Thunder Junction). Emit at most once per cast,
+        // regardless of how many opponent-controlled targets the spell chose.
+        if (CrimeDetector.isCrime(newState, casterId, effectiveTargets)) {
+            events.add(CommitCrimeEvent(casterId, cardId, eventName))
+        }
+
         // Emit BecomesTargetEvent for each permanent target (Rule 601.2c)
         // Also track targeting for Valiant ("first time each turn")
         for (target in effectiveTargets) {
@@ -300,6 +306,10 @@ class StackResolver(
                 abilityEntityId = abilityId
             )
         )
+
+        if (CrimeDetector.isCrime(newState, ability.controllerId, targets)) {
+            events.add(CommitCrimeEvent(ability.controllerId, abilityId, ability.sourceName))
+        }
 
         // Emit BecomesTargetEvent for each permanent target
         // Use abilityId (the entity on the stack) as source so ward can counter it
@@ -457,6 +467,10 @@ class StackResolver(
                 abilityEntityId = abilityId
             )
         )
+
+        if (CrimeDetector.isCrime(newState, ability.controllerId, targets)) {
+            events.add(CommitCrimeEvent(ability.controllerId, abilityId, ability.sourceName))
+        }
 
         // Emit BecomesTargetEvent for each permanent target
         // Use abilityId (the entity on the stack) as source so ward can counter it

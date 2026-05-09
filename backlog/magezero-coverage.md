@@ -92,14 +92,14 @@ one enchantment (Unholy Annex) are double-faced / modal DFCs and depend on DFC s
 - [x] Bloodletter of Aclazotz ×4 *(Lost Caverns of Ixalan)*
 - [x] Cecil, Dark Knight // Cecil, Redeemed Paladin ×3 *(DFC — requires DFC support)*
 - [x] Deep-Cavern Bat ×4 *(Lost Caverns of Ixalan)*
-- [ ] Forsaken Miner ×4
+- [x] Forsaken Miner ×4 *(Outlaws of Thunder Junction)*
 - [x] Gatekeeper of Malakir ×4
 - [x] Mai, Scornful Striker ×3
 - [x] Unstoppable Slasher ×4
 - [x] Iridescent Vinelasher ×4 *(Bloomburrow)*
 
 ### Instants (2)
-- [ ] Shoot the Sheriff ×2
+- [x] Shoot the Sheriff ×2 *(Outlaws of Thunder Junction)*
 
 ### Enchantments (4)
 - [ ] Unholy Annex // Ritual Chamber ×4 *(DFC modal room — requires DFC + rooms support)*
@@ -118,7 +118,6 @@ dominate the implementation cost:
 - **Rooms (Duskmourn)** — Unholy Annex // Ritual Chamber
 - **Prowess / spell-count triggers** — Haughty Djinn, Kitsa, Otterball Elite (already in)
 - **Delirium** — Thirst for Discovery
-- **Bargain** — Shoot the Sheriff
 - **Convoke / Toxic / Backup** — Skrelv, Defector Mite (toxic + pump)
 - **Stun counters** — Sleep-Cursed Faerie, Unstoppable Slasher, No More Lies
 - **Exile-with-play-it (Oblivion Ring family)** — Sheltered by Ghosts, Soul Partition

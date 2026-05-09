@@ -96,6 +96,7 @@ val engineSerializersModule = SerializersModule {
         subclass(CreatureTypeChangedEvent::class)
         subclass(CreatureTypeChosenEvent::class)
         subclass(GiftGivenEvent::class)
+        subclass(CommitCrimeEvent::class)
         subclass(HandLookedAtEvent::class)
         subclass(RoomFullyUnlockedEvent::class)
         subclass(TurnHijackedEvent::class)
