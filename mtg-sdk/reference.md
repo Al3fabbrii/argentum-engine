@@ -1044,7 +1044,6 @@ Set via `staticAbility { ability = ... }`:
 - `GrantTriggeredAbilityToAttachedCreature(ability: TriggeredAbility)` — triggered ability to attached creature (e.g., Combat Research granting a combat-damage draw trigger)
 - `GrantActivatedAbilityToCreatureGroup(ability: ActivatedAbility, filter: GroupFilter)` — activated ability to group (e.g., Spectral Sliver granting pump to all Slivers)
 - `GrantActivatedAbilityToAttachedCreature(ability: ActivatedAbility)` — activated ability to attached creature (e.g., Singing Bell Strike granting "{6}: Untap this creature")
-- `GrantCantBeBlockedExceptBySubtype(filter: GroupFilter, requiredSubtype: String)` — "can't be blocked except by [subtype]" to group (e.g., Shifting Sliver)
 - `GrantKeywordByCounter(keyword, counterType)` — grant keyword when counter present
 - `ModifyStats(powerBonus, toughnessBonus, target: StaticTarget)` — P/T bonus
 - `ModifyStatsForCreatureGroup(powerBonus, toughnessBonus, filter: GroupFilter)` — P/T to group (use `GroupFilter.ChosenSubtypeCreatures()` for chosen-type lord effects)
@@ -1069,6 +1068,7 @@ Set via `staticAbility { ability = ... }`:
 - `CantBlockUnless(condition: Condition, target)` — conditional block restriction (uses any `Condition`)
 - `CantBlockCreaturesWithGreaterPower(target)`
 - `CanOnlyBlockCreaturesWithKeyword(keyword, target)`
+- `CanOnlyBlockCreaturesWith(blockerFilter: GameObjectFilter, filter: GroupFilter)` — can block only creatures matching filter (e.g., Spirit token: "can't block non-Spirit creatures")
 - `CanBlockAnyNumber(target)` — can block any number of creatures
 - `CanBlockAdditionalForCreatureGroup(count, filter)` — creatures matching filter can block an additional N creatures (cumulative)
 

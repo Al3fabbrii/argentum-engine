@@ -77,25 +77,29 @@ data class CanOnlyBlockCreaturesWithKeyword(
 }
 
 /**
- * Grants "can't be blocked except by creatures with subtype X" to a group of creatures.
- * Used for Shifting Sliver: "Slivers can't be blocked except by Slivers."
+ * This creature can only block creatures matching a filter.
+ * Generalized "can block only X creatures" — used for the Spirit token from Realm of Koh
+ * ("can't block or be blocked by non-Spirit creatures") and any analogous restriction.
  *
- * @property filter The group of creatures that gain the evasion
- * @property requiredSubtype The subtype that blockers must have
+ * Examples:
+ * - Spirits only: `CanOnlyBlockCreaturesWith(GameObjectFilter.Creature.withSubtype("Spirit"))`
+ * - Power 3 or less: `CanOnlyBlockCreaturesWith(GameObjectFilter.Creature.powerAtMost(3))`
+ *
+ * Applied via projected state, so it works on tokens as well as registered cards.
+ *
+ * @property blockerFilter Filter describing which creatures this creature is allowed to block
+ * @property filter The group of creatures this restriction applies to (default: source)
  */
-@SerialName("GrantCantBeBlockedExceptBySubtype")
+@SerialName("CanOnlyBlockCreaturesWith")
 @Serializable
-data class GrantCantBeBlockedExceptBySubtype(
-    val filter: GroupFilter,
-    val requiredSubtype: String
+data class CanOnlyBlockCreaturesWith(
+    val blockerFilter: GameObjectFilter,
+    val filter: GroupFilter = GroupFilter.source()
 ) : StaticAbility {
-    override val description: String = "${filter.description} can't be blocked except by ${requiredSubtype}s"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newFilter = filter.applyTextReplacement(replacer)
-        val newSubtype = replacer.replaceCreatureType(requiredSubtype)
-        return if (newFilter !== filter || newSubtype != requiredSubtype) copy(filter = newFilter, requiredSubtype = newSubtype) else this
-    }
+    override val description: String = "can block only ${blockerFilter.description}"
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
 }
+
 
 /**
  * This creature can't block creatures with power greater than this creature's power.

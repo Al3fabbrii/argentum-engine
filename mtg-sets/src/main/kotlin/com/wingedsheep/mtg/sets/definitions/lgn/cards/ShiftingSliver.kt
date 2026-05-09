@@ -2,8 +2,8 @@ package com.wingedsheep.mtg.sets.definitions.lgn.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CantBeBlockedExceptBy
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.GrantCantBeBlockedExceptBySubtype
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 
 /**
@@ -22,9 +22,9 @@ val ShiftingSliver = card("Shifting Sliver") {
     oracleText = "Slivers can't be blocked except by Slivers."
 
     staticAbility {
-        ability = GrantCantBeBlockedExceptBySubtype(
-            filter = GroupFilter(GameObjectFilter.Creature.withSubtype("Sliver")),
-            requiredSubtype = "Sliver"
+        ability = CantBeBlockedExceptBy(
+            blockerFilter = GameObjectFilter.Creature.withSubtype("Sliver"),
+            filter = GroupFilter(GameObjectFilter.Creature.withSubtype("Sliver"))
         )
     }
 

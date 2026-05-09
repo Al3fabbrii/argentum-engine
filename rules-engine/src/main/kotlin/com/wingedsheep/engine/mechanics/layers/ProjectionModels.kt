@@ -562,11 +562,23 @@ sealed interface Modification {
     }
 
     /**
-     * Blocking restriction: creature can only be blocked by creatures with a specific subtype.
-     * Used for Shifting Sliver: "Slivers can't be blocked except by Slivers."
+     * Blocking restriction: creature can only be blocked by creatures matching the filter.
+     * Generalized "can't be blocked except by X" — used for Shifting Sliver
+     * ("Slivers can't be blocked except by Slivers"), Realm of Koh's Spirit token
+     * ("can't be blocked by non-Spirit creatures"), and any analogous restriction.
      */
     @Serializable
-    data class CantBeBlockedExceptBySubtype(val subtype: String) : Modification {
+    data class CantBeBlockedExceptBy(val blockerFilter: GameObjectFilter) : Modification {
+        override val layer get() = Layer.ABILITY
+    }
+
+    /**
+     * Blocking restriction: creature can only block creatures matching the filter.
+     * Generalized "can block only X creatures" — used for tokens and printed cards alike
+     * (e.g., the Spirit token from Realm of Koh: "can't block ... non-Spirit creatures").
+     */
+    @Serializable
+    data class CanOnlyBlockCreaturesWith(val blockerFilter: GameObjectFilter) : Modification {
         override val layer get() = Layer.ABILITY
     }
 
@@ -637,7 +649,8 @@ internal data class MutableProjectedValues(
     var cantBlock: Boolean = false,
     var mustAttack: Boolean = false,
     var mustBlock: Boolean = false,
-    val cantBeBlockedExceptBySubtypes: MutableSet<String> = mutableSetOf(),
+    val cantBeBlockedExceptByFilters: MutableList<GameObjectFilter> = mutableListOf(),
+    val canOnlyBlockCreaturesWithFilters: MutableList<GameObjectFilter> = mutableListOf(),
     var additionalBlockCount: Int = 0,
     var lostAllAbilities: Boolean = false
 )

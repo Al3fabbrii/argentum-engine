@@ -60,7 +60,6 @@ import com.wingedsheep.sdk.scripting.conditions.SourceIsTapped
 import com.wingedsheep.sdk.scripting.conditions.SourceIsUntapped
 import com.wingedsheep.sdk.scripting.GrantKeyword
 import com.wingedsheep.sdk.scripting.RemoveKeywordStatic
-import com.wingedsheep.sdk.scripting.GrantCantBeBlockedExceptBySubtype
 import com.wingedsheep.sdk.scripting.GrantCantBeBlockedToSmallCreatures
 import com.wingedsheep.sdk.scripting.GrantDynamicStatsEffect
 import com.wingedsheep.sdk.scripting.GrantWard
@@ -446,9 +445,15 @@ class StaticAbilityHandler(
                     affectsFilter = convertGroupFilter(ability.filter)
                 )
             }
-            is GrantCantBeBlockedExceptBySubtype -> {
+            is com.wingedsheep.sdk.scripting.CantBeBlockedExceptBy -> {
                 ContinuousEffectData(
-                    modification = Modification.CantBeBlockedExceptBySubtype(ability.requiredSubtype),
+                    modification = Modification.CantBeBlockedExceptBy(ability.blockerFilter),
+                    affectsFilter = convertGroupFilter(ability.filter)
+                )
+            }
+            is com.wingedsheep.sdk.scripting.CanOnlyBlockCreaturesWith -> {
+                ContinuousEffectData(
+                    modification = Modification.CanOnlyBlockCreaturesWith(ability.blockerFilter),
                     affectsFilter = convertGroupFilter(ability.filter)
                 )
             }

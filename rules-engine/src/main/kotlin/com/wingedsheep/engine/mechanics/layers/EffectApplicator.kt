@@ -156,8 +156,11 @@ internal class EffectApplicator(
                 is Modification.CanBlockAdditional -> {
                     values.additionalBlockCount += mod.count
                 }
-                is Modification.CantBeBlockedExceptBySubtype -> {
-                    values.cantBeBlockedExceptBySubtypes.add(mod.subtype)
+                is Modification.CantBeBlockedExceptBy -> {
+                    values.cantBeBlockedExceptByFilters.add(mod.blockerFilter)
+                }
+                is Modification.CanOnlyBlockCreaturesWith -> {
+                    values.canOnlyBlockCreaturesWithFilters.add(mod.blockerFilter)
                 }
                 is Modification.ModifyPowerToughnessDynamic -> {
                     val controllerId = projectedValues[effect.sourceId]?.controllerId

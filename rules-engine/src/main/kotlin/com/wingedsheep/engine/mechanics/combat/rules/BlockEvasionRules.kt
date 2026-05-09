@@ -214,59 +214,42 @@ class CantBeBlockedByColorRule : BlockEvasionRule {
 
 /**
  * CantBeBlockedExceptBy: Can only be blocked by creatures matching a GameObjectFilter.
- * Unified rule replacing CantBeBlockedExceptByKeywordRule.
+ *
+ * Reads from projected state so it works for tokens (no registered CardDefinition) as
+ * well as printed cards. The static ability `CantBeBlockedExceptBy(blockerFilter, filter)`
+ * is converted by [StaticAbilityHandler] into [Modification.CantBeBlockedExceptBy] and
+ * applied via continuous effects.
  */
 class CantBeBlockedExceptByRule(
     private val predicateEvaluator: PredicateEvaluator
 ) : BlockEvasionRule {
     override fun check(ctx: BlockCheckContext): String? {
-        val attackerCard = ctx.state.getEntity(ctx.attackerId)?.get<CardComponent>() ?: return null
-        val cardDef = ctx.cardRegistry.getCard(attackerCard.cardDefinitionId) ?: return null
-        val restrictions = cardDef.staticAbilities.filterIsInstance<CantBeBlockedExceptBy>()
-        if (restrictions.isEmpty()) return null
+        val filters = ctx.projected.getCantBeBlockedExceptByFilters(ctx.attackerId)
+        if (filters.isEmpty()) return null
 
         val attackerController = ctx.projected.getController(ctx.attackerId) ?: return null
         val predicateContext = PredicateContext(controllerId = attackerController, sourceId = ctx.attackerId)
 
-        for (restriction in restrictions) {
+        for (filter in filters) {
             if (predicateEvaluator.matchesWithProjection(
-                    ctx.state, ctx.projected, ctx.blockerId, restriction.blockerFilter, predicateContext
+                    ctx.state, ctx.projected, ctx.blockerId, filter, predicateContext
                 )
             ) continue
 
             // Per MTG rules, reach allows blocking creatures with "can't be blocked except by flying"
-            if (filterRequiresFlying(restriction.blockerFilter) &&
+            if (filterRequiresFlying(filter) &&
                 ctx.projected.hasKeyword(ctx.blockerId, Keyword.REACH)
             ) continue
 
+            val attackerName = ctx.state.getEntity(ctx.attackerId)?.get<CardComponent>()?.name ?: "Creature"
             val blockerName = ctx.state.getEntity(ctx.blockerId)?.get<CardComponent>()?.name ?: "Creature"
-            return "$blockerName cannot block ${attackerCard.name} (${restriction.description})"
+            return "$blockerName cannot block $attackerName (can't be blocked except by ${filter.description})"
         }
         return null
     }
 
     private fun filterRequiresFlying(filter: GameObjectFilter): Boolean {
         return filter.cardPredicates.any { it is CardPredicate.HasKeyword && it.keyword == Keyword.FLYING }
-    }
-}
-
-/**
- * CantBeBlockedExceptBySubtype: Can only be blocked by creatures with a specific subtype (projected).
- */
-class CantBeBlockedExceptBySubtypeRule : BlockEvasionRule {
-    override fun check(ctx: BlockCheckContext): String? {
-        val requiredSubtypes = ctx.projected.getCantBeBlockedExceptBySubtypes(ctx.attackerId)
-        if (requiredSubtypes.isEmpty()) return null
-
-        val blockerName = ctx.state.getEntity(ctx.blockerId)?.get<CardComponent>()?.name ?: "Creature"
-        val attackerName = ctx.state.getEntity(ctx.attackerId)?.get<CardComponent>()?.name ?: "Creature"
-
-        for (requiredSubtype in requiredSubtypes) {
-            if (!ctx.projected.hasSubtype(ctx.blockerId, requiredSubtype)) {
-                return "$blockerName cannot block $attackerName (can only be blocked by ${requiredSubtype}s)"
-            }
-        }
-        return null
     }
 }
 
@@ -380,6 +363,40 @@ class CanOnlyBlockCreaturesWithKeywordRule : BlockEvasionRule {
 }
 
 /**
+ * CanOnlyBlockCreaturesWith: Blocker can only block creatures matching a filter
+ * (e.g. Realm of Koh's Spirit token: "can't block ... non-Spirit creatures").
+ *
+ * Reads from projected state so it works for tokens (which have no registered
+ * CardDefinition) and honors continuous effects on both blocker and attacker.
+ */
+class CanOnlyBlockCreaturesWithRule(
+    private val predicateEvaluator: PredicateEvaluator
+) : BlockEvasionRule {
+    override fun check(ctx: BlockCheckContext): String? {
+        if (ctx.state.getEntity(ctx.blockerId)?.has<FaceDownComponent>() == true) return null
+        val filters = ctx.projected.getCanOnlyBlockCreaturesWithFilters(ctx.blockerId)
+        if (filters.isEmpty()) return null
+
+        val blockerController = ctx.projected.getController(ctx.blockerId) ?: return null
+        val predicateContext = PredicateContext(
+            controllerId = blockerController,
+            sourceId = ctx.blockerId
+        )
+
+        for (filter in filters) {
+            if (!predicateEvaluator.matchesWithProjection(
+                    ctx.state, ctx.projected, ctx.attackerId, filter, predicateContext
+                )
+            ) {
+                val blockerName = ctx.state.getEntity(ctx.blockerId)?.get<CardComponent>()?.name ?: "Creature"
+                return "$blockerName can block only ${filter.description}"
+            }
+        }
+        return null
+    }
+}
+
+/**
  * CantBlockCreaturesWithGreaterPower: Blocker can't block creatures whose power exceeds
  * the blocker's power (e.g. Spitfire Handler).
  */
@@ -474,7 +491,6 @@ fun defaultBlockEvasionRules(
     CantBeBlockedExceptByColorRule(),
     CantBeBlockedByColorRule(),
     CantBeBlockedExceptByRule(predicateEvaluator),
-    CantBeBlockedExceptBySubtypeRule(),
     CantBeBlockedUnlessDefenderSharesCreatureTypeRule(),
     GrantCantBeBlockedToSmallCreaturesRule(),
     CantBeBlockedIfCastSpellTypeRule(predicateEvaluator),
@@ -482,5 +498,6 @@ fun defaultBlockEvasionRules(
     ProtectionFromSubtypeRule(),
     ProtectionFromEachOpponentRule(),
     CanOnlyBlockCreaturesWithKeywordRule(),
+    CanOnlyBlockCreaturesWithRule(predicateEvaluator),
     CantBlockCreaturesWithGreaterPowerRule()
 )

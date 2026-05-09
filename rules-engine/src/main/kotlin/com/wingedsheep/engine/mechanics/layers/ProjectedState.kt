@@ -21,7 +21,8 @@ data class ProjectedValues(
     val cantBlock: Boolean = false,
     val mustAttack: Boolean = false,
     val mustBlock: Boolean = false,
-    val cantBeBlockedExceptBySubtypes: Set<String> = emptySet(),
+    val cantBeBlockedExceptByFilters: List<com.wingedsheep.sdk.scripting.GameObjectFilter> = emptyList(),
+    val canOnlyBlockCreaturesWithFilters: List<com.wingedsheep.sdk.scripting.GameObjectFilter> = emptyList(),
     val additionalBlockCount: Int = 0,
     val lostAllAbilities: Boolean = false
 )
@@ -81,8 +82,11 @@ class ProjectedState(
 
     fun mustBlock(entityId: EntityId): Boolean = projectedValues[entityId]?.mustBlock == true
 
-    fun getCantBeBlockedExceptBySubtypes(entityId: EntityId): Set<String> =
-        projectedValues[entityId]?.cantBeBlockedExceptBySubtypes ?: emptySet()
+    fun getCantBeBlockedExceptByFilters(entityId: EntityId): List<com.wingedsheep.sdk.scripting.GameObjectFilter> =
+        projectedValues[entityId]?.cantBeBlockedExceptByFilters ?: emptyList()
+
+    fun getCanOnlyBlockCreaturesWithFilters(entityId: EntityId): List<com.wingedsheep.sdk.scripting.GameObjectFilter> =
+        projectedValues[entityId]?.canOnlyBlockCreaturesWithFilters ?: emptyList()
 
     fun getAdditionalBlockCount(entityId: EntityId): Int =
         projectedValues[entityId]?.additionalBlockCount ?: 0
@@ -126,7 +130,8 @@ internal fun buildIntermediateProjectedState(
             cantBlock = v.cantBlock,
             mustAttack = v.mustAttack,
             mustBlock = v.mustBlock,
-            cantBeBlockedExceptBySubtypes = v.cantBeBlockedExceptBySubtypes.toSet(),
+            cantBeBlockedExceptByFilters = v.cantBeBlockedExceptByFilters.toList(),
+            canOnlyBlockCreaturesWithFilters = v.canOnlyBlockCreaturesWithFilters.toList(),
             additionalBlockCount = v.additionalBlockCount,
             lostAllAbilities = v.lostAllAbilities
         )
