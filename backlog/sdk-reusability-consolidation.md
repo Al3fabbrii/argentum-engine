@@ -63,20 +63,31 @@ Merged-and-deleted classes (15): `GrantKeywordToCreatureGroup`,
 `GrantActivatedAbilityToCreatureGroup` (merged into `GrantActivatedAbility`), plus
 the `StaticTarget` sealed interface and its five subtypes.
 
-### 3. `CostStaticAbilities` cost-modifier sprawl — [HIGH]
+### 3. `CostStaticAbilities` cost-modifier sprawl — [HIGH] ✅ done
 
-`scripting/CostStaticAbilities.kt` has 10 classes for "modify spell cost":
-`ReduceSpellCostBySubtype`, `ReduceSpellColoredCostBySubtype`, `ReduceSpellCostByFilter`,
-`SpellCostReduction`, `FaceDownSpellCostReduction`, `ReduceFirstSpellOfTypeColoredCost`,
+The 10 per-shape classes (`ReduceSpellCostBySubtype`,
+`ReduceSpellColoredCostBySubtype`, `ReduceSpellCostByFilter`, `SpellCostReduction`,
+`FaceDownSpellCostReduction`, `ReduceFirstSpellOfTypeColoredCost`,
 `ReduceFaceDownCastingCost`, `IncreaseSpellCostByFilter`,
-`IncreaseSpellCostByPlayerSpellsCast`, `IncreaseMorphCost`. The
-`CostReductionSource` sealed interface (line 124) is exactly the right primitive.
+`IncreaseSpellCostByPlayerSpellsCast`, `IncreaseMorphCost`) all collapsed into
+one `ModifySpellCost(target, modification, gating)`:
 
-**Fix:** one `ModifySpellCost(spellFilter, modification, gating?)` where
-`modification = ReduceGeneric(amount) | ReduceColored(symbols, amount) | IncreaseGeneric(amount)`
-and `gating = FirstOfTypePerTurn | None | FaceDownOnly | MorphCostOnly`.
+- `target: SpellCostTarget` — `SelfCast` / `YouCast(filter)` / `AnyCaster(filter)` /
+  `FaceDownYouCast` / `MorphActivation`. Captures *whose* cast is affected and which
+  mechanic (cast cost vs morph activation cost).
+- `modification: CostModification` — `ReduceGeneric(amount)` /
+  `ReduceGenericBy(CostReductionSource)` / `ReduceColored(symbols)` /
+  `ReduceColoredPerUnit(symbols, countSource)` / `IncreaseGeneric(amount)` /
+  `IncreaseGenericPerOtherSpellThisTurn(amountPerSpell)`.
+- `gating: CostGating` — `None` / `FirstOfTypePerTurn` (Eluge).
 
-**Win:** 10 → 1.
+`CostCalculator` rewritten around the new shape: a single
+`scanBattlefieldModifySpellCost` walks every battlefield permanent once,
+`targetMatchesSpell` filters by target/scope (using *projected* controller, not
+base), `gatingApplies` checks first-of-type-per-turn, and `applyToSpellCast`
+dispatches by modification kind. Face-down (`calculateFaceDownCost`) and morph
+(`calculateMorphCostIncrease`) walk the same scan with target-typed filters.
+`ReduceFaceDownCastingCost` was unused dead code and dropped entirely.
 
 ### 4. `CardPredicate` numeric collapse — [HIGH]
 

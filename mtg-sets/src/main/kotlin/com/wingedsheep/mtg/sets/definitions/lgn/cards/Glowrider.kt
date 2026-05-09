@@ -2,8 +2,10 @@ package com.wingedsheep.mtg.sets.definitions.lgn.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Glowrider
@@ -21,9 +23,9 @@ val Glowrider = card("Glowrider") {
     oracleText = "Noncreature spells cost {1} more to cast."
 
     staticAbility {
-        ability = IncreaseSpellCostByFilter(
-            filter = GameObjectFilter.Noncreature,
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.AnyCaster(GameObjectFilter.Noncreature),
+            modification = CostModification.IncreaseGeneric(1),
         )
     }
 

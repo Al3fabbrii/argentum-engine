@@ -5,9 +5,11 @@ import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Academy Journeymage
@@ -27,11 +29,14 @@ val AcademyJourneymage = card("Academy Journeymage") {
     oracleText = "This spell costs {1} less to cast if you control a Wizard.\nWhen Academy Journeymage enters the battlefield, return target creature an opponent controls to its owner's hand."
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfControlFilter(
-                amount = 1,
-                filter = GameObjectFilter.Any.withSubtype("Wizard")
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfControlFilter(
+                    amount = 1,
+                    filter = GameObjectFilter.Any.withSubtype("Wizard"),
+                ),
+            ),
         )
     }
 

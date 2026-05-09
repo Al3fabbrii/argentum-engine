@@ -8,9 +8,12 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AddLandTypeByCounter
+import com.wingedsheep.sdk.scripting.CostGating
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceFirstSpellOfTypeColoredCost
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
@@ -62,13 +65,16 @@ val ElugeTheShoreslessSea = card("Eluge, the Shoreless Sea") {
 
     // First instant/sorcery each turn costs {U} less per flood-counter land you control
     staticAbility {
-        ability = ReduceFirstSpellOfTypeColoredCost(
-            spellFilter = GameObjectFilter.InstantOrSorcery,
-            manaReductionPerUnit = "{U}",
-            countSource = CostReductionSource.PermanentsWithCounterYouControl(
-                filter = GameObjectFilter.Land,
-                counterType = Counters.FLOOD
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.InstantOrSorcery),
+            modification = CostModification.ReduceColoredPerUnit(
+                symbols = "{U}",
+                countSource = CostReductionSource.PermanentsWithCounterYouControl(
+                    filter = GameObjectFilter.Land,
+                    counterType = Counters.FLOOD,
+                ),
+            ),
+            gating = CostGating.FirstOfTypePerTurn,
         )
     }
 

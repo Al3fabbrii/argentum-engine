@@ -4,8 +4,10 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 
 /**
@@ -27,16 +29,18 @@ val DanithaCapashenParagon = card("Danitha Capashen, Paragon") {
     keywords(Keyword.FIRST_STRIKE, Keyword.VIGILANCE, Keyword.LIFELINK)
 
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter(
-                cardPredicates = listOf(
-                    CardPredicate.Or(listOf(
-                        CardPredicate.HasSubtype(Subtype.AURA),
-                        CardPredicate.HasSubtype(Subtype.EQUIPMENT)
-                    ))
-                )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(
+                GameObjectFilter(
+                    cardPredicates = listOf(
+                        CardPredicate.Or(listOf(
+                            CardPredicate.HasSubtype(Subtype.AURA),
+                            CardPredicate.HasSubtype(Subtype.EQUIPMENT),
+                        )),
+                    ),
+                ),
             ),
-            amount = 1
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

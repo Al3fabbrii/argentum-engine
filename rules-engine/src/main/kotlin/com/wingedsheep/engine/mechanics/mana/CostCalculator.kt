@@ -5,7 +5,6 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.ClassLevelComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.CommanderComponent
-import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.sdk.core.CardType
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.ManaCost
@@ -17,19 +16,14 @@ import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.sdk.core.CounterType
+import com.wingedsheep.sdk.scripting.CostGating
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
-import com.wingedsheep.sdk.scripting.FaceDownSpellCostReduction
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantAlternativeCastingCost
-import com.wingedsheep.sdk.scripting.IncreaseMorphCost
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByFilter
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByPlayerSpellsCast
 import com.wingedsheep.sdk.scripting.KeywordAbility
-import com.wingedsheep.sdk.scripting.ReduceFirstSpellOfTypeColoredCost
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellColoredCostBySubtype
-import com.wingedsheep.sdk.scripting.ReduceSpellCostBySubtype
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.engine.handlers.PredicateEvaluator
 import com.wingedsheep.engine.handlers.PredicateContext
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
@@ -37,11 +31,13 @@ import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 /**
  * Calculates effective spell costs after applying cost reductions.
  *
- * Supports:
- * - SpellCostReduction static abilities (e.g., Ghalta's "costs {X} less where X is total power")
- * - Affinity keyword abilities (e.g., "Affinity for artifacts")
+ * All cost modifiers go through the unified [ModifySpellCost] static ability:
+ * generic/colored reductions, dynamic reductions sourced from game state, global
+ * tax effects, face-down (morph) cast cost adjustments, and morph (turn face-up)
+ * activation cost adjustments.
  *
- * Cost reductions only reduce generic mana costs, never colored costs.
+ * Cost reductions only reduce generic mana costs by default; colored modifications
+ * are explicit (`CostModification.ReduceColored*`).
  * A spell's cost can never be reduced below its colored mana requirements.
  */
 class CostCalculator(
@@ -65,15 +61,25 @@ class CostCalculator(
         fromZone: Zone? = null,
     ): ManaCost {
         var totalReduction = 0
+        var totalIncrease = 0
+        val coloredReductionSymbols = mutableListOf<ManaSymbol>()
+        val coloredReductionWithOverflow = mutableListOf<ManaSymbol>()
 
-        // Evaluate SpellCostReduction static abilities
+        // Self-reductions read from the spell card's own static abilities.
         for (ability in cardDef.script.staticAbilities) {
-            if (ability is SpellCostReduction) {
-                totalReduction += evaluateReduction(state, ability.reductionSource, casterId, chosenTargets)
-            }
+            if (ability !is ModifySpellCost) continue
+            if (ability.target != SpellCostTarget.SelfCast) continue
+            if (!gatingApplies(state, casterId, cardDef, ability)) continue
+            applyToSpellCast(
+                state, cardDef, casterId, ability.modification, chosenTargets,
+                addGenericReduction = { totalReduction += it },
+                addGenericIncrease = { totalIncrease += it },
+                addColoredReduction = { coloredReductionSymbols += it },
+                addColoredReductionWithOverflow = { coloredReductionWithOverflow += it },
+            )
         }
 
-        // Evaluate Affinity keyword abilities
+        // Affinity keyword abilities (handled separately from ModifySpellCost).
         for (keywordAbility in cardDef.keywordAbilities) {
             if (keywordAbility is KeywordAbility.Affinity) {
                 totalReduction += countPermanentsOfType(state, casterId, keywordAbility.forType)
@@ -83,30 +89,31 @@ class CostCalculator(
             }
         }
 
-        // Evaluate ReduceSpellCostBySubtype from battlefield permanents controlled by the caster
-        totalReduction += calculateSubtypeCostReduction(state, cardDef, casterId)
+        // Battlefield-sourced ModifySpellCost abilities.
+        for ((sourceId, ability) in scanBattlefieldModifySpellCost(state)) {
+            if (!targetMatchesSpell(ability.target, cardDef, casterId, sourceId, state)) continue
+            if (!gatingApplies(state, casterId, cardDef, ability)) continue
+            applyToSpellCast(
+                state, cardDef, casterId, ability.modification, chosenTargets,
+                addGenericReduction = { totalReduction += it },
+                addGenericIncrease = { totalIncrease += it },
+                addColoredReduction = { coloredReductionSymbols += it },
+                addColoredReductionWithOverflow = { coloredReductionWithOverflow += it },
+            )
+        }
 
-        // Evaluate ReduceSpellCostByFilter from battlefield permanents controlled by the caster
-        totalReduction += calculateFilterCostReduction(state, cardDef, casterId)
-
-        // Calculate cost increases from global tax effects (e.g., Glowrider, Damping Sphere)
-        var totalIncrease = calculateFilterCostIncrease(state, cardDef, casterId)
-
-        // Commander tax (CR 903.8): casting a card with CommanderComponent from the command zone
-        // costs an additional {2} for each previous time it's been cast from the command zone this
-        // game. The counter is incremented on cast-commit (in StackResolver), not on resolution,
-        // so countered commanders still owe the higher tax next time.
+        // Commander tax (CR 903.8).
         totalIncrease += calculateCommanderTax(state, cardDef, casterId, fromZone)
 
-        // First apply generic cost reduction
+        // Apply: generic reduction → colored reduction (no overflow) → colored reduction (with overflow) → generic increase.
         var effectiveCost = reduceGenericCost(cardDef.manaCost, totalReduction)
-
-        // Then apply colored cost reductions
-        effectiveCost = applyColoredCostReductions(state, cardDef, casterId, effectiveCost)
-
-        // Apply cost increases after reductions
+        if (coloredReductionSymbols.isNotEmpty()) {
+            effectiveCost = reduceColoredCost(effectiveCost, coloredReductionSymbols)
+        }
+        if (coloredReductionWithOverflow.isNotEmpty()) {
+            effectiveCost = reduceColoredCostWithOverflow(effectiveCost, coloredReductionWithOverflow)
+        }
         effectiveCost = increaseGenericCost(effectiveCost, totalIncrease)
-
         return effectiveCost
     }
 
@@ -137,6 +144,117 @@ class CostCalculator(
             commander
         } ?: return 0
         return 2 * match.castsFromCommandZone
+    }
+
+    /**
+     * Scan the battlefield for [ModifySpellCost] static abilities, returning each
+     * (sourceEntityId, ability) pair. Class-level filtering via [ClassLevelComponent]
+     * is honored.
+     */
+    private fun scanBattlefieldModifySpellCost(state: GameState): List<Pair<EntityId, ModifySpellCost>> {
+        val results = mutableListOf<Pair<EntityId, ModifySpellCost>>()
+        for (playerId in state.turnOrder) {
+            for (entityId in state.getBattlefield(playerId)) {
+                val container = state.getEntity(entityId) ?: continue
+                val card = container.get<CardComponent>() ?: continue
+                val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
+                val classLevel = container.get<ClassLevelComponent>()?.currentLevel
+                for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
+                    if (ability is ModifySpellCost) {
+                        results += entityId to ability
+                    }
+                }
+            }
+        }
+        return results
+    }
+
+    /**
+     * Whether [cardDef] (cast by [casterId]) is a target of [target] for the given
+     * [sourceId] permanent on the battlefield (or null for self-cast).
+     */
+    private fun targetMatchesSpell(
+        target: SpellCostTarget,
+        cardDef: CardDefinition,
+        casterId: EntityId,
+        sourceId: EntityId,
+        state: GameState,
+    ): Boolean {
+        return when (target) {
+            SpellCostTarget.SelfCast -> false
+            is SpellCostTarget.YouCast -> {
+                val controller = state.projectedState.getController(sourceId)
+                controller == casterId &&
+                    matchesCardDefinition(cardDef, target.filter, sourceId, state, state.projectedState)
+            }
+            is SpellCostTarget.AnyCaster -> matchesCardDefinition(cardDef, target.filter, sourceId, state, state.projectedState)
+            // FaceDown / Morph targets are spell-cast modifiers only when applied to a face-down cast.
+            // calculateEffectiveCost is only called for face-up casts; face-down handling is in
+            // calculateFaceDownCost / calculateMorphCostIncrease.
+            SpellCostTarget.FaceDownYouCast -> false
+            SpellCostTarget.MorphActivation -> false
+        }
+    }
+
+    /**
+     * Whether the [ability]'s gating allows it to apply to a cast of [cardDef] by [casterId].
+     */
+    private fun gatingApplies(
+        state: GameState,
+        casterId: EntityId,
+        cardDef: CardDefinition,
+        ability: ModifySpellCost,
+    ): Boolean {
+        return when (ability.gating) {
+            CostGating.None -> true
+            CostGating.FirstOfTypePerTurn -> {
+                val target = ability.target
+                val filter = when (target) {
+                    is SpellCostTarget.YouCast -> target.filter
+                    is SpellCostTarget.AnyCaster -> target.filter
+                    else -> return false  // Gating requires a filter to know what "of type" means.
+                }
+                val records = state.spellsCastThisTurnByPlayer[casterId] ?: emptyList()
+                records.none { predicateEvaluator.matchesFilter(it, filter) }
+            }
+        }
+    }
+
+    /**
+     * Apply a single cost modification to the running totals for a spell cast.
+     */
+    private fun applyToSpellCast(
+        state: GameState,
+        cardDef: CardDefinition,
+        casterId: EntityId,
+        modification: CostModification,
+        chosenTargets: List<EntityId>,
+        addGenericReduction: (Int) -> Unit,
+        addGenericIncrease: (Int) -> Unit,
+        addColoredReduction: (ManaSymbol) -> Unit,
+        addColoredReductionWithOverflow: (ManaSymbol) -> Unit,
+    ) {
+        when (modification) {
+            is CostModification.ReduceGeneric -> addGenericReduction(modification.amount)
+            is CostModification.ReduceGenericBy ->
+                addGenericReduction(evaluateReduction(state, modification.source, casterId, chosenTargets))
+            is CostModification.ReduceColored -> {
+                ManaCost.parse(modification.symbols).symbols
+                    .filterIsInstance<ManaSymbol.Colored>()
+                    .forEach(addColoredReduction)
+            }
+            is CostModification.ReduceColoredPerUnit -> {
+                val units = evaluateReduction(state, modification.countSource, casterId, chosenTargets)
+                val coloredSymbols = ManaCost.parse(modification.symbols).symbols
+                    .filterIsInstance<ManaSymbol.Colored>()
+                repeat(units) { coloredSymbols.forEach(addColoredReductionWithOverflow) }
+            }
+            is CostModification.IncreaseGeneric -> addGenericIncrease(modification.amount)
+            is CostModification.IncreaseGenericPerOtherSpellThisTurn -> {
+                val spellsCast = state.playerSpellsCastThisTurn[casterId] ?: 0
+                addGenericIncrease(spellsCast * modification.amountPerSpell)
+            }
+        }
     }
 
     /**
@@ -252,15 +370,21 @@ class CostCalculator(
     ): ManaCost {
         val optimisticTargets = mutableListOf<EntityId>()
         for (ability in cardDef.script.staticAbilities) {
-            if (ability is SpellCostReduction) {
-                val src = ability.reductionSource
-                if (src is CostReductionSource.FixedIfAnyTargetMatches) {
-                    val match = findAnyBattlefieldMatch(state, casterId, src.filter)
-                    if (match != null) optimisticTargets += match
-                }
+            if (ability !is ModifySpellCost) continue
+            if (ability.target != SpellCostTarget.SelfCast) continue
+            val src = sourceFromModification(ability.modification)
+            if (src is CostReductionSource.FixedIfAnyTargetMatches) {
+                val match = findAnyBattlefieldMatch(state, casterId, src.filter)
+                if (match != null) optimisticTargets += match
             }
         }
         return calculateEffectiveCost(state, cardDef, casterId, optimisticTargets)
+    }
+
+    private fun sourceFromModification(modification: CostModification): CostReductionSource? = when (modification) {
+        is CostModification.ReduceGenericBy -> modification.source
+        is CostModification.ReduceColoredPerUnit -> modification.countSource
+        else -> null
     }
 
     /**
@@ -314,7 +438,6 @@ class CostCalculator(
      * Uses projected state if available to account for continuous effects.
      */
     private fun sumPower(state: GameState, playerId: EntityId): Int {
-        // Get projected state if projector is available
         val projectedState = state.projectedState
 
         var totalPower = 0
@@ -324,17 +447,16 @@ class CostCalculator(
 
             if (!card.typeLine.isCreature) continue
 
-            // Use projected power if available, otherwise fall back to base stats
             val basePower: Int = when (val p = card.baseStats?.power) {
                 is CharacteristicValue.Fixed -> p.value
-                is CharacteristicValue.Dynamic -> 0  // Dynamic values need state evaluation, use 0 for now
-                is CharacteristicValue.DynamicWithOffset -> p.offset  // Use base offset for now
+                is CharacteristicValue.Dynamic -> 0
+                is CharacteristicValue.DynamicWithOffset -> p.offset
                 null -> 0
             }
             val projectedPower: Int? = projectedState.getPower(entityId)
             val power: Int = (projectedPower ?: basePower).coerceAtLeast(0)
 
-            totalPower += power  // Negative power doesn't reduce cost
+            totalPower += power
         }
         return totalPower
     }
@@ -431,7 +553,7 @@ class CostCalculator(
             is CardPredicate.IsLand -> projectedState?.hasType(entityId, "LAND") ?: cardDef.typeLine.isLand
             is CardPredicate.IsPermanent -> cardDef.typeLine.isPermanent
             is CardPredicate.HasSubtype -> projectedState?.hasSubtype(entityId, predicate.subtype.value) ?: (predicate.subtype in cardDef.typeLine.subtypes)
-            else -> false // Only common predicates supported for cost reduction checks
+            else -> false
         }
     }
 
@@ -500,143 +622,6 @@ class CostCalculator(
     }
 
     /**
-     * Calculate cost reduction from battlefield permanents that reduce spell costs by subtype.
-     * Scans permanents controlled by the caster for ReduceSpellCostBySubtype abilities
-     * and sums reductions for matching subtypes.
-     *
-     * Used for cards like Goblin Warchief ("Goblin spells you cast cost {1} less"),
-     * Undead Warchief ("Zombie spells you cast cost {1} less"), etc.
-     */
-    private fun calculateSubtypeCostReduction(
-        state: GameState,
-        cardDef: CardDefinition,
-        casterId: EntityId
-    ): Int {
-        val spellSubtypes = cardDef.typeLine.subtypes
-        if (spellSubtypes.isEmpty()) return 0
-
-        var reduction = 0
-        for (entityId in state.getBattlefield(casterId)) {
-            val container = state.getEntity(entityId) ?: continue
-            val card = container.get<CardComponent>() ?: continue
-            val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-
-            for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
-                if (ability is ReduceSpellCostBySubtype &&
-                    Subtype.of(ability.subtype) in spellSubtypes
-                ) {
-                    reduction += ability.amount
-                }
-            }
-        }
-        return reduction
-    }
-
-    /**
-     * Calculate cost reduction from battlefield permanents with ReduceSpellCostByFilter abilities.
-     * Evaluates each filter's card predicates against the spell's CardDefinition.
-     * Passes source entity context for predicates like SharesCreatureTypeWithSource
-     * that need to cross-reference the source permanent's projected state.
-     *
-     * Used for general filter-based cost reductions like Krosan Drover
-     * ("Creature spells you cast with mana value 6 or greater cost {2} less to cast.")
-     * and Mistform Warchief ("Creature spells that share a creature type with this creature cost {1} less").
-     */
-    private fun calculateFilterCostReduction(
-        state: GameState,
-        cardDef: CardDefinition,
-        casterId: EntityId
-    ): Int {
-        val projectedState = state.projectedState
-
-        var reduction = 0
-        for (entityId in state.getBattlefield(casterId)) {
-            val container = state.getEntity(entityId) ?: continue
-            val card = container.get<CardComponent>() ?: continue
-            val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-
-            for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
-                if (ability is ReduceSpellCostByFilter &&
-                    matchesCardDefinition(cardDef, ability.filter, entityId, state, projectedState)
-                ) {
-                    reduction += ability.amount
-                }
-            }
-        }
-        return reduction
-    }
-
-    /**
-     * Apply colored cost reductions from battlefield permanents.
-     * Handles ReduceSpellColoredCostBySubtype and ReduceFirstSpellOfTypeColoredCost.
-     */
-    private fun applyColoredCostReductions(
-        state: GameState,
-        cardDef: CardDefinition,
-        casterId: EntityId,
-        currentCost: ManaCost
-    ): ManaCost {
-        val spellSubtypes = cardDef.typeLine.subtypes
-        var cost = currentCost
-
-        // Phase 1: ReduceSpellColoredCostBySubtype — no overflow (excess is dropped)
-        if (spellSubtypes.isNotEmpty()) {
-            val symbolsToRemove = mutableListOf<ManaSymbol>()
-            for (entityId in state.getBattlefield(casterId)) {
-                val container = state.getEntity(entityId) ?: continue
-                val card = container.get<CardComponent>() ?: continue
-                val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-                val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-
-                for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
-                    if (ability is ReduceSpellColoredCostBySubtype &&
-                        Subtype.of(ability.subtype) in spellSubtypes
-                    ) {
-                        val reductionCost = ManaCost.parse(ability.manaReduction)
-                        symbolsToRemove.addAll(reductionCost.symbols.filterIsInstance<ManaSymbol.Colored>())
-                    }
-                }
-            }
-            if (symbolsToRemove.isNotEmpty()) {
-                cost = reduceColoredCost(cost, symbolsToRemove)
-            }
-        }
-
-        // Phase 2: ReduceFirstSpellOfTypeColoredCost — with overflow to generic
-        val overflowSymbols = mutableListOf<ManaSymbol>()
-        for (entityId in state.getBattlefield(casterId)) {
-            val container = state.getEntity(entityId) ?: continue
-            val card = container.get<CardComponent>() ?: continue
-            val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-
-            for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
-                if (ability is ReduceFirstSpellOfTypeColoredCost &&
-                    matchesCardDefinition(cardDef, ability.spellFilter)
-                ) {
-                    val records = state.spellsCastThisTurnByPlayer[casterId] ?: emptyList()
-                    val castCount = records.count { predicateEvaluator.matchesFilter(it, ability.spellFilter) }
-                    if (castCount == 0) {
-                        val units = evaluateReduction(state, ability.countSource, casterId)
-                        val reductionSymbol = ManaCost.parse(ability.manaReductionPerUnit)
-                        val coloredSymbols = reductionSymbol.symbols.filterIsInstance<ManaSymbol.Colored>()
-                        repeat(units) {
-                            overflowSymbols.addAll(coloredSymbols)
-                        }
-                    }
-                }
-            }
-        }
-        if (overflowSymbols.isNotEmpty()) {
-            cost = reduceColoredCostWithOverflow(cost, overflowSymbols)
-        }
-
-        return cost
-    }
-
-    /**
      * Remove specific colored mana symbols from a mana cost.
      * Each symbol in symbolsToRemove removes at most one matching colored symbol from the cost.
      * Does not affect generic mana.
@@ -669,7 +654,6 @@ class CostCalculator(
             if (index >= 0) {
                 remainingSymbols.removeAt(index)
             } else {
-                // Colored symbol couldn't be removed — overflow to generic reduction
                 overflowReduction++
             }
         }
@@ -775,7 +759,6 @@ class CostCalculator(
                 if (sourceEntityId == null) return true
                 val spellSubtypes = cardDef.typeLine.subtypes
                 if (spellSubtypes.isEmpty()) return false
-                // Use projected subtypes (accounts for BecomeCreatureType effects)
                 val sourceSubtypes = if (projectedState != null) {
                     projectedState.getSubtypes(sourceEntityId)
                 } else {
@@ -787,7 +770,7 @@ class CostCalculator(
                 }
             }
 
-            CardPredicate.SharesCreatureTypeWithTriggeringEntity -> true // Not applicable in cost calculation
+            CardPredicate.SharesCreatureTypeWithTriggeringEntity -> true
             CardPredicate.HasChosenSubtype -> {
                 if (sourceEntityId == null || state == null) return false
                 val chosenType = state.getEntity(sourceEntityId)
@@ -799,9 +782,8 @@ class CostCalculator(
                     (com.wingedsheep.sdk.core.Keyword.CHANGELING in cardDef.keywords &&
                         chosenType in Subtype.ALL_CREATURE_TYPES)
             }
-            is CardPredicate.SharesCreatureTypeWith -> true // Not applicable in cost calculation
+            is CardPredicate.SharesCreatureTypeWith -> true
 
-            // Context-relative predicates — not applicable in cost calculation (no pipeline context)
             is CardPredicate.HasSubtypeFromVariable -> true
             is CardPredicate.HasSubtypeInStoredList -> true
             is CardPredicate.HasSubtypeInEachStoredGroup -> true
@@ -810,7 +792,6 @@ class CostCalculator(
             is CardPredicate.Or -> predicate.predicates.any { matchesCardPredicate(cardDef, it, sourceEntityId, state, projectedState) }
             is CardPredicate.Not -> !matchesCardPredicate(cardDef, predicate.predicate, sourceEntityId, state, projectedState)
 
-            // Not applicable in cost calculation — abilities aren't cards
             CardPredicate.IsActivatedOrTriggeredAbility -> false
             CardPredicate.IsTriggeredAbility -> false
         }
@@ -825,62 +806,22 @@ class CostCalculator(
     }
 
     /**
-     * Calculate cost increase from global tax effects (IncreaseSpellCostByFilter,
-     * IncreaseSpellCostByPlayerSpellsCast).
-     * Scans ALL permanents on the battlefield since these are global effects
-     * (e.g., Glowrider's "Noncreature spells cost {1} more to cast" affects all players).
-     */
-    private fun calculateFilterCostIncrease(
-        state: GameState,
-        cardDef: CardDefinition,
-        casterId: EntityId? = null
-    ): Int {
-        var increase = 0
-        for (playerId in state.turnOrder) {
-            for (entityId in state.getBattlefield(playerId)) {
-                val container = state.getEntity(entityId) ?: continue
-                val card = container.get<CardComponent>() ?: continue
-                val permanentDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-                val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-
-                for (ability in permanentDef.script.effectiveStaticAbilities(classLevel)) {
-                    if (ability is IncreaseSpellCostByFilter &&
-                        matchesCardDefinition(cardDef, ability.filter)
-                    ) {
-                        increase += ability.amount
-                    }
-                    if (ability is IncreaseSpellCostByPlayerSpellsCast && casterId != null) {
-                        val spellsCast = state.playerSpellsCastThisTurn[casterId] ?: 0
-                        increase += spellsCast * ability.amountPerSpell
-                    }
-                }
-            }
-        }
-        return increase
-    }
-
-    /**
      * Calculate the effective cost of casting a face-down creature spell (morph).
-     * The base cost is {3}, reduced by FaceDownSpellCostReduction abilities
-     * on permanents the caster controls.
-     *
-     * @param state The current game state
-     * @param casterId The player casting the spell
-     * @return The effective morph cost after reductions
+     * The base cost is {3}, reduced by any [ModifySpellCost] with target
+     * [SpellCostTarget.FaceDownYouCast] on permanents the caster controls.
      */
     fun calculateFaceDownCost(state: GameState, casterId: EntityId): ManaCost {
         val baseMorphCost = ManaCost.parse("{3}")
         var totalReduction = 0
 
-        // Scan battlefield permanents controlled by the caster for FaceDownSpellCostReduction
-        for (entityId in state.getBattlefield(casterId)) {
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-
-            for (ability in cardDef.script.staticAbilities) {
-                if (ability is FaceDownSpellCostReduction) {
-                    totalReduction += evaluateReduction(state, ability.reductionSource, casterId)
-                }
+        for ((sourceId, ability) in scanBattlefieldModifySpellCost(state)) {
+            if (ability.target != SpellCostTarget.FaceDownYouCast) continue
+            if (state.projectedState.getController(sourceId) != casterId) continue
+            when (val mod = ability.modification) {
+                is CostModification.ReduceGeneric -> totalReduction += mod.amount
+                is CostModification.ReduceGenericBy ->
+                    totalReduction += evaluateReduction(state, mod.source, casterId)
+                else -> { /* face-down only supports generic reduction */ }
             }
         }
 
@@ -888,29 +829,19 @@ class CostCalculator(
     }
 
     /**
-     * Calculate the total morph cost increase from all IncreaseMorphCost abilities on the battlefield.
-     * Scans ALL permanents on the battlefield (not just those controlled by a specific player)
-     * since IncreaseMorphCost affects all players globally.
-     *
-     * @param state The current game state
-     * @return The total generic mana increase to apply to morph (turn face-up) costs
+     * Calculate the total morph cost increase from all [ModifySpellCost] abilities
+     * on the battlefield with target [SpellCostTarget.MorphActivation]. This affects
+     * all players globally (turn-face-up activated cost).
      */
     fun calculateMorphCostIncrease(state: GameState): Int {
         var totalIncrease = 0
-
-        for (playerId in state.turnOrder) {
-            for (entityId in state.getBattlefield(playerId)) {
-                val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-                val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-
-                for (ability in cardDef.script.staticAbilities) {
-                    if (ability is IncreaseMorphCost) {
-                        totalIncrease += ability.amount
-                    }
-                }
+        for ((_, ability) in scanBattlefieldModifySpellCost(state)) {
+            if (ability.target != SpellCostTarget.MorphActivation) continue
+            when (val mod = ability.modification) {
+                is CostModification.IncreaseGeneric -> totalIncrease += mod.amount
+                else -> { /* morph-activation only supports generic increase */ }
             }
         }
-
         return totalIncrease
     }
 
@@ -962,9 +893,9 @@ class CostCalculator(
      * Applies cost increases (tax effects) to the alternative cost.
      * Per Rule 118.9a, cost reductions and increases apply to alternative costs.
      *
-     * Note: SpellCostReduction (self-reduction on the card) and Affinity are NOT applied
-     * to alternative costs, since those modify the card's own mana cost. Only global
-     * tax effects (IncreaseSpellCostByFilter) apply.
+     * Note: Self-reduction (`SpellCostTarget.SelfCast`) and Affinity are NOT applied to
+     * alternative costs, since those modify the card's own mana cost. Only
+     * battlefield-sourced AnyCaster increases apply.
      */
     fun calculateEffectiveCostWithAlternativeBase(
         state: GameState,
@@ -972,7 +903,22 @@ class CostCalculator(
         alternativeCost: ManaCost,
         casterId: EntityId? = null
     ): ManaCost {
-        val totalIncrease = calculateFilterCostIncrease(state, cardDef, casterId)
+        var totalIncrease = 0
+        for ((sourceId, ability) in scanBattlefieldModifySpellCost(state)) {
+            val target = ability.target
+            if (target !is SpellCostTarget.AnyCaster) continue
+            if (!matchesCardDefinition(cardDef, target.filter, sourceId, state, state.projectedState)) continue
+            when (val mod = ability.modification) {
+                is CostModification.IncreaseGeneric -> totalIncrease += mod.amount
+                is CostModification.IncreaseGenericPerOtherSpellThisTurn -> {
+                    if (casterId != null) {
+                        val spellsCast = state.playerSpellsCastThisTurn[casterId] ?: 0
+                        totalIncrease += spellsCast * mod.amountPerSpell
+                    }
+                }
+                else -> { /* AnyCaster reductions don't apply to alternative casting costs. */ }
+            }
+        }
         return increaseGenericCost(alternativeCost, totalIncrease)
     }
 
@@ -981,11 +927,13 @@ class CostCalculator(
          * Check if a card has any cost reduction abilities.
          */
         fun hasCostReduction(cardDef: CardDefinition): Boolean {
-            val hasSpellCostReduction = cardDef.script.staticAbilities.any { it is SpellCostReduction }
+            val hasSelfReduction = cardDef.script.staticAbilities.any { ability ->
+                ability is ModifySpellCost && ability.target == SpellCostTarget.SelfCast
+            }
             val hasAffinity = cardDef.keywordAbilities.any {
                 it is KeywordAbility.Affinity || it is KeywordAbility.AffinityForSubtype
             }
-            return hasSpellCostReduction || hasAffinity
+            return hasSelfReduction || hasAffinity
         }
     }
 }

@@ -7,9 +7,11 @@ import com.wingedsheep.sdk.dsl.EffectPatterns
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 
 /**
@@ -34,10 +36,13 @@ val Sunderflock = card("Sunderflock") {
     keywords(Keyword.FLYING)
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.GreatestManaValueAmongPermanentsYouControl(
-                GameObjectFilter.Permanent.withSubtype(Subtype("Elemental"))
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.GreatestManaValueAmongPermanentsYouControl(
+                    GameObjectFilter.Permanent.withSubtype(Subtype("Elemental")),
+                ),
+            ),
         )
     }
 

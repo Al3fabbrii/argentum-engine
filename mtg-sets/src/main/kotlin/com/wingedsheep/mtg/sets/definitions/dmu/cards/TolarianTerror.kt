@@ -3,10 +3,12 @@ package com.wingedsheep.mtg.sets.definitions.dmu.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.KeywordAbility
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Tolarian Terror
@@ -27,10 +29,13 @@ val TolarianTerror = card("Tolarian Terror") {
 
     // Cost reduction: {1} less per instant/sorcery in graveyard
     staticAbility {
-        ability = SpellCostReduction(
-            reductionSource = CostReductionSource.CardsInGraveyardMatchingFilter(
-                filter = GameObjectFilter.Companion.InstantOrSorcery
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.CardsInGraveyardMatchingFilter(
+                    filter = GameObjectFilter.InstantOrSorcery,
+                ),
+            ),
         )
     }
 

@@ -4,9 +4,11 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Wizard's Retort
@@ -22,11 +24,14 @@ val WizardsRetort = card("Wizard's Retort") {
     oracleText = "This spell costs {1} less to cast if you control a Wizard.\nCounter target spell."
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfControlFilter(
-                amount = 1,
-                filter = GameObjectFilter.Any.withSubtype("Wizard")
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfControlFilter(
+                    amount = 1,
+                    filter = GameObjectFilter.Any.withSubtype("Wizard"),
+                ),
+            ),
         )
     }
 

@@ -3,8 +3,10 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureTypeEffect
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
@@ -26,14 +28,16 @@ val MistformWarchief = card("Mistform Warchief") {
     oracleText = "Creature spells you cast that share a creature type with this creature cost {1} less to cast.\n{T}: This creature becomes the creature type of your choice until end of turn."
 
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter(
-                cardPredicates = listOf(
-                    CardPredicate.IsCreature,
-                    CardPredicate.SharesCreatureTypeWithSource
-                )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(
+                GameObjectFilter(
+                    cardPredicates = listOf(
+                        CardPredicate.IsCreature,
+                        CardPredicate.SharesCreatureTypeWithSource,
+                    ),
+                ),
             ),
-            amount = 1
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

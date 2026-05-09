@@ -11,8 +11,11 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.*
 import com.wingedsheep.sdk.scripting.AbilityCost
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.DampLandManaProduction
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByPlayerSpellsCast
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.effects.ManaRestriction
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -57,7 +60,10 @@ class DampingSphereTest : FunSpec({
         }
 
         staticAbility {
-            ability = IncreaseSpellCostByPlayerSpellsCast()
+            ability = ModifySpellCost(
+                target = SpellCostTarget.AnyCaster(GameObjectFilter.Any),
+                modification = CostModification.IncreaseGenericPerOtherSpellThisTurn(),
+            )
         }
     }
 

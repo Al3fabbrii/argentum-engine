@@ -3,9 +3,11 @@ package com.wingedsheep.mtg.sets.definitions.blb.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Huskburster Swarm {7}{B}
@@ -27,10 +29,13 @@ val HuskbursterSwarm = card("Huskburster Swarm") {
     keywords(Keyword.MENACE, Keyword.DEATHTOUCH)
 
     staticAbility {
-        ability = SpellCostReduction(
-            reductionSource = CostReductionSource.CardsInGraveyardAndExileMatchingFilter(
-                filter = GameObjectFilter.Creature
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.CardsInGraveyardAndExileMatchingFilter(
+                    filter = GameObjectFilter.Creature,
+                ),
+            ),
         )
     }
 

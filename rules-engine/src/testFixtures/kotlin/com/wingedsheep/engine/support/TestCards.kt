@@ -423,7 +423,10 @@ object TestCards {
         creatureStats = CreatureStats(12, 12),
         script = CardScript(
             staticAbilities = listOf(
-                SpellCostReduction(CostReductionSource.TotalPowerYouControl)
+                ModifySpellCost(
+                    target = SpellCostTarget.SelfCast,
+                    modification = CostModification.ReduceGenericBy(CostReductionSource.TotalPowerYouControl),
+                )
             )
         )
     )

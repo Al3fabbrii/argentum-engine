@@ -5,117 +5,178 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Reduces the cost of spells with a matching subtype cast by the controller of this permanent.
- * Used for "Goblin spells you cast cost {1} less" (Goblin Warchief),
- * "Zombie spells you cast cost {1} less" (Undead Warchief),
- * "Dragon spells you cast cost {2} less" (Dragonspeaker Shaman), etc.
+ * Unified static ability that modifies spell or morph-activation costs.
  *
- * This is a battlefield-based static ability — the permanent with this ability
- * must be on the battlefield to provide the reduction.
+ * Replaces the old per-shape classes (`ReduceSpellCostBySubtype`,
+ * `ReduceSpellColoredCostBySubtype`, `ReduceSpellCostByFilter`, `SpellCostReduction`,
+ * `FaceDownSpellCostReduction`, `ReduceFirstSpellOfTypeColoredCost`,
+ * `IncreaseSpellCostByFilter`, `IncreaseSpellCostByPlayerSpellsCast`,
+ * `IncreaseMorphCost`).
  *
- * @property subtype The creature subtype that spells must have to benefit from the reduction
- * @property amount The amount of generic mana to reduce
+ * @property target Which spells/costs the modifier applies to.
+ * @property modification How the cost is changed (reduce/increase, generic/colored, fixed/dynamic).
+ * @property gating Optional extra restriction (e.g. only the first matching spell each turn).
  */
-@SerialName("ReduceSpellCostBySubtype")
+@SerialName("ModifySpellCost")
 @Serializable
-data class ReduceSpellCostBySubtype(
-    val subtype: String,
-    val amount: Int
+data class ModifySpellCost(
+    val target: SpellCostTarget,
+    val modification: CostModification,
+    val gating: CostGating = CostGating.None,
 ) : StaticAbility {
-    override val description: String = "$subtype spells you cast cost {$amount} less to cast"
+    override val description: String = buildDescription()
+
+    private fun buildDescription(): String {
+        val gate = if (gating == CostGating.FirstOfTypePerTurn) "The first " else ""
+        val subject = when (target) {
+            SpellCostTarget.SelfCast -> "This spell"
+            is SpellCostTarget.YouCast -> "${target.filter.description} spells you cast"
+            is SpellCostTarget.AnyCaster -> "${target.filter.description} spells"
+            SpellCostTarget.FaceDownYouCast -> "Face-down creature spells you cast"
+            SpellCostTarget.MorphActivation -> "All morph costs"
+        }
+        val verb = when (modification) {
+            is CostModification.ReduceGeneric -> "cost {${modification.amount}} less to cast"
+            is CostModification.ReduceGenericBy -> "cost {X} less to cast, where X is ${modification.source.description}"
+            is CostModification.ReduceColored -> "cost ${modification.symbols} less to cast"
+            is CostModification.ReduceColoredPerUnit ->
+                "cost ${modification.symbols} less to cast for each ${modification.countSource.description}"
+            is CostModification.IncreaseGeneric -> "cost {${modification.amount}} more"
+            is CostModification.IncreaseGenericPerOtherSpellThisTurn ->
+                "cost {${modification.amountPerSpell}} more to cast for each other spell that player has cast this turn"
+        }
+        val firstOfType = if (gating == CostGating.FirstOfTypePerTurn) " each turn" else ""
+        val prefix = if (gate.isNotEmpty()) gate + subject.replaceFirstChar { it.lowercase() } else subject
+        return "$prefix $verb$firstOfType"
+    }
+
     override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newSubtype = replacer.replaceCreatureType(subtype)
-        return if (newSubtype != subtype) copy(subtype = newSubtype) else this
+        val newTarget = target.applyTextReplacement(replacer)
+        val newModification = modification.applyTextReplacement(replacer)
+        return if (newTarget !== target || newModification !== modification) {
+            copy(target = newTarget, modification = newModification)
+        } else this
     }
 }
 
 /**
- * Reduces the colored mana cost of spells with a matching subtype cast by the controller of this permanent.
- * Unlike ReduceSpellCostBySubtype (which reduces generic mana), this removes specific colored mana symbols.
- * Used for "Cleric spells you cast cost {W}{B} less to cast" (Edgewalker).
- *
- * The manaReduction string specifies which colored symbols to remove (e.g., "{W}{B}").
- * This effect reduces only colored mana, never generic mana.
- *
- * @property subtype The creature subtype that spells must have to benefit from the reduction
- * @property manaReduction The colored mana symbols to remove, as a mana cost string (e.g., "{W}{B}")
+ * What the [ModifySpellCost] applies to.
  */
-@SerialName("ReduceSpellColoredCostBySubtype")
 @Serializable
-data class ReduceSpellColoredCostBySubtype(
-    val subtype: String,
-    val manaReduction: String
-) : StaticAbility {
-    override val description: String = "$subtype spells you cast cost $manaReduction less to cast"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newSubtype = replacer.replaceCreatureType(subtype)
-        return if (newSubtype != subtype) copy(subtype = newSubtype) else this
+sealed interface SpellCostTarget {
+    fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget
+
+    /** Self-reduction on the spell card itself — applies when this card is cast. */
+    @SerialName("SelfCast")
+    @Serializable
+    data object SelfCast : SpellCostTarget {
+        override fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget = this
+    }
+
+    /** Spells the source's controller casts that match the filter. */
+    @SerialName("YouCast")
+    @Serializable
+    data class YouCast(val filter: GameObjectFilter) : SpellCostTarget {
+        override fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget {
+            val newFilter = filter.applyTextReplacement(replacer)
+            return if (newFilter !== filter) copy(filter = newFilter) else this
+        }
+    }
+
+    /** Spells matching the filter cast by any player (global tax effect). */
+    @SerialName("AnyCaster")
+    @Serializable
+    data class AnyCaster(val filter: GameObjectFilter) : SpellCostTarget {
+        override fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget {
+            val newFilter = filter.applyTextReplacement(replacer)
+            return if (newFilter !== filter) copy(filter = newFilter) else this
+        }
+    }
+
+    /** Face-down (morph) creature spells the source's controller casts. */
+    @SerialName("FaceDownYouCast")
+    @Serializable
+    data object FaceDownYouCast : SpellCostTarget {
+        override fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget = this
+    }
+
+    /** The morph (turn face-up) activated cost, applied globally. */
+    @SerialName("MorphActivation")
+    @Serializable
+    data object MorphActivation : SpellCostTarget {
+        override fun applyTextReplacement(replacer: TextReplacer): SpellCostTarget = this
     }
 }
 
 /**
- * Reduces the cost of spells matching a filter cast by the controller of this permanent.
- * A general-purpose cost reduction that uses GameObjectFilter's card predicates to match spells.
- *
- * Examples:
- * - "Creature spells with MV 6+ cost {2} less" → ReduceSpellCostByFilter(Creature.manaValueAtLeast(6), 2)
- * - "Red spells cost {1} less" → ReduceSpellCostByFilter(Any.withColor(Color.RED), 1)
- * - "Dragon spells cost {2} less" → ReduceSpellCostByFilter(Any.withSubtype("Dragon"), 2)
- *
- * This is a battlefield-based static ability — the permanent with this ability
- * must be on the battlefield to provide the reduction.
- *
- * @property filter The filter that spells must match to benefit from the reduction (card predicates only)
- * @property amount The amount of generic mana to reduce
+ * How a spell's cost is modified.
  */
-@SerialName("ReduceSpellCostByFilter")
 @Serializable
-data class ReduceSpellCostByFilter(
-    val filter: GameObjectFilter,
-    val amount: Int
-) : StaticAbility {
-    override val description: String = "${filter.description} spells you cast cost {$amount} less to cast"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newFilter = filter.applyTextReplacement(replacer)
-        return if (newFilter !== filter) copy(filter = newFilter) else this
-    }
+sealed interface CostModification {
+    fun applyTextReplacement(replacer: TextReplacer): CostModification = this
+
+    /** Reduce generic mana by a fixed amount. */
+    @SerialName("ReduceGeneric")
+    @Serializable
+    data class ReduceGeneric(val amount: Int) : CostModification
+
+    /** Reduce generic mana by a dynamic amount sourced from the game state. */
+    @SerialName("ReduceGenericBy")
+    @Serializable
+    data class ReduceGenericBy(val source: CostReductionSource) : CostModification
+
+    /**
+     * Remove specific colored mana symbols from the cost (e.g. `"{W}{B}"`).
+     * Excess that cannot match is silently dropped (does NOT overflow to generic).
+     */
+    @SerialName("ReduceColored")
+    @Serializable
+    data class ReduceColored(val symbols: String) : CostModification
+
+    /**
+     * Remove `symbols` per unit of [countSource]. Excess overflows to generic reduction
+     * (e.g. Eluge: "{U} less for each flood-counter land you control").
+     */
+    @SerialName("ReduceColoredPerUnit")
+    @Serializable
+    data class ReduceColoredPerUnit(
+        val symbols: String,
+        val countSource: CostReductionSource,
+    ) : CostModification
+
+    /** Increase generic mana by a fixed amount (tax effect). */
+    @SerialName("IncreaseGeneric")
+    @Serializable
+    data class IncreaseGeneric(val amount: Int) : CostModification
+
+    /**
+     * Damping-Sphere-style scaling tax: increase by `amountPerSpell` for each spell
+     * the casting player has already cast this turn.
+     */
+    @SerialName("IncreaseGenericPerOtherSpellThisTurn")
+    @Serializable
+    data class IncreaseGenericPerOtherSpellThisTurn(
+        val amountPerSpell: Int = 1,
+    ) : CostModification
 }
 
 /**
- * Reduces the cost to cast this spell.
- * Used for Vivid and similar cost-reduction mechanics.
- *
- * Note: This is a static ability that affects casting cost.
- * Full implementation requires cost calculation during spell casting.
- *
- * @property reductionSource How the reduction amount is determined
+ * Optional gating restriction layered on top of [SpellCostTarget].
  */
-@SerialName("SpellCostReduction")
 @Serializable
-data class SpellCostReduction(
-    val reductionSource: CostReductionSource
-) : StaticAbility {
-    override val description: String = "This spell costs {X} less to cast, where X is ${reductionSource.description}"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
-}
+sealed interface CostGating {
+    /** No extra restriction — the modifier applies to every matching cast. */
+    @SerialName("None")
+    @Serializable
+    data object None : CostGating
 
-/**
- * Reduces the cost to cast face-down creature spells (morph).
- * Used for Dream Chisel: "Face-down creature spells you cast cost {1} less to cast."
- *
- * This is a static ability on a permanent that reduces the morph casting cost
- * for its controller. The engine scans battlefield permanents for this ability
- * when calculating face-down spell costs.
- *
- * @property reductionSource How the reduction amount is determined
- */
-@SerialName("FaceDownSpellCostReduction")
-@Serializable
-data class FaceDownSpellCostReduction(
-    val reductionSource: CostReductionSource
-) : StaticAbility {
-    override val description: String = "Face-down creature spells you cast cost {${reductionSource.description}} less to cast"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
+    /**
+     * Modifier applies only to the first matching spell the casting player casts each turn
+     * (e.g. Eluge's "the first instant or sorcery spell you cast each turn").
+     */
+    @SerialName("FirstOfTypePerTurn")
+    @Serializable
+    data object FirstOfTypePerTurn : CostGating
 }
 
 /**
@@ -297,114 +358,4 @@ sealed interface CostReductionSource {
         override val description: String =
             "$amount if a nonland permanent left the battlefield this turn or a spell was warped this turn"
     }
-}
-
-/**
- * Reduces the colored mana cost of the first spell matching a filter you cast each turn,
- * by a per-unit mana symbol multiplied by a dynamic count.
- * Used for Eluge: "The first instant or sorcery spell you cast each turn costs {U} less
- * for each land you control with a flood counter on it."
- *
- * This is a battlefield-based static ability. The engine checks the player's spell records
- * to determine "first of type" eligibility, then evaluates the count source
- * and applies colored mana reduction.
- *
- * @property spellFilter The filter that spells must match (card predicates only)
- * @property manaReductionPerUnit The colored mana symbol to remove per unit (e.g., "{U}")
- * @property countSource How the number of reduction units is determined
- */
-@SerialName("ReduceFirstSpellOfTypeColoredCost")
-@Serializable
-data class ReduceFirstSpellOfTypeColoredCost(
-    val spellFilter: GameObjectFilter,
-    val manaReductionPerUnit: String,
-    val countSource: CostReductionSource
-) : StaticAbility {
-    override val description: String = "The first ${spellFilter.description} spell you cast each turn costs $manaReductionPerUnit less to cast for each ${countSource.description}"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newFilter = spellFilter.applyTextReplacement(replacer)
-        return if (newFilter !== spellFilter) copy(spellFilter = newFilter) else this
-    }
-}
-
-/**
- * Reduces the cost of face-down creature spells you cast.
- * Used for Dream Chisel: "Face-down creature spells you cast cost {1} less to cast."
- *
- * This is a battlefield-based static ability — the permanent with this ability
- * must be on the battlefield to provide the reduction.
- *
- * @property amount The amount of generic mana to reduce
- */
-@SerialName("ReduceFaceDownCastingCost")
-@Serializable
-data class ReduceFaceDownCastingCost(
-    val amount: Int
-) : StaticAbility {
-    override val description: String = "Face-down creature spells you cast cost {$amount} less to cast"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
-}
-
-/**
- * All morph costs cost more to pay (turning face-down creatures face up).
- * Used for Exiled Doomsayer: "All morph costs cost {2} more."
- *
- * This affects all players' morph (turn face-up) costs globally.
- * The engine scans all battlefield permanents for this ability when calculating
- * the effective cost to turn a face-down creature face up.
- * Does not affect the cost to cast creature spells face down.
- *
- * @property amount The amount of additional generic mana required
- */
-@SerialName("IncreaseMorphCost")
-@Serializable
-data class IncreaseMorphCost(
-    val amount: Int
-) : StaticAbility {
-    override val description: String = "All morph costs cost {$amount} more"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
-}
-
-/**
- * Increases the cost of spells matching a filter for ALL players.
- * Used for tax effects like Glowrider: "Noncreature spells cost {1} more to cast."
- *
- * This is a global effect — it applies to all players, not just the controller.
- * The engine scans all battlefield permanents for this ability when calculating
- * effective spell costs.
- *
- * @property filter The filter that spells must match to be taxed (card predicates only)
- * @property amount The amount of generic mana to increase
- */
-@SerialName("IncreaseSpellCostByFilter")
-@Serializable
-data class IncreaseSpellCostByFilter(
-    val filter: GameObjectFilter,
-    val amount: Int
-) : StaticAbility {
-    override val description: String = "${filter.description} spells cost {$amount} more to cast"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newFilter = filter.applyTextReplacement(replacer)
-        return if (newFilter !== filter) copy(filter = newFilter) else this
-    }
-}
-
-/**
- * Increases the cost of each spell a player casts by {1} for each other spell
- * that player has already cast this turn.
- * Used for Damping Sphere: "Each spell a player casts costs {1} more to cast
- * for each other spell that player has cast this turn."
- *
- * This is a global effect — it applies to all players.
- * The engine uses the per-player spell count from GameState to determine the increase.
- *
- * @property amountPerSpell The amount of generic mana added per previously-cast spell (typically 1)
- */
-@SerialName("IncreaseSpellCostByPlayerSpellsCast")
-@Serializable
-data class IncreaseSpellCostByPlayerSpellsCast(
-    val amountPerSpell: Int = 1
-) : StaticAbility {
-    override val description: String = "Each spell a player casts costs {$amountPerSpell} more to cast for each other spell that player has cast this turn"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
 }

@@ -2,10 +2,12 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
 import com.wingedsheep.sdk.scripting.ModifyStats
-import com.wingedsheep.sdk.scripting.ReduceSpellCostBySubtype
+import com.wingedsheep.sdk.scripting.SpellCostTarget
+import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 
 /**
  * Daru Warchief
@@ -24,9 +26,9 @@ val DaruWarchief = card("Daru Warchief") {
     oracleText = "Soldier spells you cast cost {1} less to cast.\nSoldier creatures you control get +1/+2."
 
     staticAbility {
-        ability = ReduceSpellCostBySubtype(
-            subtype = "Soldier",
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Soldier")),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

@@ -358,12 +358,19 @@ class CardBuilder(private val name: String) {
      * (Lorwyn Eclipsed, cost-reduction half).
      *
      * Like [vividEtb], this emits normal serializable data — a [Keyword.VIVID] tag
-     * plus a [SpellCostReduction] static ability sourced from
+     * plus a [ModifySpellCost] self-cast static ability sourced from
      * [CostReductionSource.ColorsAmongPermanentsYouControl].
      */
     fun vividCostReduction() {
         keywordSet.add(Keyword.VIVID)
-        staticAbilities.add(SpellCostReduction(CostReductionSource.ColorsAmongPermanentsYouControl))
+        staticAbilities.add(
+            ModifySpellCost(
+                target = SpellCostTarget.SelfCast,
+                modification = CostModification.ReduceGenericBy(
+                    CostReductionSource.ColorsAmongPermanentsYouControl,
+                ),
+            ),
+        )
     }
 
     /**

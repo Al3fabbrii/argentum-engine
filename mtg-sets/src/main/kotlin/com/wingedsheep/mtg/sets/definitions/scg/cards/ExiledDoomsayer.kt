@@ -2,7 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.IncreaseMorphCost
+import com.wingedsheep.sdk.scripting.CostModification
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Exiled Doomsayer
@@ -21,7 +23,10 @@ val ExiledDoomsayer = card("Exiled Doomsayer") {
     toughness = 2
 
     staticAbility {
-        ability = IncreaseMorphCost(2)
+        ability = ModifySpellCost(
+            target = SpellCostTarget.MorphActivation,
+            modification = CostModification.IncreaseGeneric(2),
+        )
     }
 
     metadata {

@@ -4,8 +4,10 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameEvent.AttackEvent
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.TriggerSpec
 import com.wingedsheep.sdk.scripting.effects.ModifyStatsEffect
@@ -46,9 +48,9 @@ val DoranBesiegedByTime = card("Doran, Besieged by Time") {
 
     // Each creature spell you cast with toughness greater than its power costs {1} less to cast.
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter.Creature.toughnessGreaterThanPower(),
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Creature.toughnessGreaterThanPower()),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

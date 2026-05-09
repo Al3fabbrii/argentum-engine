@@ -10,9 +10,15 @@
     "script": {
         "staticAbilities": [
             {
-                "type": "ReduceSpellCostBySubtype",
-                "subtype": "Zombie",
-                "amount": 1
+                "type": "ModifySpellCost",
+                "target": {
+                    "type": "YouCast",
+                    "filter": "Zombie"
+                },
+                "modification": {
+                    "type": "ReduceGeneric",
+                    "amount": 1
+                }
             },
             {
                 "type": "ModifyStats",

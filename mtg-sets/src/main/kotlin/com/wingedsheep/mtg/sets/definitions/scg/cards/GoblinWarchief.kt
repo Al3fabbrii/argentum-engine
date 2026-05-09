@@ -3,10 +3,12 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantKeyword
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostBySubtype
 
 /**
  * Goblin Warchief
@@ -25,9 +27,9 @@ val GoblinWarchief = card("Goblin Warchief") {
     oracleText = "Goblin spells you cast cost {1} less to cast.\nGoblins you control have haste."
 
     staticAbility {
-        ability = ReduceSpellCostBySubtype(
-            subtype = "Goblin",
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Goblin")),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

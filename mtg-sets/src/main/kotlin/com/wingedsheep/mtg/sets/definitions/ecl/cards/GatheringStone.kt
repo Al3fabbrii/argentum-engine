@@ -5,9 +5,11 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ChoiceType
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.EntersWithChoice
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.effects.CardDestination
 import com.wingedsheep.sdk.scripting.effects.CardSource
 import com.wingedsheep.sdk.scripting.effects.CollectionFilter
@@ -44,9 +46,9 @@ val GatheringStone = card("Gathering Stone") {
     replacementEffect(EntersWithChoice(ChoiceType.CREATURE_TYPE))
 
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter.Any.withChosenSubtype(),
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Any.withChosenSubtype()),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

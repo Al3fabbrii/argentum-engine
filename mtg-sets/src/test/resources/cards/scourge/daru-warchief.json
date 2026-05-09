@@ -10,9 +10,15 @@
     "script": {
         "staticAbilities": [
             {
-                "type": "ReduceSpellCostBySubtype",
-                "subtype": "Soldier",
-                "amount": 1
+                "type": "ModifySpellCost",
+                "target": {
+                    "type": "YouCast",
+                    "filter": "Soldier"
+                },
+                "modification": {
+                    "type": "ReduceGeneric",
+                    "amount": 1
+                }
             },
             {
                 "type": "ModifyStats",

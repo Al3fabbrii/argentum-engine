@@ -2,7 +2,10 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.ReduceSpellColoredCostBySubtype
+import com.wingedsheep.sdk.scripting.CostModification
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Edgewalker
@@ -21,9 +24,9 @@ val Edgewalker = card("Edgewalker") {
     oracleText = "Cleric spells you cast cost {W}{B} less to cast. This effect reduces only the amount of colored mana you pay. (For example, if you cast a Cleric spell with mana cost {1}{W}, it costs {1} to cast.)"
 
     staticAbility {
-        ability = ReduceSpellColoredCostBySubtype(
-            subtype = "Cleric",
-            manaReduction = "{W}{B}"
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Cleric")),
+            modification = CostModification.ReduceColored("{W}{B}"),
         )
     }
 

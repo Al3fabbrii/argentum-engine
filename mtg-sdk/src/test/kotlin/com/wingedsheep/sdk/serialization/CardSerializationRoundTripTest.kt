@@ -376,7 +376,7 @@ class CardSerializationRoundTripTest : DescribeSpec({
 
             val serialized = CardLoader.toJson(card)
             serialized shouldContain "\"VIVID\""
-            serialized shouldContain "SpellCostReduction"
+            serialized shouldContain "ModifySpellCost"
             serialized shouldContain "ColorsAmongPermanentsYouControl"
 
             val deserialized = CardLoader.fromJson(serialized)

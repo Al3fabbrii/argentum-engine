@@ -3,8 +3,10 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostBySubtype
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.effects.RegenerateEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.TargetPermanent
@@ -26,9 +28,9 @@ val KrosanWarchief = card("Krosan Warchief") {
     oracleText = "Beast spells you cast cost {1} less to cast.\n{1}{G}: Regenerate target Beast."
 
     staticAbility {
-        ability = ReduceSpellCostBySubtype(
-            subtype = "Beast",
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Beast")),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

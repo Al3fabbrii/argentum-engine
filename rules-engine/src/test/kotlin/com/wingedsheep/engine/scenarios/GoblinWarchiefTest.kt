@@ -10,10 +10,12 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantKeyword
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostBySubtype
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -35,7 +37,10 @@ class GoblinWarchiefTest : FunSpec({
         toughness = 2
 
         staticAbility {
-            ability = ReduceSpellCostBySubtype(subtype = "Goblin", amount = 1)
+            ability = ModifySpellCost(
+                target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Goblin")),
+                modification = CostModification.ReduceGeneric(1),
+            )
         }
 
         staticAbility {

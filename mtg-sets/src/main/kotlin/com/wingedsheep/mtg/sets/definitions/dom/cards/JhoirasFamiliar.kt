@@ -2,9 +2,11 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.core.Keyword
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Jhoira's Familiar
@@ -25,9 +27,9 @@ val JhoirasFamiliar = card("Jhoira's Familiar") {
     keywords(Keyword.FLYING)
 
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter.Historic,
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.Historic),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

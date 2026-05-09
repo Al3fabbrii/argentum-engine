@@ -9,7 +9,10 @@ import com.wingedsheep.sdk.core.ManaSymbol
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
-import com.wingedsheep.sdk.scripting.ReduceSpellColoredCostBySubtype
+import com.wingedsheep.sdk.scripting.CostModification
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -31,9 +34,9 @@ class EdgewalkerTest : FunSpec({
         toughness = 2
 
         staticAbility {
-            ability = ReduceSpellColoredCostBySubtype(
-                subtype = "Cleric",
-                manaReduction = "{W}{B}"
+            ability = ModifySpellCost(
+                target = SpellCostTarget.YouCast(GameObjectFilter.Any.withSubtype("Cleric")),
+                modification = CostModification.ReduceColored("{W}{B}"),
             )
         }
     }

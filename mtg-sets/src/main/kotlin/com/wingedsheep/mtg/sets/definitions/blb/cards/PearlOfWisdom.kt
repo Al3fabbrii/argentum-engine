@@ -3,9 +3,11 @@ package com.wingedsheep.mtg.sets.definitions.blb.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Pearl of Wisdom
@@ -22,11 +24,14 @@ val PearlOfWisdom = card("Pearl of Wisdom") {
     oracleText = "This spell costs {1} less to cast if you control an Otter.\nDraw two cards."
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfControlFilter(
-                amount = 1,
-                filter = GameObjectFilter.Any.withSubtype("Otter")
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfControlFilter(
+                    amount = 1,
+                    filter = GameObjectFilter.Any.withSubtype("Otter"),
+                ),
+            ),
         )
     }
 

@@ -6,8 +6,10 @@ import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.sdk.core.*
 import com.wingedsheep.sdk.model.*
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -30,9 +32,9 @@ class GlowriderTest : FunSpec({
         oracleText = "Noncreature spells cost {1} more to cast.",
         script = CardScript(
             staticAbilities = listOf(
-                IncreaseSpellCostByFilter(
-                    filter = GameObjectFilter.Noncreature,
-                    amount = 1
+                ModifySpellCost(
+                    target = SpellCostTarget.AnyCaster(GameObjectFilter.Noncreature),
+                    modification = CostModification.IncreaseGeneric(1),
                 )
             )
         )

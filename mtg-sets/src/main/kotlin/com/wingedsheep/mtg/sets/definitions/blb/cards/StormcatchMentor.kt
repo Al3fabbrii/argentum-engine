@@ -3,8 +3,10 @@ package com.wingedsheep.mtg.sets.definitions.blb.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Stormcatch Mentor
@@ -28,9 +30,9 @@ val StormcatchMentor = card("Stormcatch Mentor") {
     prowess()
 
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = GameObjectFilter.InstantOrSorcery,
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(GameObjectFilter.InstantOrSorcery),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

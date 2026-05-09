@@ -4,9 +4,11 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.predicates.StatePredicate
 
 /**
@@ -29,15 +31,18 @@ val DireDowndraft = card("Dire Downdraft") {
     }
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfAnyTargetMatches(
-                amount = 1,
-                filter = GameObjectFilter.Creature.copy(
-                    statePredicates = listOf(
-                        StatePredicate.Or(listOf(StatePredicate.IsAttacking, StatePredicate.IsTapped))
-                    )
-                )
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfAnyTargetMatches(
+                    amount = 1,
+                    filter = GameObjectFilter.Creature.copy(
+                        statePredicates = listOf(
+                            StatePredicate.Or(listOf(StatePredicate.IsAttacking, StatePredicate.IsTapped)),
+                        ),
+                    ),
+                ),
+            ),
         )
     }
 

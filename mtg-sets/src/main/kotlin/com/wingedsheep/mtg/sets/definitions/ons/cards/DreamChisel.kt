@@ -2,8 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.ons.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.CostReductionSource
-import com.wingedsheep.sdk.scripting.FaceDownSpellCostReduction
+import com.wingedsheep.sdk.scripting.CostModification
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Dream Chisel
@@ -18,7 +19,10 @@ val DreamChisel = card("Dream Chisel") {
     oracleText = "Face-down creature spells you cast cost {1} less to cast."
 
     staticAbility {
-        ability = FaceDownSpellCostReduction(CostReductionSource.Fixed(1))
+        ability = ModifySpellCost(
+            target = SpellCostTarget.FaceDownYouCast,
+            modification = CostModification.ReduceGeneric(1),
+        )
     }
 
     metadata {

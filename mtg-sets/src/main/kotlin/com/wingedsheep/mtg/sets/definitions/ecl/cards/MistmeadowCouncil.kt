@@ -4,9 +4,11 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 val MistmeadowCouncil = card("Mistmeadow Council") {
     manaCost = "{4}{G}"
@@ -18,11 +20,14 @@ val MistmeadowCouncil = card("Mistmeadow Council") {
         "When this creature enters, draw a card."
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfControlFilter(
-                amount = 1,
-                filter = GameObjectFilter.Any.withSubtype("Kithkin")
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfControlFilter(
+                    amount = 1,
+                    filter = GameObjectFilter.Any.withSubtype("Kithkin"),
+                ),
+            ),
         )
     }
 

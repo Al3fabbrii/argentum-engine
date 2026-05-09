@@ -4,9 +4,11 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Wizard's Lightning
@@ -22,11 +24,14 @@ val WizardsLightning = card("Wizard's Lightning") {
     oracleText = "This spell costs {2} less to cast if you control a Wizard.\nWizard's Lightning deals 3 damage to any target."
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfControlFilter(
-                amount = 2,
-                filter = GameObjectFilter.Any.withSubtype("Wizard")
-            )
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfControlFilter(
+                    amount = 2,
+                    filter = GameObjectFilter.Any.withSubtype("Wizard"),
+                ),
+            ),
         )
     }
 

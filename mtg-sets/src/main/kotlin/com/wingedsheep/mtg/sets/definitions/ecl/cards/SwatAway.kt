@@ -3,9 +3,11 @@ package com.wingedsheep.mtg.sets.definitions.ecl.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.CostReductionSource
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.SpellCostReduction
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.targets.TargetSpellOrPermanent
 
 /**
@@ -33,8 +35,11 @@ val SwatAway = card("Swat Away") {
     }
 
     staticAbility {
-        ability = SpellCostReduction(
-            CostReductionSource.FixedIfCreatureAttackingYou(amount = 2)
+        ability = ModifySpellCost(
+            target = SpellCostTarget.SelfCast,
+            modification = CostModification.ReduceGenericBy(
+                CostReductionSource.FixedIfCreatureAttackingYou(amount = 2),
+            ),
         )
     }
 

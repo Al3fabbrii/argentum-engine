@@ -6,8 +6,10 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.CharacteristicValue
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.dsl.Filters
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
@@ -44,9 +46,9 @@ val HaughtyDjinn = card("Haughty Djinn") {
 
     // Cost reduction for instant and sorcery spells
     staticAbility {
-        ability = ReduceSpellCostByFilter(
-            filter = Filters.Unified.instantOrSorcery,
-            amount = 1
+        ability = ModifySpellCost(
+            target = SpellCostTarget.YouCast(Filters.Unified.instantOrSorcery),
+            modification = CostModification.ReduceGeneric(1),
         )
     }
 

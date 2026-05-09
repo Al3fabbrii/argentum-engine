@@ -2,8 +2,11 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.DampLandManaProduction
-import com.wingedsheep.sdk.scripting.IncreaseSpellCostByPlayerSpellsCast
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 
 /**
  * Damping Sphere
@@ -24,7 +27,10 @@ val DampingSphere = card("Damping Sphere") {
     }
 
     staticAbility {
-        ability = IncreaseSpellCostByPlayerSpellsCast()
+        ability = ModifySpellCost(
+            target = SpellCostTarget.AnyCaster(GameObjectFilter.Any),
+            modification = CostModification.IncreaseGenericPerOtherSpellThisTurn(),
+        )
     }
 
     metadata {

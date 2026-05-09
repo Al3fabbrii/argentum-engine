@@ -7,13 +7,15 @@ import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
+import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.scripting.ReduceSpellCostByFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 /**
- * Tests for Krosan Drover and the general ReduceSpellCostByFilter static ability.
+ * Tests for Krosan Drover and the general ModifySpellCost static ability with YouCast(filter).
  *
  * Krosan Drover: {3}{G}
  * Creature — Elf
@@ -29,9 +31,9 @@ class KrosanDroverTest : FunSpec({
         toughness = 2
 
         staticAbility {
-            ability = ReduceSpellCostByFilter(
-                filter = GameObjectFilter.Creature.manaValueAtLeast(6),
-                amount = 2
+            ability = ModifySpellCost(
+                target = SpellCostTarget.YouCast(GameObjectFilter.Creature.manaValueAtLeast(6)),
+                modification = CostModification.ReduceGeneric(2),
             )
         }
     }
