@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 1 / 312
+**Implemented:** 2 / 312
 
 | Color      | Total | Done |
 |------------|-------|------|
@@ -13,7 +13,7 @@
 | Green      | 62    | 1    |
 | Multicolor | 40    | 0    |
 | Colorless  | 33    | 0    |
-| Land       | 69    | 0    |
+| Land       | 69    | 1    |
 
 ---
 
@@ -158,7 +158,7 @@
 - [ ] Junk Winder
 - [ ] Kalonian Hydra
 - [ ] Karn, the Great Creator
-- [ ] Karplusan Forest
+- [x] Karplusan Forest
 - [ ] Kodama of the East Tree
 - [ ] Kwain, Itinerant Meddler
 - [ ] Kykar, Wind's Fury
