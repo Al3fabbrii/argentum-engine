@@ -106,7 +106,7 @@ one enchantment (Unholy Annex) are double-faced / modal DFCs and depend on DFC s
 
 ### Lands (24)
 - [ ] Realm of Koh ×4
-- [ ] Soulstone Sanctuary ×2
+- [x] Soulstone Sanctuary ×2
 - [x] Swamp ×18
 
 ## Mechanic gaps to watch
