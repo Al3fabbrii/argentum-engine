@@ -11,7 +11,9 @@ import com.wingedsheep.engine.state.components.identity.LifeTotalComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.model.EntityId
+import com.wingedsheep.sdk.scripting.CanAttackDespiteDefender
 import com.wingedsheep.sdk.scripting.CantAttackUnless
+import com.wingedsheep.sdk.scripting.filters.unified.Scope
 import com.wingedsheep.sdk.scripting.CantBeAttackedWithout
 
 // =========================================================================
@@ -75,15 +77,33 @@ class SummoningSicknessAttackRule : AttackRestrictionRule {
 }
 
 /**
- * Cannot have defender keyword.
+ * Cannot have defender keyword, unless the creature has a conditional ability to bypass defender.
  */
 class DefenderAttackRule : AttackRestrictionRule {
     override fun check(ctx: AttackCheckContext): String? {
-        if (ctx.projected.hasKeyword(ctx.attackerId, Keyword.DEFENDER)) {
-            val name = ctx.state.getEntity(ctx.attackerId)?.get<CardComponent>()?.name ?: "Creature"
-            return "$name has defender and cannot attack"
-        }
-        return null
+        if (!ctx.projected.hasKeyword(ctx.attackerId, Keyword.DEFENDER)) return null
+
+        val container = ctx.state.getEntity(ctx.attackerId) ?: return errorMsg(ctx)
+        val cardComp = container.get<CardComponent>() ?: return errorMsg(ctx)
+        val cardDef = ctx.cardRegistry.getCard(cardComp.cardDefinitionId) ?: return errorMsg(ctx)
+
+        val effectContext = EffectContext(sourceId = ctx.attackerId, controllerId = ctx.attackingPlayer, opponentId = null)
+        val canAttackDespite = cardDef.staticAbilities
+            .filterIsInstance<CanAttackDespiteDefender>()
+            .filter { it.filter.scope is Scope.Self }
+            .any { conditionEvaluator.evaluate(ctx.state, it.condition, effectContext) }
+
+        if (canAttackDespite) return null
+        return errorMsg(ctx)
+    }
+
+    private fun errorMsg(ctx: AttackCheckContext): String {
+        val name = ctx.state.getEntity(ctx.attackerId)?.get<CardComponent>()?.name ?: "Creature"
+        return "$name has defender and cannot attack"
+    }
+
+    companion object {
+        private val conditionEvaluator = ConditionEvaluator()
     }
 }
 
