@@ -84,7 +84,21 @@ class CastZoneResolver(
 
         // Check direct MayPlayFromExileComponent grant
         val component = state.getEntity(cardId)?.get<MayPlayFromExileComponent>()
-        if (component?.controllerId == playerId) return true
+        if (component?.controllerId == playerId) {
+            // Honor optional condition gate (Possibility Technician's "if you control a Kavu").
+            if (component.condition != null) {
+                val opponentId = state.turnOrder.firstOrNull { it != playerId }
+                val gateContext = com.wingedsheep.engine.handlers.EffectContext(
+                    sourceId = cardId,
+                    controllerId = playerId,
+                    opponentId = opponentId
+                )
+                val gateOk = com.wingedsheep.engine.handlers.ConditionEvaluator()
+                    .evaluate(state, component.condition, gateContext)
+                if (!gateOk) return hasLinkedExileCastPermission(state, playerId, cardId)
+            }
+            return true
+        }
 
         // Check for GrantMayCastFromLinkedExile static abilities on battlefield permanents
         return hasLinkedExileCastPermission(state, playerId, cardId)

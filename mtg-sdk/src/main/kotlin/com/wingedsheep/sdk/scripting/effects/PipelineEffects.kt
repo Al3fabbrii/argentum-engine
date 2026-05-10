@@ -4,6 +4,7 @@ import com.wingedsheep.sdk.core.CounterType
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.scripting.AdditionalCost
 import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.conditions.Condition
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
@@ -749,10 +750,21 @@ data class GrantMayPlayFromExileEffect(
      * "and mana of any type can be spent to cast that spell" clauses (Taster of Wares,
      * Cruelclaw's Heist).
      */
-    val withAnyManaType: Boolean = false
+    val withAnyManaType: Boolean = false,
+    /**
+     * Optional gate evaluated each time the play permission is checked. Used for cards
+     * that grant a conditional may-play, e.g. Possibility Technician's "you may play it
+     * if you control a Kavu" — the permission persists with the card in exile, but is
+     * only honored while the condition holds. Re-evaluated on every legal-action query.
+     */
+    val condition: Condition? = null
 ) : Effect {
     override val description: String = buildString {
         append("${expiry.description.replaceFirstChar { it.uppercase() }}, you may play the $from cards from exile")
+        if (condition != null) {
+            append(" ")
+            append(condition.description)
+        }
         if (withAnyManaType) append(", and mana of any type can be spent to cast them")
     }
 

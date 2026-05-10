@@ -42,7 +42,8 @@ class GrantMayPlayFromExileExecutor : EffectExecutor<GrantMayPlayFromExileEffect
                         controllerId = controllerId,
                         permanent = isPermanent,
                         expiresAfterTurn = expiresAfterTurn,
-                        withAnyManaType = effect.withAnyManaType
+                        withAnyManaType = effect.withAnyManaType,
+                        condition = effect.condition
                     )
                 )
             }

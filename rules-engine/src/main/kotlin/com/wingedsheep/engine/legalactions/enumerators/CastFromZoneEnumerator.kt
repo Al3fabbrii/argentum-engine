@@ -340,6 +340,19 @@ class CastFromZoneEnumerator : ActionEnumerator {
             val container = state.getEntity(cardId) ?: continue
             val exileComponent = container.get<MayPlayFromExileComponent>() ?: continue
             if (exileComponent.controllerId != playerId) continue
+            // If the grant carries a runtime gate (Possibility Technician's "if you control a Kavu"),
+            // re-evaluate it here so the legal action only surfaces while the gate holds.
+            if (exileComponent.condition != null) {
+                val opponentId = state.turnOrder.firstOrNull { it != playerId }
+                val gateContext = com.wingedsheep.engine.handlers.EffectContext(
+                    sourceId = cardId,
+                    controllerId = playerId,
+                    opponentId = opponentId
+                )
+                val gateOk = com.wingedsheep.engine.handlers.ConditionEvaluator()
+                    .evaluate(state, exileComponent.condition, gateContext)
+                if (!gateOk) continue
+            }
             val playForFree = container.get<PlayWithoutPayingCostComponent>()?.controllerId == playerId
             val runtimeAdditionalCost = container.get<PlayWithAdditionalCostComponent>()
                 ?.takeIf { it.controllerId == playerId }

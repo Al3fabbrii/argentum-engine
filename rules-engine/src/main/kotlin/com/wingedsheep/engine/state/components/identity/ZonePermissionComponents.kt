@@ -2,6 +2,7 @@ package com.wingedsheep.engine.state.components.identity
 
 import com.wingedsheep.engine.state.Component
 import com.wingedsheep.sdk.model.EntityId
+import com.wingedsheep.sdk.scripting.conditions.Condition
 import kotlinx.serialization.Serializable
 
 /**
@@ -38,13 +39,17 @@ data class RevealedToComponent(
  * @param withAnyManaType If true, mana of any type can be spent to cast this card. Used by effects
  *   like Taster of Wares ("...mana of any type can be spent to cast that spell"). Treats every
  *   colored cost symbol as generic for the purposes of payment when casting from exile.
+ * @param condition Optional gate re-evaluated on every legal-action query. The play permission
+ *   is honored only while the condition holds. Used for "you may play it if you control a Kavu"
+ *   (Possibility Technician).
  */
 @Serializable
 data class MayPlayFromExileComponent(
     val controllerId: EntityId,
     val permanent: Boolean = false,
     val expiresAfterTurn: Int? = null,
-    val withAnyManaType: Boolean = false
+    val withAnyManaType: Boolean = false,
+    val condition: Condition? = null
 ) : Component
 
 /**

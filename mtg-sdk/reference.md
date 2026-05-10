@@ -347,7 +347,7 @@ constructors.
 | `EffectPatterns.putCreatureFromHandSharingTypeWithTapped()`                          | (none)                                              | Pipeline: Gather tapped subtypes → filter hand → select → move to battlefield |
 | `ShuffleLibraryEffect`                                                              | `target`                                            | Shuffle library                                   |
 | `TakeFromLinkedExileEffect`                                                         | (object)                                            | Put top card of linked exile pile into hand       |
-| `GrantMayPlayFromExileEffect`                                                       | `from`                                              | Grant play-from-exile permission to cards in collection |
+| `GrantMayPlayFromExileEffect`                                                       | `from, expiry?, withAnyManaType?, condition?: Condition` | Grant play-from-exile permission to cards in collection. `condition` is a re-evaluated gate (e.g. "if you control a Kavu" — Possibility Technician). |
 | `GrantPlayWithoutPayingCostEffect`                                                  | `from`                                              | Grant play-without-paying-cost to cards in collection  |
 | `GrantPlayWithAdditionalCostEffect`                                                 | `from, additionalCost`                              | Grant play-from-exile with additional cost (e.g., discard) |
 | `GrantFreeCastTargetFromExileEffect`                                                | `target, exileAfterResolve`                         | Grant single target in exile free cast + optional exile-after-resolve |
