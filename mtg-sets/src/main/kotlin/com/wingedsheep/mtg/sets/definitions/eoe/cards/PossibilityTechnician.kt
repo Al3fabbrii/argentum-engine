@@ -2,6 +2,7 @@ package com.wingedsheep.mtg.sets.definitions.eoe.cards
 
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.core.Zone
+import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameEvent.ZoneChangeEvent
@@ -13,7 +14,6 @@ import com.wingedsheep.sdk.scripting.effects.CardDestination
 import com.wingedsheep.sdk.scripting.effects.CardSource
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
-import com.wingedsheep.sdk.scripting.effects.GrantMayPlayFromExileEffect
 import com.wingedsheep.sdk.scripting.effects.MayPlayExpiry
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.references.Player
@@ -55,7 +55,7 @@ val PossibilityTechnician = card("Possibility Technician") {
                     from = "exiledCard",
                     destination = CardDestination.ToZone(Zone.EXILE)
                 ),
-                GrantMayPlayFromExileEffect(
+                Effects.GrantMayPlayFromExile(
                     from = "exiledCard",
                     expiry = MayPlayExpiry.Permanent,
                     condition = Exists(
