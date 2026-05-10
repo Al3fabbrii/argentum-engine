@@ -31,6 +31,8 @@ import com.wingedsheep.engine.state.components.identity.ExileAfterResolveCompone
 import com.wingedsheep.engine.state.components.identity.PlayWithoutPayingCostComponent
 import com.wingedsheep.engine.state.components.identity.RevealedToComponent
 import com.wingedsheep.engine.state.components.identity.TextReplacementComponent
+import com.wingedsheep.engine.state.permissions.addMayPlayPermission
+import com.wingedsheep.engine.state.permissions.removeMayPlayPermissionsForCard
 import com.wingedsheep.sdk.scripting.GrantCantBeCountered
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.core.Color
@@ -238,6 +240,12 @@ class StackResolver(
             updated = updated.without<com.wingedsheep.engine.state.components.identity.PlayWithCostIncreaseComponent>()
             updated
         }
+        // Mirror on the new permissions list: drop one-shot grants targeting this card.
+        newState = newState.copy(
+            mayPlayPermissions = newState.mayPlayPermissions.filterNot { permission ->
+                cardId in permission.cardIds && !permission.permanent
+            }
+        )
 
         // For face-down creatures, use a generic name in the event
         val eventName = if (castFaceDown) "Face-down creature" else cardComponent.name
@@ -1173,6 +1181,15 @@ class StackResolver(
                             )
                         )
                     }
+                    pausedState = pausedState.addMayPlayPermission(
+                        com.wingedsheep.engine.state.permissions.MayPlayPermission(
+                            id = com.wingedsheep.sdk.model.EntityId.generate(),
+                            cardIds = setOf(spellId),
+                            controllerId = spellComponent.casterId,
+                            permanent = true,
+                            timestamp = state.timestamp,
+                        )
+                    )
                 }
 
                 val pausedCounterEvents = mutableListOf<GameEvent>()
@@ -1249,6 +1266,7 @@ class StackResolver(
                 .without<com.wingedsheep.engine.state.components.identity.PlayWithCostIncreaseComponent>()
                 .without<ExileAfterResolveComponent>()
         }
+        newState = newState.removeMayPlayPermissionsForCard(spellId)
         newState = newState.addToZone(destZoneKey, spellId)
 
         // CR 715.5 — an Adventure card exiled by its own resolution may be cast as the creature
@@ -1264,6 +1282,15 @@ class StackResolver(
                     )
                 )
             }
+            newState = newState.addMayPlayPermission(
+                com.wingedsheep.engine.state.permissions.MayPlayPermission(
+                    id = com.wingedsheep.sdk.model.EntityId.generate(),
+                    cardIds = setOf(spellId),
+                    controllerId = spellComponent.casterId,
+                    permanent = true,
+                    timestamp = state.timestamp,
+                )
+            )
         }
 
         // Add counters granted by ExileAfterResolveComponent (e.g., Goliath Daydreamer's dream counter).
@@ -1733,6 +1760,17 @@ class StackResolver(
                     .with(PlayWithoutPayingCostComponent(controllerId = controllerId, permanent = true))
             }
             updated
+        }
+        if (grantFreeCast) {
+            newState = newState.addMayPlayPermission(
+                com.wingedsheep.engine.state.permissions.MayPlayPermission(
+                    id = com.wingedsheep.sdk.model.EntityId.generate(),
+                    cardIds = setOf(spellId),
+                    controllerId = controllerId,
+                    permanent = true,
+                    timestamp = state.timestamp,
+                )
+            )
         }
 
         return ExecutionResult.success(

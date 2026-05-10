@@ -453,6 +453,18 @@ class CleanupPhaseManager(
             }
         }
 
+        // Mirror cleanup on the new permissions list.
+        if (newState.mayPlayPermissions.isNotEmpty()) {
+            newState = newState.copy(
+                mayPlayPermissions = newState.mayPlayPermissions.filterNot { permission ->
+                    !permission.permanent && when {
+                        permission.expiresAfterTurn != null -> newState.turnNumber >= permission.expiresAfterTurn
+                        else -> true
+                    }
+                }
+            )
+        }
+
         // 10. Expire event-based delayed triggered abilities with EndOfTurn expiry
         // (e.g., Long River Lurker's "whenever that creature deals combat damage this turn").
         if (newState.delayedTriggers.isNotEmpty()) {

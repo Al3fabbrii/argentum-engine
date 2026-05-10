@@ -7,6 +7,9 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.identity.ExileAfterResolveComponent
 import com.wingedsheep.engine.state.components.identity.MayPlayFromExileComponent
 import com.wingedsheep.engine.state.components.identity.PlayWithoutPayingCostComponent
+import com.wingedsheep.engine.state.permissions.MayPlayPermission
+import com.wingedsheep.engine.state.permissions.addMayPlayPermission
+import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.effects.GrantFreeCastTargetFromExileEffect
 import kotlin.reflect.KClass
 
@@ -32,7 +35,7 @@ class GrantFreeCastTargetFromExileExecutor : EffectExecutor<GrantFreeCastTargetF
         val controllerId = context.controllerId
         val targetId = context.resolveTarget(effect.target) ?: return EffectResult.success(state)
 
-        val newState = state.updateEntity(targetId) { container ->
+        var newState = state.updateEntity(targetId) { container ->
             var updated = container
                 .with(MayPlayFromExileComponent(controllerId = controllerId))
                 .with(PlayWithoutPayingCostComponent(controllerId = controllerId))
@@ -41,6 +44,16 @@ class GrantFreeCastTargetFromExileExecutor : EffectExecutor<GrantFreeCastTargetF
             }
             updated
         }
+
+        newState = newState.addMayPlayPermission(
+            MayPlayPermission(
+                id = EntityId.generate(),
+                cardIds = setOf(targetId),
+                controllerId = controllerId,
+                sourceId = context.sourceId,
+                timestamp = state.timestamp,
+            )
+        )
 
         return EffectResult.success(newState)
     }

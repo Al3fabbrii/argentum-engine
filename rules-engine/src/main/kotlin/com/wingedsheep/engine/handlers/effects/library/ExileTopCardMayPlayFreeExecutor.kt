@@ -6,6 +6,8 @@ import com.wingedsheep.engine.handlers.effects.EffectExecutor
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.identity.MayPlayFromExileComponent
 import com.wingedsheep.engine.state.components.identity.PlayWithoutPayingCostComponent
+import com.wingedsheep.engine.state.permissions.MayPlayPermission
+import com.wingedsheep.engine.state.permissions.addMayPlayPermission
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.effects.GrantMayPlayFromExileEffect
@@ -47,6 +49,22 @@ class GrantMayPlayFromExileExecutor : EffectExecutor<GrantMayPlayFromExileEffect
                     )
                 )
             }
+        }
+
+        if (collection.isNotEmpty()) {
+            newState = newState.addMayPlayPermission(
+                MayPlayPermission(
+                    id = EntityId.generate(),
+                    cardIds = collection.toSet(),
+                    controllerId = controllerId,
+                    sourceId = context.sourceId,
+                    condition = effect.condition,
+                    withAnyManaType = effect.withAnyManaType,
+                    permanent = isPermanent,
+                    expiresAfterTurn = expiresAfterTurn,
+                    timestamp = state.timestamp,
+                )
+            )
         }
 
         return EffectResult.success(newState)
