@@ -35,6 +35,9 @@ class GymBeansConfig {
         for (name in cardRegistry.allCardNames()) {
             cardRegistry.getCardsByName(name).forEach(::registerSynthesizedDefault)
         }
+        // Each set may contribute reprint rows for cards canonically defined elsewhere.
+        register(PortalSet.printings)
+        register(BloomburrowSet.printings)
     }
 
     @Bean

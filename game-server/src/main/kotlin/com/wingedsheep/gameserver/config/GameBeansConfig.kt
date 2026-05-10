@@ -44,15 +44,26 @@ class GameBeansConfig(
     }
 
     /**
-     * Per-printing index. Populated with synthesised defaults from every registered
-     * card (one printing per `CardDefinition`). Real Scryfall printing data lands in a
-     * later phase via a classpath-loaded jsonl; until then this is enough for the
-     * deckbuilder picker and game-init art override to function.
+     * Per-printing index. Populated in two passes:
+     *
+     * 1. Synthesised defaults from every registered card — one printing row per
+     *    `CardDefinition` derived from its `setCode` + `metadata.collectorNumber`.
+     *    This covers the canonical printing of every card.
+     * 2. Explicit reprint rows contributed by each [MtgSet] via `MtgSet.printings`.
+     *    Reprints overwrite synthesised entries with the same `(setCode, collectorNumber)`
+     *    so a hand-curated reprint always wins over auto-derivation.
+     *
+     * Real Scryfall printing data lands in a later phase via a classpath-loaded jsonl;
+     * until then these two passes are enough for the deckbuilder picker and the
+     * game-init art override to function.
      */
     @Bean
     fun printingRegistry(cardRegistry: CardRegistry): PrintingRegistry = PrintingRegistry().apply {
         for (name in cardRegistry.allCardNames()) {
             cardRegistry.getCardsByName(name).forEach(::registerSynthesizedDefault)
+        }
+        for (set in MtgSetCatalog.all) {
+            register(set.printings)
         }
     }
 

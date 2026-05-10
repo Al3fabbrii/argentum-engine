@@ -258,6 +258,133 @@ Re-fetch the Scryfall card data and systematically compare it against your imple
    - Missing ability entirely (multi-ability cards)
    - Wrong duration (e.g., "until end of turn" mapped to permanent effect)
 
+## Step 10b: Adding Another Printing of an Existing Card (reprints)
+
+**Use this only if the card is already implemented in another set** and you're adding a
+reprint (different art / set code / collector number, same oracle behavior). Skip otherwise.
+
+The engine treats cards by name (oracle identity), not by printing — the canonical
+`CardDefinition` (script, types, P/T) lives in **one** set's package and is registered
+once. Reprints contribute only per-printing metadata: `setCode`, `collectorNumber`, art,
+artist, scryfall id. They live in the **reprinting set's** package, not in the canonical
+card's file.
+
+### When to add a reprint vs. a new card
+
+- **Same oracle text → reprint.** Add a `Printing` row to the new set's package.
+- **Different oracle text (functional reprint, errata, name change) → new card.** Follow
+  Steps 1–10 normally and pick whichever set should hold the canonical `CardDefinition`.
+
+### Workflow
+
+1. **Confirm the canonical card exists.** `grep -r "name = \"<Card Name>\"" mtg-sets/src/main/kotlin/`
+   should find a `CardDefinition` in some other set's package. If not, this is a new card,
+   not a reprint — go back to Step 1.
+
+2. **Fetch printing-only data from Scryfall** for the new set:
+   `https://api.scryfall.com/cards/named?exact=<card-name>&set=<new-set-code>`
+   Extract: `set`, `collector_number`, `artist`, `image_uris.normal`, `rarity`,
+   `released_at`, `id` (scryfallId), and `image_uris.normal` of any back face.
+
+3. **Create a per-set `Reprints.kt`** if it doesn't exist:
+   `mtg-sets/src/main/kotlin/com/wingedsheep/mtg/sets/definitions/{set}/Reprints.kt`
+
+   ```kotlin
+   package com.wingedsheep.mtg.sets.definitions.{set}
+
+   import com.wingedsheep.sdk.model.Printing
+   import com.wingedsheep.sdk.model.Rarity
+
+   /**
+    * Per-printing rows for cards that are reprinted in {Set Name} but whose canonical
+    * [com.wingedsheep.sdk.model.CardDefinition] lives elsewhere. Pure presentation data —
+    * no script, no behavior. Engine identity is the card name.
+    */
+   internal val {SetCode}Reprints: List<Printing> = listOf(
+       Printing(
+           oracleId = "<Scryfall oracle_id, e.g. 'abc12345-...'>",
+           name = "Lightning Bolt",
+           setCode = "<NEW_SET_CODE>",
+           collectorNumber = "<COLLECTOR_NUMBER>",
+           scryfallId = "<Scryfall id>",
+           artist = "<Artist Name>",
+           imageUri = "<image_uris.normal — verify with HEAD request, must return 200>",
+           releaseDate = "<YYYY-MM-DD>",
+           rarity = Rarity.COMMON,
+       ),
+       // Add additional reprints in this set here.
+   )
+   ```
+
+4. **Wire it into the set object.** In the same package's `{Set}Set.kt`:
+
+   ```kotlin
+   object MySet : MtgSet {
+       override val code = "MYS"
+       override val cards = ...                    // existing
+       override val printings = MYSReprints        // NEW — reprints contributed by this set
+   }
+   ```
+
+   `MtgSet.printings` defaults to an empty list, so sets that don't reprint anything need
+   no change. `GameBeansConfig` registers `set.printings` alongside the synthesised
+   defaults — explicit reprints win when they share `(setCode, collectorNumber)` with a
+   synthesised entry.
+
+5. **Per-printing fields** — what to fill in:
+   - `oracleId` — the canonical Scryfall `oracle_id` (same value across every printing of
+     the card). Pull it from the API response. Use a placeholder if it's missing — it's
+     informational; lookups go through `(setCode, collectorNumber)`.
+   - `setCode` / `collectorNumber` — uniquely identify this row.
+   - `imageUri` — must match exactly what Scryfall returns; verify with `curl -sI`.
+   - `backFaceImageUri` — only for DFC reprints; pull from the back face's `image_uris.normal`.
+   - `rarity` / `artist` / `releaseDate` / `scryfallId` — straight from the API response.
+   - `isPromo`, `isFullArt`, `frameEffects` — fill from `promo`, `full_art`, `frame_effects`
+     when relevant; safe to omit otherwise.
+
+6. **No new test required** for a reprint by itself — the seam is already covered by
+   `MultiPrintingGameTest`. Only add a test if you also touched the card's behavior.
+
+7. **Backlog and commit message.**
+   - If the *new* set has a `backlog/sets/{set-name}/cards.md`, mark the card if listed.
+   - Commit: `Add {Card Name} reprint to {New Set Name}`.
+
+### Example: Lightning Bolt reprinted from M10 → 2X2
+
+Lightning Bolt's canonical `CardDefinition` (its spell script) lives in
+`mtg-sets/.../definitions/m10/cards/LightningBolt.kt`. To add the 2X2 reprint:
+
+```kotlin
+// mtg-sets/.../definitions/2x2/Reprints.kt
+internal val M2X2Reprints = listOf(
+    Printing(
+        oracleId = "4457ed35-7c10-48c8-9776-456485fdf070",
+        name = "Lightning Bolt",
+        setCode = "2X2",
+        collectorNumber = "117",
+        artist = "Christopher Moeller",
+        imageUri = "https://cards.scryfall.io/normal/front/.../bolt-2x2.jpg?...",
+        releaseDate = "2022-04-22",
+        rarity = Rarity.UNCOMMON,
+        scryfallId = "...",
+    ),
+)
+```
+
+```kotlin
+// mtg-sets/.../definitions/2x2/M2X2Set.kt
+object M2X2Set : MtgSet {
+    override val code = "2X2"
+    override val cards = ...
+    override val printings = M2X2Reprints
+}
+```
+
+The engine continues to look up "Lightning Bolt" in `CardRegistry` and finds the M10
+script. When a deck pins `PrintingRef("2X2", "117")`, `GameInitializer` resolves the
+`Printing` from `PrintingRegistry`, stamps the 2X2 art onto the per-entity
+`CardComponent.imageUri`, and the client renders the 2X2 print.
+
 ## Step 11: Update Set Backlog
 
 If `backlog/sets/{set-name}/cards.md` exists:
