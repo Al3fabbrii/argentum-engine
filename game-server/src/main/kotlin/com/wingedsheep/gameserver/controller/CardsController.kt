@@ -2,6 +2,7 @@ package com.wingedsheep.gameserver.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wingedsheep.engine.registry.CardRegistry
+import com.wingedsheep.engine.registry.PrintingRegistry
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.search.ParseError
 import com.wingedsheep.search.SearchCard
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/cards")
 class CardsController(
     private val cardRegistry: CardRegistry,
+    private val printingRegistry: PrintingRegistry,
 ) {
 
     @GetMapping
@@ -118,6 +120,12 @@ class CardsController(
          * `setCode` and `metadata.collectorNumber`.
          */
         val defaultPrinting: PrintingRef? = null,
+        /**
+         * Every set this card has a registered printing in (canonical + reprints). Drives
+         * the `s:`/`set:` search matcher so a reprint surfaces under its new set code even
+         * though its [setCode] still points at the original printing's set.
+         */
+        override val printingSetCodes: List<String> = emptyList(),
     ) : SearchCard
 
     private fun CardDefinition.toSummary(): CardSummaryDTO = CardSummaryDTO(
@@ -143,6 +151,9 @@ class CardsController(
         backFaceName = backFace?.name,
         backFaceImageUri = backFace?.metadata?.imageUri,
         defaultPrinting = defaultPrintingRef,
+        printingSetCodes = printingRegistry.printingsOf(name)
+            .map { it.setCode }
+            .distinct(),
     )
 
     companion object {
