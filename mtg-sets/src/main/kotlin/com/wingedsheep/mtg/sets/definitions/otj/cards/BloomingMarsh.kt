@@ -1,4 +1,4 @@
-package com.wingedsheep.mtg.sets.definitions.one.cards
+package com.wingedsheep.mtg.sets.definitions.otj.cards
 
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.dsl.card
@@ -14,16 +14,16 @@ import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
 /**
- * Copperline Gorge
+ * Blooming Marsh
  * Land
  *
  * This land enters tapped unless you control two or fewer other lands.
- * {T}: Add {R} or {G}.
+ * {T}: Add {B} or {G}.
  */
-val CopperlineGorge = card("Copperline Gorge") {
+val BloomingMarsh = card("Blooming Marsh") {
     typeLine = "Land"
-    colorIdentity = "RG"
-    oracleText = "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {R} or {G}."
+    colorIdentity = "BG"
+    oracleText = "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {B} or {G}."
 
     replacementEffect(EntersTapped(
         unlessCondition = Compare(
@@ -35,7 +35,7 @@ val CopperlineGorge = card("Copperline Gorge") {
 
     activatedAbility {
         cost = AbilityCost.Tap
-        effect = AddManaEffect(Color.RED)
+        effect = AddManaEffect(Color.BLACK)
         manaAbility = true
         timing = TimingRule.ManaAbility
     }
@@ -49,10 +49,9 @@ val CopperlineGorge = card("Copperline Gorge") {
 
     metadata {
         rarity = Rarity.RARE
-        collectorNumber = "249"
+        collectorNumber = "266"
         artist = "Yeong-Hao Han"
-        flavorText = "Where fire meets ferocity, a greater evolution begins."
-        imageUri = "https://cards.scryfall.io/normal/front/7/8/78b0f36b-7d8c-4e77-adc2-a4dad93a81d5.jpg?1675957264"
-        ruling("2023-02-04", "If one of these lands enters the battlefield at the same time as one or more other lands, it doesn't take those lands into consideration when determining how many other lands you control.")
+        imageUri = "https://cards.scryfall.io/normal/front/8/6/861caabb-0573-4e94-8b03-342f90465064.jpg?1723149884"
+        ruling("2024-04-19", "If one of these lands enters the battlefield at the same time as one or more other lands, it doesn't take those lands into consideration when determining how many other lands you control.")
     }
 }
