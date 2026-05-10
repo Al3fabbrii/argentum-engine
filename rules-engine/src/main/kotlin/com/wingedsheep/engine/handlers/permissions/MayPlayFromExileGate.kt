@@ -12,6 +12,13 @@ import com.wingedsheep.sdk.model.EntityId
  * control a Kavu" — must re-evaluate the condition at every read site (legal-action
  * enumeration, cast validation, land-play validation, client view), not just at the moment
  * the stamp was created.
+ *
+ * Supported condition shapes: ambient state (`Exists`, `Compare`, life totals, hand sizes, …)
+ * and anything keyed off [EffectContext.controllerId]. Source-referencing conditions
+ * (`SourceHas*`, `SourceIs*`) are NOT supported here — the granting permanent's id is not
+ * preserved on the component, so `sourceId` is set to the exiled card itself. If a future
+ * card needs a source-keyed gate, add a `granterId` field on [MayPlayFromExileComponent]
+ * and thread it through the executor.
  */
 fun MayPlayFromExileComponent.gateOpen(
     state: GameState,
