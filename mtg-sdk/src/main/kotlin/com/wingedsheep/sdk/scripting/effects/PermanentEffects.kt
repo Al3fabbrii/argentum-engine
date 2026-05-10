@@ -185,3 +185,28 @@ data object IncrementAbilityResolutionCountEffect : Effect {
     override val description: String = "Track ability resolution"
     override fun applyTextReplacement(replacer: TextReplacer): Effect = this
 }
+
+// =============================================================================
+// Explore
+// =============================================================================
+
+/**
+ * Target creature explores.
+ *
+ * "Reveal the top card of your library. If it's a land card, put it into your hand.
+ * Otherwise, put a +1/+1 counter on this creature, then put the revealed card into
+ * your hand or graveyard."
+ *
+ * The exploring player is the controller of the effect (the Map token's controller).
+ * The exploring creature is [target].
+ *
+ * @property target The creature that is exploring.
+ */
+@SerialName("Explore")
+@Serializable
+data class ExploreEffect(
+    val target: EffectTarget = EffectTarget.ContextTarget(0)
+) : Effect {
+    override val description: String = "${target.description} explores"
+    override fun applyTextReplacement(replacer: TextReplacer): Effect = this
+}
