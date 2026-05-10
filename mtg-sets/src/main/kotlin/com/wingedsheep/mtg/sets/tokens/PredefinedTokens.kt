@@ -276,6 +276,32 @@ object PredefinedTokens {
     )
 
     /**
+     * Map token — an artifact with:
+     * "{1}, {T}, Sacrifice this artifact: Target creature you control explores.
+     *  Activate only as a sorcery."
+     */
+    val Map = card("Map") {
+        typeLine = "Artifact — Map"
+
+        activatedAbility {
+            val creature = target("target creature you control", Targets.CreatureYouControl)
+            cost = Costs.Composite(
+                Costs.Mana("{1}"),
+                Costs.Tap,
+                Costs.SacrificeSelf
+            )
+            effect = Effects.Explore(creature)
+            timing = TimingRule.SorcerySpeed
+        }
+
+        metadata {
+            imageUri = "https://cards.scryfall.io/normal/front/6/4/64839118-09d2-4645-9d3c-f80755ac781f.jpg?1698873927"
+            artist = "Francesca Baerald"
+            collectorNumber = "17"
+        }
+    }
+
+    /**
      * All predefined token definitions.
      * Register these in the CardRegistry so token abilities are resolved.
      */
@@ -284,6 +310,7 @@ object PredefinedTokens {
         Food,
         Lander,
         JustOneGlass,
+        Map,
         Sword,
         Cragflame,
         Mutavault,

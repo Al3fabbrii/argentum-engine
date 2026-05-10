@@ -26,6 +26,7 @@ import com.wingedsheep.sdk.scripting.effects.AddSubtypeEffect
 import com.wingedsheep.sdk.scripting.effects.AddCountersToCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.AnimateLandEffect
+import com.wingedsheep.sdk.scripting.effects.ExploreEffect
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureEffect
 import com.wingedsheep.sdk.scripting.effects.EachPermanentBecomesCopyOfTargetEffect
 import com.wingedsheep.sdk.scripting.effects.SetBasePowerEffect
@@ -1121,6 +1122,28 @@ object Effects {
      */
     fun Incubate(amount: com.wingedsheep.sdk.scripting.values.DynamicAmount): Effect =
         EffectPatterns.incubate(amount)
+
+    /**
+     * Target creature explores.
+     *
+     * "Reveal the top card of your library. If it's a land card, put it into your hand.
+     * Otherwise, put a +1/+1 counter on this creature, then put the card back on top of
+     * your library or put it into your graveyard."
+     *
+     * @param target The creature that explores (default: context target 0)
+     */
+    fun Explore(target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        ExploreEffect(target)
+
+    /**
+     * Create a Map artifact token.
+     * "{1}, {T}, Sacrifice this artifact: Target creature you control explores.
+     *  Activate only as a sorcery."
+     *
+     * @param count Number of tokens to create
+     */
+    fun CreateMapToken(count: Int = 1): Effect =
+        CreatePredefinedTokenEffect("Map", count)
 
     // =========================================================================
     // Protection Effects
