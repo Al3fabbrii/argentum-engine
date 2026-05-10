@@ -597,9 +597,14 @@ class CastFromZoneEnumerator : ActionEnumerator {
             )
 
             for (exiledId in linked.exiledIds) {
-                // Skip if already handled by MayPlayFromExileComponent
+                // Skip if already handled by MayPlayFromExileComponent — but only when its
+                // gate is open. A closed conditional gate must fall through so the linked-exile
+                // path remains a viable independent permission source.
                 val exiledContainer = state.getEntity(exiledId) ?: continue
-                if (exiledContainer.get<MayPlayFromExileComponent>()?.controllerId == playerId) continue
+                val directGrant = exiledContainer.get<MayPlayFromExileComponent>()
+                if (directGrant?.controllerId == playerId &&
+                    directGrant.gateOpen(state, exiledId, context.conditionEvaluator)
+                ) continue
                 val exiledCard = exiledContainer.get<CardComponent>() ?: continue
 
                 // Ownership restriction — "cards you own exiled with this creature"
@@ -810,8 +815,15 @@ class CastFromZoneEnumerator : ActionEnumerator {
             val zoneCards = state.getZone(ZoneKey(playerId, zone))
             for (cardId in zoneCards) {
                 val container = state.getEntity(cardId) ?: continue
-                // Skip cards already handled by MayPlayFromExileComponent or linked exile
-                if (zone == Zone.EXILE && container.get<MayPlayFromExileComponent>()?.controllerId == playerId) continue
+                // Skip cards already handled by MayPlayFromExileComponent (gate-open only;
+                // a closed conditional gate must fall through to intrinsic cast permission)
+                // or linked exile.
+                if (zone == Zone.EXILE) {
+                    val directGrant = container.get<MayPlayFromExileComponent>()
+                    if (directGrant?.controllerId == playerId &&
+                        directGrant.gateOpen(state, cardId, context.conditionEvaluator)
+                    ) continue
+                }
                 if (zone == Zone.EXILE && cardId in linkedExileCardIds) continue
                 val cardComponent = container.get<CardComponent>() ?: continue
                 val cardDef = context.cardRegistry.getCard(cardComponent.name) ?: continue
