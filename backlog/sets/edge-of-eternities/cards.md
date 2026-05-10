@@ -2,7 +2,8 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 142 / 261
+**Implemented:** 143 / 261
+---
 
 - [x] Adagia, Windswept Bastion
 - [x] All-Fates Scroll
@@ -242,7 +243,7 @@
 - [ ] Thrumming Hivepool
 - [ ] Timeline Culler
 - [ ] Tractor Beam
-- [ ] Tragic Trajectory
+- [x] Tragic Trajectory
 - [x] Umbral Collar Zealot
 - [ ] Unravel
 - [ ] Uthros Psionicist

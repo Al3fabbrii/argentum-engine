@@ -37,7 +37,7 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Hymn of the Faller
 - [ ] Insatiable Skittermaw
 - [ ] Temporal Intervention
-- [ ] Tragic Trajectory
+- [x] Tragic Trajectory
 - [ ] Voidforged Titan
 - [ ] Kavaron Skywarden
 - [x] Plasma Bolt
