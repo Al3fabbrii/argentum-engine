@@ -18,6 +18,7 @@ object OutlawsOfThunderJunctionSet : MtgSet {
     override val cards: List<CardDefinition> = listOf(
         BristlyBillSpineSower,
         BloomingMarsh,
+        BotanicalSanctum,
         ConcealedCourtyard,
         ForsakenMiner,
         InspiringVantage,
