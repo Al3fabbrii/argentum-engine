@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 6 / 312
+**Implemented:** 7 / 312
 
 | Color      | Total | Done |
 |------------|-------|------|
@@ -13,7 +13,7 @@
 | Green      | 62    | 2    |
 | Multicolor | 40    | 1    |
 | Colorless  | 33    | 1    |
-| Land       | 69    | 3    |
+| Land       | 69    | 4    |
 
 ---
 
@@ -290,7 +290,7 @@
 - [ ] Temple of Epiphany
 - [ ] Temple of Malady
 - [ ] Temple of Mystery
-- [ ] Temple of Plenty
+- [x] Temple of Plenty
 - [ ] Temple of Triumph
 - [ ] Tempt with Bunnies
 - [ ] Tempt with Discovery
