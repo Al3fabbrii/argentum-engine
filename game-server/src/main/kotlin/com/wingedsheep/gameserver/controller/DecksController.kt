@@ -222,6 +222,78 @@ class DecksController(
                     "Plains" to 7,
                     "Swamp" to 7
                 )
+            ),
+            // Standard / Pioneer-leaning aggro-tempo and control lists. DFCs and Rooms use the
+            // engine's canonical full name (e.g. "Unholy Annex // Ritual Chamber") even though
+            // MTGA-format imports usually drop everything after the slash — the catalogue keys
+            // off the full registered name, so abbreviating here would surface as a placeholder.
+            ExampleDeckDTO(
+                id = "uw_tempo",
+                name = "UW Tempo",
+                description = "Azorius tempo with auras and counterspells.",
+                cards = mapOf(
+                    "Malcolm, Alluring Scoundrel" to 4,
+                    "Skrelv, Defector Mite" to 4,
+                    "Sleep-Cursed Faerie" to 2,
+                    "Kitsa, Otterball Elite" to 4,
+                    "Bounce Off" to 4,
+                    "Negate" to 2,
+                    "No More Lies" to 4,
+                    "Soul Partition" to 2,
+                    "Spell Pierce" to 2,
+                    "Combat Research" to 4,
+                    "Shardmage's Rescue" to 2,
+                    "Sheltered by Ghosts" to 4,
+                    "Adarkar Wastes" to 4,
+                    "Floodfarm Verge" to 3,
+                    "Meticulous Archive" to 4,
+                    "Seachrome Coast" to 4,
+                    "Island" to 7
+                )
+            ),
+            ExampleDeckDTO(
+                id = "standard_monou",
+                name = "Mono-Blue Control",
+                description = "Mono-blue control with Haughty Djinn and Tolarian Terror.",
+                cards = mapOf(
+                    "Teferi, Temporal Pilgrim" to 1,
+                    "Chrome Host Seedshark" to 1,
+                    "Haughty Djinn" to 4,
+                    "Hullbreaker Horror" to 2,
+                    "Tolarian Terror" to 3,
+                    "Blue Sun's Twilight" to 1,
+                    "Consider" to 4,
+                    "Dissipate" to 4,
+                    "Essence Scatter" to 2,
+                    "Fading Hope" to 4,
+                    "Flow of Knowledge" to 2,
+                    "Impulse" to 2,
+                    "Memory Deluge" to 1,
+                    "Negate" to 2,
+                    "Spell Pierce" to 2,
+                    "Thirst for Discovery" to 2,
+                    "Island" to 23
+                )
+            ),
+            ExampleDeckDTO(
+                id = "standard_monob",
+                name = "Mono-Black Aggro",
+                description = "Mono-black aggro splashing Vampires and Rogues.",
+                cards = mapOf(
+                    "Bloodletter of Aclazotz" to 4,
+                    "Cecil, Dark Knight" to 3,
+                    "Deep-Cavern Bat" to 4,
+                    "Forsaken Miner" to 4,
+                    "Gatekeeper of Malakir" to 4,
+                    "Mai, Scornful Striker" to 3,
+                    "Unstoppable Slasher" to 4,
+                    "Iridescent Vinelasher" to 4,
+                    "Shoot the Sheriff" to 2,
+                    "Unholy Annex // Ritual Chamber" to 4,
+                    "Realm of Koh" to 4,
+                    "Soulstone Sanctuary" to 2,
+                    "Swamp" to 18
+                )
             )
         )
     }

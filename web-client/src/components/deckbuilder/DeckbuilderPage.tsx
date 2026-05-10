@@ -90,6 +90,15 @@ const FORMAT_TOKENS = DECK_FORMATS
 
 type SetInfo = { code: string; name: string }
 
+// Server-supplied example deck (GET /api/decks/examples). Matches the
+// `ExampleDeckDTO` shape exposed by `DecksController`.
+interface ExampleDeck {
+  id: string
+  name: string
+  description: string
+  cards: Record<string, number>
+}
+
 type SortMode = 'name' | 'cmc' | 'color' | 'rarity'
 
 // "cards" = original layout (catalog grid in center, deck list on right).
@@ -237,6 +246,24 @@ export function DeckbuilderPage() {
   const [bulkEditOpen, setBulkEditOpen] = useState(false)
   // Saved-decks browser overlay visibility.
   const [decksBrowserOpen, setDecksBrowserOpen] = useState(false)
+  // Example-decks picker overlay visibility.
+  const [examplesOpen, setExamplesOpen] = useState(false)
+
+  // Server-supplied starter decks. Mirrors the DeckPicker's Examples tab — fetched once and
+  // surfaced in the deckbuilder via the topbar "Examples" button.
+  const [examples, setExamples] = useState<ExampleDeck[]>([])
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/decks/examples')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: ExampleDeck[]) => {
+        if (!cancelled) setExamples(list)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Search & filters live in the URL (?q=…&sort=…) so they're shareable and
   // survive refreshes. `query` and `sortMode` are derived from searchParams.
@@ -550,6 +577,21 @@ export function DeckbuilderPage() {
     setImportOpen(false)
   }
 
+  const handleLoadExample = (ex: ExampleDeck) => {
+    if (
+      Object.keys(deckCards).length > 0 &&
+      !window.confirm(`Replace your current deck contents with "${ex.name}"?`)
+    ) {
+      return
+    }
+    setDeckCards({ ...ex.cards })
+    setCommander(null)
+    setActiveDeckId(null)
+    setDeckName(ex.name)
+    navigate(`/deckbuilder${searchSuffix()}`)
+    setExamplesOpen(false)
+  }
+
   // ----- Render -----
 
   const totalCards = Object.values(deckCards).reduce((a, b) => a + b, 0)
@@ -624,6 +666,14 @@ export function DeckbuilderPage() {
           </button>
         </div>
         <div className={styles.topbarSpacer} />
+        <button
+          className={styles.iconButton}
+          onClick={() => setExamplesOpen(true)}
+          disabled={examples.length === 0}
+          title={examples.length === 0 ? 'Loading examples…' : 'Load a starter deck'}
+        >
+          Examples
+        </button>
         <button className={styles.iconButton} onClick={() => setImportOpen(true)}>
           Import deck
         </button>
@@ -672,6 +722,14 @@ export function DeckbuilderPage() {
           onLoad={handleLoadSaved}
           onRename={handleRenameSaved}
           onDelete={handleDeleteSaved}
+        />
+      )}
+
+      {examplesOpen && (
+        <ExampleDecksModal
+          examples={examples}
+          onCancel={() => setExamplesOpen(false)}
+          onLoad={handleLoadExample}
         />
       )}
 
@@ -950,6 +1008,66 @@ function DeckCentricFooter({
         </button>
       </div>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Example-decks modal — server-supplied starter lists, click to load.
+// ---------------------------------------------------------------------------
+
+function ExampleDecksModal({
+  examples,
+  onCancel,
+  onLoad,
+}: {
+  examples: ExampleDeck[]
+  onCancel: () => void
+  onLoad: (ex: ExampleDeck) => void
+}) {
+  return (
+    <>
+      <div className={styles.importBackdrop} onClick={onCancel} />
+      <div className={styles.importDialog} role="dialog" aria-label="Example decks">
+        <div className={styles.importHeader}>
+          <strong>Load an example deck</strong>
+          <button className={styles.linkButton} onClick={onCancel} type="button">
+            Close
+          </button>
+        </div>
+        <p className={styles.importHint}>
+          Pick a starter list to load into the builder. This replaces the current deck contents.
+        </p>
+        {examples.length === 0 ? (
+          <p className={styles.importHint}>No examples available.</p>
+        ) : (
+          <div className={styles.browserGrid}>
+            {examples.map((ex) => {
+              const total = Object.values(ex.cards).reduce((a, b) => a + b, 0)
+              return (
+                <button
+                  key={ex.id}
+                  className={styles.deckCard}
+                  onClick={() => onLoad(ex)}
+                  type="button"
+                >
+                  <div className={styles.deckCardBody}>
+                    <span className={styles.deckCardName}>{ex.name}</span>
+                    <span className={styles.deckCardMeta}>
+                      {total} card{total === 1 ? '' : 's'} · {ex.description}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        )}
+        <div className={styles.importActions}>
+          <button className={styles.secondaryButton} onClick={onCancel} type="button">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </>
   )
 }
 
