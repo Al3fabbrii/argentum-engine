@@ -34,6 +34,7 @@ import {
   type CardSummary,
   type ParseError,
 } from './cardFilter'
+import { extractSetFilter } from './query'
 import {
   parseArenaDeckList,
   resolveAgainstCatalog,
@@ -431,6 +432,10 @@ export function DeckbuilderPage() {
   const predicate = parseResult.predicate
   const queryErrors = parseResult.errors
   const advanced = useMemo(() => isAdvancedQuery(query), [query])
+  // Dominant set filter (`s:EOE`, `set:eoe`) extracted from the parsed AST. Drives the
+  // catalog grid + hover preview to render the *reprint's* art when a card has a printing
+  // in that set, instead of always showing the canonical CardDefinition's image.
+  const activeSetFilter = useMemo(() => extractSetFilter(parseResult.ast), [parseResult.ast])
   // When a deck format is selected, scope the catalog to format-legal cards automatically so
   // the user only sees plays they can actually run. The `format:` query token still works as
   // an extra filter (intersected on top), but isn't required for this default behavior.
@@ -449,7 +454,66 @@ export function DeckbuilderPage() {
     setVisibleCount(PAGE_SIZE)
   }, [query, sortMode, activeFormat])
 
-  const displayed = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
+  // Reprint-art override map: card name → that set's printing art. Populated lazily via
+  // /api/printings whenever an `s:` filter is active and the visible set of card names
+  // changes. One batched request per filter change covers every visible tile + the
+  // hover preview. When [activeSetFilter] is null this stays empty and renders fall back
+  // to the catalog's default printing art.
+  const [setArtOverride, setSetArtOverride] = useState<
+    Record<string, { imageUri: string | null; backFaceImageUri: string | null }>
+  >({})
+  useEffect(() => {
+    if (!activeSetFilter || filtered.length === 0) {
+      setSetArtOverride({})
+      return
+    }
+    let cancelled = false
+    const params = new URLSearchParams()
+    // De-dupe — `filtered` is already unique by name but be explicit; URLSearchParams
+    // doesn't dedupe and we don't want to send the same name twice.
+    const names = Array.from(new Set(filtered.map((c) => c.name)))
+    names.forEach((n) => params.append('names', n))
+    fetch(`/api/printings?${params.toString()}`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data: Record<string, Array<{ setCode: string; imageUri: string | null; backFaceImageUri: string | null }>>) => {
+        if (cancelled) return
+        const next: Record<string, { imageUri: string | null; backFaceImageUri: string | null }> = {}
+        for (const name of names) {
+          const match = data[name]?.find((p) => p.setCode.toUpperCase() === activeSetFilter)
+          if (match) next[name] = { imageUri: match.imageUri, backFaceImageUri: match.backFaceImageUri }
+        }
+        setSetArtOverride(next)
+      })
+      .catch(() => {
+        if (!cancelled) setSetArtOverride({})
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [activeSetFilter, filtered])
+
+  // Apply the set-filter art override to filtered cards. Done once here so the catalog
+  // grid, the hover preview, and the in-deck-row hover all see the same imageUri without
+  // each component needing to know about the override.
+  const filteredWithArt = useMemo<CardSummary[]>(() => {
+    if (!activeSetFilter || Object.keys(setArtOverride).length === 0) return filtered
+    return filtered.map((c) => {
+      const override = setArtOverride[c.name]
+      if (!override) return c
+      // Only override fields that are actually set on the override; leaving the source
+      // value untouched preserves CardSummary's exactOptionalPropertyTypes contract
+      // (the optional fields can't be assigned `undefined` explicitly).
+      const next: CardSummary = { ...c }
+      if (override.imageUri !== null) next.imageUri = override.imageUri
+      if (override.backFaceImageUri !== null) next.backFaceImageUri = override.backFaceImageUri
+      return next
+    })
+  }, [filtered, activeSetFilter, setArtOverride])
+
+  const displayed = useMemo(
+    () => filteredWithArt.slice(0, visibleCount),
+    [filteredWithArt, visibleCount],
+  )
 
   // Server-side validation (debounced via abort controllers, like DeckPicker).
   const [validation, setValidation] = useState<ValidationResult | null>(null)
