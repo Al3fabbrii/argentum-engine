@@ -104,7 +104,7 @@
 - [x] Honor
 - [x] Honored Knight-Captain
 - [x] Hullcarver
-- [ ] Hylderblade
+- [x] Hylderblade
 - [ ] Hymn of the Faller
 - [x] Icecave Crasher
 - [ ] Icetill Explorer
