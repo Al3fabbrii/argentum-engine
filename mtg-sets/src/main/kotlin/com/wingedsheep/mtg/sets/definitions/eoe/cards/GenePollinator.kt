@@ -4,7 +4,6 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.GameObjectFilter
 
 /**
  * Gene Pollinator
@@ -24,7 +23,7 @@ val GenePollinator = card("Gene Pollinator") {
     activatedAbility {
         cost = Costs.Composite(
             Costs.Tap,
-            Costs.TapAnotherPermanent(GameObjectFilter.Any)
+            Costs.TapAnotherPermanent()
         )
         effect = Effects.AddAnyColorMana(1)
         manaAbility = true
