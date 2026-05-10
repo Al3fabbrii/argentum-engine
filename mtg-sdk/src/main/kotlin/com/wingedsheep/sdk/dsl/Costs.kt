@@ -174,10 +174,11 @@ object Costs {
         AbilityCost.TapPermanents(count, filter)
 
     /**
-     * Tap another untapped permanent you control (e.g., "Tap another untapped creature you control").
+     * Tap another untapped permanent you control (e.g., "Tap another untapped permanent you control").
      * Excludes the source permanent from the tap candidates.
+     * Pass `GameObjectFilter.Creature` to restrict to creatures, etc.
      */
-    fun TapAnotherPermanent(filter: GameObjectFilter = GameObjectFilter.Creature): AbilityCost =
+    fun TapAnotherPermanent(filter: GameObjectFilter = GameObjectFilter.Any): AbilityCost =
         AbilityCost.TapPermanents(count = 1, filter = filter, excludeSelf = true)
 
     /**

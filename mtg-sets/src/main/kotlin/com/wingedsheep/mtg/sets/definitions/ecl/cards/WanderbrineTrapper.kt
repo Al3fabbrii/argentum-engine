@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.GameObjectFilter
 
 /**
  * Wanderbrine Trapper
@@ -25,7 +26,7 @@ val WanderbrineTrapper = card("Wanderbrine Trapper") {
         cost = Costs.Composite(
             Costs.Mana("{1}"),
             Costs.Tap,
-            Costs.TapAnotherPermanent()
+            Costs.TapAnotherPermanent(GameObjectFilter.Creature)
         )
         val t = target("creature an opponent controls", Targets.CreatureOpponentControls)
         effect = Effects.Tap(t)
