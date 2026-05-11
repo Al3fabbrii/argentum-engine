@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 146 / 261
+**Implemented:** 147 / 261
 - [x] Adagia, Windswept Bastion
 - [x] All-Fates Scroll
 - [x] All-Fates Stalker
@@ -223,7 +223,7 @@
 - [x] Syr Vondam, Sunstar Exemplar
 - [x] Syr Vondam, the Lucent
 - [x] Systems Override
-- [ ] Tannuk, Memorial Ensign
+- [x] Tannuk, Memorial Ensign
 - [ ] Tannuk, Steadfast Second
 - [ ] Tapestry Warden
 - [ ] Temporal Intervention
