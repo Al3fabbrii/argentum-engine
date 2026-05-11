@@ -234,9 +234,6 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 ## Return up to three target creature cards with total mana value 3 or less from your graveyard to the battlefield. Put a +1/+1 counter on each of them
 - [ ] Scout for Survivors
 
-## mill half their library
-- [ ] Singularity Rupture
-
 ## Whenever this creature blocks a creature with flying, this creature gets +5/+0 until end of turn
 - [ ] Skystinger
 

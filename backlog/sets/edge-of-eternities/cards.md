@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 142 / 261
+**Implemented:** 143 / 261
 
 - [x] Adagia, Windswept Bastion
 - [x] All-Fates Scroll
@@ -193,7 +193,7 @@
 - [x] Seedship Impact
 - [ ] Selfcraft Mechan
 - [x] Shattered Wings
-- [ ] Singularity Rupture
+- [x] Singularity Rupture
 - [x] Sinister Cryologist
 - [ ] Skystinger
 - [x] Slagdrill Scrapper
