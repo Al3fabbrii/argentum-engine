@@ -1097,6 +1097,7 @@ Set via `staticAbility { ability = ... }`:
 
 ### Other
 
+- `SpellTargetingLifeCost(amount: Int)` — spells opponents cast that target this permanent cost an additional `amount` life to cast; enforced as a casting cost in `CostCalculator.calculateTargetingLifeCost` + `CastSpellHandler`; cast is rejected if caster can't afford the life; unlike ward, there is no counter-or-pay choice and the spell never goes on the stack without payment (Terror of the Peaks)
 - `CantReceiveCounters(target)` — target can't have counters put on it (grants `AbilityFlag.CANT_RECEIVE_COUNTERS`; checked by `AddCountersExecutor`)
 - `ControlEnchantedPermanent` — control the enchanted permanent
 - `GrantShroudToController` — controller has shroud

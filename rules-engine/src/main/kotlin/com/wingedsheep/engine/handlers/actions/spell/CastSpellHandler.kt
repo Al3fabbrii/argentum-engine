@@ -490,6 +490,22 @@ class CastSpellHandler(
             }
         }
 
+        // Validate that the caster can afford the targeting life cost imposed by opponent
+        // permanents (e.g. Terror of the Peaks: "Spells your opponents cast that target this
+        // creature cost an additional 3 life to cast.").
+        if (action.targets.isNotEmpty()) {
+            val targetingLifeCost = costCalculator.calculateTargetingLifeCost(
+                state, action.playerId, action.targets
+            )
+            if (targetingLifeCost > 0) {
+                val currentLife = state.getEntity(action.playerId)
+                    ?.get<LifeTotalComponent>()?.life ?: 0
+                if (currentLife < targetingLifeCost) {
+                    return "Not enough life to pay targeting cost ($targetingLifeCost life required)"
+                }
+            }
+        }
+
         return null
     }
 
@@ -1709,6 +1725,24 @@ class CastSpellHandler(
             }
             events.add(LifeChangedEvent(action.playerId, currentLife, newLife, LifeChangeReason.LIFE_LOSS))
             currentState = com.wingedsheep.engine.handlers.effects.DamageUtils.markLifeLostThisTurn(currentState, action.playerId)
+        }
+
+        // Pay targeting life cost imposed by opponent permanents (e.g. Terror of the Peaks).
+        // "Spells your opponents cast that target this creature cost an additional 3 life to cast."
+        if (action.targets.isNotEmpty()) {
+            val targetingLifeCost = costCalculator.calculateTargetingLifeCost(
+                currentState, action.playerId, action.targets
+            )
+            if (targetingLifeCost > 0) {
+                val currentLife = currentState.getEntity(action.playerId)
+                    ?.get<LifeTotalComponent>()?.life ?: 0
+                val newLife = currentLife - targetingLifeCost
+                currentState = currentState.updateEntity(action.playerId) { container ->
+                    container.with(LifeTotalComponent(newLife))
+                }
+                events.add(LifeChangedEvent(action.playerId, currentLife, newLife, LifeChangeReason.PAYMENT))
+                currentState = DamageUtils.markLifeLostThisTurn(currentState, action.playerId)
+            }
         }
 
         // Compute target requirements for resolution-time re-validation (Rule 608.2b).

@@ -24,7 +24,9 @@ import com.wingedsheep.sdk.scripting.GrantAlternativeCastingCost
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.ModifySpellCost
 import com.wingedsheep.sdk.scripting.SpellCostTarget
+import com.wingedsheep.sdk.scripting.SpellTargetingLifeCost
 import com.wingedsheep.engine.handlers.PredicateEvaluator
+import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.engine.handlers.PredicateContext
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 
@@ -942,6 +944,35 @@ class CostCalculator(
             }
         }
         return increaseGenericCost(alternativeCost, totalIncrease)
+    }
+
+    /**
+     * Calculate the additional life an opponent must pay for a spell that targets
+     * permanents with [SpellTargetingLifeCost] static abilities (e.g. Terror of the Peaks).
+     *
+     * Only applies to targets whose controller is an opponent of [casterId].
+     * Called from [CastSpellHandler] to validate affordability and collect payment.
+     */
+    fun calculateTargetingLifeCost(
+        state: GameState,
+        casterId: EntityId,
+        targets: List<ChosenTarget>
+    ): Int {
+        val projected = state.projectedState
+        var total = 0
+        for (target in targets) {
+            if (target !is ChosenTarget.Permanent) continue
+            val targetController = projected.getController(target.entityId) ?: continue
+            if (targetController == casterId) continue
+            val card = state.getEntity(target.entityId)?.get<CardComponent>() ?: continue
+            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
+            val classLevel = state.getEntity(target.entityId)
+                ?.get<ClassLevelComponent>()?.currentLevel
+            for (ability in cardDef.script.effectiveStaticAbilities(classLevel)) {
+                if (ability is SpellTargetingLifeCost) total += ability.amount
+            }
+        }
+        return total
     }
 
     companion object {
