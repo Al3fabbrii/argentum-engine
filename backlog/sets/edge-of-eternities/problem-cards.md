@@ -37,9 +37,6 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Fungal Colossus
 - [ ] Survey Mechan
 
-## Legendary token:
-- [x] Adagia, Windswept Bastion
-
 ## NthSpell static ability
 - [x] Brightspear Zealot
 
@@ -47,7 +44,7 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 - [ ] Cosmogoyf
 
 ## Drone token:
-- [ ] Desculpting Blast
+- [x] Desculpting Blast
 - [ ] Station Monitor
 - [ ] Pinnacle Emissary
 
