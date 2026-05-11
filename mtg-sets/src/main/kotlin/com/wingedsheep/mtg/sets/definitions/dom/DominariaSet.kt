@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.limited.BoosterStrategy
 import com.wingedsheep.sdk.limited.GuaranteedLegendaryBooster
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.MtgSet
+import com.wingedsheep.sdk.model.Printing
 
 /**
  * Dominaria Set (2018)
@@ -30,6 +31,10 @@ object DominariaSet : MtgSet {
 
     override val basicLands: List<CardDefinition> by lazy {
         CardDiscovery.findBasicLandsIn(CARDS_PACKAGE).map { it.copy(setCode = code) }
+    }
+
+    override val printings: List<Printing> by lazy {
+        CardDiscovery.findPrintingsIn(CARDS_PACKAGE)
     }
 
     private const val CARDS_PACKAGE = "com.wingedsheep.mtg.sets.definitions.dom.cards"

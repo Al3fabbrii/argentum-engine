@@ -1,8 +1,9 @@
 package com.wingedsheep.mtg.sets.definitions.otj
 
-import com.wingedsheep.mtg.sets.definitions.otj.cards.*
+import com.wingedsheep.mtg.sets.discovery.CardDiscovery
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.MtgSet
+import com.wingedsheep.sdk.model.Printing
 
 /**
  * Outlaws of Thunder Junction (2024)
@@ -15,14 +16,13 @@ object OutlawsOfThunderJunctionSet : MtgSet {
     override val code = "OTJ"
     override val displayName = "Outlaws of Thunder Junction"
 
-    override val cards: List<CardDefinition> = listOf(
-        BristlyBillSpineSower,
-        BloomingMarsh,
-        BotanicalSanctum,
-        ConcealedCourtyard,
-        ForsakenMiner,
-        InspiringVantage,
-        ShootTheSheriff,
-        SpirebluffCanal,
-    )
+    override val cards: List<CardDefinition> by lazy {
+        CardDiscovery.findIn(CARDS_PACKAGE)
+    }
+
+    override val printings: List<Printing> by lazy {
+        CardDiscovery.findPrintingsIn(CARDS_PACKAGE)
+    }
+
+    private const val CARDS_PACKAGE = "com.wingedsheep.mtg.sets.definitions.otj.cards"
 }
