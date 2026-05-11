@@ -143,23 +143,14 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 ## X is 2 plus the number of creatures and/or Spacecraft you control.
 - [ ] Focus Fire
 
-## Creature spells you control can’t be countered.
-- [ ] Frenzied Baloth
-
 ## target creature has base power and toughness 3/3 until end of turn. If you control six or more lands, that creature has base power and toughness 6/6 until end of turn instead
 - [ ] Genemorph Imago
-
-## {T}, Tap an untapped permanent you control
-- [ ] Gene Pollinator
 
 ## This spell costs {3} less to cast if you’ve cast another spell this turn.
 - [ ] Gigastorm Titan
 
 ## Whenever one or more creatures you control with +1/+1 counters on them deal combat damage to a player, draw a card. (Only keyword by counter exists)
 - [ ] Haliya, Ascendant Cadet
-
-## This creature can’t be blocked if you’ve cast two or more spells this turn
-- [ ] Illvoi Infiltrator
 
 ## create a tapped 2/2 colorless Robot artifact creature token for each multicolored permanent you control.
 - [ ] Infinite Guideline Station
