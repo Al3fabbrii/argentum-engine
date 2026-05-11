@@ -59,18 +59,13 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 
 
 ## 4 damage to each creature:
-- [ ] Extinguisher Battleship
+- [x] Extinguisher Battleship
 
-## Additional land, land from graveyard
+## Additional land, land from graveyard - New mechanics needed
 - [ ] Icetill Explorer
 
-
-## Sacrifice, unless tap an untapped
+## Sacrifice, unless tap an untapped - New mechanics needed
 - [ ] Command Bridge
-
-## Deals damage to itself
-
-- [ ] Cut Propulsion
 
 ## Sacrifce, token, next endstep
 - [ ] Kav Landseeker
@@ -140,29 +135,17 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 ## Devour land 3
 - [ ] Famished Worldsire
 
-## then return a creature or Spacecraft card from your graveyard to your hand. (not target)
-- [ ] Fell Gravship
-
 ## X is 2 plus the number of creatures and/or Spacecraft you control.
 - [ ] Focus Fire
 
-## Creature spells you control can’t be countered.
-- [ ] Frenzied Baloth
-
 ## target creature has base power and toughness 3/3 until end of turn. If you control six or more lands, that creature has base power and toughness 6/6 until end of turn instead
 - [ ] Genemorph Imago
-
-## {T}, Tap an untapped permanent you control
-- [ ] Gene Pollinator
 
 ## This spell costs {3} less to cast if you’ve cast another spell this turn.
 - [ ] Gigastorm Titan
 
 ## Whenever one or more creatures you control with +1/+1 counters on them deal combat damage to a player, draw a card. (Only keyword by counter exists)
 - [ ] Haliya, Ascendant Cadet
-
-## This creature can’t be blocked if you’ve cast two or more spells this turn
-- [ ] Illvoi Infiltrator
 
 ## create a tapped 2/2 colorless Robot artifact creature token for each multicolored permanent you control.
 - [ ] Infinite Guideline Station

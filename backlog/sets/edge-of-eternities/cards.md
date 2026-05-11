@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 162 / 261
+**Implemented:** 166 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -44,7 +44,7 @@
 - [x] Cosmogrand Zenith
 - [x] Cryogen Relic
 - [x] Cryoshatter
-- [ ] Cut Propulsion
+- [x] Cut Propulsion
 - [x] Dark Endurance
 - [x] Dauntless Scrapbot
 - [x] Dawnsire, Sunstar Dreadnought
@@ -74,10 +74,10 @@
 - [x] Evendo, Waking Haven
 - [ ] Exalted Sunborn
 - [x] Exosuit Savior
-- [ ] Extinguisher Battleship
+- [x] Extinguisher Battleship
 - [ ] Faller's Faithful
 - [ ] Famished Worldsire
-- [ ] Fell Gravship
+- [x] Fell Gravship
 - [ ] Flight-Deck Coordinator
 - [ ] Focus Fire
 - [x] Frenzied Baloth
@@ -108,7 +108,7 @@
 - [x] Icecave Crasher
 - [ ] Icetill Explorer
 - [x] Illvoi Galeblade
-- [ ] Illvoi Infiltrator
+- [x] Illvoi Infiltrator
 - [x] Illvoi Light Jammer
 - [x] Illvoi Operative
 - [ ] Infinite Guideline Station
