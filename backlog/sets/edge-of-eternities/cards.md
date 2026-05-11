@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 154 / 261
+**Implemented:** 159 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -178,7 +178,7 @@
 - [ ] Rescue Skiff
 - [x] Rig for War
 - [ ] Roving Actuator
-- [ ] Ruinous Rampage
+- [x] Ruinous Rampage
 - [x] Rust Harvester
 - [x] Sacred Foundry
 - [x] Sami's Curiosity
@@ -194,14 +194,14 @@
 - [x] Seedship Impact
 - [ ] Selfcraft Mechan
 - [x] Shattered Wings
-- [ ] Singularity Rupture
+- [x] Singularity Rupture
 - [x] Sinister Cryologist
 - [ ] Skystinger
 - [x] Slagdrill Scrapper
 - [x] Sledge-Class Seedship
 - [ ] Sothera, the Supervoid
 - [ ] Space-Time Anomaly
-- [ ] Specimen Freighter
+- [x] Specimen Freighter
 - [x] Squire's Lightblade
 - [x] Starbreach Whale
 - [x] Starfield Shepherd
@@ -222,10 +222,10 @@
 - [ ] Susur Secundi, Void Altar
 - [x] Swarm Culler
 - [ ] Synthesizer Labship
-- [ ] Syr Vondam, Sunstar Exemplar
+- [x] Syr Vondam, Sunstar Exemplar
 - [x] Syr Vondam, the Lucent
 - [x] Systems Override
-- [ ] Tannuk, Memorial Ensign
+- [x] Tannuk, Memorial Ensign
 - [ ] Tannuk, Steadfast Second
 - [ ] Tapestry Warden
 - [x] Temporal Intervention
