@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 145 / 261
+**Implemented:** 146 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -50,7 +50,7 @@
 - [x] Dawnsire, Sunstar Dreadnought
 - [ ] Dawnstrike Vanguard
 - [x] Debris Field Crusher
-- [ ] Decode Transmissions
+- [x] Decode Transmissions
 - [x] Depressurize
 - [ ] Desculpting Blast
 - [ ] Devastating Onslaught

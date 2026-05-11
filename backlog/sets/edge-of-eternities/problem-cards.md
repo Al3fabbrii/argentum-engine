@@ -30,7 +30,6 @@ https://api.scryfall.com/cards/named?exact=Beyond%20the%20Quiet&set=eoe
 ## Void:
 
 - [x] Alpharael, Stonechosen
-- [ ] Decode Transmissions
 - [ ] Elegy Acolyte
 - [ ] Hylderblade
 - [ ] Hymn of the Faller
