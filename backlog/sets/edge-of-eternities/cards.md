@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 147 / 261
+**Implemented:** 149 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -228,7 +228,7 @@
 - [ ] Tannuk, Memorial Ensign
 - [ ] Tannuk, Steadfast Second
 - [ ] Tapestry Warden
-- [ ] Temporal Intervention
+- [x] Temporal Intervention
 - [ ] Terminal Velocity
 - [ ] Terrapact Intimidator
 - [ ] Terrasymbiosis
