@@ -9,7 +9,6 @@ import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaSpendOnChosenTypeEffect
-import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaSpendOnChosenTypeUncounterableEffect
 import com.wingedsheep.sdk.scripting.effects.AddColorlessManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddDynamicManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
@@ -105,7 +104,6 @@ object LandManaColorInspector {
             is AddColorlessManaEffect -> Unit
             is AddAnyColorManaEffect,
             is AddAnyColorManaSpendOnChosenTypeEffect,
-            is AddAnyColorManaSpendOnChosenTypeUncounterableEffect,
             is AddManaOfColorAmongEffect -> out.addAll(Color.entries)
             is AddManaOfChosenColorEffect -> {
                 sourceContainer.get<ChosenColorComponent>()?.color?.let { out.add(it) }

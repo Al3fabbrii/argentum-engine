@@ -1848,11 +1848,9 @@ class CastSpellHandler(
         var currentCastState = castResult.newState
         var allEvents = events + castResult.events
 
-        // Stamp spell as uncounterable when restricted mana with grantCantBeCountered was spent
-        if (paymentResult.usedUncounterableMana) {
-            currentCastState = currentCastState.updateEntity(action.cardId) { c ->
-                c.with(CantBeCounteredComponent)
-            }
+        // Apply any spell riders carried by the mana that paid for this spell.
+        for (rider in paymentResult.consumedRiders) {
+            currentCastState = applyManaSpellRider(currentCastState, action.cardId, rider)
         }
 
         // Record Muldrotha graveyard cast permission usage
@@ -2418,6 +2416,20 @@ class CastSpellHandler(
             cursor += slotCount
         }
         return result
+    }
+
+    /**
+     * Apply a single [com.wingedsheep.sdk.scripting.effects.ManaSpellRider] to a
+     * spell on the stack. Each rider variant maps to a specific component or
+     * marker on the spell card.
+     */
+    private fun applyManaSpellRider(
+        state: GameState,
+        spellEntityId: com.wingedsheep.sdk.model.EntityId,
+        rider: com.wingedsheep.sdk.scripting.effects.ManaSpellRider
+    ): GameState = when (rider) {
+        is com.wingedsheep.sdk.scripting.effects.ManaSpellRider.MakesSpellUncounterable ->
+            state.updateEntity(spellEntityId) { c -> c.with(CantBeCounteredComponent) }
     }
 
     companion object {

@@ -10,6 +10,7 @@ import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.scripting.effects.ManaRestriction
+import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
 import com.wingedsheep.gameserver.ScenarioTestBase
 import io.kotest.assertions.withClue
 import io.kotest.matchers.shouldBe
@@ -42,7 +43,7 @@ class CavernOfSoulsScenarioTest : ScenarioTestBase() {
         }
 
         context("Cavern of Souls — restricted colored mana ability (floating pool path)") {
-            test("produces restricted entry with grantCantBeCountered=true") {
+            test("produces restricted entry carrying MakesSpellUncounterable rider") {
                 val game = scenario()
                     .withPlayers("Player", "Opponent")
                     .withCardOnBattlefield(1, "Cavern of Souls")
@@ -61,9 +62,13 @@ class CavernOfSoulsScenarioTest : ScenarioTestBase() {
                 val pool = game.state.getEntity(game.player1Id)?.get<ManaPoolComponent>()!!
                 withClue("Pool should have 1 restricted entry") { pool.restrictedMana.size shouldBe 1 }
                 val entry = pool.restrictedMana.first()
-                withClue("Entry should grant cant-be-countered") { entry.grantCantBeCountered shouldBe true }
-                withClue("Entry restriction should be CreatureSubtypeOnly(Goblin)") {
-                    (entry.restriction as ManaRestriction.CreatureSubtypeOnly).subtype shouldBe "Goblin"
+                withClue("Entry should carry MakesSpellUncounterable rider") {
+                    entry.riders shouldBe setOf(ManaSpellRider.MakesSpellUncounterable)
+                }
+                withClue("Entry restriction should be SubtypeSpellsOrAbilitiesOnly(Goblin, creatureOnly = true)") {
+                    val r = entry.restriction as ManaRestriction.SubtypeSpellsOrAbilitiesOnly
+                    r.subtype shouldBe "Goblin"
+                    r.creatureOnly shouldBe true
                 }
             }
 

@@ -4,6 +4,7 @@ import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.ManaSymbol
 import com.wingedsheep.sdk.scripting.effects.ManaRestriction
+import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
 import com.wingedsheep.engine.state.components.player.RestrictedManaEntry
 import kotlinx.serialization.Serializable
 
@@ -33,9 +34,8 @@ fun ManaRestriction.isSatisfiedBy(context: SpellPaymentContext): Boolean = when 
     is ManaRestriction.SpellsMV4OrGreater -> context.manaValue >= 4
     is ManaRestriction.CreatureSpellsOnly -> context.isCreature
     is ManaRestriction.SubtypeSpellsOrAbilitiesOnly ->
-        context.subtypes.any { it.equals(subtype, ignoreCase = true) }
-    is ManaRestriction.CreatureSubtypeOnly ->
-        context.isCreature && context.subtypes.any { it.equals(subtype, ignoreCase = true) }
+        (!creatureOnly || context.isCreature) &&
+            context.subtypes.any { it.equals(subtype, ignoreCase = true) }
 }
 
 @Serializable
@@ -96,8 +96,13 @@ data class ManaPool(
     /**
      * Add restricted mana to the pool.
      */
-    fun addRestricted(color: Color?, amount: Int, restriction: ManaRestriction, grantCantBeCountered: Boolean = false): ManaPool {
-        val entries = (1..amount).map { RestrictedManaEntry(color, restriction, grantCantBeCountered) }
+    fun addRestricted(
+        color: Color?,
+        amount: Int,
+        restriction: ManaRestriction,
+        riders: Set<ManaSpellRider> = emptySet()
+    ): ManaPool {
+        val entries = (1..amount).map { RestrictedManaEntry(color, restriction, riders) }
         return copy(restrictedMana = restrictedMana + entries)
     }
 

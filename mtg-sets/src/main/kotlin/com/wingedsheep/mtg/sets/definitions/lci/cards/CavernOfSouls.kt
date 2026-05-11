@@ -7,6 +7,7 @@ import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.ChoiceType
 import com.wingedsheep.sdk.scripting.EntersWithChoice
 import com.wingedsheep.sdk.scripting.TimingRule
+import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
 
 /**
  * Cavern of Souls
@@ -35,7 +36,10 @@ val CavernOfSouls = card("Cavern of Souls") {
 
     activatedAbility {
         cost = AbilityCost.Tap
-        effect = Effects.AddAnyColorManaSpendOnChosenTypeUncounterable()
+        effect = Effects.AddAnyColorManaSpendOnChosenType(
+            creatureOnly = true,
+            riders = setOf(ManaSpellRider.MakesSpellUncounterable)
+        )
         manaAbility = true
         timing = TimingRule.ManaAbility
     }

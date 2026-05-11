@@ -26,7 +26,6 @@ import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.ActivationRestriction
 import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaSpendOnChosenTypeEffect
-import com.wingedsheep.sdk.scripting.effects.AddAnyColorManaSpendOnChosenTypeUncounterableEffect
 import com.wingedsheep.sdk.scripting.effects.AddColorlessManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddDynamicManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
@@ -36,6 +35,7 @@ import com.wingedsheep.sdk.scripting.effects.AddManaOfColorLandsCouldProduceEffe
 import com.wingedsheep.sdk.scripting.effects.LandControllerScope
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.ManaRestriction
+import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
 import com.wingedsheep.sdk.scripting.ActivatedAbility
 import com.wingedsheep.sdk.scripting.AdditionalManaOnSourceTap
 import com.wingedsheep.sdk.scripting.AdditionalManaOnTap
@@ -79,8 +79,14 @@ data class ManaSource(
     val bonusManaColor: Color? = null,
     /** Mana spending restriction (e.g., "only for instant/sorcery"). Null = unrestricted. */
     val restriction: ManaRestriction? = null,
-    /** True when tapping this source for any spell makes that spell uncounterable (Cavern of Souls). */
-    val grantCantBeCountered: Boolean = false,
+    /**
+     * Per-color spell riders attached to mana this source produces (e.g. Cavern of
+     * Souls' colored mana carries [ManaSpellRider.MakesSpellUncounterable]). Tracked
+     * per-color so a fused source with mixed rider/non-rider abilities (e.g. an
+     * uncounterable colored ability alongside a plain colorless ability) attributes
+     * riders only to the color the rider-bearing ability actually produces.
+     */
+    val colorRiders: Map<Color, Set<ManaSpellRider>> = emptyMap(),
     /** Per-color mana restrictions. Colors not in this map are unrestricted. */
     val colorRestrictions: Map<Color, ManaRestriction> = emptyMap(),
     /**
@@ -116,8 +122,13 @@ data class ManaSolution(
     val manaProduced: Map<EntityId, ManaProduction>,
     /** Bonus mana remaining after the solver consumed some to pay the cost */
     val remainingBonusMana: Map<Color, Int> = emptyMap(),
-    /** True when any tapped source grants can't-be-countered (e.g. Cavern of Souls). */
-    val usedUncounterableMana: Boolean = false
+    /**
+     * Spell riders consumed by this solution — the union of riders attached to the
+     * specific (source, color) slots actually tapped (e.g. Cavern of Souls' colored
+     * ability contributes [ManaSpellRider.MakesSpellUncounterable] when tapped for
+     * a color, but its colorless `{T}: Add {C}` ability does not).
+     */
+    val consumedRiders: Set<ManaSpellRider> = emptySet()
 )
 
 /**
@@ -376,10 +387,11 @@ class ManaSolver(
             genericRemaining--
         }
 
-        val usedUncounterableMana = usedSources.any { source ->
-            source.grantCantBeCountered && manaProduced[source.entityId]?.color != null
+        val consumedRiders: Set<ManaSpellRider> = usedSources.flatMapTo(mutableSetOf()) { source ->
+            val color = manaProduced[source.entityId]?.color ?: return@flatMapTo emptySet()
+            source.colorRiders[color] ?: emptySet()
         }
-        return ManaSolution(usedSources, manaProduced, bonusManaPool.filter { it.value > 0 }, usedUncounterableMana)
+        return ManaSolution(usedSources, manaProduced, bonusManaPool.filter { it.value > 0 }, consumedRiders)
     }
 
     /**
@@ -587,8 +599,11 @@ class ManaSolver(
             val perColorRestrictions = mutableMapOf<Color, ManaRestriction?>()
             // Track the minimum mana-cost-to-activate per color (cheapest ability producing it)
             val perColorActivationCost = mutableMapOf<Color, Int>()
-            // True if any ability on this source grants can't-be-countered when used
-            var sourceGrantsCantBeCountered = false
+            // Spell riders contributed per color by abilities on this source (e.g.
+            // Cavern of Souls' "Add one mana of any color" carries
+            // MakesSpellUncounterable on every color it can produce, while its
+            // plain `{T}: Add {C}` ability contributes nothing).
+            val perColorRiders = mutableMapOf<Color, MutableSet<ManaSpellRider>>()
 
             for (ability in manaAbilities) {
                 // Skip abilities whose activation restrictions aren't satisfied
@@ -656,7 +671,6 @@ class ManaSolver(
                             it is AddColorlessManaEffect ||
                             it is AddAnyColorManaEffect ||
                             it is AddAnyColorManaSpendOnChosenTypeEffect ||
-                            it is AddAnyColorManaSpendOnChosenTypeUncounterableEffect ||
                             it is AddManaOfColorAmongEffect ||
                             it is AddManaOfColorLandsCouldProduceEffect ||
                             it is AddManaOfChosenColorEffect ||
@@ -693,19 +707,12 @@ class ManaSolver(
                             effectColors.addAll(Color.entries)
                             val manaAmount = evaluateManaAmount(effect.amount, state, entityId, playerId)
                             maxManaAmount = maxOf(maxManaAmount, manaAmount)
-                            com.wingedsheep.sdk.scripting.effects.ManaRestriction.SubtypeSpellsOrAbilitiesOnly(chosenType)
-                        } else null
-                    }
-                    is AddAnyColorManaSpendOnChosenTypeUncounterableEffect -> {
-                        val chosenType = state.getEntity(entityId)
-                            ?.get<ChosenCreatureTypeComponent>()?.creatureType
-                        if (chosenType != null) {
-                            combinedColors.addAll(Color.entries)
-                            effectColors.addAll(Color.entries)
-                            val manaAmount = evaluateManaAmount(effect.amount, state, entityId, playerId)
-                            maxManaAmount = maxOf(maxManaAmount, manaAmount)
-                            sourceGrantsCantBeCountered = true
-                            com.wingedsheep.sdk.scripting.effects.ManaRestriction.CreatureSubtypeOnly(chosenType)
+                            if (effect.riders.isNotEmpty()) {
+                                for (color in Color.entries) {
+                                    perColorRiders.getOrPut(color) { mutableSetOf() }.addAll(effect.riders)
+                                }
+                            }
+                            ManaRestriction.SubtypeSpellsOrAbilitiesOnly(chosenType, effect.creatureOnly)
                         } else null
                     }
                     is AddManaOfColorAmongEffect -> {
@@ -839,7 +846,7 @@ class ManaSolver(
                     canAttack = canAttack,
                     manaAmount = maxManaAmount,
                     restriction = sourceRestriction,
-                    grantCantBeCountered = sourceGrantsCantBeCountered,
+                    colorRiders = perColorRiders.mapValues { (_, v) -> v.toSet() },
                     colorRestrictions = restrictedColors,
                     colorActivationManaCost = colorActivationCosts
                 )
@@ -1361,10 +1368,6 @@ class ManaSolver(
                         anyColorTotal += activationCount * amount
                     }
                     is AddAnyColorManaSpendOnChosenTypeEffect -> {
-                        val amount = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1
-                        anyColorTotal += activationCount * amount
-                    }
-                    is AddAnyColorManaSpendOnChosenTypeUncounterableEffect -> {
                         val amount = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1
                         anyColorTotal += activationCount * amount
                     }

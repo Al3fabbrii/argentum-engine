@@ -15,15 +15,21 @@ import com.wingedsheep.engine.mechanics.mana.ManaPool
 import com.wingedsheep.engine.mechanics.mana.SpellPaymentContext
 import com.wingedsheep.engine.mechanics.mana.isSatisfiedBy
 import com.wingedsheep.engine.state.components.player.RestrictedManaEntry
+import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
 
 /**
  * Result of a mana payment attempt.
+ *
+ * @property consumedRiders Union of [ManaSpellRider]s carried by the mana actually
+ *   spent on this payment (from both restricted floating mana and freshly-tapped
+ *   sources). The caller applies each rider to the spell as it goes on the stack —
+ *   e.g. [ManaSpellRider.MakesSpellUncounterable] stamps `CantBeCounteredComponent`.
  */
 data class PaymentResult(
     val state: GameState,
     val events: List<GameEvent>,
     val error: String?,
-    val usedUncounterableMana: Boolean = false
+    val consumedRiders: Set<ManaSpellRider> = emptySet()
 )
 
 /**
@@ -184,8 +190,8 @@ class CastPaymentProcessor(
             colorless = colorlessSpent
         )
 
-        val usedUncounterable = wasUncounterableManaSpent(poolComponent.restrictedMana, poolAfterPayment.restrictedMana)
-        return PaymentResult(newState, listOf(event), null, usedUncounterable)
+        val consumedRiders = ridersConsumedDuringPayment(poolComponent.restrictedMana, poolAfterPayment.restrictedMana)
+        return PaymentResult(newState, listOf(event), null, consumedRiders)
     }
 
     private fun autoPay(
@@ -271,11 +277,11 @@ class CastPaymentProcessor(
         }
 
         // Tap lands for remaining cost (using xRemainingToPay instead of full xValue)
-        var solutionUsedUncounterable = false
+        var solutionConsumedRiders: Set<ManaSpellRider> = emptySet()
         if (!remainingCost.isEmpty() || xRemainingToPay > 0) {
             val solution = manaSolver.solve(currentState, playerId, remainingCost, xRemainingToPay, excludeSources = excludeSources, spellContext = spellContext)
                 ?: return PaymentResult(currentState, events, "Not enough mana to auto-pay")
-            solutionUsedUncounterable = solution.usedUncounterableMana
+            solutionConsumedRiders = solution.consumedRiders
 
             // Tap each source AND run any non-mana side effects of the matching
             // activated mana ability (e.g. Adarkar Wastes' "this land deals 1
@@ -322,9 +328,9 @@ class CastPaymentProcessor(
             )
         )
 
-        val usedUncounterable = wasUncounterableManaSpent(poolComponent.restrictedMana, poolAfterPayment.restrictedMana)
-            || solutionUsedUncounterable
-        return PaymentResult(currentState, events, null, usedUncounterable)
+        val consumedRiders =
+            ridersConsumedDuringPayment(poolComponent.restrictedMana, poolAfterPayment.restrictedMana) + solutionConsumedRiders
+        return PaymentResult(currentState, events, null, consumedRiders)
     }
 
     /**
@@ -373,15 +379,25 @@ class CastPaymentProcessor(
     }
 
     /**
-     * Returns true if any restricted mana with [RestrictedManaEntry.grantCantBeCountered]
-     * was consumed (present in [before] but not in [after]).
+     * Union of [ManaSpellRider]s carried by restricted mana entries that disappeared
+     * during payment (present in [before], gone from [after] after multiset
+     * subtraction). Used to detect that e.g. Cavern of Souls' floating restricted
+     * mana was spent on the cast.
      */
-    private fun wasUncounterableManaSpent(
+    private fun ridersConsumedDuringPayment(
         before: List<RestrictedManaEntry>,
         after: List<RestrictedManaEntry>
-    ): Boolean {
-        val beforeCount = before.count { it.grantCantBeCountered }
-        val afterCount = after.count { it.grantCantBeCountered }
-        return beforeCount > afterCount
+    ): Set<ManaSpellRider> {
+        val remaining = after.toMutableList()
+        val consumed = mutableSetOf<ManaSpellRider>()
+        for (entry in before) {
+            val idx = remaining.indexOfFirst { it == entry }
+            if (idx >= 0) {
+                remaining.removeAt(idx)
+            } else if (entry.riders.isNotEmpty()) {
+                consumed.addAll(entry.riders)
+            }
+        }
+        return consumed
     }
 }
