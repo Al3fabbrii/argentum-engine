@@ -303,6 +303,7 @@ class CostCalculator(
                     source.amount
                 else 0
             }
+            is CostReductionSource.DifferentlyNamedLandsYouControl -> countDifferentlyNamedLands(state, playerId)
         }
     }
 
@@ -595,6 +596,20 @@ class CostCalculator(
         }
 
         return colors.size
+    }
+
+    /**
+     * Count differently named lands controlled by a player.
+     * Each land's English name is counted once — duplicates don't increase the total.
+     */
+    private fun countDifferentlyNamedLands(state: GameState, playerId: EntityId): Int {
+        val names = mutableSetOf<String>()
+        state.getBattlefield(playerId).forEach { entityId ->
+            val card = state.getEntity(entityId)?.get<CardComponent>() ?: return@forEach
+            if (!card.typeLine.isLand) return@forEach
+            names.add(card.name)
+        }
+        return names.size
     }
 
     /**
