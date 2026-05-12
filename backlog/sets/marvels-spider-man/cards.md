@@ -2,7 +2,7 @@
 
 **Set Size:** 188 booster cards (excluding basic lands and tokens)
 **Release Date:** September 26, 2025
-**Implemented:** 4 / 188
+**Implemented:** 5 / 188
 ---
 
 - [x] Agent Venom
@@ -53,7 +53,7 @@
 - [ ] Hydro-Man, Fluid Felon
 - [ ] Impostor Syndrome
 - [ ] Inner Demons Gangsters
-- [ ] Interdimensional Web Watch
+- [x] Interdimensional Web Watch
 - [ ] Iron Spider, Stark Upgrade
 - [ ] J. Jonah Jameson
 - [ ] Jackal, Genius Geneticist
