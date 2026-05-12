@@ -291,6 +291,21 @@ sealed interface CardPredicate : TextReplaceable<CardPredicate> {
         override fun applyTextReplacement(replacer: TextReplacer): CardPredicate = this
     }
 
+    /**
+     * Mana value at most that of a referenced entity. Resolves the entity from
+     * [PredicateContext] (triggering entity, source permanent, etc.) and compares against
+     * its [com.wingedsheep.sdk.model.CardComponent]'s mana value.
+     *
+     * Used by cards like Kodama of the East Tree: "a permanent card with equal or lesser
+     * mana value [than the permanent that just entered]".
+     */
+    @SerialName("ManaValueAtMostEntity")
+    @Serializable
+    data class ManaValueAtMostEntity(val reference: EntityReference) : CardPredicate {
+        override val description: String = "with mana value less than or equal to ${reference.description}"
+        override fun applyTextReplacement(replacer: TextReplacer): CardPredicate = this
+    }
+
     // =============================================================================
     // Power/Toughness Predicates
     // =============================================================================

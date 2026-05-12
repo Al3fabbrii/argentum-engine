@@ -19,7 +19,7 @@
 - [x] 1 Goreclaw, Terror of Qal Sisma
 - [x] 1 Grothama, All-Devouring
 - [x] 1 Grumgully, the Generous
-- [ ] 1 Kodama of the East Tree
+- [x] 1 Kodama of the East Tree
 - [ ] 1 Llanowar Loamspeaker
 - [ ] 1 Lotus Cobra
 - [ ] 1 Prosperous Bandit

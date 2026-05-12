@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 43 / 312
+**Implemented:** 44 / 312
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 37    | 0    |
@@ -158,7 +158,7 @@
 - [ ] Kalonian Hydra
 - [ ] Karn, the Great Creator
 - [x] Karplusan Forest
-- [ ] Kodama of the East Tree
+- [x] Kodama of the East Tree
 - [ ] Kwain, Itinerant Meddler
 - [ ] Kykar, Wind's Fury
 - [ ] Liliana of the Dark Realms

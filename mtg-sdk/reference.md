@@ -704,6 +704,7 @@ constructors.
 - `Filters.Unified.instant` / `.sorcery` / `.permanent` / `.nonlandPermanent` / `.instantOrSorcery`
 - `Filters.Unified.withColor(color)` / `.withSubtype(subtype)` / `.withAnyOfSubtypes(listOf(Subtype("A"), Subtype("B")))` / `.withKeyword(keyword)`
 - `Filters.Unified.manaValueAtMost(max)` / `.manaValueAtLeast(min)`
+- `Filters.Unified.manaValueAtMostEntity(EntityReference.Triggering)` — mana value at most that of a referenced entity (triggering permanent, source, etc.); useful for "permanent card with equal or lesser mana value [than the permanent that just entered]" (Kodama of the East Tree)
 - `GameObjectFilter.Creature.totalPowerAndToughnessAtMost(max)` — creature cards/permanents with combined P/T at most `max`
 
 ---

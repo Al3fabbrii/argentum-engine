@@ -265,6 +265,12 @@ class PredicateEvaluator {
                 val cmc = if (projectedValues?.isFaceDown == true) 0 else card.manaValue
                 cmc >= predicate.min
             }
+            is CardPredicate.ManaValueAtMostEntity -> {
+                val refEntityId = resolveEntityReference(predicate.reference, context) ?: return false
+                val refManaValue = state.getEntity(refEntityId)?.get<CardComponent>()?.manaValue ?: return false
+                val cmc = if (projectedValues?.isFaceDown == true) 0 else card.manaValue
+                cmc <= refManaValue
+            }
 
             // Power/toughness predicates - use projected P/T
             is CardPredicate.PowerEquals -> {
@@ -553,6 +559,11 @@ class PredicateEvaluator {
                 xValue == null || card.manaValue <= xValue
             }
             is CardPredicate.ManaValueAtLeast -> card.manaValue >= predicate.min
+            is CardPredicate.ManaValueAtMostEntity -> {
+                val refEntityId = resolveEntityReference(predicate.reference, context) ?: return false
+                val refManaValue = state.getEntity(refEntityId)?.get<CardComponent>()?.manaValue ?: return false
+                card.manaValue <= refManaValue
+            }
 
             // Power/toughness predicates
             is CardPredicate.PowerEquals -> {
@@ -942,6 +953,8 @@ class PredicateEvaluator {
             // ManaValueAtMostX is target-time only; without context it cannot match record-level history.
             CardPredicate.ManaValueAtMostX -> false
             is CardPredicate.ManaValueAtLeast -> record.manaValue >= predicate.min
+            // Entity-relative — no entity context for cast records
+            is CardPredicate.ManaValueAtMostEntity -> false
 
             // Power/toughness — not meaningful for cast records
             is CardPredicate.PowerEquals, is CardPredicate.PowerAtMost, is CardPredicate.PowerAtLeast,

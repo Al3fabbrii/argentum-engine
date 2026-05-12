@@ -210,6 +210,11 @@ data class GameObjectFilter(
         cardPredicates = cardPredicates + CardPredicate.ManaValueAtLeast(min)
     )
 
+    /** Mana value at most that of a referenced entity (triggering, source, etc.) */
+    fun manaValueAtMostEntity(reference: EntityReference) = copy(
+        cardPredicates = cardPredicates + CardPredicate.ManaValueAtMostEntity(reference)
+    )
+
     /** Power equals */
     fun power(value: Int) = copy(
         cardPredicates = cardPredicates + CardPredicate.PowerEquals(value)
