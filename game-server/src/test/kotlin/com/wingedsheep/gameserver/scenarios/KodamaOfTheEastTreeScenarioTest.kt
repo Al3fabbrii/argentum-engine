@@ -79,6 +79,43 @@ class KodamaOfTheEastTreeScenarioTest : ScenarioTestBase() {
                 }
             }
 
+            test("permanent put onto the battlefield with this ability does NOT re-trigger Kodama") {
+                // Oracle: "if it wasn't put onto the battlefield with this ability, you
+                // may put a permanent card...". So when Kodama's own trigger puts
+                // Grizzly Bears onto the battlefield, Grizzly Bears entering must NOT
+                // cause Kodama to trigger again — Llanowar Elves must stay in hand.
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardOnBattlefield(1, "Kodama of the East Tree")
+                    .withCardInHand(1, "Elite Cat Warrior")    // MV 3 — initial trigger source
+                    .withCardInHand(1, "Grizzly Bears")        // MV 2 — pay-off for first trigger
+                    .withCardInHand(1, "Llanowar Elves")       // MV 1 — would chain off Bears IF the
+                                                               // anti-loop guard were missing
+                    .withLandsOnBattlefield(1, "Forest", 3)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                game.castSpell(1, "Elite Cat Warrior")
+                game.resolveStack()
+
+                // First trigger: pick Grizzly Bears.
+                val bearsInHand = game.findCardsInHand(1, "Grizzly Bears")
+                game.selectCards(bearsInHand)
+                game.resolveStack()
+
+                withClue("Grizzly Bears entered the battlefield via Kodama") {
+                    game.findAllPermanents("Grizzly Bears").size shouldBe 1
+                }
+                withClue("Llanowar Elves must NOT have been chained in — Bears' entry should not re-trigger Kodama") {
+                    game.findCardsInHand(1, "Llanowar Elves").size shouldBe 1
+                    game.findAllPermanents("Llanowar Elves").size shouldBe 0
+                }
+                withClue("No further decision should be pending") {
+                    game.hasPendingDecision() shouldBe false
+                }
+            }
+
             test("declining the optional trigger leaves the eligible card in hand") {
                 val game = scenario()
                     .withPlayers("Player", "Opponent")

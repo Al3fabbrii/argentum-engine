@@ -89,9 +89,37 @@ class MoveCollectionExecutor(
                     }
                     result = EffectResult.success(newState, result.events).copy(updatedCollections = result.updatedCollections)
                 }
+                if (effect.markEnteredViaSourceAbility && destination.zone == Zone.BATTLEFIELD && result.isSuccess) {
+                    result = markEnteredViaSourceAbility(result, context, cards)
+                }
                 result
             }
         }
+    }
+
+    /**
+     * Stamp each card that just landed on the battlefield with an
+     * [com.wingedsheep.engine.state.components.battlefield.EnteredViaAbilityComponent]
+     * referencing the resolving ability's source permanent. Used by anti-loop guards
+     * like Kodama of the East Tree's "if it wasn't put onto the battlefield with this
+     * ability" intervening-if. Cards that ended up off the battlefield (e.g., redirected
+     * by a replacement effect) are skipped — the component would not apply to them.
+     */
+    private fun markEnteredViaSourceAbility(
+        result: EffectResult,
+        context: EffectContext,
+        cards: List<EntityId>
+    ): EffectResult {
+        val sourceId = context.sourceId ?: return result
+        var newState = result.state
+        for (cardId in cards) {
+            val zone = findCurrentZone(newState, cardId, newState.getEntity(cardId)?.get<CardComponent>()?.ownerId ?: continue)
+            if (zone != Zone.BATTLEFIELD) continue
+            newState = newState.updateEntity(cardId) { c ->
+                c.with(com.wingedsheep.engine.state.components.battlefield.EnteredViaAbilityComponent(sourceId))
+            }
+        }
+        return EffectResult.success(newState, result.events).copy(updatedCollections = result.updatedCollections)
     }
 
     /**

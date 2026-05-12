@@ -92,6 +92,20 @@ data object TriggeringEntityEnteredOrWasCastFromGraveyard : Condition {
 }
 
 /**
+ * Condition: "if it wasn't put onto the battlefield with this ability".
+ * True when the triggering entity does NOT carry an `EnteredViaAbilityComponent`
+ * pointing to this trigger's source permanent. Used to break ETB-trigger loops on
+ * cards like Kodama of the East Tree, where the trigger's own pay-off (putting a
+ * card from hand onto the battlefield) would otherwise re-fire the trigger.
+ */
+@SerialName("TriggeringEntityWasNotPutByThisSource")
+@Serializable
+data object TriggeringEntityWasNotPutByThisSource : Condition {
+    override val description: String = "if it wasn't put onto the battlefield with this ability"
+    override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+}
+
+/**
  * Condition: "if it had a -1/-1 counter on it" (intervening-if for dies/leaves triggers).
  * Reads the last-known -1/-1 counter count captured on the dying entity at the moment
  * it left the battlefield (Rule 603.10 / 603.6c). Used by cards like Retched Wretch

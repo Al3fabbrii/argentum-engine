@@ -2,6 +2,7 @@ package com.wingedsheep.mtg.sets.definitions.blc.cards
 
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Zone
+import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
@@ -33,8 +34,11 @@ import com.wingedsheep.sdk.scripting.values.EntityReference
  * - Partner is omitted; the engine does not yet model multi-commander decks, and the
  *   Animated Army precon uses Bello as a single commander.
  * - The "if it wasn't put onto the battlefield with this ability" anti-loop guard is
- *   omitted: the trigger is a "may", so the player can decline to break any chain. A
- *   future move-source tracker could enforce the literal Oracle wording.
+ *   modeled by `MoveCollectionEffect.markEnteredViaSourceAbility` + the intervening-if
+ *   `Conditions.TriggeringEntityWasNotPutByThisSource`: cards Kodama puts onto the
+ *   battlefield are stamped with `EnteredViaAbilityComponent(thisKodamaId)`, and the
+ *   trigger ignores entries carrying that marker for *this* Kodama. Another copy of
+ *   Kodama still triggers off the same entry.
  */
 val KodamaOfTheEastTree = card("Kodama of the East Tree") {
     manaCost = "{4}{G}{G}"
@@ -52,6 +56,10 @@ val KodamaOfTheEastTree = card("Kodama of the East Tree") {
 
     triggeredAbility {
         trigger = Triggers.OtherPermanentYouControlEnters
+        // Anti-loop: the trigger ignores permanents that Kodama itself put onto the
+        // battlefield. Set as an intervening-if (Rule 603.4) so the trigger never goes
+        // on the stack for chained entries.
+        triggerCondition = Conditions.TriggeringEntityWasNotPutByThisSource
         // The "you may" is modeled by `ChooseUpTo(1)` — the player can pick zero cards
         // to decline. No separate yes/no decision is required.
         effect = CompositeEffect(
@@ -72,7 +80,8 @@ val KodamaOfTheEastTree = card("Kodama of the East Tree") {
                 ),
                 MoveCollectionEffect(
                     from = "kodama_putting",
-                    destination = CardDestination.ToZone(Zone.BATTLEFIELD, Player.You)
+                    destination = CardDestination.ToZone(Zone.BATTLEFIELD, Player.You),
+                    markEnteredViaSourceAbility = true
                 )
             )
         )

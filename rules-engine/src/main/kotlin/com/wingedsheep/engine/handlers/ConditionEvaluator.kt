@@ -7,6 +7,7 @@ import com.wingedsheep.engine.state.components.battlefield.AttachedToComponent
 import com.wingedsheep.engine.state.components.battlefield.CastFromHandComponent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.engine.state.components.battlefield.EnteredThisTurnComponent
+import com.wingedsheep.engine.state.components.battlefield.EnteredViaAbilityComponent
 import com.wingedsheep.engine.state.components.battlefield.HasDealtCombatDamageToPlayerComponent
 import com.wingedsheep.engine.state.components.battlefield.HasDealtDamageComponent
 import com.wingedsheep.engine.state.components.battlefield.CastRecordComponent
@@ -62,6 +63,7 @@ import com.wingedsheep.sdk.scripting.conditions.TargetMatchesFilter
 import com.wingedsheep.sdk.scripting.conditions.TriggeringEntityEnteredOrWasCastFromGraveyard
 import com.wingedsheep.sdk.scripting.conditions.TriggeringEntityHadMinusOneMinusOneCounter
 import com.wingedsheep.sdk.scripting.conditions.TriggeringEntityWasHistoric
+import com.wingedsheep.sdk.scripting.conditions.TriggeringEntityWasNotPutByThisSource
 import com.wingedsheep.sdk.scripting.conditions.TriggeringSpellHasSingleTarget
 import com.wingedsheep.sdk.scripting.conditions.CollectionContainsMatch
 import com.wingedsheep.sdk.scripting.conditions.IsFirstSpellOfTypeCastThisTurn
@@ -126,6 +128,8 @@ class ConditionEvaluator {
                 evaluateTriggeringEntityEnteredOrWasCastFromGraveyard(state, context)
             is TriggeringEntityHadMinusOneMinusOneCounter ->
                 (context.triggerMinusOneMinusOneCounterCount ?: 0) > 0
+            is TriggeringEntityWasNotPutByThisSource ->
+                evaluateTriggeringEntityWasNotPutByThisSource(state, context)
             is TriggeringSpellHasSingleTarget -> evaluateTriggeringSpellHasSingleTarget(state, context)
             is TargetMatchesFilter -> evaluateTargetMatchesFilter(state, condition, context)
 
@@ -498,6 +502,16 @@ class ConditionEvaluator {
         val entity = state.getEntity(entityId) ?: return false
         return entity.has<com.wingedsheep.engine.state.components.battlefield.CastFromGraveyardComponent>() ||
             entity.has<com.wingedsheep.engine.state.components.battlefield.EnteredFromGraveyardComponent>()
+    }
+
+    private fun evaluateTriggeringEntityWasNotPutByThisSource(
+        state: GameState,
+        context: EffectContext
+    ): Boolean {
+        val triggeringId = context.triggeringEntityId ?: return true
+        val sourceId = context.sourceId ?: return true
+        val marker = state.getEntity(triggeringId)?.get<EnteredViaAbilityComponent>()
+        return marker?.sourceId != sourceId
     }
 
     private fun evaluateTriggeringSpellHasSingleTarget(

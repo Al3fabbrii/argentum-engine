@@ -294,6 +294,7 @@ object ZoneMovementUtils {
             .without<AttachmentsComponent>()
             .without<EnteredThisTurnComponent>()
             .without<ExileOnLeaveBattlefieldComponent>()
+            .without<com.wingedsheep.engine.state.components.battlefield.EnteredViaAbilityComponent>()
             .without<SagaComponent>()
             .without<ReplacementEffectSourceComponent>()
             .without<TimestampComponent>()

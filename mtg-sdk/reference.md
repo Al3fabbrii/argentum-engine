@@ -769,6 +769,7 @@ constructors.
 - `Conditions.SacrificedHadSubtype(subtype)` — a permanent sacrificed as cost had specific subtype
 - `Conditions.TriggeringEntityWasHistoric` — the triggering entity was historic (legendary, artifact, or Saga)
 - `Conditions.TriggeringEntityHadMinusOneMinusOneCounter` — the triggering entity had a -1/-1 counter on it when it left the battlefield (intervening-if for dies/leaves triggers, e.g., Retched Wretch)
+- `Conditions.TriggeringEntityWasNotPutByThisSource` — the triggering entity was NOT put onto the battlefield by *this* source's ability. Pair with `MoveCollectionEffect(markEnteredViaSourceAbility = true)` so the put-from-ability move stamps `EnteredViaAbilityComponent`. Breaks ETB-trigger loops on cards like Kodama of the East Tree.
 - `Conditions.TriggeringSpellHasSingleTarget` — the triggering spell or ability has exactly one target chosen (Spinerock Tyrant)
 
 ### Turn

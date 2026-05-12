@@ -95,6 +95,20 @@ data class CastRecordComponent(
 data object ExileOnLeaveBattlefieldComponent : Component
 
 /**
+ * Records that this permanent entered the battlefield via a tracked ability of a
+ * specific source permanent. Used to satisfy "if it wasn't put onto the battlefield
+ * with this ability" anti-loop clauses (e.g., Kodama of the East Tree).
+ *
+ * Set by `MoveCollectionEffect` when the executor is configured to tag the move with
+ * the resolving ability's source. Read by [com.wingedsheep.sdk.scripting.conditions.Condition.TriggeringEntityWasNotPutByThisSource]
+ * at trigger-evaluation time. The component is cleared on every subsequent move to the
+ * battlefield (so a permanent that left and re-entered via a different path starts
+ * clean).
+ */
+@Serializable
+data class EnteredViaAbilityComponent(val sourceId: EntityId) : Component
+
+/**
  * Tracks the current level of a Class enchantment (Rule 716).
  * Added when a Class enters the battlefield (starts at level 1).
  * Level advances when the player pays the level-up cost.

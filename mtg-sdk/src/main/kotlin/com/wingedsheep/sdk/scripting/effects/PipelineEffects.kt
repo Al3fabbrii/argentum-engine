@@ -614,7 +614,15 @@ data class MoveCollectionEffect(
     val noRegenerate: Boolean = false,
     val storeMovedAs: String? = null,
     val underOwnersControl: Boolean = false,
-    val addCounterType: CounterType? = null
+    val addCounterType: CounterType? = null,
+    /**
+     * When true, each card moved to the battlefield is stamped with an
+     * `EnteredViaAbilityComponent` referencing the resolving ability's source
+     * permanent. Enables "if it wasn't put onto the battlefield with this ability"
+     * anti-loop guards (Kodama of the East Tree). Ignored when the destination is
+     * not the battlefield.
+     */
+    val markEnteredViaSourceAbility: Boolean = false
 ) : Effect {
     override val description: String = buildString {
         if (revealed) append("Reveal and put") else append("Put")

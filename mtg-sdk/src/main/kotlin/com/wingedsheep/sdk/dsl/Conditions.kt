@@ -583,6 +583,16 @@ object Conditions {
         com.wingedsheep.sdk.scripting.conditions.TriggeringEntityHadMinusOneMinusOneCounter
 
     /**
+     * If the triggering entity was NOT put onto the battlefield by this source's ability.
+     * Used to break ETB-trigger loops on cards like Kodama of the East Tree:
+     * "if it wasn't put onto the battlefield with this ability". Pair with
+     * `MoveCollectionEffect.markEnteredViaSourceAbility = true` on the move that
+     * tags the entering permanent.
+     */
+    val TriggeringEntityWasNotPutByThisSource: ConditionInterface =
+        com.wingedsheep.sdk.scripting.conditions.TriggeringEntityWasNotPutByThisSource
+
+    /**
      * If the triggering spell or ability has exactly one target.
      * Reads the triggering entity's TargetsComponent (counts unique chosen targets).
      * Used by cards like Spinerock Tyrant.
