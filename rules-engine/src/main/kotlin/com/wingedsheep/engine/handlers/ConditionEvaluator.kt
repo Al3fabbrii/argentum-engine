@@ -76,6 +76,7 @@ import com.wingedsheep.sdk.scripting.conditions.YouAttackedWithCreaturesThisTurn
 import com.wingedsheep.sdk.scripting.conditions.YouCastSpellsThisTurn
 import com.wingedsheep.sdk.scripting.conditions.YouWereAttackedThisStep
 import com.wingedsheep.sdk.scripting.conditions.VoidCondition
+import com.wingedsheep.sdk.scripting.conditions.YouCastASpellWithManaValueNOrGreaterThisTurn
 
 /**
  * Evaluates conditions from the SDK against the game state.
@@ -142,6 +143,9 @@ class ConditionEvaluator {
             is IsFirstSpellOfTypeCastThisTurn -> evaluateFirstSpellOfType(state, condition, context)
             is YouCastSpellsThisTurn -> evaluateYouCastSpellsThisTurn(state, condition, context)
             is SourceAbilityResolvedNTimesThisTurn -> evaluateSourceAbilityResolvedNTimes(state, condition, context)
+            is YouCastASpellWithManaValueNOrGreaterThisTurn ->
+                (state.spellsCastThisTurnByPlayer[context.controllerId] ?: emptyList())
+                    .any { it.manaValue >= condition.threshold }
 
             // Void (Edge of Eternities ability word)
             is VoidCondition ->
