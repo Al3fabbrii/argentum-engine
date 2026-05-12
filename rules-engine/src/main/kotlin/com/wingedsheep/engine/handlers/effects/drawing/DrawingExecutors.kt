@@ -48,6 +48,7 @@ class DrawingExecutors(
         EachPlayerDiscardsOrLoseLifeExecutor(decisionHandler),
         ReplaceNextDrawWithExecutor(),
         ReadTheRunesExecutor(amountEvaluator, decisionHandler, cardRegistry),
-        EachPlayerDrawsForDamageDealtToSourceExecutor(drawCardsExecutor)
+        EachPlayerDrawsForDamageDealtToSourceExecutor(drawCardsExecutor),
+        com.wingedsheep.engine.handlers.effects.ConniveEffectHandler(cardRegistry, decisionHandler)
     )
 }
