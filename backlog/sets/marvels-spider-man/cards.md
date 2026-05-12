@@ -2,7 +2,7 @@
 
 **Set Size:** 188 booster cards (excluding basic lands and tokens)
 **Release Date:** September 26, 2025
-**Implemented:** 4 / 188
+**Implemented:** 6 / 188
 ---
 
 - [x] Agent Venom
@@ -98,10 +98,10 @@
 - [ ] Pumpkin Bombardment
 - [ ] Radioactive Spider
 - [ ] Raging Goblinoids
-- [ ] Rent Is Due
+- [x] Rent Is Due
 - [ ] Rhino's Rampage
 - [ ] Rhino, Barreling Brute
-- [ ] Risky Research
+- [x] Risky Research
 - [ ] Robotics Mastery
 - [ ] Rocket-Powered Goblin Glider
 - [x] Romantic Rendezvous
