@@ -42,6 +42,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.core.CountersAddedEvent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
+import com.wingedsheep.engine.state.components.battlefield.LinkedExileComponent
 import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.sdk.core.Counters
 import com.wingedsheep.sdk.core.CounterType
@@ -1127,6 +1128,12 @@ class CastSpellHandler(
 
         val xValue = action.xValue ?: 0
         val cardDef = cardRegistry.getCard(cardComponent.cardDefinitionId)
+
+        // Rule 400.7: a card that changed zones is a new object. Drop any stale
+        // LinkedExileComponent carried over from a previous battlefield visit (e.g.
+        // Veteran Survivor bounced to hand, then recast) before additional costs run —
+        // a behold-and-exile cost on this same cast will attach a fresh one afterwards.
+        currentState = currentState.updateEntity(action.cardId) { c -> c.without<LinkedExileComponent>() }
 
         // Cast-time mode selection for choose-N modal spells (rules 601.2b, 700.2).
         // Must run before cost payment so cancellation leaves no side effects.
