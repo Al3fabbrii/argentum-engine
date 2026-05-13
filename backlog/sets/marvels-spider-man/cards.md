@@ -2,7 +2,7 @@
 
 **Set Size:** 188 booster cards (excluding basic lands and tokens)
 **Release Date:** September 26, 2025
-**Implemented:** 5 / 188
+**Implemented:** 4 / 188
 ---
 
 - [x] Agent Venom
@@ -96,7 +96,7 @@
 - [ ] Professional Wrestler
 - [ ] Prowler, Clawed Thief
 - [ ] Pumpkin Bombardment
-- [x] Radioactive Spider
+- [ ] Radioactive Spider
 - [ ] Raging Goblinoids
 - [ ] Rent Is Due
 - [ ] Rhino's Rampage
