@@ -24,5 +24,6 @@ val ProwlerClawedThief = card("Prowler, Clawed Thief") {
 
     metadata {
         rarity = Rarity.RARE
+        imageUri = "https://cards.scryfall.io/normal/front/b/d/bd31953a-7259-44e3-a94f-013bda68006d.jpg?1757377763"
     }
 }
