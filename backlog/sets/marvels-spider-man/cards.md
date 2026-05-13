@@ -50,7 +50,7 @@
 - [ ] Hydro-Man, Fluid Felon
 - [ ] Impostor Syndrome
 - [ ] Inner Demons Gangsters
-- [ ] Interdimensional Web Watch
+- [x] Interdimensional Web Watch
 - [ ] Iron Spider, Stark Upgrade
 - [ ] J. Jonah Jameson
 - [ ] Jackal, Genius Geneticist
