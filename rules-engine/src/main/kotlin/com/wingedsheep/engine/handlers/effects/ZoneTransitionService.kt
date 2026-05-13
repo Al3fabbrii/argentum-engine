@@ -1,5 +1,6 @@
 package com.wingedsheep.engine.handlers.effects
 
+import com.wingedsheep.engine.core.CardsDiscardedEvent
 import com.wingedsheep.engine.core.CountersAddedEvent
 import com.wingedsheep.engine.core.ZoneChangeEvent
 import com.wingedsheep.engine.core.GameEvent as EngineGameEvent
@@ -452,6 +453,24 @@ object ZoneTransitionService {
         }
 
         return ZoneTransitionResult(state = currentState, events = allEvents)
+    }
+
+    /**
+     * Move a card from a player's hand to their graveyard as a discard.
+     *
+     * Emits the standard `CardsDiscardedEvent` plus the `ZoneChangeEvent` produced by
+     * `moveToZone`, so dies/discard triggers and animations both see the canonical pair.
+     */
+    fun discardCard(state: GameState, playerId: EntityId, cardId: EntityId): ZoneTransitionResult {
+        val cardName = state.getEntity(cardId)?.get<CardComponent>()?.name ?: "Card"
+        val moveResult = moveToZone(
+            state = state,
+            entityId = cardId,
+            destinationZone = Zone.GRAVEYARD,
+            fromZoneKey = ZoneKey(playerId, Zone.HAND)
+        )
+        val discardEvent = CardsDiscardedEvent(playerId, listOf(cardId), listOf(cardName))
+        return moveResult.copy(events = listOf(discardEvent) + moveResult.events)
     }
 
     /**
