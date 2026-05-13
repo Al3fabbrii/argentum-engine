@@ -51,6 +51,7 @@ val JJonahJameson = card("J. Jonah Jameson") {
         rarity = Rarity.RARE
         collectorNumber = "81"
         artist = "Paolo Rivera"
+        flavorText = "\"The photos are garbage, Parker! I'll buy them all.\""
         imageUri = "https://cards.scryfall.io/normal/front/9/e/9ee905d6-b647-4eb1-a8d9-89add9bafc31.jpg?1761565998"
     }
 }
