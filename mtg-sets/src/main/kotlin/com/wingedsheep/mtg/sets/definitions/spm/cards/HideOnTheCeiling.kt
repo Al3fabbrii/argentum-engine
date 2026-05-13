@@ -9,14 +9,14 @@ import com.wingedsheep.sdk.model.Rarity
  * Hide on the Ceiling
  * {X}{U}
  * Instant
- * Exile X target artifacts and/or creatures. Return them to the battlefield
- * under their owners' control at the beginning of the next end step.
+ * Exile X target artifacts and/or creatures. Return the exiled cards to the
+ * battlefield under their owners' control at the beginning of the next end step.
  */
 val HideOnTheCeiling = card("Hide on the Ceiling") {
     manaCost = "{X}{U}"
     colorIdentity = "U"
     typeLine = "Instant"
-    oracleText = "Exile X target artifacts and/or creatures. Return them to the battlefield under their owners' control at the beginning of the next end step."
+    oracleText = "Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning of the next end step."
 
     spell {
         val target = target("target artifact or creature", Targets.CreatureOrArtifact)
@@ -25,8 +25,8 @@ val HideOnTheCeiling = card("Hide on the Ceiling") {
 
     metadata {
         rarity = Rarity.RARE
-        collectorNumber = "65"
-        artist = "Jarel Threat"
-        imageUri = "https://cards.scryfall.io/normal/front/7/a/7a18d1c3-e9cc-472e-861e-4b0eec2be8c4.jpg?1757377827"
+        collectorNumber = "32"
+        artist = "Fariba Khamseh"
+        imageUri = "https://cards.scryfall.io/normal/front/7/9/7977e448-01fa-4fa5-a275-0d6a1357b35c.jpg?1757376939"
     }
 }
