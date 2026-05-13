@@ -26,6 +26,6 @@ val RiskyResearch = card("Risky Research") {
         rarity = Rarity.UNCOMMON
         collectorNumber = "84"
         artist = "David Rapoza"
-        imageUri = "https://cards.scryfall.io/normal/front/3/c/3c2bc8a4-cd50-4f3e-a09f-0a6a93736ae7.jpg?1757377863"
+        imageUri = "https://cards.scryfall.io/normal/front/1/f/1f8aa705-6177-42e9-95cb-e7f880c186e3.jpg?1757377145"
     }
 }

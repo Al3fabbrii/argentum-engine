@@ -62,6 +62,6 @@ val RentIsDue = card("Rent Is Due") {
         rarity = Rarity.UNCOMMON
         collectorNumber = "20"
         artist = "Kekai Kotaki"
-        imageUri = "https://cards.scryfall.io/normal/front/b/e/be1f9d67-6a34-4a20-ad59-e0fd0fa0eb70.jpg?1757376788"
+        imageUri = "https://cards.scryfall.io/normal/front/b/3/b3f8d221-081f-49f5-a501-07e5eb21a840.jpg?1757376808"
     }
 }
