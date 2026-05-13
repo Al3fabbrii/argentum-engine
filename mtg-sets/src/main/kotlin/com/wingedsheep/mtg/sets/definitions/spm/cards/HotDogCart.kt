@@ -34,8 +34,9 @@ val HotDogCart = card("Hot Dog Cart") {
 
     metadata {
         rarity = Rarity.COMMON
-        collectorNumber = "240"
-        artist = "Jodie Muir"
+        collectorNumber = "164"
+        artist = "David Álvarez"
+        flavorText = "\"One with everything, please.\""
         imageUri = "https://cards.scryfall.io/normal/front/6/e/6ee3b883-e9f5-426f-a2ea-96fe9ff3aba9.jpg?1757378016"
     }
 }
