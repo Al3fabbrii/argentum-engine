@@ -106,7 +106,7 @@
 - [x] Hylderblade
 - [x] Hymn of the Faller
 - [x] Icecave Crasher
-- [ ] Icetill Explorer
+- [x] Icetill Explorer
 - [x] Illvoi Galeblade
 - [x] Illvoi Infiltrator
 - [x] Illvoi Light Jammer

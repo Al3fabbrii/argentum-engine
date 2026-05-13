@@ -960,6 +960,26 @@ object Effects {
         AddDynamicManaEffect(amount, allowedColors, restriction)
 
     /**
+     * Add N mana in any combination of the given colors. Player picks each pip's color
+     * independently at resolution. Defaults to all five colors — "Add N mana in any
+     * combination of colors" (e.g., Interdimensional Web Watch).
+     *
+     * For one or two allowed colors the executor falls back to its bulk/two-color split
+     * paths; with three or more colors it prompts pip-by-pip.
+     */
+    fun AddManaInAnyCombination(
+        amount: Int,
+        allowedColors: Set<Color> = Color.entries.toSet(),
+        restriction: ManaRestriction? = null
+    ): Effect = AddDynamicManaEffect(DynamicAmount.Fixed(amount), allowedColors, restriction)
+
+    fun AddManaInAnyCombination(
+        amount: DynamicAmount,
+        allowedColors: Set<Color> = Color.entries.toSet(),
+        restriction: ManaRestriction? = null
+    ): Effect = AddDynamicManaEffect(amount, allowedColors, restriction)
+
+    /**
      * Add one mana of the color chosen when this permanent entered the battlefield.
      * Used for cards like Uncharted Haven.
      */
@@ -1057,7 +1077,8 @@ object Effects {
         attacking: Boolean = false,
         triggeredAbilities: List<TriggeredAbility> = emptyList(),
         addedKeywords: Set<com.wingedsheep.sdk.core.Keyword> = emptySet(),
-        addedSupertypes: Set<com.wingedsheep.sdk.core.Supertype> = emptySet()
+        addedSupertypes: Set<com.wingedsheep.sdk.core.Supertype> = emptySet(),
+        removedSupertypes: Set<com.wingedsheep.sdk.core.Supertype> = emptySet()
     ): Effect = CreateTokenCopyOfTargetEffect(
         target = target,
         count = DynamicAmount.Fixed(count),
@@ -1067,7 +1088,8 @@ object Effects {
         attacking = attacking,
         triggeredAbilities = triggeredAbilities,
         addedKeywords = addedKeywords,
-        addedSupertypes = addedSupertypes
+        addedSupertypes = addedSupertypes,
+        removedSupertypes = removedSupertypes
     )
 
     /**
