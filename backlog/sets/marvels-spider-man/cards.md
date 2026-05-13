@@ -2,11 +2,9 @@
 
 **Set Size:** 188 booster cards (excluding basic lands and tokens)
 **Release Date:** September 26, 2025
-**Implemented:** 5 / 188
----
+**Implemented:** 9 / 188
 
 - [x] Agent Venom
-- [ ] Alien Symbiosis
 - [x] Angry Rabble
 - [x] Amazing Acrobatics
 - [ ] Anti-Venom, Horrifying Healer
@@ -98,10 +96,12 @@
 - [ ] Pumpkin Bombardment
 - [ ] Radioactive Spider
 - [ ] Raging Goblinoids
-- [ ] Rent Is Due
+- [x] Rent Is Due
 - [ ] Rhino's Rampage
 - [ ] Rhino, Barreling Brute
 - [ ] Risky Research
+- [x] Robotics Mastery
+- [x] Risky Research
 - [ ] Robotics Mastery
 - [ ] Rocket-Powered Goblin Glider
 - [x] Romantic Rendezvous
@@ -112,7 +112,7 @@
 - [ ] Scarlet Spider, Ben Reilly
 - [ ] Scarlet Spider, Kaine
 - [ ] School Daze
-- [ ] Scorpion's Sting
+- [x] Scorpion's Sting
 - [x] Scorpion, Seething Striker
 - [ ] Scout the City
 - [ ] Secret Identity
