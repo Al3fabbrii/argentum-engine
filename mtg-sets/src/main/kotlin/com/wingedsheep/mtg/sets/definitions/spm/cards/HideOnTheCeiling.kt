@@ -27,6 +27,7 @@ val HideOnTheCeiling = card("Hide on the Ceiling") {
         rarity = Rarity.RARE
         collectorNumber = "32"
         artist = "Fariba Khamseh"
+        flavorText = "\"Peter? Is that you? I could have sworn I heard that boy moving around up here.\"\n—Aunt May"
         imageUri = "https://cards.scryfall.io/normal/front/7/9/7977e448-01fa-4fa5-a275-0d6a1357b35c.jpg?1757376939"
     }
 }
