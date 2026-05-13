@@ -31,6 +31,6 @@ val ImpostorSyndrome = card("Impostor Syndrome") {
         rarity = Rarity.RARE
         collectorNumber = "54"
         artist = "Mike McKone"
-        imageUri = "https://cards.scryfall.io/normal/front/4/5/4518be73-2571-4eef-b7a0-3eac5bc3a8c3.jpg?1757376788"
+        imageUri = "https://cards.scryfall.io/normal/front/0/8/08da9f92-0e25-4f39-aaa4-d8974af81a41.jpg?1757376952"
     }
 }

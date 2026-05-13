@@ -40,6 +40,6 @@ val Kapow = card("Kapow!") {
         rarity = Rarity.COMMON
         collectorNumber = "167"
         artist = "Juliann Tiu"
-        imageUri = "https://cards.scryfall.io/normal/front/9/5/954d8ab3-2378-47cb-b5b1-6bc5b5ec4e37.jpg?1757380058"
+        imageUri = "https://cards.scryfall.io/normal/front/c/e/cec575f6-43c9-41c6-a996-bb806bf82185.jpg?1757377442"
     }
 }
