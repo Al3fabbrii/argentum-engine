@@ -7,6 +7,7 @@ import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.player.ManaPoolComponent
 import com.wingedsheep.engine.state.permissions.MayPlayPermission
 import com.wingedsheep.gameserver.ScenarioTestBase
+import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
@@ -49,7 +50,8 @@ class InterdimensionalWebWatchScenarioTest : ScenarioTestBase() {
                     ActivateAbility(
                         playerId = game.player1Id,
                         sourceId = watchId,
-                        abilityId = manaAbility.id
+                        abilityId = manaAbility.id,
+                        manaColorChoice = Color.GREEN
                     )
                 )
                 withClue("Tap ability should activate successfully: ${activateResult.error}") {
@@ -217,7 +219,8 @@ class InterdimensionalWebWatchScenarioTest : ScenarioTestBase() {
                     ActivateAbility(
                         playerId = game.player1Id,
                         sourceId = watchId,
-                        abilityId = manaAbility.id
+                        abilityId = manaAbility.id,
+                        manaColorChoice = Color.GREEN
                     )
                 )
                 withClue("Tap ability should activate: ${activate.error}") {
