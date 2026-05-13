@@ -100,24 +100,23 @@ data class AssignDamageEqualToToughness(
 }
 
 /**
- * Creatures matching [filter] that are tapped to activate a Station ability contribute
- * their toughness (rather than their power) as long as their toughness is greater than
- * their power.
+ * Creatures this permanent's controller controls that are tapped to activate a Station
+ * ability contribute their toughness (rather than their power), as long as toughness
+ * is greater than power.
+ *
+ * The engine enforces this via [GrantsStationUsingToughnessComponent]: all permanents
+ * of the same controller are checked — a more restrictive per-creature filter is not
+ * currently supported.
  *
  * Used for Tapestry Warden: "Each creature you control with toughness greater than its
  * power stations permanents using its toughness rather than its power."
  */
 @SerialName("StationUsingToughness")
 @Serializable
-data class StationUsingToughness(
-    val filter: GroupFilter = GroupFilter.AllCreaturesYouControl,
-) : StaticAbility {
+data object StationUsingToughness : StaticAbility {
     override val description: String =
         "Each creature you control with toughness greater than its power stations permanents using its toughness rather than its power"
-    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
-        val newFilter = filter.applyTextReplacement(replacer)
-        return if (newFilter !== filter) copy(filter = newFilter) else this
-    }
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
 }
 
 /**

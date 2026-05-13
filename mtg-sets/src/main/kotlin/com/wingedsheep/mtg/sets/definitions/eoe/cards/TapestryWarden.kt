@@ -40,9 +40,7 @@ val TapestryWarden = card("Tapestry Warden") {
     }
 
     staticAbility {
-        ability = StationUsingToughness(
-            filter = GroupFilter.AllCreaturesYouControl,
-        )
+        ability = StationUsingToughness
     }
 
     metadata {

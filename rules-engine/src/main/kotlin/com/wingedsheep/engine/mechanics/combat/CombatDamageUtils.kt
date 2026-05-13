@@ -97,7 +97,10 @@ internal object CombatDamageUtils {
             // Honor excludeSelf: skip if this ability excludes the source and creature is the source
             if (unwrapped.filter.excludeSelf && sourceId == creatureId) continue
             if (unwrapped.onlyWhenToughnessGreaterThanPower && toughness <= power) continue
-            // Evaluate controller predicate: "you" = the source permanent's controller
+            // Only the controllerPredicate is evaluated; CardPredicate/StatePredicate
+            // restrictions in baseFilter (e.g. subtype filters) are not checked here.
+            // Tapestry Warden uses AllCreaturesYouControl which has no card predicates,
+            // so this is correct for all current uses.
             when (unwrapped.filter.baseFilter.controllerPredicate) {
                 ControllerPredicate.ControlledByYou -> if (creatureController != sourceController) continue
                 ControllerPredicate.ControlledByOpponent -> if (creatureController == sourceController) continue
