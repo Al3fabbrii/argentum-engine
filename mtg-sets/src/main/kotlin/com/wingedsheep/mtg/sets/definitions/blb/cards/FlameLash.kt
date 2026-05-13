@@ -28,5 +28,6 @@ val FlameLash = card("Flame Lash") {
         collectorNumber = "391"
         artist = "Viktor Titov"
         imageUri = "https://cards.scryfall.io/normal/front/c/6/c6440439-7178-4a97-9e18-7fdef4b02678.jpg?1721428094"
+        inBooster = false
     }
 }

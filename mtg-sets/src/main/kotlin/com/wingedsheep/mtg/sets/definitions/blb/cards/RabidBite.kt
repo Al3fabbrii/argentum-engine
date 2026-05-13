@@ -36,5 +36,6 @@ val RabidBite = card("Rabid Bite") {
         collectorNumber = "394"
         artist = "John Thacker"
         imageUri = "https://cards.scryfall.io/normal/front/5/3/53a73200-b798-4bfd-a431-8b94e17b70be.jpg?1721428112"
+        inBooster = false
     }
 }

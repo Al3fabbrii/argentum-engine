@@ -39,5 +39,6 @@ val Colossification = card("Colossification") {
         collectorNumber = "392"
         artist = "Johan Grenier"
         imageUri = "https://cards.scryfall.io/normal/front/c/2/c2cad902-ffd2-4bab-b114-b4b6df2ac6b3.jpg?1721428099"
+        inBooster = false
     }
 }

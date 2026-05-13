@@ -28,5 +28,6 @@ val GiantGrowth = card("Giant Growth") {
         collectorNumber = "393"
         artist = "Dmitry Burmak"
         imageUri = "https://cards.scryfall.io/normal/front/e/7/e70722d6-b4d5-45c2-9488-9a5eb0bdb9bd.jpg?1721428103"
+        inBooster = false
     }
 }

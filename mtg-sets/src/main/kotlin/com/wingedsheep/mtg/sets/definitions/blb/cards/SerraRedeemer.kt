@@ -48,5 +48,6 @@ val SerraRedeemer = card("Serra Redeemer") {
         collectorNumber = "387"
         artist = "Joshua Raphael"
         imageUri = "https://cards.scryfall.io/normal/front/2/3/230b9aef-bd9c-4332-ace4-b5b065bac6d8.jpg?1721428078"
+        inBooster = false
     }
 }

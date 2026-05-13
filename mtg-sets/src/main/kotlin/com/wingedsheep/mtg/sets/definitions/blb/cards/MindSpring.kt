@@ -27,5 +27,6 @@ val MindSpring = card("Mind Spring") {
         collectorNumber = "389"
         artist = "Mark Zug"
         imageUri = "https://cards.scryfall.io/normal/front/e/7/e7e7d174-eb7c-41ad-a241-cfbfdc71e3a7.jpg?1721428086"
+        inBooster = false
     }
 }

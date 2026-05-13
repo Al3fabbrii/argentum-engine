@@ -41,5 +41,6 @@ val ThievingOtter = card("Thieving Otter") {
         collectorNumber = "390"
         artist = "Jakub Kasper"
         imageUri = "https://cards.scryfall.io/normal/front/5/2/52a258be-39e3-4689-b2d0-7c353ce7d574.jpg?1721428090"
+        inBooster = false
     }
 }

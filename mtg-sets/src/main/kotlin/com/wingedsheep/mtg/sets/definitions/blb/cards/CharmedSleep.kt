@@ -40,5 +40,6 @@ val CharmedSleep = card("Charmed Sleep") {
         collectorNumber = "388"
         artist = "Titus Lunter"
         imageUri = "https://cards.scryfall.io/normal/front/7/d/7d171802-2604-45a5-a0f2-ab5afa1db5d5.jpg?1721428082"
+        inBooster = false
     }
 }

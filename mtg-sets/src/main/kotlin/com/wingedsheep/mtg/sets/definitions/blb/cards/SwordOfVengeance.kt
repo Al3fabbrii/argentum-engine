@@ -52,5 +52,6 @@ val SwordOfVengeance = card("Sword of Vengeance") {
         collectorNumber = "395"
         artist = "Dan Murayama Scott"
         imageUri = "https://cards.scryfall.io/normal/front/f/2/f21b5fc1-7611-44ac-ad8d-1f0c6d4fc9a3.jpg?1721428115"
+        inBooster = false
     }
 }
