@@ -1086,7 +1086,8 @@ Set via `staticAbility { ability = ... }`:
 
 ### Damage
 
-- `AssignDamageEqualToToughness(target, onlyWhenToughnessGreaterThanPower)` — Doran
+- `AssignDamageEqualToToughness(filter, onlyWhenToughnessGreaterThanPower)` — assigns combat damage as toughness; use `Scope.Self` for the creature itself, `Scope.AttachedTo` for equipment/aura, `Scope.Battlefield` for global permanents (Tapestry Warden)
+- `StationUsingToughness(filter: GroupFilter)` — creatures matching filter tap for their toughness (rather than power) when stationing, as long as toughness > power (Tapestry Warden)
 - `DivideCombatDamageFreely(target)` — divide damage freely
 - `AssignCombatDamageAsUnblocked(target)` — may assign combat damage as though unblocked (Thorn Elemental)
 

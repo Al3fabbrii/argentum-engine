@@ -10,6 +10,8 @@ import com.wingedsheep.sdk.scripting.AssignDamageEqualToToughness
 import com.wingedsheep.sdk.scripting.ConditionalStaticAbility
 import com.wingedsheep.sdk.scripting.StaticAbility
 import com.wingedsheep.sdk.scripting.filters.unified.Scope
+import com.wingedsheep.sdk.scripting.predicates.ControllerPredicate
+import com.wingedsheep.engine.state.components.identity.ControllerComponent
 
 /**
  * Helpers for calculating the amount of combat damage a creature assigns.
@@ -66,6 +68,44 @@ internal object CombatDamageUtils {
             if (matches(abilities, Scope.AttachedTo, power, toughness)) return true
         }
 
+        // Global permanents with Scope.Battlefield (e.g., Tapestry Warden: "creatures you control")
+        // The source may equal the creature (e.g., Tapestry Warden applying to itself).
+        val creatureController = state.getEntity(creatureId)?.get<ControllerComponent>()?.playerId
+        for (permanentId in state.getBattlefield()) {
+            val permCardId = state.getEntity(permanentId)?.get<CardComponent>()?.cardDefinitionId ?: continue
+            val abilities = cardRegistry.getCard(permCardId)?.staticAbilities.orEmpty()
+            if (matchesBattlefield(state, permanentId, creatureId, creatureController, abilities, power, toughness)) return true
+        }
+
+        return false
+    }
+
+    private fun matchesBattlefield(
+        state: GameState,
+        sourceId: EntityId,
+        creatureId: EntityId,
+        creatureController: EntityId?,
+        abilities: List<StaticAbility>,
+        power: Int,
+        toughness: Int,
+    ): Boolean {
+        val sourceController = state.getEntity(sourceId)?.get<ControllerComponent>()?.playerId
+        for (ability in abilities) {
+            val unwrapped = if (ability is ConditionalStaticAbility) ability.ability else ability
+            if (unwrapped !is AssignDamageEqualToToughness) continue
+            if (unwrapped.filter.scope !is Scope.Battlefield) continue
+            // Honor excludeSelf: skip if this ability excludes the source and creature is the source
+            if (unwrapped.filter.excludeSelf && sourceId == creatureId) continue
+            if (unwrapped.onlyWhenToughnessGreaterThanPower && toughness <= power) continue
+            // Evaluate controller predicate: "you" = the source permanent's controller
+            when (unwrapped.filter.baseFilter.controllerPredicate) {
+                ControllerPredicate.ControlledByYou -> if (creatureController != sourceController) continue
+                ControllerPredicate.ControlledByOpponent -> if (creatureController == sourceController) continue
+                null, ControllerPredicate.ControlledByAny -> { /* applies to all */ }
+                else -> continue
+            }
+            return true
+        }
         return false
     }
 

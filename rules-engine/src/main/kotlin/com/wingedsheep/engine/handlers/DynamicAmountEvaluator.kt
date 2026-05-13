@@ -5,6 +5,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.components.battlefield.AttachmentsComponent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
+import com.wingedsheep.engine.state.components.battlefield.GrantsStationUsingToughnessComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
@@ -167,6 +168,17 @@ class DynamicAmountEvaluator(
                         else -> { /* fall through */ }
                     }
                     return resolveNumericProperty(state, entityId, amount.numericProperty, context, useProjected = false)
+                }
+                // Station mechanic override: when tapping a creature as cost for a Station
+                // ability and the controller has StationUsingToughness in play, use toughness
+                // instead of power if toughness > power.
+                if (amount.entity is EntityReference.TappedAsCost && amount.numericProperty is EntityNumericProperty.Power) {
+                    val power = resolveNumericProperty(state, entityId, EntityNumericProperty.Power, context, useProjected = true, explicitProjected = projectedState)
+                    val toughness = resolveNumericProperty(state, entityId, EntityNumericProperty.Toughness, context, useProjected = true, explicitProjected = projectedState)
+                    if (toughness > power && controllerHasStationUsingToughness(state, entityId)) {
+                        return toughness
+                    }
+                    return power
                 }
                 resolveNumericProperty(state, entityId, amount.numericProperty, context, useProjected = true, explicitProjected = projectedState)
             }
@@ -620,6 +632,24 @@ class DynamicAmountEvaluator(
             is EntityReference.AffectedEntity -> context.affectedEntityId
             is EntityReference.IterationEntity -> context.pipeline.iterationTarget
         }
+
+    // =========================================================================
+    // Station Toughness Override
+    // =========================================================================
+
+    /**
+     * Returns true if any permanent controlled by [entityId]'s controller has the
+     * [GrantsStationUsingToughnessComponent], enabling the creature to station using
+     * toughness instead of power.
+     */
+    private fun controllerHasStationUsingToughness(state: GameState, entityId: EntityId): Boolean {
+        val controller = state.getEntity(entityId)?.get<ControllerComponent>()?.playerId ?: return false
+        return state.getBattlefield().any { permanentId ->
+            val perm = state.getEntity(permanentId) ?: return@any false
+            perm.has<GrantsStationUsingToughnessComponent>() &&
+                perm.get<ControllerComponent>()?.playerId == controller
+        }
+    }
 
     // =========================================================================
     // Entity Numeric Property Resolution

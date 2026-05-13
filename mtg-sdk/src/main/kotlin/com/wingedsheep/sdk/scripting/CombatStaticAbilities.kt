@@ -100,6 +100,27 @@ data class AssignDamageEqualToToughness(
 }
 
 /**
+ * Creatures matching [filter] that are tapped to activate a Station ability contribute
+ * their toughness (rather than their power) as long as their toughness is greater than
+ * their power.
+ *
+ * Used for Tapestry Warden: "Each creature you control with toughness greater than its
+ * power stations permanents using its toughness rather than its power."
+ */
+@SerialName("StationUsingToughness")
+@Serializable
+data class StationUsingToughness(
+    val filter: GroupFilter = GroupFilter.AllCreaturesYouControl,
+) : StaticAbility {
+    override val description: String =
+        "Each creature you control with toughness greater than its power stations permanents using its toughness rather than its power"
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
+        val newFilter = filter.applyTextReplacement(replacer)
+        return if (newFilter !== filter) copy(filter = newFilter) else this
+    }
+}
+
+/**
  * This creature's combat damage may be divided as its controller chooses among
  * the defending player and/or any number of creatures they control.
  * Used for Butcher Orgg.
