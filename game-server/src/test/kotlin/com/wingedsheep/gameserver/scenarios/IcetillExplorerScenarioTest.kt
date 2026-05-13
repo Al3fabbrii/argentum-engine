@@ -121,6 +121,7 @@ class IcetillExplorerScenarioTest : ScenarioTestBase() {
 
                 val forestId = findInGraveyard(game, 1, "Forest")
                 game.execute(PlayLand(game.player1Id, forestId))
+                game.resolveStack()
 
                 // Landfall trigger fires — one card should be milled
                 withClue("One card should have been milled from library to graveyard") {
@@ -149,6 +150,7 @@ class IcetillExplorerScenarioTest : ScenarioTestBase() {
                 // First land: from graveyard
                 val graveyardForest = findInGraveyard(game, 1, "Forest")
                 val result1 = game.execute(PlayLand(game.player1Id, graveyardForest))
+                game.resolveStack()  // resolve landfall trigger before playing the next land
                 withClue("First land (from graveyard) should succeed: ${result1.error}") {
                     result1.error shouldBe null
                 }
@@ -158,6 +160,7 @@ class IcetillExplorerScenarioTest : ScenarioTestBase() {
                     game.state.getEntity(id)?.get<CardComponent>()?.name == "Forest"
                 }!!
                 val result2 = game.execute(PlayLand(game.player1Id, handForestId))
+                game.resolveStack()  // resolve second landfall trigger
                 withClue("Second land (from hand via bonus drop) should succeed: ${result2.error}") {
                     result2.error shouldBe null
                 }
