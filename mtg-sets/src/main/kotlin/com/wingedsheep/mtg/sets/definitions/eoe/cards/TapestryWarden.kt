@@ -49,5 +49,17 @@ val TapestryWarden = card("Tapestry Warden") {
         artist = "Andreas Zafiratos"
         flavorText = "Drix never leave their worlds defenseless."
         imageUri = "https://cards.scryfall.io/normal/front/7/c/7cbbab6c-43ae-4e50-97ce-532a3316591a.jpg?1752947411"
+        ruling(
+            "2025-07-25",
+            "Tapestry Warden's second and third abilities don't actually change any creature's power. They change only the amount of combat damage the creature assigns and how many counters are put on a permanent with station when the creature is tapped to pay the cost of a station ability. All other rules and effects that check power or toughness use the real values, even if they cause damage \"equal to a creature's power\" to be dealt."
+        )
+        ruling(
+            "2025-07-25",
+            "If a station ability you control resolves while you control Tapestry Warden, but the creature tapped to pay the cost of that station ability is no longer on the battlefield, check the characteristics of that creature as it last existed on the battlefield. If its toughness was greater than its power, use its toughness to determine how many counters are put on the permanent with station."
+        )
+        ruling(
+            "2025-07-25",
+            "If you activate a station ability while you control Tapestry Warden, but you no longer control Tapestry Warden at the time that ability resolves, use the power of the creature tapped to pay the cost of the station ability to determine how many counters are put on the permanent with station."
+        )
     }
 }

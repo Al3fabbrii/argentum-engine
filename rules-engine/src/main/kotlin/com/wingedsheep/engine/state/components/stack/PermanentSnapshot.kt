@@ -19,6 +19,7 @@ data class PermanentSnapshot(
     val power: Int? = null,
     val toughness: Int? = null,
     val subtypes: Set<String> = emptySet(),
+    val controllerId: EntityId? = null,
 )
 
 /**
@@ -34,6 +35,7 @@ fun capturePermanentSnapshots(
         power = projected.getPower(id),
         toughness = projected.getToughness(id),
         subtypes = projected.getSubtypes(id),
+        controllerId = projected.getController(id),
     )
 }
 

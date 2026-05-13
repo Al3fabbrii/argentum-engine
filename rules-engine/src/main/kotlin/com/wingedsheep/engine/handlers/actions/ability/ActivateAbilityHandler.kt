@@ -436,6 +436,13 @@ class ActivateAbilityHandler(
         val sacrificeTargetIds = action.costPayment?.sacrificedPermanents ?: emptyList()
         val sacrificedSnapshots = capturePermanentSnapshots(sacrificeTargetIds, currentState.projectedState)
 
+        // Snapshot tapped-as-cost permanents too — they don't leave the battlefield as part
+        // of the cost, but they might be killed/bounced in response while the ability is on
+        // the stack. Capturing P/T/controller now lets the resolver read last-known
+        // characteristics (Tapestry Warden + station ability case, 2025-07-25 ruling).
+        val tappedTargetIds = action.costPayment?.tappedPermanents ?: emptyList()
+        val tappedSnapshots = capturePermanentSnapshots(tappedTargetIds, currentState.projectedState)
+
         // When using Explicit payment, mana sources were already tapped above —
         // strip the Mana portion so payAbilityCost doesn't try to deduct from the pool.
         // When convoke was applied, replace the mana portion with the reduced cost.
@@ -855,6 +862,7 @@ class ActivateAbilityHandler(
             sacrificedPermanents = sacrificedSnapshots,
             xValue = action.xValue,
             tappedPermanents = action.costPayment?.tappedPermanents ?: emptyList(),
+            tappedPermanentSnapshots = tappedSnapshots,
             descriptionOverride = ability.descriptionOverride
         )
 

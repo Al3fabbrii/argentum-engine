@@ -1,6 +1,7 @@
 package com.wingedsheep.gameserver.scenarios
 
 import com.wingedsheep.engine.core.ActivateAbility
+import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.components.battlefield.AttachedToComponent
 import com.wingedsheep.engine.state.components.battlefield.AttachmentsComponent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
@@ -8,6 +9,7 @@ import com.wingedsheep.gameserver.ScenarioTestBase
 import com.wingedsheep.sdk.core.CounterType
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.scripting.AdditionalCostPayment
 import com.wingedsheep.sdk.scripting.AbilityCost
 import io.kotest.assertions.withClue
@@ -216,6 +218,112 @@ class TapestryWardenScenarioTest : ScenarioTestBase() {
                 val counters = game.state.getEntity(crusherId)?.get<CountersComponent>()
                 withClue("Stolen Devoted Hero should contribute 2 charge counters (toughness) under projected controller") {
                     counters?.getCount(CounterType.CHARGE) shouldBe 2
+                }
+            }
+
+            test("tapped creature that left the battlefield still contributes toughness (last known information)") {
+                // Per the 2025-07-25 ruling: "If a station ability you control resolves while you
+                // control Tapestry Warden, but the creature tapped to pay the cost of that station
+                // ability is no longer on the battlefield, check the characteristics of that creature
+                // as it last existed on the battlefield. If its toughness was greater than its power,
+                // use its toughness to determine how many counters are put on the permanent with
+                // station."
+                //
+                // Simulates Devoted Hero (1/2) being killed in response to the station activation —
+                // by manually moving it from battlefield to graveyard while the station ability is
+                // on the stack. The station should still place 2 charge counters (its LKI toughness).
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardOnBattlefield(1, "Tapestry Warden", summoningSickness = false)
+                    .withCardOnBattlefield(1, "Devoted Hero", summoningSickness = false) // 1/2 tapper
+                    .withCardOnBattlefield(1, "Debris Field Crusher")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val stationAbility = cardRegistry.getCard("Debris Field Crusher")!!
+                    .script.activatedAbilities.first { it.cost is AbilityCost.TapPermanents }
+                val crusherId = game.findPermanent("Debris Field Crusher")!!
+                val devotedHeroId = game.findPermanent("Devoted Hero")!!
+
+                val result = game.execute(
+                    ActivateAbility(
+                        playerId = game.player1Id,
+                        sourceId = crusherId,
+                        abilityId = stationAbility.id,
+                        costPayment = AdditionalCostPayment(tappedPermanents = listOf(devotedHeroId))
+                    )
+                )
+                withClue("Station activation should succeed: ${result.error}") {
+                    result.error shouldBe null
+                }
+
+                // Simulate Devoted Hero being killed in response (e.g., a Lightning Bolt) — it
+                // leaves the battlefield before the station ability resolves.
+                game.state = game.state.moveToZone(
+                    devotedHeroId,
+                    ZoneKey(game.player1Id, Zone.BATTLEFIELD),
+                    ZoneKey(game.player1Id, Zone.GRAVEYARD)
+                )
+
+                game.resolveStack()
+
+                val counters = game.state.getEntity(crusherId)?.get<CountersComponent>()
+                withClue("Tapped creature left the battlefield; per LKI ruling Crusher should still get 2 charge counters (toughness), not 1 (power) or 0") {
+                    counters?.getCount(CounterType.CHARGE) shouldBe 2
+                }
+            }
+
+            test("losing control of Tapestry Warden mid-resolution drops back to power") {
+                // Per the 2025-07-25 ruling: "If you activate a station ability while you control
+                // Tapestry Warden, but you no longer control Tapestry Warden at the time that
+                // ability resolves, use the power of the creature tapped to pay the cost of the
+                // station ability to determine how many counters are put on the permanent with
+                // station."
+                //
+                // Simulates removing Tapestry Warden after the station ability is on the stack:
+                // the override evaluator checks the current battlefield at resolution time, so the
+                // tapped 1/2 should now contribute 1 (power) charge counter.
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardOnBattlefield(1, "Tapestry Warden", summoningSickness = false)
+                    .withCardOnBattlefield(1, "Devoted Hero", summoningSickness = false) // 1/2 tapper
+                    .withCardOnBattlefield(1, "Debris Field Crusher")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val stationAbility = cardRegistry.getCard("Debris Field Crusher")!!
+                    .script.activatedAbilities.first { it.cost is AbilityCost.TapPermanents }
+                val crusherId = game.findPermanent("Debris Field Crusher")!!
+                val wardenId = game.findPermanent("Tapestry Warden")!!
+                val devotedHeroId = game.findPermanent("Devoted Hero")!!
+
+                val result = game.execute(
+                    ActivateAbility(
+                        playerId = game.player1Id,
+                        sourceId = crusherId,
+                        abilityId = stationAbility.id,
+                        costPayment = AdditionalCostPayment(tappedPermanents = listOf(devotedHeroId))
+                    )
+                )
+                withClue("Station activation should succeed: ${result.error}") {
+                    result.error shouldBe null
+                }
+
+                // Remove Tapestry Warden from the battlefield before resolution (e.g., destroyed in
+                // response). The toughness-substitution should no longer apply.
+                game.state = game.state.moveToZone(
+                    wardenId,
+                    ZoneKey(game.player1Id, Zone.BATTLEFIELD),
+                    ZoneKey(game.player1Id, Zone.GRAVEYARD)
+                )
+
+                game.resolveStack()
+
+                val counters = game.state.getEntity(crusherId)?.get<CountersComponent>()
+                withClue("Tapestry Warden gone at resolution; Crusher should get 1 charge counter (power), not 2 (toughness)") {
+                    counters?.getCount(CounterType.CHARGE) shouldBe 1
                 }
             }
 

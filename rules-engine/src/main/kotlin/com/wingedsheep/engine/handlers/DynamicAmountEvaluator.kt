@@ -176,11 +176,22 @@ class DynamicAmountEvaluator(
             // substituting toughness when the entity's controller has StationUsingToughness
             // in play and toughness > power. Kept off the generic EntityProperty path so the
             // override never leaks into unrelated "tapped creature's power" reads.
+            //
+            // If the tapped creature has left the battlefield since the cost was paid (e.g.,
+            // killed in response to the station ability), fall back to the snapshot captured
+            // at activation time — Rule 112.7a "as it last existed on the battlefield"
+            // (Tapestry Warden 2025-07-25 ruling).
             is DynamicAmount.StationTapPower -> {
                 val entityId = resolveEntityId(amount.entity, context) ?: return 0
-                val power = resolveNumericProperty(state, entityId, EntityNumericProperty.Power, context, useProjected = true, explicitProjected = projectedState)
-                val toughness = resolveNumericProperty(state, entityId, EntityNumericProperty.Toughness, context, useProjected = true, explicitProjected = projectedState)
-                if (toughness > power && controllerHasStationUsingToughness(state, entityId)) toughness else power
+                val onBattlefield = state.getBattlefield().contains(entityId)
+                val snapshot = if (!onBattlefield) {
+                    context.tappedPermanentSnapshots.firstOrNull { it.entityId == entityId }
+                } else null
+                val power = snapshot?.power
+                    ?: resolveNumericProperty(state, entityId, EntityNumericProperty.Power, context, useProjected = true, explicitProjected = projectedState)
+                val toughness = snapshot?.toughness
+                    ?: resolveNumericProperty(state, entityId, EntityNumericProperty.Toughness, context, useProjected = true, explicitProjected = projectedState)
+                if (toughness > power && controllerHasStationUsingToughness(state, entityId, snapshot?.controllerId)) toughness else power
             }
 
             is DynamicAmount.Divide -> {
@@ -642,10 +653,18 @@ class DynamicAmountEvaluator(
      * [GrantsStationUsingToughnessComponent], enabling the creature to station using
      * toughness instead of power. Reads projected controllers (Rule 613) so the
      * effect survives control-changing continuous effects on either permanent.
+     *
+     * [fallbackControllerId] is consulted when [entityId] is no longer on the battlefield
+     * (projection has no controller) — typically the snapshot's last-known controller
+     * captured at cost-payment time (Rule 112.7a).
      */
-    private fun controllerHasStationUsingToughness(state: GameState, entityId: EntityId): Boolean {
+    private fun controllerHasStationUsingToughness(
+        state: GameState,
+        entityId: EntityId,
+        fallbackControllerId: EntityId? = null
+    ): Boolean {
         val projected = state.projectedState
-        val controller = projected.getController(entityId) ?: return false
+        val controller = projected.getController(entityId) ?: fallbackControllerId ?: return false
         return state.getBattlefield().any { permanentId ->
             val perm = state.getEntity(permanentId) ?: return@any false
             perm.has<GrantsStationUsingToughnessComponent>() &&
