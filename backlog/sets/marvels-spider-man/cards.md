@@ -2,8 +2,7 @@
 
 **Set Size:** 188 booster cards (excluding basic lands and tokens)
 **Release Date:** September 26, 2025
-**Implemented:** 9 / 188
-
+**Implemented:** 9 / 189
 - [x] Agent Venom
 - [x] Angry Rabble
 - [x] Amazing Acrobatics
