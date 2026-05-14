@@ -38,10 +38,10 @@
 
 ## Instants (5)
 
-- [ ] 1 Abrade
-- [ ] 1 Beast Within
-- [ ] 1 Big Score
-- [ ] 1 Chaos Warp
+- [x] 1 Abrade
+- [x] 1 Beast Within
+- [x] 1 Big Score
+- [x] 1 Chaos Warp
 - [x] 1 Starsto/rm
 
 ## Sorceries (7)
