@@ -1623,6 +1623,18 @@ class ClientStateTransformer(
             )
         }
 
+        // Check for PlayerCitysBlessingComponent (Ascend / city's blessing, CR 702.131)
+        if (container.has<PlayerCitysBlessingComponent>()) {
+            effects.add(
+                ClientPlayerEffect(
+                    effectId = "citys_blessing",
+                    name = "City's Blessing",
+                    description = "You have the city's blessing for the rest of the game",
+                    icon = "shield"
+                )
+            )
+        }
+
         // Check for MustAttackPlayerComponent (Taunt effect)
         val mustAttack = container.get<MustAttackPlayerComponent>()
         if (mustAttack != null) {
