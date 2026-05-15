@@ -52,7 +52,7 @@
 - [x] 1 Explore
 - [x] 1 Farseek
 - [x] 1 Harmonize
-- [ ] 1 Rampant Growth
+- [x] 1 Rampant Growth
 
 ## Artifacts (14)
 
