@@ -397,6 +397,16 @@ sealed interface CostReductionSource {
     }
 
     /**
+     * Reduces cost by a fixed amount if it's the caster's turn.
+     * Used for cards like Mental Modulation ("This spell costs {1} less to cast during your turn").
+     */
+    @SerialName("FixedIfYourTurn")
+    @Serializable
+    data class FixedIfYourTurn(val amount: Int) : CostReductionSource {
+        override val description: String = "$amount during your turn"
+    }
+
+    /**
      * Reduces cost by the number of differently named permanents the caster controls
      * matching a filter. Used for Fungal Colossus ("This spell costs {X} less to cast,
      * where X is the number of differently named lands you control") via

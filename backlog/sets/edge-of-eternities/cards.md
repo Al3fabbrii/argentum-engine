@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 176 / 261
+**Implemented:** 177 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -141,7 +141,7 @@
 - [x] Meltstrider's Resolve
 - [x] Memorial Team Leader
 - [ ] Memorial Vault
-- [ ] Mental Modulation
+- [x] Mental Modulation
 - [x] Mightform Harmonizer
 - [ ] Mm'menon, the Right Hand
 - [x] Mm'menon, Uthros Exile

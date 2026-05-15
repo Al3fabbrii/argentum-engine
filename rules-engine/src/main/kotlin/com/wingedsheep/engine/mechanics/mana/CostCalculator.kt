@@ -347,6 +347,9 @@ class CostCalculator(
                     source.amount
                 else 0
             }
+            is CostReductionSource.FixedIfYourTurn -> {
+                if (state.activePlayerId == playerId) source.amount else 0
+            }
             is CostReductionSource.DifferentlyNamedPermanentsYouControl ->
                 countDifferentlyNamedPermanents(state, playerId, source.filter)
             is CostReductionSource.PermanentsOnBattlefieldMatching ->
