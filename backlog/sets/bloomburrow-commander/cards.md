@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 72 / 312
+**Implemented:** 74 / 312
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 37    | 0    |
@@ -92,7 +92,7 @@
 - [ ] Echoing Assault
 - [ ] Elspeth, Sun's Champion
 - [ ] End-Raze Forerunners
-- [ ] Esika's Chariot
+- [x] Esika's Chariot
 - [x] Etali, Primal Storm
 - [x] Evercoat Ursine
 - [x] Evolving Wilds
@@ -127,7 +127,7 @@
 - [ ] Grim Backwoods
 - [x] Grothama, All-Devouring
 - [x] Grumgully, the Generous
-- [ ] Gruul Signet
+- [x] Gruul Signet
 - [ ] Gruul Turf
 - [ ] Hanged Executioner
 - [x] Harmonize
