@@ -20,6 +20,7 @@ object OmenpathsSet : MtgSet {
 
     override val code = "OM1"
     override val displayName = "Through the Omenpaths"
+    override val releaseDate = "2025-09-23"
     override val incomplete = true
 
     override val cards: List<CardDefinition> by lazy {
