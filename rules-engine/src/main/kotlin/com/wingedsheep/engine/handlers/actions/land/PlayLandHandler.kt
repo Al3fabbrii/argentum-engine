@@ -292,6 +292,44 @@ class PlayLandHandler(
                         // Lands don't use CREATURE_ON_BATTLEFIELD, but handle gracefully
                         null
                     }
+
+                    ChoiceType.MODE -> {
+                        if (firstChoice.modeOptions.isEmpty()) {
+                            null
+                        } else {
+                            val decisionId = "choose-mode-land-enters-${action.cardId.value}"
+                            val decision = com.wingedsheep.engine.core.ChooseOptionDecision(
+                                id = decisionId,
+                                playerId = chooserId,
+                                prompt = "Choose for ${cardComponent.name}",
+                                context = com.wingedsheep.engine.core.DecisionContext(
+                                    sourceId = action.cardId,
+                                    sourceName = cardComponent.name,
+                                    phase = com.wingedsheep.engine.core.DecisionPhase.RESOLUTION
+                                ),
+                                options = firstChoice.modeOptions.map { it.label },
+                                optionMetadata = firstChoice.modeOptions.map {
+                                    com.wingedsheep.engine.core.OptionMetadata(
+                                        id = it.id,
+                                        description = it.description,
+                                        iconKey = it.iconKey
+                                    )
+                                }
+                            )
+                            val continuation = com.wingedsheep.engine.core.EntersWithChoiceLandContinuation(
+                                decisionId = decisionId,
+                                landId = action.cardId,
+                                controllerId = action.playerId,
+                                choiceType = ChoiceType.MODE,
+                                modeOptionIds = firstChoice.modeOptions.map { it.id },
+                                fromZone = fromZone
+                            )
+                            val pausedState = newState
+                                .pushContinuation(continuation)
+                                .withPendingDecision(decision)
+                            ExecutionResult.paused(pausedState, decision, events)
+                        }
+                    }
                 }
                 if (result != null) return result
             }

@@ -182,7 +182,14 @@ data class EntersWithChoiceSpellContinuation(
     val controllerId: EntityId,
     val ownerId: EntityId,
     val choiceType: com.wingedsheep.sdk.scripting.ChoiceType,
-    val creatureTypes: List<String> = emptyList()
+    val creatureTypes: List<String> = emptyList(),
+    /**
+     * For [com.wingedsheep.sdk.scripting.ChoiceType.MODE] choices, the
+     * positionally aligned list of mode ids. The response's chosen index
+     * indexes into this list to recover the stable mode id stored on the
+     * resulting [com.wingedsheep.engine.state.components.identity.ChosenModeComponent].
+     */
+    val modeOptionIds: List<String> = emptyList()
 ) : ContinuationFrame
 
 /**
@@ -207,6 +214,9 @@ data class EntersWithChoiceLandContinuation(
     val controllerId: EntityId,
     val choiceType: com.wingedsheep.sdk.scripting.ChoiceType,
     val creatureTypes: List<String> = emptyList(),
+    /** For [com.wingedsheep.sdk.scripting.ChoiceType.MODE] choices, see
+     *  [EntersWithChoiceSpellContinuation.modeOptionIds]. */
+    val modeOptionIds: List<String> = emptyList(),
     val fromZone: Zone = Zone.HAND
 ) : ContinuationFrame
 

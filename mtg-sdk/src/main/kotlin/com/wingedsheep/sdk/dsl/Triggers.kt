@@ -206,6 +206,20 @@ object Triggers {
     )
 
     /**
+     * When a creature you control leaves the battlefield (any destination — graveyard,
+     * exile, hand, library). Includes the source if the source itself is a creature you
+     * control. Used by cards like Outpost Siege (Dragons mode): "Whenever a creature
+     * you control leaves the battlefield, ~ deals 1 damage to any target."
+     */
+    val YourCreatureLeavesBattlefield: TriggerSpec = TriggerSpec(
+        event = ZoneChangeEvent(
+            filter = GameObjectFilter.Creature.youControl(),
+            from = Zone.BATTLEFIELD
+        ),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
      * When this is put into the graveyard from the battlefield.
      */
     val PutIntoGraveyardFromBattlefield: TriggerSpec = TriggerSpec(

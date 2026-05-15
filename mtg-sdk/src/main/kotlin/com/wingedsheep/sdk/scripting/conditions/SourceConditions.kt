@@ -246,6 +246,23 @@ data class SourceHasKeyword(val keyword: Keyword) : Condition {
 }
 
 /**
+ * Condition: "If the chosen mode is [modeId]".
+ *
+ * Reads the `ChosenModeComponent` stored on the source permanent (set by an
+ * `EntersWithChoice(ChoiceType.MODE,...)` replacement effect). Used to gate
+ * triggered or static abilities on a card-defined named choice — e.g., a
+ * Siege whose upkeep trigger only fires when "Khans" was chosen.
+ *
+ * @property modeId The mode id to match against the stored chosen mode.
+ */
+@SerialName("SourceChosenModeIs")
+@Serializable
+data class SourceChosenModeIs(val modeId: String) : Condition {
+    override val description: String = "if the chosen mode is \"$modeId\""
+    override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+}
+
+/**
  * Condition: "While this creature has a [counter type] counter on it"
  * Used for intervening-if triggers like Moonshadow that only fire while a specific
  * counter is present on the source permanent.

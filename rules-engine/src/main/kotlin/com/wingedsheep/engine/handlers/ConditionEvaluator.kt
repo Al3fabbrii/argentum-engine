@@ -49,6 +49,8 @@ import com.wingedsheep.sdk.scripting.conditions.SourceHasDealtCombatDamageToPlay
 import com.wingedsheep.sdk.scripting.conditions.SourceHasDealtDamage
 import com.wingedsheep.sdk.scripting.conditions.SourceHasCounter
 import com.wingedsheep.sdk.scripting.conditions.SourceHasKeyword
+import com.wingedsheep.sdk.scripting.conditions.SourceChosenModeIs
+import com.wingedsheep.engine.state.components.identity.ChosenModeComponent
 import com.wingedsheep.sdk.scripting.conditions.SourceHasSubtype
 import com.wingedsheep.sdk.scripting.conditions.SourceIsAttacking
 import com.wingedsheep.sdk.scripting.conditions.SourceIsBlocking
@@ -125,6 +127,11 @@ class ConditionEvaluator {
             is SourceHasDealtCombatDamageToPlayer -> evaluateSourceHasDealtCombatDamageToPlayer(state, context)
             is SourceHasSubtype -> evaluateSourceHasSubtype(state, condition, context)
             is SourceHasKeyword -> evaluateSourceHasKeyword(state, condition, context)
+            is SourceChosenModeIs -> {
+                val sourceId = context.sourceId
+                sourceId != null &&
+                    state.getEntity(sourceId)?.get<ChosenModeComponent>()?.modeId == condition.modeId
+            }
             is SourceHasCounter -> evaluateSourceHasCounter(state, condition, context)
             is SacrificedPermanentHadSubtype -> evaluateSacrificedPermanentHadSubtype(condition, context)
             is TriggeringEntityWasHistoric -> evaluateTriggeringEntityWasHistoric(state, context)

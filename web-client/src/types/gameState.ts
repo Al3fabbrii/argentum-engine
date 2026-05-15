@@ -224,6 +224,12 @@ export interface ClientCard {
   /** Chosen color for "as enters, choose a color" permanents (e.g., Riptide Replicator) */
   readonly chosenColor?: string | null
 
+  /**
+   * Chosen mode label for "as enters, choose X or Y" permanents (e.g., the Siege cycle).
+   * Rendered as a badge on the permanent so the player can see which mode is active.
+   */
+  readonly chosenMode?: string | null
+
   /** Triggering entity ID for triggered abilities on the stack (for source arrows) */
   readonly triggeringEntityId?: EntityId | null
 

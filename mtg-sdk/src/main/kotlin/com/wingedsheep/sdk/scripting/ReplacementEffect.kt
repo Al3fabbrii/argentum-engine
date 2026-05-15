@@ -693,8 +693,37 @@ enum class ChoiceType {
     /** Choose a creature type (e.g., Doom Cannon, Cover of Darkness) */
     CREATURE_TYPE,
     /** Choose another creature you control (e.g., Dauntless Bodyguard) */
-    CREATURE_ON_BATTLEFIELD
+    CREATURE_ON_BATTLEFIELD,
+    /**
+     * Choose one of a card-defined set of named [ModeOption]s. Used for cards
+     * whose entry choice gates which abilities are active — e.g., the Khans
+     * cycle of Sieges ("As this enters, choose Khans or Dragons"). The chosen
+     * mode is stored on the permanent and queryable via
+     * [com.wingedsheep.sdk.scripting.conditions.SourceChosenModeIs].
+     */
+    MODE
 }
+
+/**
+ * A single named option in an [EntersWithChoice] of type [ChoiceType.MODE].
+ *
+ * The [id] is the stable, machine-readable identifier referenced by
+ * [com.wingedsheep.sdk.scripting.conditions.SourceChosenModeIs] and stored
+ * on the resulting [com.wingedsheep.engine.state.components.identity.ChosenModeComponent].
+ * The [label] is the human-readable display text shown in the prompt.
+ *
+ * [description] supplies optional rules text shown alongside the label
+ * (e.g., the corresponding ability's reminder text). [iconKey] is an
+ * optional asset identifier the frontend can map to an SVG icon — cards
+ * that do not supply an icon get a purely textual choice.
+ */
+@Serializable
+data class ModeOption(
+    val id: String,
+    val label: String,
+    val description: String? = null,
+    val iconKey: String? = null
+)
 
 /**
  * As this permanent enters, make a choice. The chosen value is stored on
@@ -723,6 +752,11 @@ data class EntersWithChoice(
      * enumerate a specific tribal shortlist such as Eclipsed Realms.
      */
     val allowedCreatureTypes: List<String>? = null,
+    /**
+     * When [choiceType] is [ChoiceType.MODE], the card-defined list of named
+     * options the player picks between. Required for MODE; ignored otherwise.
+     */
+    val modeOptions: List<ModeOption> = emptyList(),
     override val appliesTo: GameEvent = GameEvent.ZoneChangeEvent(
         filter = GameObjectFilter.Any,
         to = Zone.BATTLEFIELD
@@ -740,6 +774,14 @@ data class EntersWithChoice(
             "As this permanent enters, choose a creature type"
         }
         ChoiceType.CREATURE_ON_BATTLEFIELD -> "As this creature enters, choose another creature you control"
+        ChoiceType.MODE -> {
+            val labels = modeOptions.joinToString(" or ") { it.label }
+            if (chooser == Player.Opponent) {
+                "As this permanent enters, an opponent chooses $labels"
+            } else {
+                "As this permanent enters, choose $labels"
+            }
+        }
     }
 
     override fun applyTextReplacement(replacer: TextReplacer): ReplacementEffect {

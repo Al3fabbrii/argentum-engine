@@ -1602,8 +1602,8 @@ export function GameCard({
         </div>
       )}
 
-      {/* Chosen creature type / color badge (e.g., Doom Cannon, Riptide Replicator) */}
-      {!faceDown && (card.chosenCreatureType ?? card.chosenColor) && (
+      {/* Chosen creature type / color / mode badge (e.g., Doom Cannon, Riptide Replicator, Outpost Siege) */}
+      {!faceDown && (card.chosenCreatureType ?? card.chosenColor ?? card.chosenMode) && (
         <div style={{
           position: 'absolute',
           bottom: card.power != null ? 22 : 4,
@@ -1618,7 +1618,7 @@ export function GameCard({
           pointerEvents: 'none',
           zIndex: 5,
         }}>
-          {[card.chosenColor, card.chosenCreatureType].filter(Boolean).join(' ')}
+          {[card.chosenColor, card.chosenCreatureType, card.chosenMode].filter(Boolean).join(' ')}
         </div>
       )}
 

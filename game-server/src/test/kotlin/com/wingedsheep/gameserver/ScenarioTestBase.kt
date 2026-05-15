@@ -16,6 +16,7 @@ import com.wingedsheep.mtg.sets.definitions.ecl.LorwynEclipsedSet
 import com.wingedsheep.mtg.sets.definitions.eoe.EdgeOfEternitiesSet
 import com.wingedsheep.mtg.sets.definitions.fdn.FoundationsSet
 import com.wingedsheep.mtg.sets.definitions.fin.FinalFantasySet
+import com.wingedsheep.mtg.sets.definitions.frf.FateReforgedSet
 import com.wingedsheep.mtg.sets.definitions.inr.InnistradRemasteredSet
 import com.wingedsheep.mtg.sets.definitions.inv.InvasionSet
 import com.wingedsheep.mtg.sets.definitions.khm.KaldheimSet
@@ -101,6 +102,7 @@ abstract class ScenarioTestBase : FunSpec() {
         register(DuskmournSet.cards)
         register(EdgeOfEternitiesSet.cards); register(EdgeOfEternitiesSet.basicLands)
         register(FinalFantasySet.cards)
+        register(FateReforgedSet.cards)
         register(FoundationsSet.cards)
         register(InnistradCrimsonVowSet.cards)
         register(InnistradMidnightHuntSet.cards)

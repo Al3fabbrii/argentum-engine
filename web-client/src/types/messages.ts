@@ -402,12 +402,29 @@ export interface ChooseNumberDecision extends PendingDecisionBase {
  * Player must choose from a list of string options (e.g., creature types).
  * Used by effects like Artificial Evolution.
  */
+/**
+ * Optional per-option metadata aligned positionally with the options list.
+ * The frontend uses `iconKey` to render visual choices and `description` to
+ * show reminder text alongside the label. `id` is a stable machine-readable
+ * identifier the engine assigns when relevant (e.g. named-mode entry choices).
+ */
+export interface OptionMetadata {
+  readonly id?: string | null
+  readonly description?: string | null
+  readonly iconKey?: string | null
+}
+
 export interface ChooseOptionDecision extends PendingDecisionBase {
   readonly type: 'ChooseOptionDecision'
   readonly options: readonly string[]
   readonly defaultSearch?: string | null
   /** Maps option index to entity IDs of cards associated with that option (for preview) */
   readonly optionCardIds?: Record<number, readonly EntityId[]> | null
+  /**
+   * Optional per-option metadata, aligned positionally with `options`. Empty
+   * means no metadata; otherwise the same length as `options`.
+   */
+  readonly optionMetadata?: readonly OptionMetadata[]
   /** Whether the player may abort this decision (e.g., cast-time modal mode pick before any cost is paid). */
   readonly canCancel?: boolean
 }

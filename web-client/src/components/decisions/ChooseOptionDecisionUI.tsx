@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore.ts'
 import type { EntityId, ChooseOptionDecision } from '@/types'
 import { useResponsive } from '@/hooks/useResponsive.ts'
 import { getCardImageUrl } from '@/utils/cardImages.ts'
+import { optionIcon } from '@/assets/icons/options'
 import { DecisionCardPreview } from './DecisionComponents'
 import styles from './DecisionUI.module.css'
 
@@ -53,6 +54,12 @@ export function ChooseOptionDecisionUI({
   const sourceCardImageUrl = sourceCard ? getCardImageUrl(sourceCard.name, sourceCard.imageUri) : undefined
 
   const hasCardIds = !!decision.optionCardIds
+  // A "tiled" choice has per-option metadata with at least one icon. This is the
+  // visual fork in the road for card-defined mode choices (e.g. Sieges).
+  const hasOptionMetadata = (decision.optionMetadata?.length ?? 0) === decision.options.length
+    && (decision.optionMetadata?.length ?? 0) > 0
+  const useTiledLayout = hasOptionMetadata
+    && decision.optionMetadata!.some((m) => !!optionIcon(m.iconKey))
 
   const filteredOptions = useMemo(() => {
     const mapped = decision.options.map((opt, i) => {
@@ -119,31 +126,64 @@ export function ChooseOptionDecisionUI({
         </p>
       )}
 
-      {/* Search filter */}
-      <input
-        type="text"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        placeholder="Search..."
-        className={styles.optionSearchInput}
-        autoFocus
-      />
+      {/* Search filter — hidden for the tiled (icon-backed) layout. */}
+      {!useTiledLayout && (
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Search..."
+          className={styles.optionSearchInput}
+          autoFocus
+        />
+      )}
 
-      {/* Scrollable option list */}
-      <div className={styles.optionList}>
-        {filteredOptions.map((opt) => (
-          <button
-            key={opt.index}
-            onClick={() => setSelectedIndex(opt.index)}
-            className={`${styles.optionItem} ${selectedIndex === opt.index ? styles.optionItemSelected : ''}`}
-          >
-            {opt.label}
-          </button>
-        ))}
-        {filteredOptions.length === 0 && (
-          <p className={styles.noCardsMessage}>No matching options</p>
-        )}
-      </div>
+      {/* Visual tile layout for card-defined mode choices that supply icons. */}
+      {useTiledLayout ? (
+        <div className={styles.optionTiles}>
+          {decision.options.map((label, idx) => {
+            const meta = decision.optionMetadata![idx]
+            const iconUrl = optionIcon(meta?.iconKey)
+            const isSelected = selectedIndex === idx
+            return (
+              <button
+                key={idx}
+                onClick={() => setSelectedIndex(idx)}
+                className={`${styles.optionTile} ${isSelected ? styles.optionTileSelected : ''}`}
+              >
+                {iconUrl && (
+                  <img src={iconUrl} alt="" className={styles.optionTileIcon} />
+                )}
+                <span className={styles.optionTileLabel}>{label}</span>
+                {meta?.description && (
+                  <span className={styles.optionTileDescription}>{meta.description}</span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        <div className={styles.optionList}>
+          {filteredOptions.map((opt) => {
+            const description = decision.optionMetadata?.[opt.index]?.description
+            return (
+              <button
+                key={opt.index}
+                onClick={() => setSelectedIndex(opt.index)}
+                className={`${styles.optionItem} ${selectedIndex === opt.index ? styles.optionItemSelected : ''}`}
+              >
+                <span>{opt.label}</span>
+                {description && (
+                  <span className={styles.optionTileDescription}> — {description}</span>
+                )}
+              </button>
+            )
+          })}
+          {filteredOptions.length === 0 && (
+            <p className={styles.noCardsMessage}>No matching options</p>
+          )}
+        </div>
+      )}
 
       {/* Card previews for selected option */}
       {hasCardIds && previewCards.length > 0 && (

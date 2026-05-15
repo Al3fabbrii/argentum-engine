@@ -31,3 +31,16 @@ data class ChosenCreatureTypeComponent(
 data class ChosenCreatureComponent(
     val creatureId: EntityId
 ) : Component
+
+/**
+ * Stores the named mode chosen when this permanent entered the battlefield.
+ * Used by cards whose entry choice is a card-defined list of options (e.g., the
+ * Khans cycle of Sieges: "As this enters, choose Khans or Dragons"). The stored
+ * [modeId] is the stable id from the `EntersWithChoice(ChoiceType.MODE,...)`
+ * declaration; conditions read it via
+ * [com.wingedsheep.sdk.scripting.conditions.SourceChosenModeIs].
+ */
+@Serializable
+data class ChosenModeComponent(
+    val modeId: String
+) : Component

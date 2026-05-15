@@ -78,7 +78,7 @@
 - [x] 1 Garruk's Uprising
 - [x] 1 Gratuitous Violence
 - [x] 1 Greater Good
-- [ ] 1 Outpost Siege
+- [x] 1 Outpost Siege
 - [ ] 1 Path of Discovery
 - [ ] 1 Primeval Bounty
 - [ ] 1 Rain of Riches

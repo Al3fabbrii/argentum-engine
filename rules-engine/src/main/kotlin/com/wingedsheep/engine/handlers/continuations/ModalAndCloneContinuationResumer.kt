@@ -522,6 +522,16 @@ class ModalAndCloneContinuationResumer(
                     c.with(com.wingedsheep.engine.state.components.identity.ChosenCreatureComponent(chosenCreatureId))
                 }
             }
+            com.wingedsheep.sdk.scripting.ChoiceType.MODE -> {
+                if (response !is OptionChosenResponse) {
+                    return ExecutionResult.error(state, "Expected option chosen response for mode choice")
+                }
+                val modeId = continuation.modeOptionIds.getOrNull(response.optionIndex)
+                    ?: return ExecutionResult.error(state, "Invalid mode option index: ${response.optionIndex}")
+                state.updateEntity(spellId) { c ->
+                    c.with(com.wingedsheep.engine.state.components.identity.ChosenModeComponent(modeId))
+                }
+            }
         }
 
         // Check if the card has remaining choices to chain to
@@ -601,6 +611,16 @@ class ModalAndCloneContinuationResumer(
             com.wingedsheep.sdk.scripting.ChoiceType.CREATURE_ON_BATTLEFIELD -> {
                 // Lands don't use this choice type, but handle gracefully
                 return checkForMore(state, emptyList())
+            }
+            com.wingedsheep.sdk.scripting.ChoiceType.MODE -> {
+                if (response !is OptionChosenResponse) {
+                    return ExecutionResult.error(state, "Expected option chosen response for mode choice")
+                }
+                val modeId = continuation.modeOptionIds.getOrNull(response.optionIndex)
+                    ?: return ExecutionResult.error(state, "Invalid mode option index: ${response.optionIndex}")
+                state.updateEntity(continuation.landId) { c ->
+                    c.with(com.wingedsheep.engine.state.components.identity.ChosenModeComponent(modeId))
+                }
             }
         }
 

@@ -892,6 +892,21 @@ class ClientStateTransformer(
         // Get chosen color for "as enters, choose a color" permanents (e.g., Riptide Replicator)
         val chosenColor = container.get<ChosenColorComponent>()?.color?.displayName
 
+        // Get chosen mode label for "as enters, choose X or Y" permanents (e.g., Outpost Siege).
+        // Resolve the stored mode id back to the display label declared in the card's
+        // EntersWithChoice(modeOptions = [...]) so the UI can show the human-friendly name.
+        val chosenMode = container
+            .get<com.wingedsheep.engine.state.components.identity.ChosenModeComponent>()
+            ?.modeId
+            ?.let { modeId ->
+                val modeOptions = cardDef?.script?.replacementEffects
+                    ?.filterIsInstance<com.wingedsheep.sdk.scripting.EntersWithChoice>()
+                    ?.firstOrNull { it.choiceType == com.wingedsheep.sdk.scripting.ChoiceType.MODE }
+                    ?.modeOptions
+                    .orEmpty()
+                modeOptions.firstOrNull { it.id == modeId }?.label ?: modeId
+            }
+
         // Get sacrificed creature types for spells with sacrifice-as-cost (e.g., Endemic Plague)
         val sacrificedCreatureTypes = spellOnStack?.sacrificedPermanents
             ?.flatMap { it.subtypes }?.toSet()
@@ -1004,6 +1019,7 @@ class ClientStateTransformer(
             chosenX = chosenX,
             chosenCreatureType = chosenCreatureType,
             chosenColor = chosenColor,
+            chosenMode = chosenMode,
             sacrificedCreatureTypes = sacrificedCreatureTypes,
             playableFromExile = playableFromExile,
             copyOf = container.get<com.wingedsheep.engine.state.components.identity.CopyOfComponent>()?.let { copyComp ->

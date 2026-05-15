@@ -290,6 +290,22 @@ data class SplitPilesDecision(
 ) : PendingDecision
 
 /**
+ * Per-option metadata accompanying a [ChooseOptionDecision].
+ *
+ * - [id] is a stable machine-readable identifier (when the caller wants to
+ *   match the chosen option by id rather than by index, e.g. for named modes).
+ * - [description] is optional rules-text shown alongside the option label.
+ * - [iconKey] is an optional asset identifier the frontend can map to an SVG
+ *   icon. Cards may omit it for a purely textual choice.
+ */
+@Serializable
+data class OptionMetadata(
+    val id: String? = null,
+    val description: String? = null,
+    val iconKey: String? = null
+)
+
+/**
  * Player must choose from a fixed set of options (generic choice).
  */
 @Serializable
@@ -303,6 +319,13 @@ data class ChooseOptionDecision(
     val defaultSearch: String? = null,
     /** Maps option index to entity IDs of cards associated with that option (for preview) */
     val optionCardIds: Map<Int, List<EntityId>>? = null,
+    /**
+     * Optional per-option metadata aligned positionally with [options]. Empty
+     * (the default) means no metadata; otherwise must be the same length as
+     * [options]. The frontend uses [OptionMetadata.iconKey] to render visual
+     * choices and [OptionMetadata.description] to show reminder text.
+     */
+    val optionMetadata: List<OptionMetadata> = emptyList(),
     /**
      * Whether the player may back out of this decision entirely via
      * [CancelDecisionResponse]. Used for cast-time modal mode selection (rules

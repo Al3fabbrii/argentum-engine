@@ -232,6 +232,12 @@ data class ClientCard(
     /** Chosen color for "as enters, choose a color" permanents (e.g., Riptide Replicator) */
     val chosenColor: String? = null,
 
+    /**
+     * Chosen mode label for "as enters, choose X or Y" permanents (e.g., the Siege cycle).
+     * Rendered as a badge on the permanent so the player can see which mode is active.
+     */
+    val chosenMode: String? = null,
+
     /** Triggering entity ID for triggered abilities on the stack (for source arrows) */
     val triggeringEntityId: EntityId? = null,
 

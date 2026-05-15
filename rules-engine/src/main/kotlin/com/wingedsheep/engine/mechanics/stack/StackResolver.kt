@@ -2244,6 +2244,39 @@ class StackResolver(
                     .withPendingDecision(decision)
                 ExecutionResult.paused(pausedState, decision)
             }
+
+            ChoiceType.MODE -> {
+                if (choice.modeOptions.isEmpty()) {
+                    return null
+                }
+                val decisionId = "choose-mode-enters-${spellId.value}"
+                val decision = ChooseOptionDecision(
+                    id = decisionId,
+                    playerId = chooserId,
+                    prompt = "Choose for ${cardComponent.name}",
+                    context = DecisionContext(
+                        sourceId = spellId,
+                        sourceName = cardComponent.name,
+                        phase = DecisionPhase.RESOLUTION
+                    ),
+                    options = choice.modeOptions.map { it.label },
+                    optionMetadata = choice.modeOptions.map {
+                        OptionMetadata(id = it.id, description = it.description, iconKey = it.iconKey)
+                    }
+                )
+                val continuation = EntersWithChoiceSpellContinuation(
+                    decisionId = decisionId,
+                    spellId = spellId,
+                    controllerId = controllerId,
+                    ownerId = ownerId,
+                    choiceType = ChoiceType.MODE,
+                    modeOptionIds = choice.modeOptions.map { it.id }
+                )
+                val pausedState = state
+                    .pushContinuation(continuation)
+                    .withPendingDecision(decision)
+                ExecutionResult.paused(pausedState, decision)
+            }
         }
     }
 

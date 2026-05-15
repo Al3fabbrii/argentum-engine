@@ -20,6 +20,7 @@ import com.wingedsheep.mtg.sets.definitions.ody.OdysseySet
 import com.wingedsheep.mtg.sets.definitions.tsp.TimeSpiralSet
 import com.wingedsheep.mtg.sets.definitions.eoe.EdgeOfEternitiesSet
 import com.wingedsheep.mtg.sets.definitions.fdn.FoundationsSet
+import com.wingedsheep.mtg.sets.definitions.frf.FateReforgedSet
 import com.wingedsheep.mtg.sets.definitions.fin.FinalFantasySet
 import com.wingedsheep.mtg.sets.definitions.inr.InnistradRemasteredSet
 import com.wingedsheep.mtg.sets.definitions.inv.InvasionSet
@@ -72,6 +73,7 @@ object MtgSetCatalog {
         ScourgeSet,
         LegionsSet,
         KhansOfTarkirSet,
+        FateReforgedSet,
         DragonsOfTarkirSet,
         MirrodinSet,
         MirrodinBesiegedSet,
