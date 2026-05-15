@@ -61,7 +61,7 @@
 - [x] 1 Esika's Chariot
 - [x] 1 Fellwar Stone
 - [x] 1 Gilded Lotus
-- [ ] 1 Gruul Signet
+- [x] 1 Gruul Signet
 - [ ] 1 Hedron Archive
 - [ ] 1 Mind Stone
 - [ ] 1 Rolling Hamsphere
