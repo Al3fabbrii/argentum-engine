@@ -309,6 +309,27 @@ enum class PlayerEffectRemoval {
 }
 
 /**
+ * Spells matching any of [filters] that the player owning this component casts
+ * can't be countered, for the duration described by [removeOn].
+ *
+ * Player-scoped counterpart to the permanent-static
+ * [com.wingedsheep.sdk.scripting.GrantCantBeCountered]: same protection, but the source
+ * is a player rather than a battlefield permanent, so the protection survives the granter
+ * leaving the battlefield (Domri, Anarch of Bolas's +1).
+ *
+ * Multiple grants stack additively — each call appends to [filters]; a spell is uncounterable
+ * if it matches any entry. The whole component is removed in one shot when the duration elapses.
+ *
+ * @property filters Filters matched against the spell on the stack.
+ * @property removeOn When this component is removed.
+ */
+@Serializable
+data class SpellsCantBeCounteredComponent(
+    val filters: List<GameObjectFilter> = emptyList(),
+    val removeOn: PlayerEffectRemoval = PlayerEffectRemoval.EndOfTurn
+) : Component
+
+/**
  * Component indicating that a player cannot cast spells for the rest of this turn.
  * Applied by effects like Xantid Swarm ("defending player can't cast spells this turn").
  *

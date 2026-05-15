@@ -64,6 +64,7 @@ import com.wingedsheep.sdk.scripting.effects.ExchangeLifeAndPowerEffect
 import com.wingedsheep.sdk.scripting.effects.GainControlByMostOfSubtypeEffect
 import com.wingedsheep.sdk.scripting.effects.GiftGivenEffect
 import com.wingedsheep.sdk.scripting.effects.GrantSpellKeywordEffect
+import com.wingedsheep.sdk.scripting.effects.GrantSpellsCantBeCounteredEffect
 import com.wingedsheep.sdk.scripting.effects.GainControlEffect
 import com.wingedsheep.sdk.scripting.effects.GainLifeEffect
 import com.wingedsheep.sdk.scripting.effects.GrantExileOnLeaveEffect
@@ -2037,4 +2038,14 @@ object Effects {
         keyword: com.wingedsheep.sdk.core.Keyword,
         spellFilter: com.wingedsheep.sdk.scripting.GameObjectFilter
     ): Effect = GrantSpellKeywordEffect(keyword, spellFilter)
+
+    /**
+     * Spells matching [spellFilter] that [target] casts can't be countered for [duration].
+     * Used for Domri, Anarch of Bolas's +1 ("Creature spells you cast this turn can't be countered.").
+     */
+    fun GrantSpellsCantBeCountered(
+        target: com.wingedsheep.sdk.scripting.targets.EffectTarget = com.wingedsheep.sdk.scripting.targets.EffectTarget.Controller,
+        spellFilter: com.wingedsheep.sdk.scripting.GameObjectFilter = com.wingedsheep.sdk.scripting.GameObjectFilter.Creature,
+        duration: com.wingedsheep.sdk.scripting.Duration = com.wingedsheep.sdk.scripting.Duration.EndOfTurn
+    ): Effect = GrantSpellsCantBeCounteredEffect(target, spellFilter, duration)
 }

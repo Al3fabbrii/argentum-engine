@@ -637,6 +637,7 @@ constructors.
 ### Spell Keyword Grants
 
 - `Effects.GrantSpellKeyword(keyword: Keyword, spellFilter: SpellTypeFilter)` — permanently grant a keyword to spells of a type the controller casts. Used for Ral's storm emblem. Adds `GrantedSpellKeywordsComponent` to the player.
+- `Effects.GrantSpellsCantBeCountered(target = Controller, spellFilter = Creature, duration = EndOfTurn)` — player-scoped, time-bounded counterpart to the `GrantCantBeCountered` static ability: spells the target casts matching `spellFilter` can't be countered for `duration`. Stacks additively (multiple grants on the same player append filters). Used for Domri, Anarch of Bolas's +1.
 
 ### Life
 

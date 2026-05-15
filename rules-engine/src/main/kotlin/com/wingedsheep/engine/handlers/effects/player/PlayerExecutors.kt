@@ -46,6 +46,7 @@ class PlayerExecutors(
         GiftGivenExecutor(),
         GrantCastCreaturesFromGraveyardWithForageExecutor(),
         GrantSpellKeywordExecutor(),
+        GrantSpellsCantBeCounteredExecutor(),
         GrantDamageBonusExecutor(),
         GrantHexproofExecutor(),
         GrantShroudExecutor(),

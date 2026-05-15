@@ -408,6 +408,34 @@ data class GrantSpellKeywordEffect(
 }
 
 /**
+ * Spells matching [spellFilter] that [target] casts can't be countered until [duration].
+ *
+ * Player-scoped counterpart to the permanent-static [com.wingedsheep.sdk.scripting.GrantCantBeCountered]:
+ * grants the same protection but with a duration and a controller scope, so it can be
+ * triggered by activated abilities like Domri, Anarch of Bolas's +1
+ * ("Creature spells you cast this turn can't be countered.").
+ *
+ * @property target Whose spells gain the protection (default: controller).
+ * @property spellFilter Which spell types are protected (defaults to creature spells).
+ * @property duration How long the protection lasts (default: end of turn).
+ */
+@SerialName("GrantSpellsCantBeCountered")
+@Serializable
+data class GrantSpellsCantBeCounteredEffect(
+    val target: EffectTarget = EffectTarget.Controller,
+    val spellFilter: GameObjectFilter = GameObjectFilter.Creature,
+    val duration: Duration = Duration.EndOfTurn
+) : Effect {
+    override val description: String =
+        "${spellFilter.description} spells ${target.description} cast${if (duration == Duration.Permanent) "" else " ${duration.description}"} can't be countered"
+
+    override fun applyTextReplacement(replacer: TextReplacer): Effect {
+        val newFilter = spellFilter.applyTextReplacement(replacer)
+        return if (newFilter !== spellFilter) copy(spellFilter = newFilter) else this
+    }
+}
+
+/**
  * Create a permanent emblem that grants a static modification to all permanents matching a filter.
  * Used for planeswalker -X abilities that produce a static-ability emblem
  * (e.g., Oko's "Creatures you control of the chosen type get +3/+3 and have vigilance and hexproof").
