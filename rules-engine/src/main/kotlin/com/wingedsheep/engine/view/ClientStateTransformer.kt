@@ -450,7 +450,7 @@ class ClientStateTransformer(
                 subtypes = emptySet(),
                 colors = sourceCard?.colors ?: emptySet(),
                 oracleText = activatedAbility.descriptionOverride
-                    ?: runtimeAbilityText(state, entityId, activatedAbility.controllerId, activatedAbility.effect, activatedAbility.xValue)
+                    ?: runtimeAbilityText(state, entityId, activatedAbility)
                     ?: activatedAbility.effect.description,
                 power = null,
                 toughness = null,
@@ -1326,22 +1326,26 @@ class ClientStateTransformer(
 
     /**
      * Generate runtime text for an activated ability on the stack with dynamic amounts resolved.
-     * Returns null if evaluation fails or the effect has no dynamic amounts.
+     * Mirrors the cost-payment LKI carried on [ActivatedAbilityOnStackComponent] (sacrificed and
+     * tapped permanent snapshots, X) into the [EffectContext] so stack text for effects like
+     * "draw cards equal to the sacrificed creature's power" renders the actual number instead
+     * of falling back to 0. Returns null if evaluation fails or the effect has no dynamic amounts.
      */
     private fun runtimeAbilityText(
         state: GameState,
         abilityEntityId: EntityId,
-        controllerId: EntityId,
-        effect: Effect,
-        xValue: Int?
+        activated: ActivatedAbilityOnStackComponent
     ): String? {
         val context = EffectContext(
             sourceId = abilityEntityId,
-            controllerId = controllerId,
-            opponentId = state.getOpponent(controllerId),
-            xValue = xValue
+            controllerId = activated.controllerId,
+            opponentId = state.getOpponent(activated.controllerId),
+            xValue = activated.xValue,
+            sacrificedPermanents = activated.sacrificedPermanents,
+            tappedPermanents = activated.tappedPermanents,
+            tappedPermanentSnapshots = activated.tappedPermanentSnapshots
         )
-        return runtimeAbilityText(state, effect, context)
+        return runtimeAbilityText(state, activated.effect, context)
     }
 
     /**
