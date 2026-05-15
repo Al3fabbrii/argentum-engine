@@ -101,7 +101,8 @@ class WardPaidWithSpringleafDrumTest : FunSpec({
                 autoPay = false
             )
         )
-        tapTargetResult.isSuccess shouldBe true
+        tapTargetResult.error shouldBe null
+        tapTargetResult.isPaused shouldBe true
 
         val followUp = driver.pendingDecision
         followUp.shouldBeInstanceOf<SelectCardsDecision>()
@@ -119,10 +120,11 @@ class WardPaidWithSpringleafDrumTest : FunSpec({
         // Drain anything left on the stack.
         repeat(6) { if (driver.state.priorityPlayerId != null && driver.pendingDecision == null) driver.bothPass() }
 
-        // Springleaf tapped, Lions tapped, ward paid → Carbonize resolved → Lurker dies.
+        // Springleaf tapped, Lions tapped, ward paid → Carbonize resolved → Lurker is
+        // exiled (Carbonize replaces "would die" with "exile instead").
         driver.isTapped(drum) shouldBe true
         driver.isTapped(lions) shouldBe true
         driver.findPermanent(opponent, "Long River Lurker") shouldBe null
-        driver.getGraveyardCardNames(opponent).contains("Long River Lurker") shouldBe true
+        driver.getExileCardNames(opponent).contains("Long River Lurker") shouldBe true
     }
 })
