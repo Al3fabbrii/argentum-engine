@@ -200,7 +200,7 @@
 - [x] Slagdrill Scrapper
 - [x] Sledge-Class Seedship
 - [x] Sothera, the Supervoid
-- [ ] Space-Time Anomaly
+- [x] Space-Time Anomaly
 - [x] Specimen Freighter
 - [x] Squire's Lightblade
 - [x] Starbreach Whale
