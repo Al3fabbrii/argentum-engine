@@ -990,6 +990,7 @@ class ClientStateTransformer(
             attachments = attachments,
             linkedExile = linkedExile,
             isFaceDown = isFaceDown,
+            isSuspected = projectedValues?.isSuspected == true,
             morphCost = if (isFaceDown && morphData != null) morphData.morphCost.description else null,
             targets = targets,
             imageUri = cardComponent.imageUri ?: cardDef?.metadata?.imageUri,
@@ -1008,6 +1009,10 @@ class ClientStateTransformer(
             copyOf = container.get<com.wingedsheep.engine.state.components.identity.CopyOfComponent>()?.let { copyComp ->
                 cardRegistry.getCard(copyComp.originalCardDefinitionId)?.name
             },
+            nonLegendaryCopy = zoneKey.zoneType == Zone.BATTLEFIELD
+                && cardDef != null
+                && com.wingedsheep.sdk.core.Supertype.LEGENDARY in cardDef.typeLine.supertypes
+                && com.wingedsheep.sdk.core.Supertype.LEGENDARY !in cardComponent.typeLine.supertypes,
             damageDistribution = (spellOnStack?.damageDistribution ?: container.get<TriggeredAbilityOnStackComponent>()?.damageDistribution)?.takeIf { it.isNotEmpty() },
             sagaTotalChapters = cardDef?.finalChapter,
             classLevel = container.get<com.wingedsheep.engine.state.components.battlefield.ClassLevelComponent>()?.currentLevel,
@@ -1615,6 +1620,21 @@ class ClientStateTransformer(
                     name = "Hexproof",
                     description = "You have hexproof (you can't be the target of spells or abilities your opponents control)",
                     icon = "shield"
+                )
+            )
+        }
+
+        // Check for PlayerCitysBlessingComponent (Ascend / city's blessing, CR 702.131).
+        // Surface the actual Scryfall "City's Blessing" marker card (tblc #40) as the badge
+        // image so it matches the physical-game marker players know.
+        if (container.has<PlayerCitysBlessingComponent>()) {
+            effects.add(
+                ClientPlayerEffect(
+                    effectId = "citys_blessing",
+                    name = "City's Blessing",
+                    description = "You have the city's blessing for the rest of the game",
+                    icon = "shield",
+                    imageUri = "https://cards.scryfall.io/normal/front/3/0/30758c2e-fc01-4037-838c-bdabe8a4e5a3.jpg?1721428739"
                 )
             )
         }

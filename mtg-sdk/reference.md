@@ -80,6 +80,7 @@ constructors.
 - `Effects.ModifyStats(power, toughness, target = ContextTarget(0))` — until end of turn
 - `Effects.ModifyStats(power: DynamicAmount, toughness: DynamicAmount, target)` — dynamic P/T
 - `Effects.GrantHexproof(target = Controller, duration = EndOfTurn)` — grant hexproof to player or permanent
+- `Effects.GainCitysBlessing(target = Controller)` — grant the city's blessing (CR 702.131); permanent, idempotent
 - `Effects.GrantKeyword(keyword, target = ContextTarget(0), duration = EndOfTurn)` — grant a keyword for a duration
 - `Effects.GrantKeywordToAttackersBlockedBy(keyword, target, duration)` — grant keyword to attackers blocked by target
 - `Effects.GrantExileOnLeave(target)` — exile instead of leaving battlefield (Kheru Lich Lord, Whip of Erebos)
@@ -777,6 +778,8 @@ constructors.
 - `Conditions.IsYourTurn` / `.IsNotYourTurn`
 - `Conditions.IsInPhase(vararg phases, yoursOnly = true)` — true if the current phase is one of the listed phases; with `yoursOnly` also requires the controller's turn (Dose of Dawnglow)
 - `Conditions.IsYourMainPhase` — convenience for `IsInPhase(PRECOMBAT_MAIN, POSTCOMBAT_MAIN, yoursOnly = true)`
+- `Conditions.YouHaveCitysBlessing` — true if you have the city's blessing (CR 702.131 / 700.5). Static-ability path goes through `SourceProjectionCondition.ControllerHasCitysBlessing`
+- `Conditions.ControlPermanentsAtLeast(count)` — true if you control N+ permanents of any type. Primary use is the Ascend ETB intervening-if (10+)
 - `Conditions.YouGainedLifeThisTurn` — true if you gained life this turn
 - `Conditions.YouGainedOrLostLifeThisTurn` — true if you gained or lost life this turn
 - `Conditions.YouLostLifeThisTurn` — true if you lost life this turn (for conditional static abilities)
@@ -998,6 +1001,11 @@ reveal creatures, create tokens
 
 `STORM`
 
+### City's Blessing
+
+`ASCEND` — Ixalan keyword (CR 702.131). On a permanent spell, conventionally wired
+per card as `triggeredAbility { trigger = Triggers.EntersBattlefield; effect = ConditionalEffect(Conditions.ControlPermanentsAtLeast(10), Effects.GainCitysBlessing()) }`. The blessing is a permanent player designation; once granted it persists for the rest of the game. Test via `Conditions.YouHaveCitysBlessing`.
+
 ### Damage Modification
 
 `WITHER` — Damage dealt to creatures by this source is dealt in the form of -1/-1 counters (CR 702.79)
@@ -1086,7 +1094,8 @@ Set via `staticAbility { ability = ... }`:
 
 ### Damage
 
-- `AssignDamageEqualToToughness(target, onlyWhenToughnessGreaterThanPower)` — Doran
+- `AssignDamageEqualToToughness(filter, onlyWhenToughnessGreaterThanPower)` — assigns combat damage as toughness; use `Scope.Self` for the creature itself, `Scope.AttachedTo` for equipment/aura, `Scope.Battlefield` for global permanents (Tapestry Warden)
+- `StationUsingToughness` — while a permanent with this is in play, creatures its controller controls with toughness > power contribute toughness instead of power when tapped to pay a Station cost. Applies automatically to any Station ability whose cost-input formula reads `EntityProperty(TappedAsCost, Power)` (Tapestry Warden)
 - `DivideCombatDamageFreely(target)` — divide damage freely
 - `AssignCombatDamageAsUnblocked(target)` — may assign combat damage as though unblocked (Thorn Elemental)
 
@@ -1123,6 +1132,7 @@ Set via `staticAbility { ability = ... }`:
 - `MayCastSelfFromZones(zones: List<Zone>)` — intrinsic permission to cast this card from specified zones (e.g., graveyard, exile)
 - `MayCastFromGraveyardWithLifeCost(filter, lifeCost, duringYourTurnOnly)` — controller may cast matching spells from graveyard by paying life (e.g., Festival of Embers)
 - `MayPlayPermanentsFromGraveyard` — during each of your turns, play a land and cast a permanent spell of each type from your graveyard (Muldrotha). Tracks per-type usage via `GraveyardPlayPermissionUsedComponent` on the source permanent, cleared at end of turn.
+- `MayPlayLandsFromGraveyard` — you may play lands from your graveyard (Crucible of Worlds / Icetill Explorer style). No per-turn usage tracking; the land-drop counter already limits plays. Handled by `PlayLandEnumerator` and `PlayLandHandler` via `hasLandGraveyardPlayPermission()` — no interaction with `GraveyardPlayPermissionUsedComponent`.
 - `GrantMayCastFromLinkedExile(filter, duringYourTurnOnly = false, additionalCost = null)` — you may cast cards exiled with this permanent that match the filter (Rona, Disciple of Gix). `duringYourTurnOnly` restricts the permission to the controller's turn; `additionalCost` (any `AdditionalCost`) must be paid alongside the spell's normal costs (e.g., Dawnhand Dissident's `RemoveCountersFromYourCreatures(3)`). Works with `LinkedExileComponent`.
 - `LookAtFaceDownCreatures` — look at face-down creatures you don't control any time
 - `PreventCycling` — players can't cycle cards

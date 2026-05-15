@@ -20,17 +20,17 @@
 - [x] 1 Grothama, All-Devouring
 - [x] 1 Grumgully, the Generous
 - [x] 1 Kodama of the East Tree
-- [ ] 1 Llanowar Loamspeaker
-- [ ] 1 Lotus Cobra
-- [ ] 1 Prosperous Bandit
-- [ ] 1 Pyreswipe Hawk
-- [ ] 1 Rampaging Baloths
-- [ ] 1 Sakura-Tribe Elder
-- [ ] 1 Teapot Slinger
-- [ ] 1 Tendershoot Dryad
-- [ ] 1 Trailtracker Scout
-- [ ] 1 Wandertale Mentor
-- [ ] 1 Wildsear, Scouring Maw
+- [x] 1 Llanowar Loamspeaker
+- [x] 1 Lotus Cobra
+- [x] 1 Prosperous Bandit
+- [x] 1 Pyreswipe Hawk
+- [x] 1 Rampaging Baloths
+- [x] 1 Sakura-Tribe Elder
+- [x] 1 Teapot Slinger
+- [x] 1 Tendershoot Dryad
+- [x] 1 Trailtracker Scout
+- [x] 1 Wandertale Mentor
+- [x] 1 Wildsear, Scouring Maw
 
 ## Planeswalkers (1)
 
@@ -38,11 +38,11 @@
 
 ## Instants (5)
 
-- [ ] 1 Abrade
-- [ ] 1 Beast Within
-- [ ] 1 Big Score
-- [ ] 1 Chaos Warp
-- [x] 1 Starstorm
+- [x] 1 Abrade
+- [x] 1 Beast Within
+- [x] 1 Big Score
+- [x] 1 Chaos Warp
+- [x] 1 Starsto/rm
 
 ## Sorceries (7)
 

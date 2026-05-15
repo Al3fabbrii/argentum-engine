@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 166 / 261
+**Implemented:** 171 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -106,7 +106,7 @@
 - [x] Hylderblade
 - [x] Hymn of the Faller
 - [x] Icecave Crasher
-- [ ] Icetill Explorer
+- [x] Icetill Explorer
 - [x] Illvoi Galeblade
 - [x] Illvoi Infiltrator
 - [x] Illvoi Light Jammer
@@ -127,7 +127,7 @@
 - [x] Lightless Evangel
 - [ ] Lightstall Inquisitor
 - [ ] Lithobraking
-- [ ] Loading Zone
+- [x] Loading Zone
 - [x] Lost in Space
 - [x] Lumen-Class Frigate
 - [ ] Luxknight Breacher
@@ -160,9 +160,9 @@
 - [x] Ouroboroid
 - [ ] Pain for All
 - [ ] Perigee Beckoner
-- [ ] Pinnacle Emissary
+- [x] Pinnacle Emissary
 - [x] Pinnacle Kill-Ship
-- [ ] Pinnacle Starcage
+- [x] Pinnacle Starcage
 - [x] Plasma Bolt
 - [x] Possibility Technician
 - [ ] Pull Through the Weft
@@ -227,7 +227,7 @@
 - [x] Systems Override
 - [x] Tannuk, Memorial Ensign
 - [ ] Tannuk, Steadfast Second
-- [ ] Tapestry Warden
+- [x] Tapestry Warden
 - [x] Temporal Intervention
 - [ ] Terminal Velocity
 - [ ] Terrapact Intimidator
