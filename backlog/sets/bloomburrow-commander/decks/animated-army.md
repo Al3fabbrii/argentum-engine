@@ -62,7 +62,7 @@
 - [x] 1 Fellwar Stone
 - [x] 1 Gilded Lotus
 - [x] 1 Gruul Signet
-- [ ] 1 Hedron Archive
+- [x] 1 Hedron Archive
 - [ ] 1 Mind Stone
 - [ ] 1 Rolling Hamsphere
 - [ ] 1 Sol Ring
