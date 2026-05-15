@@ -91,6 +91,23 @@ more useful than abstract objection.
 Reference: `docs/architecture-principles.md` §1.5 (atomic pipelines), §1.2 (AST for
 dynamic values), §1.3 (composable filtering), §1.6 (DSL as abstraction).
 
+## 2b. Printing placement for new / reprinted cards
+
+For every card whose `CardDefinition` or `Printing(...)` row is added or moved in the
+diff, run `just check-card-printing "<Card Name>"`. The script lists all Scryfall
+printings and exits non-zero unless:
+
+- the canonical `card("Name") { ... }` lives in the card's **earliest real-expansion
+  printing** (per Scryfall, skipping `promo` / `token` / `art_series`), and
+- every other scaffolded printing has a `Printing(...)` row in its set's `cards/` package.
+
+If the earliest real set isn't scaffolded under `mtg-sets/.../definitions/<setcode>/`,
+the script reports it as drift. The expectation in that case is to scaffold the earliest
+set (minimal `MtgSet` object + `META-INF/services` entry) and host the canonical there.
+Flag it as **Blocking** if the diff put the canonical in a later set without scaffolding
+the original; the only acceptable miss is when the author documents in the PR body why
+scaffolding the earlier set is out of scope.
+
 ## 3. Correctness — recurring bug classes in this engine
 
 - **Projected vs base state** (`docs/architecture-principles.md` §2.3). Battlefield reads
