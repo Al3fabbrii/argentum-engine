@@ -9,6 +9,7 @@ import com.wingedsheep.mtg.sets.definitions.bro.BrothersWarSet
 import com.wingedsheep.mtg.sets.definitions.c15.Commander2015Set
 import com.wingedsheep.mtg.sets.definitions.con.ConfluxSet
 import com.wingedsheep.mtg.sets.definitions.dft.AetherdriftSet
+import com.wingedsheep.mtg.sets.definitions.dtk.DragonsOfTarkirSet
 import com.wingedsheep.mtg.sets.definitions.dom.DominariaSet
 import com.wingedsheep.mtg.sets.definitions.dmu.DominariaUnitedSet
 import com.wingedsheep.mtg.sets.definitions.dsk.DuskmournSet
@@ -70,6 +71,7 @@ object MtgSetCatalog {
         ScourgeSet,
         LegionsSet,
         KhansOfTarkirSet,
+        DragonsOfTarkirSet,
         MirrodinSet,
         MirrodinBesiegedSet,
         RiseOfTheEldraziSet,

@@ -74,7 +74,7 @@
 ## Enchantments (13)
 
 - [x] 1 Alchemist's Talent
-- [ ] 1 Berserkers' Onslaught
+- [x] 1 Berserkers' Onslaught
 - [ ] 1 Garruk's Uprising
 - [x] 1 Gratuitous Violence
 - [ ] 1 Greater Good

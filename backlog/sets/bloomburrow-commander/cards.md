@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 84 / 312
+**Implemented:** 85 / 312
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 37    | 0    |
@@ -39,7 +39,7 @@
 - [x] Beastmaster Ascension
 - [ ] Beledros Witherbloom
 - [x] Bello, Bard of the Brambles
-- [ ] Berserkers' Onslaught
+- [x] Berserkers' Onslaught
 - [ ] Bident of Thassa
 - [x] Big Score
 - [ ] Binding the Old Gods
