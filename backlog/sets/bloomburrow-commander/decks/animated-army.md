@@ -67,7 +67,7 @@
 - [x] 1 Rolling Hamsphere
 - [x] 1 Sol Ring
 - [x] 1 Spine of Ish Sah
-- [ ] 1 Talisman of Impulse
+- [x] 1 Talisman of Impulse
 - [ ] 1 Thought Vessel
 - [ ] 1 Thran Dynamo
 
