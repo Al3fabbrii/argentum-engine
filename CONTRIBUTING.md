@@ -16,9 +16,15 @@ If anything below is unclear, that's the fastest place to ask.
 
 ## TL;DR
 
-- **PRs are welcome** — no need to ask first.
-- **Quality over quantity.** A few carefully-built, well-tested cards beat a
-  large batch of agentic-pipeline PRs that need rework.
+- **PRs are welcome** — no need to DM first.
+- **A small, well-tested PR is the easiest kind to merge.** One card,
+  faithful to its Scryfall text, with a scenario test and a quick manual
+  playthrough, is exactly what I'm looking for.
+- **Batching is fine when the cards reuse existing effects.** If every card
+  in the PR is built from primitives already in `Effects.*` /
+  `EffectPatterns.*`, feel free to bundle several. But if a card introduces a
+  *new* effect, please give it tests and keep it to one new-effect card per
+  PR — those need closer review.
 - **Ideas, suggestions, bug reports** — open an issue or post in Discord. No
   permission needed.
 - **Forks, custom sets, AI agents against the gym** — go ahead, and please
@@ -45,8 +51,9 @@ for, roughly in order:
    in the UI catches the rest.
 4. **UX is considered.** A correctly-implemented card with no visible trigger,
    no obvious targeting prompt, or a missing log line is still a broken
-   experience. Trace the player flow through the web client before declaring
-   the card done.
+   experience. Trace the player flow through the web client from both seats
+   before declaring the card done — triggers visible on the stack, targeting
+   prompts clear, log readable, opponent sees what they should.
 5. **Scoped sensibly.** Bundling several cards in one PR is fine *if* each
    one is built entirely from primitives already in `Effects.*` /
    `EffectPatterns.*` — those are quick to review together. If a card
@@ -65,23 +72,20 @@ check.
 1. **Implement** — run the `add-card` skill with the card name and set code.
    It handles Scryfall lookup, oracle errata, set registration, and a starter
    scenario test.
-2. **Review** — run the `review-changes` skill against the diff. It catches
-   most of the "this should compose an existing primitive" cases before they
-   land in a PR.
-3. **Re-read the principles doc.**
+2. **Generate a scenario and play it manually** — run the `generate-scenario`
+   skill with a brief description of what you want to test (the interesting
+   interaction, not just the happy path), then start the server and client
+   (`just server` / `just client`), load the scenario, and click through it.
+3. **Look at the UX from both seats.** Is the triggered ability visible on
+   the stack with a readable label? Are targeting prompts unambiguous? Does
+   the opponent see what they should (and not see what they shouldn't)? Does
+   the log read sensibly?
+4. **For more complex cards, run `review-changes` against the diff.** It
+   catches most of the "this should compose an existing primitive" cases
+   before they land in a PR. A quick re-read of
    [`docs/architecture-principles.md`](docs/architecture-principles.md) is
-   short, and a quick re-read is the best way to notice when an
-   implementation is fighting the engine rather than reusing it.
-4. **Generate a scenario** — run the `generate-scenario` skill with a brief
-   description of what you want to test (the interesting interaction, not
-   just the happy path).
-5. **Play the scenario manually** — start the server and client (`just server`
-   / `just client`), load the scenario, and click through it. Check:
-   - Is the triggered ability visible on the stack with a readable label?
-   - Are targeting prompts unambiguous?
-   - Does the opponent see what they're supposed to see (and not see what
-     they're not)?
-   - Does the log read sensibly?
+   the best way to notice when an implementation is fighting the engine
+   rather than reusing it.
 
 If a step in the pipeline turns up something the previous steps missed, that's
 usually a signal that the card needs another pass before opening the PR — not
