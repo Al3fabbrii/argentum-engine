@@ -606,7 +606,7 @@ class ManaSolver(
 
             // Include mana abilities granted by static effects from other permanents
             // (e.g., Clement, the Worrywort granting {T}: Add {G} or {U} to Frogs)
-            val staticGrantedManaAbilities = getStaticGrantedManaAbilities(entityId, card, state)
+            val staticGrantedManaAbilities = getStaticGrantedManaAbilities(entityId, state)
             val rawManaAbilities = allAbilities.filter { it.isManaAbility } + staticGrantedManaAbilities
 
             // When a spell/ability payment context is provided, drop mana abilities whose
@@ -1258,7 +1258,6 @@ class ManaSolver(
      */
     private fun getStaticGrantedManaAbilities(
         entityId: EntityId,
-        targetCard: CardComponent,
         state: GameState
     ): List<ActivatedAbility> {
         val result = mutableListOf<ActivatedAbility>()
@@ -1273,15 +1272,15 @@ class ManaSolver(
                 if (ability is GrantActivatedAbility &&
                     ability.filter.scope is com.wingedsheep.sdk.scripting.filters.unified.Scope.Battlefield) {
                     if (ability.filter.excludeSelf && permanentId == entityId) continue
-                    val filter = ability.filter.baseFilter
-                    val matchesAll = filter.cardPredicates.all { predicate ->
-                        when (predicate) {
-                            is CardPredicate.IsCreature -> targetCard.typeLine.isCreature
-                            is CardPredicate.HasSubtype -> targetCard.typeLine.hasSubtype(predicate.subtype)
-                            else -> true
-                        }
-                    }
-                    if (matchesAll && ability.ability.isManaAbility) {
+                    val granterController = state.projectedState.getController(permanentId) ?: continue
+                    val matches = predicateEvaluator.matchesWithProjection(
+                        state,
+                        state.projectedState,
+                        entityId,
+                        ability.filter.baseFilter,
+                        PredicateContext(controllerId = granterController, sourceId = permanentId)
+                    )
+                    if (matches && ability.ability.isManaAbility) {
                         result.add(ability.ability)
                     }
                 }

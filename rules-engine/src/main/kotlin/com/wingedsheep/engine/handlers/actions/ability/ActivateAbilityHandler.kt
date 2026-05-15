@@ -1603,8 +1603,7 @@ class ActivateAbilityHandler(
         entityId: EntityId,
         state: GameState
     ): List<Pair<ActivatedAbility, EntityId>> {
-        val targetContainer = state.getEntity(entityId) ?: return emptyList()
-        val targetCard = targetContainer.get<CardComponent>() ?: return emptyList()
+        if (state.getEntity(entityId) == null) return emptyList()
 
         val result = mutableListOf<Pair<ActivatedAbility, EntityId>>()
 
@@ -1619,17 +1618,15 @@ class ActivateAbilityHandler(
                 when (ability.filter.scope) {
                     is Scope.Battlefield -> {
                         if (ability.filter.excludeSelf && permanentId == entityId) continue
-                        val filter = ability.filter.baseFilter
-                        val matchesAll = filter.cardPredicates.all { predicate ->
-                            when (predicate) {
-                                is com.wingedsheep.sdk.scripting.predicates.CardPredicate.IsCreature ->
-                                    targetCard.typeLine.isCreature
-                                is com.wingedsheep.sdk.scripting.predicates.CardPredicate.HasSubtype ->
-                                    targetCard.typeLine.hasSubtype(predicate.subtype)
-                                else -> true
-                            }
-                        }
-                        if (matchesAll) {
+                        val granterController = state.projectedState.getController(permanentId) ?: continue
+                        val matches = predicateEvaluator.matchesWithProjection(
+                            state,
+                            state.projectedState,
+                            entityId,
+                            ability.filter.baseFilter,
+                            PredicateContext(controllerId = granterController, sourceId = permanentId)
+                        )
+                        if (matches) {
                             result.add(ability.ability to permanentId)
                         }
                     }
