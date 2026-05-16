@@ -13,8 +13,10 @@ import kotlinx.serialization.Serializable
  * - commander tax — `+2` generic mana per [castsFromCommandZone] when cast from the command zone
  *   (CR 903.8); incremented on cast-commit, not on resolution, so countered commanders still owe
  *   the higher tax next time
- * - zone-change replacement: when the card would leave for graveyard / exile / hand / library, the
- *   owner may divert it to the command zone (Phase 1 always-divert; Phase 1.5 player choice)
+ * - CR 903.9a state-based action: when the card sits in graveyard / exile / hand / library,
+ *   the owner is prompted to put it into the command zone (see
+ *   `CommanderZoneChoiceCheck`). The legacy `Format.Commander.alwaysDivertToCommand` flag
+ *   short-circuits the prompt with a synchronous replacement-time divert.
  * - commander-damage tracking — combat damage dealt by this entity contributes to the
  *   `commanderDamage` map, gated by absence of `TokenComponent` (CR 903.10a — token copies are
  *   not the commander)

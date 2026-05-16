@@ -235,3 +235,25 @@ data class LegendRuleContinuation(
     val playerId: EntityId,
     val allDuplicates: List<EntityId>
 ) : ContinuationFrame
+
+/**
+ * Resume after the commander's owner answers the CR 903.9a state-based action prompt.
+ *
+ * Yes → the commander moves from [currentZone] to the command zone. No → mark the commander
+ * as asked-this-stay so the SBA stops re-prompting; the marker is cleared automatically by
+ * the next zone transition (see [com.wingedsheep.engine.state.components.identity.
+ * CommanderZoneChoiceAskedComponent]).
+ *
+ * @property commanderId The commander entity awaiting the choice.
+ * @property ownerId The owner answering the prompt (i.e. the player whose decision this is).
+ * @property currentZone The non-command zone the commander is sitting in while the prompt
+ *   is open. Captured so the resumer can issue the correct from-zone on the move and so the
+ *   prompt remains traceable in logs even after the commander moves.
+ */
+@Serializable
+data class CommanderZoneChoiceContinuation(
+    override val decisionId: String,
+    val commanderId: EntityId,
+    val ownerId: EntityId,
+    val currentZone: com.wingedsheep.sdk.core.Zone
+) : ContinuationFrame

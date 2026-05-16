@@ -14,6 +14,7 @@ class PermanentSbaModule(
         LegendRuleCheck(decisionHandler),
         CounterAnnihilationCheck(),
         UnattachedAurasCheck(),
-        SagaSacrificeCheck(cardRegistry)
+        SagaSacrificeCheck(cardRegistry),
+        CommanderZoneChoiceCheck(decisionHandler),
     )
 }

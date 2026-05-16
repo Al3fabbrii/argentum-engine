@@ -27,9 +27,12 @@ sealed interface Format {
      * @property deckSize Total deck size including the commander; the validator enforces this.
      * @property startingLife Each player's starting life total.
      * @property startingHandSize Cards drawn for the opening hand.
-     * @property alwaysDivertToCommand Phase 1 short-cut for the zone-change replacement: when a
-     *   commander would move to graveyard / exile / hand / library, divert to the command zone
-     *   automatically. Phase 1.5 will replace this with a player-choice yes/no decision.
+     * @property alwaysDivertToCommand Bypass the CR 903.9a player choice and unconditionally
+     *   divert a commander leaving for graveyard / exile / hand / library to the command zone.
+     *   Off by default — the SBA pauses with a yes/no decision so the owner can choose to leave
+     *   the commander in the destination zone (e.g. to keep recursion targets in graveyard or
+     *   keep linked-exile abilities tracking it). AI/headless tooling can flip this on to skip
+     *   the prompt.
      */
     @Serializable
     data class Commander(
@@ -37,7 +40,7 @@ sealed interface Format {
         val deckSize: Int = 100,
         val startingLife: Int = 40,
         val startingHandSize: Int = 7,
-        val alwaysDivertToCommand: Boolean = true,
+        val alwaysDivertToCommand: Boolean = false,
     ) : Format
 }
 

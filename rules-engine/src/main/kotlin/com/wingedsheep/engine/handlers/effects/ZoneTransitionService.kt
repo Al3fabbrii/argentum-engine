@@ -11,6 +11,8 @@ import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.components.battlefield.*
 import com.wingedsheep.engine.state.components.combat.*
 import com.wingedsheep.engine.state.components.identity.CardComponent
+import com.wingedsheep.engine.state.components.identity.CommanderComponent
+import com.wingedsheep.engine.state.components.identity.CommanderZoneChoiceAskedComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.DoubleFacedComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
@@ -315,6 +317,18 @@ object ZoneTransitionService {
                             .with(dfc.copy(currentFace = DoubleFacedComponent.Face.FRONT, frontFaceCard = null))
                     }
                 }
+            }
+        }
+
+        // 7c. Clear the CR 903.9a "already asked this stay" marker on every commander zone
+        // change. The marker is attached by CommanderZoneChoiceCheck when the owner declines
+        // the prompt; clearing it here means the next entry into a non-command zone produces a
+        // fresh question, matching the rule's "since the last time state-based actions were
+        // checked" wording (a new zone entry resets the clock). Cheap unconditional strip —
+        // without<> is a no-op when the component is absent.
+        if (newState.getEntity(entityId)?.has<CommanderComponent>() == true) {
+            newState = newState.updateEntity(entityId) { c ->
+                c.without<CommanderZoneChoiceAskedComponent>()
             }
         }
 

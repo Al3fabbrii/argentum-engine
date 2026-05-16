@@ -395,14 +395,15 @@ object ZoneMovementUtils {
             return ZoneChangeRedirectResult(Zone.EXILE)
         }
 
-        // Commander zone-change replacement (CR 903.9). When a card with CommanderComponent would
-        // move to graveyard / exile / hand / library from any zone, the owner *may* divert to the
-        // command zone. Token copies of a commander aren't the commander itself (CR 903.10a) and
-        // never carry CommanderComponent, so the TokenComponent guard is implicit.
+        // Commander zone-change shortcut (CR 903.9). When `alwaysDivertToCommand` is enabled
+        // on Format.Commander, a card with CommanderComponent that would move to
+        // graveyard / exile / hand / library from any other zone is silently diverted to the
+        // command zone. Token copies of a commander aren't the commander itself (CR 903.10a)
+        // and never carry CommanderComponent, so the TokenComponent guard is implicit.
         //
-        // Phase 1: Format.Commander.alwaysDivertToCommand = true → unconditional redirect. The
-        // graveyard-recursion archetypes (Muldrotha / Meren / Karador) lose the choice until
-        // Phase 1.5 wires a YesNoDecision continuation through ZoneTransitionResult.
+        // The default path leaves the destination unchanged — the commander reaches the
+        // intended zone and the CR 903.9a state-based action (see CommanderZoneChoiceCheck)
+        // prompts the owner before priority is granted.
         if (container.has<CommanderComponent>() &&
             toZone in COMMANDER_DIVERT_DESTINATIONS &&
             fromZone != Zone.COMMAND

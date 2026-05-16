@@ -1,16 +1,20 @@
 package com.wingedsheep.engine.handlers.continuations
 
 import com.wingedsheep.engine.core.*
+import com.wingedsheep.engine.handlers.effects.ZoneTransitionService
 import com.wingedsheep.engine.mechanics.sba.SbaZoneMovementHelper
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.identity.CardComponent
+import com.wingedsheep.engine.state.components.identity.CommanderZoneChoiceAskedComponent
+import com.wingedsheep.sdk.core.Zone
 
 class StateBasedContinuationResumer(
     private val services: com.wingedsheep.engine.core.EngineServices
 ) : ContinuationResumerModule {
 
     override fun resumers(): List<ContinuationResumer<*>> = listOf(
-        resumer(LegendRuleContinuation::class, ::resumeLegendRule)
+        resumer(LegendRuleContinuation::class, ::resumeLegendRule),
+        resumer(CommanderZoneChoiceContinuation::class, ::resumeCommanderZoneChoice),
     )
 
     private fun resumeLegendRule(
@@ -49,5 +53,45 @@ class StateBasedContinuationResumer(
         }
 
         return checkForMore(newState, events)
+    }
+
+    private fun resumeCommanderZoneChoice(
+        state: GameState,
+        continuation: CommanderZoneChoiceContinuation,
+        response: DecisionResponse,
+        checkForMore: CheckForMore
+    ): ExecutionResult {
+        if (response !is YesNoResponse) {
+            return ExecutionResult.error(state, "Expected yes/no response for commander zone choice")
+        }
+
+        // Re-check that the commander is still in the zone we asked about. Between the prompt
+        // and the response another effect could in theory have moved it (engine pauses don't
+        // typically allow that today, but this defends against future re-entrancy).
+        val container = state.getEntity(continuation.commanderId)
+            ?: return checkForMore(state, emptyList())
+        val currentZone = state.zones.entries.firstOrNull { continuation.commanderId in it.value }?.key?.zoneType
+
+        if (response.choice) {
+            if (currentZone == null || currentZone == Zone.COMMAND) {
+                return checkForMore(state, emptyList())
+            }
+            // Move to the command zone. ZoneTransitionService strips the asked marker on the
+            // way (every commander zone change clears it), so the SBA will not re-prompt.
+            val result = ZoneTransitionService.moveToZone(
+                state,
+                continuation.commanderId,
+                Zone.COMMAND,
+            )
+            return checkForMore(result.state, result.events)
+        }
+
+        // Decline: attach the asked marker so the SBA stops re-prompting on subsequent
+        // iterations while the commander remains in this zone. The marker is cleared
+        // automatically the next time the commander changes zones.
+        val newState = state.updateEntity(continuation.commanderId) { c ->
+            c.with(CommanderZoneChoiceAskedComponent)
+        }
+        return checkForMore(newState, emptyList())
     }
 }

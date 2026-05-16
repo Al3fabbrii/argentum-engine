@@ -19,13 +19,18 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 /**
- * Phase 1.5 — `ZoneMovementUtils.checkZoneChangeRedirect` diverts commanders to the command zone
- * when the format is Commander with `alwaysDivertToCommand = true`.
+ * `ZoneMovementUtils.checkZoneChangeRedirect` diverts commanders to the command zone when the
+ * format is Commander *and* `alwaysDivertToCommand = true`. With the default
+ * `alwaysDivertToCommand = false` the redirect is skipped — the commander reaches its original
+ * destination and the CR 903.9a state-based action is responsible for prompting the owner (see
+ * `CommanderZoneChoiceCheckTest`).
  */
 class CommanderZoneRedirectTest : FunSpec({
 
     val ownerId = EntityId.generate()
     val cmdrId = EntityId.generate()
+
+    val alwaysDivertCommander = Format.Commander(alwaysDivertToCommand = true)
 
     fun stateWithCommander(format: Format, commanderZone: Zone): GameState {
         val cardContainer = ComponentContainer.of(
@@ -55,7 +60,7 @@ class CommanderZoneRedirectTest : FunSpec({
     }
 
     test("destroyed commander diverts to the command zone in Commander format") {
-        val state = stateWithCommander(Format.Commander(), Zone.BATTLEFIELD)
+        val state = stateWithCommander(alwaysDivertCommander, Zone.BATTLEFIELD)
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.BATTLEFIELD, Zone.GRAVEYARD,
         )
@@ -63,7 +68,7 @@ class CommanderZoneRedirectTest : FunSpec({
     }
 
     test("milled commander diverts to the command zone (library → graveyard)") {
-        val state = stateWithCommander(Format.Commander(), Zone.LIBRARY)
+        val state = stateWithCommander(alwaysDivertCommander, Zone.LIBRARY)
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.LIBRARY, Zone.GRAVEYARD,
         )
@@ -71,7 +76,7 @@ class CommanderZoneRedirectTest : FunSpec({
     }
 
     test("exiled commander diverts to the command zone (battlefield → exile)") {
-        val state = stateWithCommander(Format.Commander(), Zone.BATTLEFIELD)
+        val state = stateWithCommander(alwaysDivertCommander, Zone.BATTLEFIELD)
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.BATTLEFIELD, Zone.EXILE,
         )
@@ -79,7 +84,7 @@ class CommanderZoneRedirectTest : FunSpec({
     }
 
     test("bounced commander diverts to the command zone (battlefield → hand)") {
-        val state = stateWithCommander(Format.Commander(), Zone.BATTLEFIELD)
+        val state = stateWithCommander(alwaysDivertCommander, Zone.BATTLEFIELD)
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.BATTLEFIELD, Zone.HAND,
         )
@@ -87,7 +92,7 @@ class CommanderZoneRedirectTest : FunSpec({
     }
 
     test("commander leaving the command zone is not redirected back") {
-        val state = stateWithCommander(Format.Commander(), Zone.COMMAND)
+        val state = stateWithCommander(alwaysDivertCommander, Zone.COMMAND)
         // The commander is on the stack heading toward the battlefield (cast resolution).
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.COMMAND, Zone.BATTLEFIELD,
@@ -100,6 +105,16 @@ class CommanderZoneRedirectTest : FunSpec({
             Format.Commander(alwaysDivertToCommand = false),
             Zone.BATTLEFIELD,
         )
+        val result = ZoneMovementUtils.checkZoneChangeRedirect(
+            state, cmdrId, Zone.BATTLEFIELD, Zone.GRAVEYARD,
+        )
+        result.destinationZone shouldBe Zone.GRAVEYARD
+    }
+
+    test("default Commander format defers to the SBA — no synchronous redirect") {
+        // The new default (alwaysDivertToCommand = false) hands the choice to
+        // CommanderZoneChoiceCheck, so the replacement-time check must not silently divert.
+        val state = stateWithCommander(Format.Commander(), Zone.BATTLEFIELD)
         val result = ZoneMovementUtils.checkZoneChangeRedirect(
             state, cmdrId, Zone.BATTLEFIELD, Zone.GRAVEYARD,
         )
