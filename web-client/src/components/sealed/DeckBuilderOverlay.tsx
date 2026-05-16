@@ -176,9 +176,14 @@ function DeckBuilder({ state }: { state: DeckBuildingState }) {
   }).length
   const spellCount = state.deck.length - nonBasicLandCount
   const landCount = basicLandCount + nonBasicLandCount
-  // Commander shape: the chosen commander counts toward the deck total (the server also strips
-  // it back out before building Deck.cards, so the wire format double-counts intentionally).
-  const commanderInTotal = isCommanderShape && state.commander != null ? 1 : 0
+  // Commander shape: the chosen commander counts toward the deck total. The "must be in
+  // state.deck" invariant (see effect below) means state.deck.length already includes the
+  // commander once, so don't add another. Guard the !includes path defensively in case the
+  // invariant is briefly broken between renders.
+  const commanderAlreadyInDeck =
+    state.commander != null && state.deck.includes(state.commander)
+  const commanderInTotal =
+    isCommanderShape && state.commander != null && !commanderAlreadyInDeck ? 1 : 0
   const totalCount = state.deck.length + basicLandCount + commanderInTotal
   const requiredSize = isCommanderShape ? commanderMinDeckSize : 40
   const isValidDeck = totalCount >= requiredSize && (!isCommanderShape || state.commander != null)

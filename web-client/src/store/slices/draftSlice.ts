@@ -223,16 +223,21 @@ export const createDraftSlice: SliceCreator<DraftSlice> = (set, get) => ({
     }
 
     // Commander is sent both as the dedicated field and merged into deckList — the server's
-    // stripCommanderFromCards subtracts the merged copy when building Deck.cards. Matches the
-    // wire-format invariant documented on SubmitSealedDeckMessage.
+    // stripCommanderFromCards subtracts the merged copy when building Deck.cards. The
+    // DeckBuilderOverlay invariant ("commander must be in state.deck", enforced by the
+    // clearing effect) means the commander is already counted from `deckBuildingState.deck`
+    // above, so only add the +1 when it isn't — otherwise the server strips one too few and
+    // the pool gets allocated twice for the commander, surfacing as "not enough copies of
+    // your commander" on a singleton sealed pool.
     const commander = deckBuildingState.commander
-    if (commander) {
-      deckList[commander] = (deckList[commander] || 0) + 1
+    if (commander && !(commander in deckList)) {
+      deckList[commander] = 1
     }
 
     const landCount = Object.values(deckBuildingState.landCounts).reduce((a, b) => a + b, 0)
+    const commanderAlreadyInDeck = commander != null && deckBuildingState.deck.includes(commander)
     trackEvent('sealed_deck_submitted', {
-      deck_size: deckBuildingState.deck.length + landCount + (commander ? 1 : 0),
+      deck_size: deckBuildingState.deck.length + landCount + (commander && !commanderAlreadyInDeck ? 1 : 0),
       land_count: landCount,
       nonland_count: deckBuildingState.deck.length,
     })
