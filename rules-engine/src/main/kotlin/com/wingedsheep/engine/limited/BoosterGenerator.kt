@@ -114,28 +114,33 @@ class BoosterGenerator(
     fun getSetConfig(setCode: String): SetConfig? = availableSets[setCode]
 
     /**
-     * Generate a single 15-card booster pack from the specified set.
+     * Generate a single booster pack from the specified set.
      *
      * @param setCode The set code to generate from (e.g., "POR" for Portal)
-     * @return List of 15 card definitions
+     * @param strategy Optional override; when null, uses the set's configured strategy.
+     *                 Pass an explicit strategy (e.g., [com.wingedsheep.sdk.limited.CommanderDraftBooster])
+     *                 to ship Brawl / Commander Draft packs without mutating [SetConfig].
+     * @return List of card definitions
      * @throws IllegalArgumentException if set code is not found
      */
-    fun generateBooster(setCode: String): List<CardDefinition> {
+    fun generateBooster(setCode: String, strategy: BoosterStrategy? = null): List<CardDefinition> {
         val setConfig = availableSets[setCode]
             ?: throw IllegalArgumentException("Unknown set code: $setCode")
-        return setConfig.boosterStrategy.generate(boosterPool(setConfig.cards), Random.Default)
+        val effectiveStrategy = strategy ?: setConfig.boosterStrategy
+        return effectiveStrategy.generate(boosterPool(setConfig.cards), Random.Default)
     }
 
     /**
-     * Generate a single 15-card booster pack from one of the specified sets.
+     * Generate a single booster pack from one of the specified sets.
      * Randomly selects one set and generates a booster from that set only.
      * Each booster contains cards from a single set, never mixed.
      *
      * @param setCodes The set codes to choose from
-     * @return List of 15 card definitions from a single randomly-selected set
+     * @param strategy Optional strategy override applied to whichever set is picked.
+     * @return List of card definitions from a single randomly-selected set
      * @throws IllegalArgumentException if any set code is not found
      */
-    fun generateBooster(setCodes: List<String>): List<CardDefinition> {
+    fun generateBooster(setCodes: List<String>, strategy: BoosterStrategy? = null): List<CardDefinition> {
         if (setCodes.isEmpty()) {
             throw IllegalArgumentException("At least one set code is required")
         }
@@ -150,24 +155,30 @@ class BoosterGenerator(
         val hasIncomplete = setConfigs.any { it.incomplete }
         if (hasIncomplete) {
             val combinedCards = setConfigs.flatMap { it.cards }
-            return StandardBooster().generate(boosterPool(combinedCards), Random.Default)
+            val effectiveStrategy = strategy ?: StandardBooster()
+            return effectiveStrategy.generate(boosterPool(combinedCards), Random.Default)
         }
 
         // Pick a random set and generate a booster from it
         val selectedSet = setCodes.random()
-        return generateBooster(selectedSet)
+        return generateBooster(selectedSet, strategy)
     }
 
     /**
-     * Generate a sealed pool of 90 cards (6 boosters) from the specified set.
+     * Generate a sealed pool of [boosterCount] boosters from the specified set.
      *
      * @param setCode The set code to generate from
      * @param boosterCount Number of boosters to open (default 6)
+     * @param strategy Optional strategy override applied to every generated pack.
      * @return List of all cards in the sealed pool
      * @throws IllegalArgumentException if set code is not found
      */
-    fun generateSealedPool(setCode: String, boosterCount: Int = 6): List<CardDefinition> {
-        return (1..boosterCount).flatMap { generateBooster(setCode) }
+    fun generateSealedPool(
+        setCode: String,
+        boosterCount: Int = 6,
+        strategy: BoosterStrategy? = null,
+    ): List<CardDefinition> {
+        return (1..boosterCount).flatMap { generateBooster(setCode, strategy) }
     }
 
     /**
@@ -191,13 +202,14 @@ class BoosterGenerator(
     fun generateSealedPool(
         setCodes: List<String>,
         boosterCount: Int = 6,
-        distributionSeed: Long? = null
+        distributionSeed: Long? = null,
+        strategy: BoosterStrategy? = null,
     ): List<CardDefinition> {
         if (setCodes.isEmpty()) {
             throw IllegalArgumentException("At least one set code is required")
         }
         if (setCodes.size == 1) {
-            return generateSealedPool(setCodes.first(), boosterCount)
+            return generateSealedPool(setCodes.first(), boosterCount, strategy)
         }
 
         // Validate all set codes exist
@@ -210,7 +222,7 @@ class BoosterGenerator(
         val hasIncomplete = setConfigs.any { it.incomplete }
         if (hasIncomplete) {
             val combinedCards = setConfigs.flatMap { it.cards }
-            val combinedStrategy = StandardBooster()
+            val combinedStrategy = strategy ?: StandardBooster()
             val combinedPool = boosterPool(combinedCards)
             return (1..boosterCount).flatMap { combinedStrategy.generate(combinedPool, Random.Default) }
         }
@@ -240,7 +252,7 @@ class BoosterGenerator(
 
         // Note: We don't shuffle the final assignments - each player gets their
         // own random card contents anyway, only the set distribution needs to match
-        return boosterAssignments.flatMap { generateBooster(it) }
+        return boosterAssignments.flatMap { generateBooster(it, strategy) }
     }
 
     /**
@@ -251,7 +263,8 @@ class BoosterGenerator(
      * @throws IllegalArgumentException if any set code is not found
      */
     fun generateSealedPool(
-        boosterDistribution: Map<String, Int>
+        boosterDistribution: Map<String, Int>,
+        strategy: BoosterStrategy? = null,
     ): List<CardDefinition> {
         if (boosterDistribution.isEmpty()) {
             throw IllegalArgumentException("At least one set code is required")
@@ -268,14 +281,14 @@ class BoosterGenerator(
         if (hasIncomplete) {
             val combinedCards = setConfigs.flatMap { it.cards }
             val totalBoosters = boosterDistribution.values.sum()
-            val combinedStrategy = StandardBooster()
+            val combinedStrategy = strategy ?: StandardBooster()
             val combinedPool = boosterPool(combinedCards)
             return (1..totalBoosters).flatMap { combinedStrategy.generate(combinedPool, Random.Default) }
         }
 
         // Generate boosters per set according to distribution
         return boosterDistribution.flatMap { (setCode, count) ->
-            (1..count).flatMap { generateBooster(setCode) }
+            (1..count).flatMap { generateBooster(setCode, strategy) }
         }
     }
 
