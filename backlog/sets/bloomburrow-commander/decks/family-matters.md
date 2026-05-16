@@ -96,7 +96,7 @@
 - [x] 1 Clifftop Retreat
 - [x] 1 Command Tower
 - [x] 1 Evolving Wilds
-- [ ] 1 Exotic Orchard
+- [x] 1 Exotic Orchard
 - [ ] 1 Ferrous Lake
 - [ ] 1 Glacial Fortress
 - [ ] 2 Island

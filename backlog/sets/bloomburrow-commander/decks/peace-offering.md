@@ -94,7 +94,7 @@
 - [ ] 1 Canopy Vista
 - [x] 1 Command Tower
 - [x] 1 Evolving Wilds
-- [ ] 1 Exotic Orchard
+- [x] 1 Exotic Orchard
 - [ ] 1 Flooded Grove
 - [ ] 2 Forest
 - [ ] 2 Forest

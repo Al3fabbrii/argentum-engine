@@ -2,7 +2,7 @@
 
 **Set Size:** 312 cards
 **Release Date:** August 2, 2024
-**Implemented:** 103 / 312
+**Implemented:** 105 / 312
 | Color      | Total | Done |
 |------------|-------|------|
 | White      | 37    | 0    |
@@ -96,7 +96,7 @@
 - [x] Etali, Primal Storm
 - [x] Evercoat Ursine
 - [x] Evolving Wilds
-- [ ] Exotic Orchard
+- [x] Exotic Orchard
 - [x] Explore
 - [ ] Faeburrow Elder
 - [x] Farseek
@@ -317,7 +317,7 @@
 - [ ] Twilight Mire
 - [x] Unnatural Growth
 - [ ] Viridescent Bog
-- [ ] Warstorm Surge
+- [x] Warstorm Surge
 - [x] Wildsear, Scouring Maw
 - [ ] Windgrace's Judgment
 - [ ] Wizard Class

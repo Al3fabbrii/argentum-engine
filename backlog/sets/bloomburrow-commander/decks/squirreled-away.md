@@ -93,7 +93,7 @@
 - [ ] 1 Bojuka Bog
 - [x] 1 Command Tower
 - [x] 1 Evolving Wilds
-- [ ] 1 Exotic Orchard
+- [x] 1 Exotic Orchard
 - [ ] 5 Forest
 - [ ] 4 Forest
 - [ ] 1 Golgari Rot Farm
