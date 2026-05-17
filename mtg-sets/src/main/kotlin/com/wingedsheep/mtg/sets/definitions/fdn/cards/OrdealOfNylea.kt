@@ -8,6 +8,7 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.conditions.Compare
 import com.wingedsheep.sdk.scripting.conditions.ComparisonOperator
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
@@ -44,7 +45,7 @@ val OrdealOfNylea = card("Ordeal of Nylea") {
     // Whenever enchanted creature attacks, put a +1/+1 counter on it.
     // Then if it has three or more +1/+1 counters on it, sacrifice this Aura.
     triggeredAbility {
-        trigger = Triggers.EnchantedCreatureAttacks
+        trigger = Triggers.attacks(binding = TriggerBinding.ATTACHED)
         // EntityReference.Triggering resolves to the enchanted (attacking) creature here —
         // AttachmentTriggerDetector sets triggeringEntityId to the attached entity.
         effect = Effects.AddCounters(Counters.PLUS_ONE_PLUS_ONE, 1, EffectTarget.EnchantedCreature) then

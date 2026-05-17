@@ -12,6 +12,7 @@ import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.AbilityId
 import com.wingedsheep.sdk.scripting.ActivatedAbility
 import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
@@ -50,7 +51,7 @@ class UncontrolledInfestationTest : FunSpec({
         )
 
         triggeredAbility {
-            trigger = Triggers.EnchantedPermanentBecomesTapped
+            trigger = Triggers.becomesTapped(binding = TriggerBinding.ATTACHED)
             effect = MoveToZoneEffect(EffectTarget.EnchantedCreature, Zone.GRAVEYARD, byDestruction = true)
         }
     }

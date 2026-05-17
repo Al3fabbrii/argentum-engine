@@ -10,6 +10,7 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.scripting.TimingRule
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.model.CardDefinition.Companion.doubleFacedPermanent
 import com.wingedsheep.sdk.scripting.CanOnlyBlockCreaturesWith
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureEffect
@@ -226,7 +227,7 @@ object PredefinedTokens {
         }
 
         triggeredAbility {
-            trigger = Triggers.EnchantedCreatureAttacks
+            trigger = Triggers.attacks(binding = TriggerBinding.ATTACHED)
             effect = EffectPatterns.scry(1)
         }
 

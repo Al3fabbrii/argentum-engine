@@ -32,7 +32,7 @@ val Cryoshatter = card("Cryoshatter") {
     }
 
     triggeredAbility {
-        trigger = Triggers.EnchantedPermanentBecomesTapped
+        trigger = Triggers.becomesTapped(binding = TriggerBinding.ATTACHED)
         effect = MoveToZoneEffect(
             target = EffectTarget.EnchantedCreature,
             destination = Zone.GRAVEYARD,

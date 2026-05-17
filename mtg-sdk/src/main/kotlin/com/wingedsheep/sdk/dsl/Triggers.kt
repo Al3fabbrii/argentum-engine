@@ -508,21 +508,26 @@ object Triggers {
     )
 
     /**
-     * At the beginning of enchanted creature's controller's upkeep.
-     * Used for auras that grant "At the beginning of your upkeep" to the enchanted creature.
+     * Generic "at the beginning of <step>" trigger factory. Use the named
+     * constants above (`YourUpkeep`, `YourEndStep`, `BeginCombat`,
+     * `EachUpkeep`, `EachEndStep`, …) when their defaults match; reach for
+     * this factory for any other combination of (step, player, binding).
+     *
+     * Examples:
+     * - "At the beginning of enchanted creature's controller's upkeep"
+     *   (aura grants an upkeep trigger to its target):
+     *   `phase(Step.UPKEEP, Player.You, binding = TriggerBinding.ATTACHED)`
+     * - "At the beginning of the end step of enchanted creature's
+     *   controller" (Lingering Death):
+     *   `phase(Step.END, Player.You, binding = TriggerBinding.ATTACHED)`
      */
-    val EnchantedCreatureControllerUpkeep: TriggerSpec = TriggerSpec(
-        event = StepEvent(Step.UPKEEP, Player.You),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * At the beginning of the end step of enchanted creature's controller.
-     * Used for auras like Lingering Death that trigger on the enchanted creature's controller's end step.
-     */
-    val EnchantedCreatureControllerEndStep: TriggerSpec = TriggerSpec(
-        event = StepEvent(Step.END, Player.You),
-        binding = TriggerBinding.ATTACHED
+    fun phase(
+        step: Step,
+        player: Player = Player.You,
+        binding: TriggerBinding = TriggerBinding.ANY,
+    ): TriggerSpec = TriggerSpec(
+        event = StepEvent(step, player),
+        binding = binding,
     )
 
     /**
@@ -532,6 +537,14 @@ object Triggers {
         event = TurnFaceUpEvent,
         binding = TriggerBinding.SELF
     )
+
+    /**
+     * Generic "is turned face up" factory — use [TurnedFaceUp] for SELF;
+     * reach for this factory for ATTACHED ("enchanted creature is turned
+     * face up", Fatal Mutation) or other bindings.
+     */
+    fun turnedFaceUp(binding: TriggerBinding = TriggerBinding.SELF): TriggerSpec =
+        TriggerSpec(event = TurnFaceUpEvent, binding = binding)
 
     /**
      * Whenever a creature is turned face up (any controller).
@@ -597,14 +610,6 @@ object Triggers {
      */
     val YouDraw: TriggerSpec = TriggerSpec(
         event = DrawEvent(Player.You),
-        binding = TriggerBinding.ANY
-    )
-
-    /**
-     * Whenever any player draws a card.
-     */
-    val AnyPlayerDraws: TriggerSpec = TriggerSpec(
-        event = DrawEvent(Player.Each),
         binding = TriggerBinding.ANY
     )
 
@@ -794,61 +799,25 @@ object Triggers {
         binding = binding,
     )
 
-    /**
-     * Whenever the enchanted creature dies.
-     * Used for auras like Demonic Vigor.
-     */
-    val EnchantedCreatureDies: TriggerSpec = TriggerSpec(
-        event = ZoneChangeEvent(from = Zone.BATTLEFIELD, to = Zone.GRAVEYARD),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * When the enchanted permanent leaves the battlefield.
-     * Used for auras like Curator's Ward.
-     */
-    val EnchantedPermanentLeavesBattlefield: TriggerSpec = TriggerSpec(
-        event = ZoneChangeEvent(from = Zone.BATTLEFIELD),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * Whenever the enchanted creature attacks.
-     * Used for auras like Extra Arms.
-     */
-    val EnchantedCreatureAttacks: TriggerSpec = TriggerSpec(
-        event = AttackEvent(),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * Whenever the equipped creature attacks.
-     * Used for equipment like Heart-Piercer Bow.
-     */
-    val EquippedCreatureAttacks: TriggerSpec = TriggerSpec(
-        event = AttackEvent(),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * Whenever the equipped creature dies.
-     * Used for equipment like Forebear's Blade.
-     * Equipment stays on the battlefield; detected via aurasByTarget index
-     * on the dying creature's zone change event.
-     */
-    val EquippedCreatureDies: TriggerSpec = TriggerSpec(
-        event = ZoneChangeEvent(from = Zone.BATTLEFIELD, to = Zone.GRAVEYARD),
-        binding = TriggerBinding.ATTACHED
-    )
-
-    /**
-     * When the enchanted creature is turned face up.
-     * Used for auras like Fatal Mutation.
-     */
-    val EnchantedCreatureTurnedFaceUp: TriggerSpec = TriggerSpec(
-        event = TurnFaceUpEvent,
-        binding = TriggerBinding.ATTACHED
-    )
+    // -------------------------------------------------------------------------
+    // Aura / Equipment binding (TriggerBinding.ATTACHED)
+    //
+    // No named constants for the "enchanted/equipped creature does X" shapes —
+    // they collapse to the existing event factories with `binding = ATTACHED`:
+    //
+    // - "Enchanted creature dies":
+    //     leavesBattlefield(to = Zone.GRAVEYARD, binding = TriggerBinding.ATTACHED)
+    // - "Enchanted/equipped creature leaves the battlefield":
+    //     leavesBattlefield(binding = TriggerBinding.ATTACHED)
+    // - "Enchanted/equipped creature attacks":
+    //     attacks(binding = TriggerBinding.ATTACHED)
+    // - "Enchanted permanent becomes tapped":
+    //     becomesTapped(binding = TriggerBinding.ATTACHED)
+    // - "Enchanted creature is turned face up":
+    //     turnedFaceUp(binding = TriggerBinding.ATTACHED)
+    // - "At the beginning of enchanted creature's controller's <step>":
+    //     phase(step, Player.You, binding = TriggerBinding.ATTACHED)
+    // -------------------------------------------------------------------------
 
     // =========================================================================
     // Tap/Untap Triggers
@@ -871,13 +840,12 @@ object Triggers {
     )
 
     /**
-     * When the enchanted permanent becomes tapped.
-     * Used for auras like Uncontrolled Infestation.
+     * Generic "becomes tapped" factory — use [BecomesTapped] for SELF;
+     * reach for this factory for ATTACHED ("enchanted permanent becomes
+     * tapped", Uncontrolled Infestation) or other bindings.
      */
-    val EnchantedPermanentBecomesTapped: TriggerSpec = TriggerSpec(
-        event = TapEvent,
-        binding = TriggerBinding.ATTACHED
-    )
+    fun becomesTapped(binding: TriggerBinding = TriggerBinding.SELF): TriggerSpec =
+        TriggerSpec(event = TapEvent, binding = binding)
 
     // =========================================================================
     // Cycling Triggers
@@ -889,14 +857,6 @@ object Triggers {
     val YouCycleThis: TriggerSpec = TriggerSpec(
         event = CycleEvent(Player.You),
         binding = TriggerBinding.SELF
-    )
-
-    /**
-     * Whenever you cycle a card.
-     */
-    val YouCycle: TriggerSpec = TriggerSpec(
-        event = CycleEvent(Player.You),
-        binding = TriggerBinding.ANY
     )
 
     /**

@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
 import com.wingedsheep.sdk.scripting.effects.SacrificeSelfEffect
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
@@ -34,7 +35,7 @@ val ChoraleOfTheVoid = card("Chorale of the Void") {
     auraTarget = Targets.CreatureYouControl
 
     triggeredAbility {
-        trigger = Triggers.EnchantedCreatureAttacks
+        trigger = Triggers.attacks(binding = TriggerBinding.ATTACHED)
         val creature = target(
             "creature card from defending player's graveyard",
             TargetObject(filter = TargetFilter.CreatureInGraveyard.ownedByOpponent())

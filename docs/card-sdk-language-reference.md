@@ -664,6 +664,9 @@ Named sugar for the common cases; reach for the factories for any other combinat
 
 ### Phase & turn
 
+Named sugar for the common `(step, player)` cases; reach for `phase(step, player?, binding?)`
+for anything else (the ATTACHED-binding aura shapes, custom step/player combinations).
+
 - `YourUpkeep` — start of your upkeep.
 - `YourDrawStep` — start of your draw step.
 - `EachUpkeep` — every upkeep.
@@ -675,23 +678,35 @@ Named sugar for the common cases; reach for the factories for any other combinat
 - `FirstMainPhase` — start of pre-combat main.
 - `YourPostcombatMain` — start of post-combat main.
 
+**Factory** — `phase(step, player = Player.You, binding = TriggerBinding.ANY)`.
+
 ### Aura / equipment
 
-- `EnchantedCreatureControllerUpkeep` — at upkeep of enchanted creature's controller.
-- `EnchantedCreatureControllerEndStep` — at end step of same.
-- `EnchantedCreatureDies` — when enchanted creature dies.
-- `EnchantedCreatureAttacks` — when enchanted creature attacks.
-- `EnchantedCreatureTurnedFaceUp` — Aura sees a morph flip.
-- `EnchantedPermanentLeavesBattlefield` — enchanted permanent LTB.
-- *Enchanted-creature damage triggers* — express via the damage factories with `binding = TriggerBinding.ATTACHED`: `dealsDamage(binding = ATTACHED)` (any damage), `dealsDamage(damageType = Combat, recipient = AnyPlayer, binding = ATTACHED)` (combat damage to a player), `takesDamage(binding = ATTACHED)` (is dealt damage).
-- `EnchantedPermanentBecomesTapped` — Curse-on-tap shape.
-- `EquippedCreatureAttacks` — equipped creature attacks.
-- `EquippedCreatureDies` — equipped creature dies.
+No named constants for the "enchanted/equipped creature does X" shapes — they all collapse to
+the existing event factories with `binding = TriggerBinding.ATTACHED`. Examples (all card uses
+in the repo today):
+
+- *Enchanted creature dies* (Demonic Vigor):
+  `Triggers.leavesBattlefield(to = Zone.GRAVEYARD, binding = TriggerBinding.ATTACHED)`
+- *Enchanted/equipped creature leaves the battlefield* (Curator's Ward):
+  `Triggers.leavesBattlefield(binding = TriggerBinding.ATTACHED)`
+- *Enchanted/equipped creature attacks* (Extra Arms, Heart-Piercer Bow, Ordeal of Nylea,
+  Chorale of the Void, Atomic Microsizer, Sorcerer Role token):
+  `Triggers.attacks(binding = TriggerBinding.ATTACHED)`
+- *Enchanted permanent becomes tapped* (Uncontrolled Infestation, Cryoshatter):
+  `Triggers.becomesTapped(binding = TriggerBinding.ATTACHED)`
+- *Enchanted creature is turned face up* (Fatal Mutation):
+  `Triggers.turnedFaceUp(binding = TriggerBinding.ATTACHED)`
+- *At the beginning of enchanted creature's controller's `<step>`* (Custody Battle,
+  Lingering Death): `Triggers.phase(step, binding = TriggerBinding.ATTACHED)`
+- *Enchanted-creature damage triggers* — damage factories already support binding:
+  `Triggers.dealsDamage(binding = TriggerBinding.ATTACHED)` (any damage),
+  `Triggers.dealsDamage(damageType = Combat, recipient = AnyPlayer, binding = TriggerBinding.ATTACHED)`,
+  `Triggers.takesDamage(binding = TriggerBinding.ATTACHED)` (Aurification / Frozen Solid).
 
 ### Cards & draws
 
 - `YouDraw` — when you draw a card.
-- `AnyPlayerDraws` — when anyone draws.
 - `RevealCreatureFromDraw` — Hatching Plans-style top-card reveal.
 - `RevealCardFromDraw` — generic reveal-from-draw trigger.
 - `CardsPutIntoYourGraveyard(filter?)` — when matching cards enter your yard.
@@ -759,7 +774,7 @@ Triggers.youCastSpell(
 
 ### State change & misc
 
-- `TurnedFaceUp` — source turns face up.
+- `TurnedFaceUp` — source turns face up. Use `turnedFaceUp(binding)` for the ATTACHED-binding aura variant (Fatal Mutation).
 - `CreatureTurnedFaceUp(player?)` — when a creature you control turns face up.
 - `GainControlOfSelf` — you gain control of source.
 - `BecomesTarget(filter?)` — source becomes target of spell/ability.
@@ -767,7 +782,6 @@ Triggers.youCastSpell(
 - `Transforms` — source transforms (either direction).
 - `TransformsToFront` — to front face.
 - `TransformsToBack` — to back face.
-- `YouCycle` — you cycle any card.
 - `YouCycleThis` — you cycle source.
 - `AnyPlayerCycles` — anyone cycles.
 - `YouCommitCrime` — MKM crime mechanic.

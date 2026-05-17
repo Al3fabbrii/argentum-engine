@@ -1,12 +1,14 @@
 package com.wingedsheep.mtg.sets.definitions.scg.cards
 
+import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.targets.EffectTarget
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
-import com.wingedsheep.sdk.core.Zone
+import com.wingedsheep.sdk.scripting.targets.EffectTarget
 
 /**
  * Lingering Death
@@ -24,7 +26,7 @@ val LingeringDeath = card("Lingering Death") {
     auraTarget = Targets.Creature
 
     triggeredAbility {
-        trigger = Triggers.EnchantedCreatureControllerEndStep
+        trigger = Triggers.phase(Step.END, binding = TriggerBinding.ATTACHED)
         effect = MoveToZoneEffect(
             target = EffectTarget.EnchantedCreature,
             destination = Zone.GRAVEYARD

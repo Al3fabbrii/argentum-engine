@@ -7,6 +7,7 @@ import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.effects.SetBasePowerToughnessEffect
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 
@@ -32,7 +33,7 @@ val AtomicMicrosizer = card("Atomic Microsizer") {
 
     // Triggered ability: Whenever equipped creature attacks...
     triggeredAbility {
-        trigger = Triggers.EquippedCreatureAttacks
+        trigger = Triggers.attacks(binding = TriggerBinding.ATTACHED)
         val target = target(
             "up to one target creature", 
             com.wingedsheep.sdk.scripting.targets.TargetObject(optional = true, filter = com.wingedsheep.sdk.scripting.filters.unified.TargetFilter.Creature)

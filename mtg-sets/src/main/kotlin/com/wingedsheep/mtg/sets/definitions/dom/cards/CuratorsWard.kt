@@ -8,6 +8,7 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GrantKeyword
+import com.wingedsheep.sdk.scripting.TriggerBinding
 
 /**
  * Curator's Ward
@@ -31,7 +32,7 @@ val CuratorsWard = card("Curator's Ward") {
     }
 
     triggeredAbility {
-        trigger = Triggers.EnchantedPermanentLeavesBattlefield
+        trigger = Triggers.leavesBattlefield(binding = TriggerBinding.ATTACHED)
         triggerCondition = Conditions.TriggeringEntityWasHistoric
         effect = Effects.DrawCards(2)
     }
