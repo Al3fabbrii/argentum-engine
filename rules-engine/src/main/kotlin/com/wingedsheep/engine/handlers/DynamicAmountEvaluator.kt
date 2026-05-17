@@ -132,16 +132,20 @@ class DynamicAmountEvaluator(
 
             is DynamicAmount.ContextProperty -> evaluateContextProperty(state, amount.key, context)
 
-            // Battlefield / zone aggregates — resolve the projection here (lazy entry, eager
-            // inside the branch that actually needs it).
+            // Battlefield / zone aggregates — propagate the explicit snapshot (may be null);
+            // each helper decides whether it actually needs to reach for [defaultProjection].
+            // Doing this eagerly here would touch [state.projectedState] for non-battlefield
+            // zones (e.g., GRAVEYARD `Count`), which infinitely recurses if a mid-projection
+            // caller (a `ConditionalStaticAbility` condition evaluated inside [EffectApplicator])
+            // reaches this branch through a default-constructed [ConditionEvaluator].
             is DynamicAmount.Count ->
-                evaluateUnifiedCount(state, amount.player, amount.zone, amount.filter, context, resolveProjection(state, projectedState))
+                evaluateUnifiedCount(state, amount.player, amount.zone, amount.filter, context, projectedState)
 
             is DynamicAmount.AggregateBattlefield ->
-                evaluateBattlefieldAggregate(state, amount, context, resolveProjection(state, projectedState))
+                evaluateBattlefieldAggregate(state, amount, context, projectedState)
 
             is DynamicAmount.AggregateZone ->
-                evaluateZoneAggregate(state, amount, context, resolveProjection(state, projectedState))
+                evaluateZoneAggregate(state, amount, context, projectedState)
 
             is DynamicAmount.Conditional -> {
                 val eval = conditionEvaluator ?: ConditionEvaluator()
@@ -403,11 +407,21 @@ class DynamicAmountEvaluator(
         zone: Zone,
         filter: GameObjectFilter,
         context: EffectContext,
-        projection: ProjectedState
+        explicitProjection: ProjectedState?
     ): Int {
         val playerIds = resolveUnifiedPlayerIds(state, player, context)
         val zoneType = resolveUnifiedZone(zone)
         val predicateContext = PredicateContext.fromEffectContext(context)
+
+        // Projection only matters for battlefield reads (type/subtype/color/keyword/P/T mutated
+        // by continuous effects). Non-battlefield zones use base CardComponent via an empty
+        // projection — and crucially do *not* reach for [defaultProjection], which during a
+        // mid-projection caller would re-enter the lazy `state.projectedState` initializer.
+        val projection: ProjectedState = if (zoneType == Zone.BATTLEFIELD) {
+            resolveProjection(state, explicitProjection)
+        } else {
+            explicitProjection ?: ProjectedState(state, emptyMap())
+        }
 
         return playerIds.sumOf { playerId ->
             val entities = if (zoneType == Zone.BATTLEFIELD) {
@@ -426,10 +440,11 @@ class DynamicAmountEvaluator(
         state: GameState,
         amount: DynamicAmount.AggregateBattlefield,
         context: EffectContext,
-        projection: ProjectedState
+        explicitProjection: ProjectedState?
     ): Int {
         val playerIds = resolveUnifiedPlayerIds(state, amount.player, context)
         val predicateContext = PredicateContext.fromEffectContext(context)
+        val projection = resolveProjection(state, explicitProjection)
 
         val matchingEntities = playerIds.flatMap { playerId ->
             state.getBattlefield()
@@ -488,13 +503,14 @@ class DynamicAmountEvaluator(
         state: GameState,
         amount: DynamicAmount.AggregateZone,
         context: EffectContext,
-        projection: ProjectedState
+        explicitProjection: ProjectedState?
     ): Int {
         val playerIds = resolveUnifiedPlayerIds(state, amount.player, context)
         val predicateContext = PredicateContext.fromEffectContext(context)
 
-        // Non-battlefield zones have no projected values — the predicate evaluator falls
-        // back to base CardComponent for entries missing from [projection].
+        // Non-battlefield zone: avoid reaching for [defaultProjection] entirely. The predicate
+        // evaluator falls back to base CardComponent for entries missing from the projection.
+        val projection: ProjectedState = explicitProjection ?: ProjectedState(state, emptyMap())
         val matchingEntities = playerIds.flatMap { playerId ->
             state.getZone(ZoneKey(playerId, amount.zone))
                 .filter { entityId ->
