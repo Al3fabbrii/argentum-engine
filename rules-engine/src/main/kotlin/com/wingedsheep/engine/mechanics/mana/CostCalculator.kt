@@ -654,13 +654,20 @@ class CostCalculator(
     /**
      * Count unique colors among permanents controlled by a player.
      * Used for Vivid cost reduction.
+     *
+     * Uses projected state for both controller and color so that:
+     * - Control-changing effects (Mind Control, Threaten) are honored — the rule reads
+     *   "permanents you control", which is the projected controller (CR 613.1c).
+     * - Color-changing effects (Foraging Wickermaw's "becomes that color until end of turn",
+     *   Painter's Servant, Moonlace, etc.) contribute their granted colors, since the rule
+     *   reads "colors among permanents".
      */
     private fun countColors(state: GameState, playerId: EntityId): Int {
-        val colors = mutableSetOf<Color>()
+        val projected = state.projectedState
+        val colors = mutableSetOf<String>()
 
-        state.getBattlefield(playerId).forEach { entityId ->
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: return@forEach
-            colors.addAll(card.colors)
+        state.controlledBattlefield(playerId).forEach { entityId ->
+            colors.addAll(projected.getColors(entityId))
         }
 
         return colors.size
