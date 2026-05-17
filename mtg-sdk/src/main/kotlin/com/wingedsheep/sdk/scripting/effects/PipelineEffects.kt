@@ -451,12 +451,21 @@ data class GatherUntilMatchEffect(
  *   overlay (they already know — e.g., they just chose the card themselves while
  *   searching their library). Defaults to true so opponents and bystanders still
  *   get the reveal.
+ * @property fromZone Optional source zone the revealed cards came from. When both
+ *   [fromZone] and [toZone] are set, the client treats this as a zone-transition
+ *   reveal and shows every revealed card in the overlay — even ones that landed on
+ *   the battlefield in the same update (e.g., Polymorph's matching creature).
+ *   Without this, public-info cards would be hidden from the overlay and shown only
+ *   as a behold-pulse on the permanent.
+ * @property toZone Optional destination zone for the reveal context. See [fromZone].
  */
 @SerialName("RevealCollection")
 @Serializable
 data class RevealCollectionEffect(
     val from: String,
-    val revealToSelf: Boolean = true
+    val revealToSelf: Boolean = true,
+    val fromZone: com.wingedsheep.sdk.core.Zone? = null,
+    val toZone: com.wingedsheep.sdk.core.Zone? = null
 ) : Effect {
     override val description: String = "Reveal the $from cards"
     override fun applyTextReplacement(replacer: TextReplacer): Effect = this

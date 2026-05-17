@@ -47,7 +47,9 @@ class RevealCollectionExecutor : EffectExecutor<RevealCollectionEffect> {
             cardNames = cardNames,
             imageUris = imageUris,
             source = sourceName,
-            revealToSelf = effect.revealToSelf
+            revealToSelf = effect.revealToSelf,
+            fromZone = effect.fromZone,
+            toZone = effect.toZone
         )
 
         return EffectResult.success(state, listOf(event))
