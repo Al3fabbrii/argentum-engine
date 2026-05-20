@@ -497,11 +497,22 @@ class TriggerMatcher(
                         // Token-ness is intrinsic; LKI is required because 704.5s sweeps the
                         // token entity before the matcher runs on death triggers, and the
                         // entity may also be unreachable after a bounce/exile by the time
-                        // we check.
-                        if (event.lastKnownWasToken) return false
+                        // we check. For enter-battlefield events the entity is still in state
+                        // and lastKnownWasToken is not populated — read TokenComponent live.
+                        val isToken = if (event.fromZone == Zone.BATTLEFIELD) {
+                            event.lastKnownWasToken
+                        } else {
+                            entity?.has<com.wingedsheep.engine.state.components.identity.TokenComponent>() == true
+                        }
+                        if (isToken) return false
                     }
                     is com.wingedsheep.sdk.scripting.predicates.CardPredicate.IsToken -> {
-                        if (!event.lastKnownWasToken) return false
+                        val isToken = if (event.fromZone == Zone.BATTLEFIELD) {
+                            event.lastKnownWasToken
+                        } else {
+                            entity?.has<com.wingedsheep.engine.state.components.identity.TokenComponent>() == true
+                        }
+                        if (!isToken) return false
                     }
                     else -> {
                         // For other predicates, check the entity's type
