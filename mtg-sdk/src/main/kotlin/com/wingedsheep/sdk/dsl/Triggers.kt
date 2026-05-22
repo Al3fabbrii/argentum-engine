@@ -323,12 +323,17 @@ object Triggers {
      * Generic "blocks" trigger factory. Use [Blocks] for the SELF-only
      * unfiltered case; reach for this factory for (filter, binding) variants
      * like "Whenever a creature you control blocks" (ANY binding + filter).
+     *
+     * [attackerFilter] constrains the blocked attacker — "this creature blocks a
+     * creature with flying" is `blocks(attackerFilter = withKeyword(FLYING))`.
+     * TriggerContext.triggeringEntityId is set to the blocked attacker.
      */
     fun blocks(
         filter: GameObjectFilter? = null,
         binding: TriggerBinding = TriggerBinding.SELF,
+        attackerFilter: GameObjectFilter? = null,
     ): TriggerSpec = TriggerSpec(
-        event = BlockEvent(filter = filter),
+        event = BlockEvent(filter = filter, attackerFilter = attackerFilter),
         binding = binding,
     )
 

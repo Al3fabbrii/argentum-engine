@@ -641,11 +641,15 @@ sealed set for attack-time facts beyond the basics.
 
 - `Blocks` — SELF, no filter.
 - `BecomesBlocked` — SELF, no filter.
-- `blocks(filter?, binding?)` — factory. Covers ANY-binding + filter variants.
+- `blocks(filter?, binding?, attackerFilter?)` — factory. `filter` constrains the
+  blocker (ANY binding). `attackerFilter` constrains the blocked attacker — pair
+  with SELF binding for "whenever this creature blocks a [filter]" (Skystinger).
+  `triggeringEntityId` is set to the blocked attacker in that case.
 - `becomesBlocked(filter?, binding?)` — factory. Replaces the old
   `CreatureYouControlBecomesBlocked` and `FilteredBecomesBlocked(filter)`.
 - `BlocksOrBecomesBlockedBy(filter)` — either direction, partner-filtered;
-  sole consumer of `BlocksOrBecomesBlockedByEvent`.
+  sole consumer of `BlocksOrBecomesBlockedByEvent`. Prefer `blocks(attackerFilter=...)`
+  when only the blocking direction should fire.
 
 **`AttackPredicate`** — extensible "facts about an attack declaration."
 Adding a new attack-time mechanic is one new sealed-case + one matcher branch
@@ -674,6 +678,9 @@ Triggers.becomesBlocked(
     filter = GameObjectFilter.Creature.withSubtype("Beast"),
     binding = TriggerBinding.ANY,
 )
+
+// "Whenever this creature blocks a creature with flying" (Skystinger)
+Triggers.blocks(attackerFilter = GameObjectFilter.Creature.withKeyword(Keyword.FLYING))
 ```
 
 ### Damage
