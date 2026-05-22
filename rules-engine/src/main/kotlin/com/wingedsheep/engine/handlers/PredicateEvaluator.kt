@@ -318,6 +318,16 @@ class PredicateEvaluator {
                 val toughness = projectedValues?.toughness ?: card.baseStats?.baseToughness ?: 0
                 toughness <= predicate.max
             }
+            is CardPredicate.ToughnessAtMostX -> {
+                // Null xValue means X is unbound. Match permissively so legal-action
+                // enumeration can offer the cast; the chosen X is enforced at resolution.
+                val xValue = context?.xValue
+                if (xValue == null) true
+                else {
+                    val toughness = projectedValues?.toughness ?: card.baseStats?.baseToughness ?: 0
+                    toughness <= xValue
+                }
+            }
             is CardPredicate.ToughnessAtLeast -> {
                 val toughness = projectedValues?.toughness ?: card.baseStats?.baseToughness ?: 0
                 toughness >= predicate.min
@@ -847,6 +857,7 @@ class PredicateEvaluator {
             // Power/toughness — not meaningful for cast records
             is CardPredicate.PowerEquals, is CardPredicate.PowerAtMost, is CardPredicate.PowerAtLeast,
             is CardPredicate.ToughnessEquals, is CardPredicate.ToughnessAtMost, is CardPredicate.ToughnessAtLeast,
+            CardPredicate.ToughnessAtMostX,
             is CardPredicate.PowerOrToughnessAtLeast,
             is CardPredicate.TotalPowerAndToughnessAtMost,
             is CardPredicate.PowerGreaterThanEntity,
