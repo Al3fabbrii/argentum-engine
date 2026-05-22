@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 199 / 261
+**Implemented:** 200 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -159,7 +159,7 @@
 - [x] Oreplate Pangolin
 - [x] Ouroboroid
 - [ ] Pain for All
-- [ ] Perigee Beckoner
+- [x] Perigee Beckoner
 - [x] Pinnacle Emissary
 - [x] Pinnacle Kill-Ship
 - [x] Pinnacle Starcage
