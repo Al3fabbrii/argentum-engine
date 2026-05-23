@@ -29,7 +29,11 @@ data class ModifySpellCost(
     override val description: String = buildDescription()
 
     private fun buildDescription(): String {
-        val gate = if (gating == CostGating.FirstOfTypePerTurn) "The first " else ""
+        val gate = when (gating) {
+            CostGating.FirstOfTypePerTurn -> "The first "
+            is CostGating.NthOfTypePerTurn -> "The ${ordinal(gating.n)} "
+            CostGating.None -> ""
+        }
         val subject = when (target) {
             SpellCostTarget.SelfCast -> "This spell"
             is SpellCostTarget.YouCast -> "${target.filter.description} spells you cast"
@@ -50,9 +54,30 @@ data class ModifySpellCost(
                 "cost {${modification.amountPerSpell}} more to cast for each other spell that player has cast this turn"
             is CostModification.IncreaseLife -> "cost an additional ${modification.amount} life to cast"
         }
-        val firstOfType = if (gating == CostGating.FirstOfTypePerTurn) " each turn" else ""
+        val perTurn = when (gating) {
+            CostGating.FirstOfTypePerTurn, is CostGating.NthOfTypePerTurn -> " each turn"
+            CostGating.None -> ""
+        }
         val prefix = if (gate.isNotEmpty()) gate + subject.replaceFirstChar { it.lowercase() } else subject
-        return "$prefix $verb$firstOfType"
+        return "$prefix $verb$perTurn"
+    }
+
+    private fun ordinal(n: Int): String = when (n) {
+        1 -> "first"
+        2 -> "second"
+        3 -> "third"
+        4 -> "fourth"
+        5 -> "fifth"
+        else -> {
+            val suffix = when {
+                n % 100 in 11..13 -> "th"
+                n % 10 == 1 -> "st"
+                n % 10 == 2 -> "nd"
+                n % 10 == 3 -> "rd"
+                else -> "th"
+            }
+            "$n$suffix"
+        }
     }
 
     override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
@@ -215,6 +240,16 @@ sealed interface CostGating {
     @SerialName("FirstOfTypePerTurn")
     @Serializable
     data object FirstOfTypePerTurn : CostGating
+
+    /**
+     * Modifier applies only when the matching spell being cast is the Nth such spell the casting
+     * player has cast this turn (1-indexed; counts itself). For Uthros Psionicist's
+     * "The second spell you cast each turn costs {2} less to cast", use [NthOfTypePerTurn] with
+     * `n = 2`.
+     */
+    @SerialName("NthOfTypePerTurn")
+    @Serializable
+    data class NthOfTypePerTurn(val n: Int) : CostGating
 }
 
 /**

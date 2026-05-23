@@ -248,19 +248,26 @@ class CostCalculator(
         cardDef: CardDefinition,
         ability: ModifySpellCost,
     ): Boolean {
-        return when (ability.gating) {
+        return when (val gating = ability.gating) {
             CostGating.None -> true
             CostGating.FirstOfTypePerTurn -> {
-                val target = ability.target
-                val filter = when (target) {
-                    is SpellCostTarget.YouCast -> target.filter
-                    is SpellCostTarget.AnyCaster -> target.filter
-                    else -> return false  // Gating requires a filter to know what "of type" means.
-                }
+                val filter = filterForGating(ability.target) ?: return false
                 val records = state.spellsCastThisTurnByPlayer[casterId] ?: emptyList()
                 records.none { predicateEvaluator.matchesFilter(it, filter) }
             }
+            is CostGating.NthOfTypePerTurn -> {
+                val filter = filterForGating(ability.target) ?: return false
+                val records = state.spellsCastThisTurnByPlayer[casterId] ?: emptyList()
+                val priorMatching = records.count { predicateEvaluator.matchesFilter(it, filter) }
+                priorMatching == gating.n - 1
+            }
         }
+    }
+
+    private fun filterForGating(target: SpellCostTarget) = when (target) {
+        is SpellCostTarget.YouCast -> target.filter
+        is SpellCostTarget.AnyCaster -> target.filter
+        else -> null  // Gating requires a filter to know what "of type" means.
     }
 
     /**
