@@ -219,7 +219,7 @@
 - [x] Survey Mechan
 - [x] Susurian Dirgecraft
 - [x] Susurian Voidborn
-- [ ] Susur Secundi, Void Altar
+- [x] Susur Secundi, Void Altar
 - [x] Swarm Culler
 - [x] Synthesizer Labship
 - [x] Syr Vondam, Sunstar Exemplar
