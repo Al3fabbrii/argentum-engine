@@ -642,8 +642,9 @@ sealed set for attack-time facts beyond the basics.
 - `Blocks` — SELF, no filter.
 - `BecomesBlocked` — SELF, no filter.
 - `blocks(filter?, binding?, attackerFilter?)` — factory. `filter` constrains the
-  blocker (ANY binding). `attackerFilter` constrains the blocked attacker — pair
-  with SELF binding for "whenever this creature blocks a [filter]" (Skystinger).
+  blocker (ANY binding). `attackerFilter` constrains the blocked attacker — requires
+  SELF binding for "whenever this creature blocks a [filter]" (Skystinger);
+  combining it with ANY is rejected (the ANY detector branch ignores `attackerFilter`).
   `triggeringEntityId` is set to the blocked attacker in that case.
 - `becomesBlocked(filter?, binding?)` — factory. Replaces the old
   `CreatureYouControlBecomesBlocked` and `FilteredBecomesBlocked(filter)`.

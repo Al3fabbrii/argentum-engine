@@ -4,8 +4,12 @@ import com.wingedsheep.engine.core.DeclareAttackers
 import com.wingedsheep.engine.core.DeclareBlockers
 import com.wingedsheep.engine.mechanics.layers.StateProjector
 import com.wingedsheep.gameserver.ScenarioTestBase
+import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.scripting.GrantKeyword
+import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import io.kotest.assertions.withClue
 import io.kotest.matchers.shouldBe
 
@@ -25,7 +29,20 @@ class SkystingerScenarioTest : ScenarioTestBase() {
 
     private val stateProjector = StateProjector()
 
+    // Anthem that grants flying to its controller's creatures via a continuous (layer)
+    // effect, so flying lives in projected state rather than the attacker's base keywords.
+    private val flyingAnthem = card("Test Flying Anthem") {
+        manaCost = "{2}{U}"
+        typeLine = "Enchantment"
+        oracleText = "Creatures you control have flying."
+        staticAbility {
+            ability = GrantKeyword(Keyword.FLYING, GroupFilter.AllCreaturesYouControl)
+        }
+    }
+
     init {
+        cardRegistry.register(flyingAnthem)
+
         context("Skystinger triggers when blocking a flying creature") {
             test("gets +5/+0 when blocking Wind Drake (flying)") {
                 val game = scenario()
@@ -100,6 +117,34 @@ class SkystingerScenarioTest : ScenarioTestBase() {
                 val projected = stateProjector.project(game.state)
                 withClue("Skystinger should remain 3/3 when it's the attacker, not the blocker") {
                     projected.getPower(skystinger) shouldBe 3
+                    projected.getToughness(skystinger) shouldBe 3
+                }
+            }
+
+            test("triggers when blocking a creature whose flying is granted by a continuous effect") {
+                // Grizzly Bears has no flying in its base keywords; the anthem grants it
+                // via a layer effect. The trigger must read projected keywords, not base.
+                val game = scenario()
+                    .withPlayers("Attacker", "Defender")
+                    .withCardOnBattlefield(1, "Test Flying Anthem")
+                    .withCardOnBattlefield(1, "Grizzly Bears") // 2/2 vanilla, flying only from the anthem
+                    .withCardOnBattlefield(2, "Skystinger")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.COMBAT, Step.DECLARE_ATTACKERS)
+                    .build()
+
+                val bears = game.findPermanent("Grizzly Bears")!!
+                val skystinger = game.findPermanent("Skystinger")!!
+
+                game.execute(DeclareAttackers(game.player1Id, mapOf(bears to game.player2Id)))
+                game.passUntilPhase(Phase.COMBAT, Step.DECLARE_BLOCKERS)
+                game.execute(DeclareBlockers(game.player2Id, mapOf(skystinger to listOf(bears))))
+
+                game.resolveStack()
+
+                val projected = stateProjector.project(game.state)
+                withClue("Skystinger should be 8/3 after blocking a creature with granted flying") {
+                    projected.getPower(skystinger) shouldBe 8
                     projected.getToughness(skystinger) shouldBe 3
                 }
             }
