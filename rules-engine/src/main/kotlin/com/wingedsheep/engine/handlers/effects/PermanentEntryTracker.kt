@@ -11,9 +11,15 @@ import com.wingedsheep.sdk.model.EntityId
  *
  * Cleared at end of turn by [com.wingedsheep.engine.core.CleanupPhaseManager].
  *
- * **All battlefield entries go through [BattlefieldEntry.place].** Callers that put an
- * entity into the battlefield zone must use that helper rather than calling
- * `state.addToZone(...)` directly — that's how this tracker stays in sync.
+ * Two sanctioned recording paths keep this tracker in sync:
+ *  - The standard zone-change pipeline ([ZoneTransitionService.moveToZone]) calls [record]
+ *    itself, right after wiring the entering permanent's controller.
+ *  - Every *other* (ad-hoc) battlefield insertion — token creation, land play, permanent-
+ *    spell resolution, returns from linked exile, etc. — must go through
+ *    [BattlefieldEntry.place] rather than calling `state.addToZone(...)` directly.
+ *
+ * [record] merges into a [Set], so it is safe (idempotent) if an entry is ever recorded
+ * twice; the cost of missing a call site is only a false negative, never a wrong positive.
  *
  * Types are read from the **projected** state (post-layer), not the printed type line, so
  * a permanent that is an artifact by continuous effect at the moment of entry is recorded

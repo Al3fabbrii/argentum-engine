@@ -278,7 +278,9 @@ object ZoneTransitionService {
                     newState, entityId, cardComponent, destControllerId, options, fromZone
                 )
                 // Record entry for per-player ETB-by-type tracking (Mechan Shieldmate and similar).
-                // Read at this point so projection sees applyBattlefieldEntry's controller wiring.
+                // This pipeline records via PermanentEntryTracker.record directly rather than
+                // BattlefieldEntry.place because the read must happen *after* applyBattlefieldEntry
+                // wires the controller — only then does projection see the right controller.
                 newState = PermanentEntryTracker.record(newState, destControllerId, entityId)
                 // Handle Saga entering the battlefield (Rule 714.3a)
                 val (sagaState, sagaEvents) = applySagaEntryIfNeeded(newState, entityId)

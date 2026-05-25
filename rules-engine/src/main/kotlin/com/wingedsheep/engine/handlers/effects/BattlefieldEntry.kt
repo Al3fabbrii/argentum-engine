@@ -6,13 +6,18 @@ import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.model.EntityId
 
 /**
- * Single chokepoint for placing an entity onto the battlefield zone.
+ * Chokepoint for *ad-hoc* battlefield insertions (token creation, land play, permanent-
+ * spell resolution, returns from linked exile, etc.).
  *
  * Wraps [GameState.addToZone] for the controller's battlefield and fires the per-turn
  * [PermanentEntryTracker] so that "an X entered the battlefield this turn" conditions
- * stay in sync — calling `addToZone(battlefieldZone, …)` directly bypasses the tracker
- * and is the recurring source of subtle "card silently can't satisfy its own condition"
- * bugs. Use this helper instead, everywhere.
+ * stay in sync — calling `addToZone(battlefieldZone, …)` directly from such a path bypasses
+ * the tracker and is the recurring source of subtle "card silently can't satisfy its own
+ * condition" bugs. Use this helper instead.
+ *
+ * The standard zone-change pipeline ([ZoneTransitionService.moveToZone]) does **not** route
+ * through here: it has to record *after* [ZoneTransitionService.applyBattlefieldEntry] wires
+ * the controller, so it calls [PermanentEntryTracker.record] directly instead.
  *
  * The entity must already carry the components that define its identity at entry
  * (`CardComponent`, `ControllerComponent`, etc.) — the tracker reads projected types

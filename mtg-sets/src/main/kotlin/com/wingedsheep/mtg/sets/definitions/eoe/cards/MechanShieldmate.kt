@@ -1,6 +1,5 @@
 package com.wingedsheep.mtg.sets.definitions.eoe.cards
 
-import com.wingedsheep.sdk.core.CardType
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.card
@@ -27,7 +26,7 @@ val MechanShieldmate = card("Mechan Shieldmate") {
 
     staticAbility {
         ability = CanAttackDespiteDefender(
-            condition = Conditions.PermanentTypeEnteredBattlefieldThisTurn(CardType.ARTIFACT)
+            condition = Conditions.ArtifactEnteredBattlefieldThisTurn
         )
     }
 
