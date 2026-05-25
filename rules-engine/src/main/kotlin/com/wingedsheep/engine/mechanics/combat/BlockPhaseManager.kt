@@ -124,8 +124,23 @@ internal class BlockPhaseManager(
         blockers: Map<EntityId, List<EntityId>>,
         taxEvents: List<com.wingedsheep.engine.core.GameEvent>,
     ): ExecutionResult {
+        // CR 702.22h: blocking any member of an attacking band blocks the whole band — a blocker
+        // assigned to one band member is treated as blocking every member. Expand the declared
+        // assignments before stamping so the rest of combat (ordering, the damage board) sees the
+        // full bipartite picture.
+        val bandMembers = collectBands(state)
+        val expandedBlockers: Map<EntityId, List<EntityId>> = blockers.mapValues { (_, attackerIds) ->
+            val expanded = LinkedHashSet<EntityId>()
+            for (attackerId in attackerIds) {
+                expanded += attackerId
+                val bandId = state.getEntity(attackerId)?.get<AttackingComponent>()?.bandId
+                if (bandId != null) expanded += bandMembers[bandId] ?: emptySet()
+            }
+            expanded.toList()
+        }
+
         var newState = state
-        for ((blockerId, attackerIds) in blockers) {
+        for ((blockerId, attackerIds) in expandedBlockers) {
             newState = newState.updateEntity(blockerId) { container ->
                 container.with(BlockingComponent(attackerIds))
             }
@@ -144,9 +159,9 @@ internal class BlockPhaseManager(
             container.with(BlockersDeclaredThisCombatComponent)
         }
 
-        val blockerNameMap = blockers.keys.associateWith { state.getEntity(it)?.get<CardComponent>()?.name ?: "Creature" }
-        val attackerNameMap = blockers.values.flatten().distinct().associateWith { state.getEntity(it)?.get<CardComponent>()?.name ?: "Creature" }
-        val blockersEvent = BlockersDeclaredEvent(blockers, blockerNameMap, attackerNameMap)
+        val blockerNameMap = expandedBlockers.keys.associateWith { state.getEntity(it)?.get<CardComponent>()?.name ?: "Creature" }
+        val attackerNameMap = expandedBlockers.values.flatten().distinct().associateWith { state.getEntity(it)?.get<CardComponent>()?.name ?: "Creature" }
+        val blockersEvent = BlockersDeclaredEvent(expandedBlockers, blockerNameMap, attackerNameMap)
         val blockTaxEvents = taxEvents
 
         // Per MTG CR 510.1c: An attacker blocked by 2+ creatures has its damage divided
@@ -181,6 +196,19 @@ internal class BlockPhaseManager(
             newState,
             blockTaxEvents + blockersEvent
         )
+    }
+
+    /**
+     * Collect the current attacking bands, keyed by [AttackingComponent.bandId]. Used to expand
+     * declared block assignments so a blocker on one band member blocks the whole band (CR 702.22h).
+     */
+    private fun collectBands(state: GameState): Map<String, Set<EntityId>> {
+        val result = mutableMapOf<String, MutableSet<EntityId>>()
+        for ((entityId, container) in state.entities) {
+            val bandId = container.get<AttackingComponent>()?.bandId ?: continue
+            result.getOrPut(bandId) { mutableSetOf() }.add(entityId)
+        }
+        return result
     }
 
     /**

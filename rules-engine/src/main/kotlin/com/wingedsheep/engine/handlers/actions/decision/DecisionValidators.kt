@@ -13,6 +13,8 @@ import com.wingedsheep.engine.core.ChooseTargetsDecision
 import com.wingedsheep.engine.core.ColorChosenResponse
 import com.wingedsheep.engine.core.CombatResolutionDecision
 import com.wingedsheep.engine.core.CombatResolutionResponse
+import com.wingedsheep.engine.core.DamageEdge
+import com.wingedsheep.engine.core.DamageEdgeDirection
 import com.wingedsheep.engine.core.DamageAssignmentResponse
 import com.wingedsheep.engine.core.DecisionResponse
 import com.wingedsheep.engine.core.DistributeDecision
@@ -33,6 +35,7 @@ import com.wingedsheep.engine.core.SplitPilesDecision
 import com.wingedsheep.engine.core.TargetsResponse
 import com.wingedsheep.engine.core.YesNoDecision
 import com.wingedsheep.engine.core.YesNoResponse
+import com.wingedsheep.sdk.model.EntityId
 
 /**
  * Validators for different types of decision responses.
@@ -73,11 +76,18 @@ object DecisionValidators {
     /**
      * Validate a [CombatResolutionResponse] against its [CombatResolutionDecision].
      *
-     * TODO(Phase 5): real geometric validation — per-edge bounds, per-source power budget,
-     * CR 510.1c cross-source damage-assignment order (gated by [DamageEdge.orderConstrained]),
-     * and CR 702.19b trample lethal-first. The producer that emits this decision lands in
-     * Phase 3 and no board test runs until the validator is real, so this temporary pass-through
-     * is unreachable in the meantime.
+     * Geometric checks only (the resumer enforces per-edge ownership by filtering to the current
+     * chooser's [DamageEdge.editableBy], so this stays submitter-agnostic):
+     * - Each submitted amount lies in `[0, maximum]` for its edge.
+     * - Per source, the total assigned across its edges doesn't exceed its power.
+     * - CR 510.1c damage-assignment order: an [DamageEdge.orderConstrained] edge may carry damage
+     *   only once every earlier order-constrained edge from the same source has its target at
+     *   lethal — counting damage from *all* sources this step (cross-source lethal counting), which
+     *   is what lets a band cooperate without lifting any one attacker's order. Banding edges
+     *   (orderConstrained = false) don't gate.
+     * - CR 702.19b trample lethal-first: a trample drain may carry damage only once every blocker
+     *   the trampling attacker assigns to is at lethal (aggregated across the step). Independent of
+     *   CR 510.1c order, so banding never relaxes it.
      */
     private fun validateCombatResolution(
         decision: CombatResolutionDecision,
@@ -86,6 +96,66 @@ object DecisionValidators {
         if (response !is CombatResolutionResponse) {
             return "Expected combat resolution response"
         }
+
+        val edgesById = decision.edges.associateBy { it.id }
+        val submitted = response.edges.associateBy { it.edgeId }
+
+        for ((edgeId, entry) in submitted) {
+            val edge = edgesById[edgeId] ?: return "Unknown edge id: $edgeId"
+            if (entry.amount < 0) return "Edge $edgeId: amount ${entry.amount} below 0"
+            if (entry.amount > edge.maximum) return "Edge $edgeId: amount ${entry.amount} exceeds maximum ${edge.maximum}"
+        }
+
+        fun amountOf(edge: DamageEdge): Int = submitted[edge.id]?.amount ?: edge.amount
+
+        // Per-source budget — every edge from a source caps at that source's power (its `maximum`).
+        val edgesBySource = decision.edges.groupBy { it.sourceId }
+        for ((sourceId, sourceEdges) in edgesBySource) {
+            val total = sourceEdges.sumOf { amountOf(it) }
+            val power = sourceEdges.maxOf { it.maximum }
+            if (total > power) return "Source $sourceId: damage total $total exceeds available power $power"
+        }
+
+        // Aggregate damage reaching each target this step (CR 510.1c cross-source lethal counting).
+        val aggregate = mutableMapOf<EntityId, Int>()
+        for (edge in decision.edges) {
+            if (edge.isTrampleDrain) continue
+            aggregate.merge(edge.targetId, amountOf(edge), Int::plus)
+        }
+
+        // CR 510.1c assignment order, per source.
+        for ((_, sourceEdges) in edgesBySource) {
+            val ordered = sourceEdges.filterNot { it.isTrampleDrain }.sortedBy { it.unlockOrder }
+            var allPrecedingLethal = true
+            for (edge in ordered) {
+                if (!edge.orderConstrained) continue
+                if (amountOf(edge) > 0 && !allPrecedingLethal) {
+                    return "Edge ${edge.id}: cannot assign damage to a later target until earlier targets have lethal damage"
+                }
+                if ((aggregate[edge.targetId] ?: 0) < edge.lethal) {
+                    allPrecedingLethal = false
+                }
+            }
+        }
+
+        // CR 702.19b trample lethal-first.
+        val damageToBlocker = mutableMapOf<EntityId, Int>()
+        for (edge in decision.edges) {
+            if (edge.direction != DamageEdgeDirection.ATTACKER_TO_BLOCKER) continue
+            damageToBlocker.merge(edge.targetId, amountOf(edge), Int::plus)
+        }
+        for (drain in decision.edges) {
+            if (!drain.isTrampleDrain) continue
+            if (amountOf(drain) <= 0) continue
+            for (blockerEdge in decision.edges) {
+                if (blockerEdge.sourceId != drain.sourceId) continue
+                if (blockerEdge.direction != DamageEdgeDirection.ATTACKER_TO_BLOCKER) continue
+                if ((damageToBlocker[blockerEdge.targetId] ?: 0) < blockerEdge.lethal) {
+                    return "Trample drain ${drain.id}: preceding blocker not at lethal"
+                }
+            }
+        }
+
         return null
     }
 
