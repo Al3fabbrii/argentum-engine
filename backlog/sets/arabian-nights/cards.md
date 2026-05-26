@@ -17,7 +17,7 @@
 ---
 
 - [ ] Abu Ja'far
-- [ ] Army of Allah
+- [x] Army of Allah
 - [ ] Camel
 - [ ] Eye for an Eye
 - [ ] Jihad
