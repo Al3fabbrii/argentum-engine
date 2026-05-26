@@ -36,7 +36,7 @@
 - [ ] Serendib Djinn
 - [x] Serendib Efreet
 - [ ] Sindbad
-- [ ] Unstable Mutation
+- [x] Unstable Mutation
 - [ ] Cuombajj Witches
 - [ ] El-Hajjâj
 - [ ] Erg Raiders
