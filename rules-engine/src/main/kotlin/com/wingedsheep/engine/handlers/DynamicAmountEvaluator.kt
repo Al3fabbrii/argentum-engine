@@ -659,6 +659,10 @@ class DynamicAmountEvaluator(
                 val target = context.targets.getOrNull(ref.index)
                 when (target) {
                     is com.wingedsheep.engine.state.components.stack.ChosenTarget.Permanent -> target.entityId
+                    // A card targeted in a zone (graveyard/exile/hand) — e.g. "that card's mana
+                    // value" for a reanimation target. Resolves to the card entity so numeric
+                    // properties (mana value, power, …) can be read, mirroring ConditionEvaluator.
+                    is com.wingedsheep.engine.state.components.stack.ChosenTarget.Card -> target.cardId
                     is com.wingedsheep.engine.state.components.stack.ChosenTarget.Spell -> target.spellEntityId
                     is com.wingedsheep.engine.state.components.stack.ChosenTarget.Player -> target.playerId
                     else -> null
