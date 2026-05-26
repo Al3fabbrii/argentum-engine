@@ -76,7 +76,7 @@
 - [ ] Brass Man
 - [ ] City in a Bottle
 - [x] Dancing Scimitar
-- [ ] Ebony Horse
+- [x] Ebony Horse
 - [x] Flying Carpet
 - [ ] Jandor's Ring
 - [x] Jandor's Saddlebags
