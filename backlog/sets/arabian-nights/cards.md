@@ -47,7 +47,7 @@
 - [x] Juzám Djinn
 - [ ] Khabál Ghoul
 - [ ] Oubliette
-- [ ] Sorceress Queen
+- [x] Sorceress Queen
 - [x] Stone-Throwing Devils
 - [ ] Aladdin
 - [ ] Ali Baba
