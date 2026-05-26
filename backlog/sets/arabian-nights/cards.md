@@ -44,7 +44,7 @@
 - [ ] Hasran Ogress
 - [ ] Junún Efreet
 - [x] Juzám Djinn
-- [ ] Khabál Ghoul
+- [x] Khabál Ghoul
 - [ ] Oubliette
 - [x] Sorceress Queen
 - [x] Stone-Throwing Devils
