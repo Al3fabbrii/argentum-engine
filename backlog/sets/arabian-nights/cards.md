@@ -2,8 +2,7 @@
 
 **Set Size:** 78 cards
 **Release Date:** December 17, 1993
-**Implemented:** 0 / 78
-
+**Implemented:** 28 / 78
 | Color | Count |
 |-------|-------|
 | White | 11 |
