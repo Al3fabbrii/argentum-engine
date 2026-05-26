@@ -35,7 +35,7 @@
 - [ ] Merchant Ship
 - [ ] Old Man of the Sea
 - [ ] Serendib Djinn
-- [ ] Serendib Efreet
+- [x] Serendib Efreet
 - [ ] Sindbad
 - [ ] Unstable Mutation
 - [ ] Cuombajj Witches
