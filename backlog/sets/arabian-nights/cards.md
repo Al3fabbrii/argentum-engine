@@ -76,7 +76,7 @@
 - [ ] Bottle of Suleiman
 - [ ] Brass Man
 - [ ] City in a Bottle
-- [ ] Dancing Scimitar
+- [x] Dancing Scimitar
 - [ ] Ebony Horse
 - [ ] Flying Carpet
 - [ ] Jandor's Ring
