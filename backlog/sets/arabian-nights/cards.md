@@ -2,7 +2,7 @@
 
 **Set Size:** 78 cards
 **Release Date:** December 17, 1993
-**Implemented:** 49 / 78
+**Implemented:** 50 / 78
 | Color | Count |
 |-------|-------|
 | White | 11 |
@@ -35,7 +35,7 @@
 - [ ] Old Man of the Sea
 - [ ] Serendib Djinn
 - [x] Serendib Efreet
-- [ ] Sindbad
+- [x] Sindbad
 - [x] Unstable Mutation
 - [ ] Cuombajj Witches
 - [x] El-Hajjâj

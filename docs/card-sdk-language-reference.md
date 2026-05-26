@@ -146,6 +146,7 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 
 - `DrawCards(count, target?)` — draw N (default: controller).
 - `DrawUpTo(max, target)` — draw up to N (player picks 0–N).
+- `DrawRevealDiscardUnless(filter, target?)` — draw a card, reveal it, and discard it unless it matches `filter` (e.g. Sindbad: "draw a card and reveal it; if it isn't a land card, discard it"). Matches the drawn card in hand against `filter`.
 - `Discard(count, target)` — controller-of-target chooses; mandatory.
 - `EachOpponentDiscards(count)` — each opponent discards N.
 - `EachPlayerReturnPermanentToHand()` — each player bounces a permanent.
