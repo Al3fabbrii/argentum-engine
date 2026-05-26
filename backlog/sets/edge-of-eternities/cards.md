@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 208 / 261
+**Implemented:** 212 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -13,7 +13,7 @@
 - [x] Annul
 - [x] Anticausal Vestige
 - [x] Archenemy's Charm
-- [ ] Astelli Reclaimer
+- [x] Astelli Reclaimer
 - [x] Atmospheric Greenhouse
 - [x] Atomic Microsizer
 - [x] Auxiliary Boosters
@@ -134,7 +134,7 @@
 - [x] Mechan Assembler
 - [x] Mechan Navigator
 - [x] Mechanozoa
-- [ ] Mechan Shieldmate
+- [x] Mechan Shieldmate
 - [x] Melded Moxite
 - [ ] Meltstrider Eulogist
 - [x] Meltstrider's Gear
@@ -196,7 +196,7 @@
 - [x] Shattered Wings
 - [x] Singularity Rupture
 - [x] Sinister Cryologist
-- [ ] Skystinger
+- [x] Skystinger
 - [x] Slagdrill Scrapper
 - [x] Sledge-Class Seedship
 - [x] Sothera, the Supervoid

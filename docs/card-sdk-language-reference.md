@@ -527,6 +527,14 @@ For modal spells, prefer the explicit `targetPlayerControls(target)` DSL form; p
 - `.withSubtype(s)` / `.withKeyword(k)` — type/ability predicate.
 - `.ofColor(c)` / `.ofColors(set)` — color predicate.
 - `.power(n)` / `.minPower(n)` / `.maxPower(n)` — P/T comparator.
+- `.manaValue(n)` / `.manaValueAtMost(n)` / `.manaValueAtLeast(n)` — mana-value comparator.
+- `.manaValueAtMostX()` — mana value ≤ the X chosen for the source spell/ability.
+- `.manaValueAtMostEntity(ref)` — mana value ≤ a referenced entity's mana value (e.g. Kodama of the East Tree).
+- `.manaValueAtMostEntityManaSpent(ref)` — mana value ≤ the mana **actually spent** to cast a referenced
+  entity. Reads the live `SpellOnStackComponent` buckets while the entity is still a spell, or the
+  `CastRecordComponent` snapshot once it has resolved onto the battlefield (0 if it was never cast).
+  Used by Edge of Eternities warp payoffs like Astelli Reclaimer ("…mana value X or less…, where X is the
+  amount of mana spent to cast this creature") — X is 5 for `{3}{W}{W}`, 3 for warp `{2}{W}`, 0 for free.
 - `.tapped()` / `.untapped()` — tap state.
 - `.nontoken()` / `.token()` — token vs printed.
 - `.faceDown()` — face-down state.
