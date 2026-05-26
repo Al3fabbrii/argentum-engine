@@ -88,7 +88,7 @@
 - [x] City of Brass
 - [x] Desert
 - [x] Diamond Valley
-- [ ] Elephant Graveyard
+- [x] Elephant Graveyard
 - [x] Island of Wak-Wak
 - [x] Library of Alexandria
 - [ ] Mountain
