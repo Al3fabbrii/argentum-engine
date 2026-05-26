@@ -54,7 +54,7 @@
 - [ ] Ali from Cairo
 - [x] Bird Maiden
 - [ ] Desert Nomads
-- [ ] Hurr Jackal
+- [x] Hurr Jackal
 - [ ] Kird Ape
 - [ ] Magnetic Mountain
 - [ ] Mijae Djinn
