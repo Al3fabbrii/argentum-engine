@@ -93,4 +93,4 @@
 - [ ] Island of Wak-Wak
 - [ ] Library of Alexandria
 - [ ] Mountain
-- [ ] Oasis
+- [x] Oasis
