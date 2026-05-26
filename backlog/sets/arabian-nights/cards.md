@@ -86,7 +86,7 @@
 - [ ] Ring of Ma'rûf
 - [ ] Sandals of Abdallah
 - [x] Bazaar of Baghdad
-- [ ] City of Brass
+- [x] City of Brass
 - [ ] Desert
 - [ ] Diamond Valley
 - [ ] Elephant Graveyard
