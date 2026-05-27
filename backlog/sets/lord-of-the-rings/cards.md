@@ -2,7 +2,7 @@
 
 **Set Size:** 291 cards (261 Draft / 30 Extra)
 **Release Date:** June 23, 2023
-**Implemented:** 129 / 291
+**Implemented:** 139 / 291
 Run `scripts/card-status --set LTR` (and `--list --set LTR`) to verify status at any time.
 The split below mirrors that script: **Draft** = Scryfall `booster: true`; **Extra** =
 starter-deck/special cards and basic lands.
@@ -102,8 +102,8 @@ starter-deck/special cards and basic lands.
 - [x] Storm of Saruman
 - [ ] Surrounded by Orcs
 - [ ] Treason of Isengard
-- [ ] The Watcher in the Water
-- [ ] Willow-Wind
+- [x] The Watcher in the Water
+- [x] Willow-Wind
 
 ### Black
 
@@ -127,8 +127,8 @@ starter-deck/special cards and basic lands.
 - [ ] March from the Black Gate
 - [x] Mirkwood Bats
 - [ ] Mordor Muster
-- [ ] Mordor Trebuchet
-- [ ] Morgul-Knife Wound
+- [x] Mordor Trebuchet
+- [x] Morgul-Knife Wound
 - [ ] Nasty End
 - [ ] Nazgûl
 - [x] Oath of the Grey Host
@@ -226,7 +226,7 @@ starter-deck/special cards and basic lands.
 - [ ] Shortcut to Mushrooms
 - [x] Shower of Arrows
 - [x] Stew the Coneys
-- [ ] Wose Pathfinder
+- [x] Wose Pathfinder
 
 ### Multicolor
 
@@ -272,9 +272,9 @@ starter-deck/special cards and basic lands.
 - [ ] Shelob, Child of Ungoliant
 - [ ] Sméagol, Helpful Guide
 - [x] Strider, Ranger of the North
-- [ ] Théoden, King of Rohan
+- [x] Théoden, King of Rohan
 - [ ] Tom Bombadil
-- [ ] Uglúk of the White Hand
+- [x] Uglúk of the White Hand
 
 ### Artifact
 
@@ -294,7 +294,7 @@ starter-deck/special cards and basic lands.
 - [x] Shire Scarecrow
 - [ ] Sting, the Glinting Dagger
 - [x] Stone of Erech
-- [ ] Wizard's Rockets
+- [x] Wizard's Rockets
 
 ### Land
 
@@ -305,7 +305,7 @@ starter-deck/special cards and basic lands.
 - [x] Mines of Moria
 - [ ] Mount Doom
 - [x] Rivendell
-- [ ] The Shire
+- [x] The Shire
 - [x] Shire Terrace
 
 ---
@@ -388,7 +388,7 @@ starter-deck/special cards and basic lands.
 
 ### Blue
 
-- [ ] Minas Tirith Garrison
+- [x] Minas Tirith Garrison
 
 ### Black
 
