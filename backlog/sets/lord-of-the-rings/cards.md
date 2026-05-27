@@ -2,8 +2,7 @@
 
 **Set Size:** 291 cards (261 Draft / 30 Extra)
 **Release Date:** June 23, 2023
-**Implemented:** 0 / 291
-
+**Implemented:** 45 / 291
 Run `scripts/card-status --set LTR` (and `--list --set LTR`) to verify status at any time.
 The split below mirrors that script: **Draft** = Scryfall `booster: true`; **Extra** =
 starter-deck/special cards and basic lands.
@@ -26,31 +25,31 @@ starter-deck/special cards and basic lands.
 
 ### White
 
-- [ ] Banish from Edoras
+- [x] Banish from Edoras
 - [ ] The Battle of Bywater
 - [ ] Bill the Pony
 - [ ] Boromir, Warden of the Tower
 - [ ] Dawn of a New Age
-- [ ] Dúnedain Blade
-- [ ] Eagles of the North
-- [ ] Eastfarthing Farmer
-- [ ] East-Mark Cavalier
+- [x] Dúnedain Blade
+- [x] Eagles of the North
+- [x] Eastfarthing Farmer
+- [x] East-Mark Cavalier
 - [ ] Éowyn, Lady of Rohan
-- [ ] Errand-Rider of Gondor
-- [ ] Escape from Orthanc
-- [ ] Esquire of the King
+- [x] Errand-Rider of Gondor
+- [x] Escape from Orthanc
+- [x] Esquire of the King
 - [ ] Faramir, Field Commander
-- [ ] Flowering of the White Tree
-- [ ] Fog on the Barrow-Downs
+- [x] Flowering of the White Tree
+- [x] Fog on the Barrow-Downs
 - [ ] Forge Anew
 - [ ] Frodo, Sauron's Bane
 - [ ] Gandalf the White
 - [ ] Hobbit's Sting
 - [ ] Landroval, Horizon Witness
 - [ ] Lost to Legend
-- [ ] Nimble Hobbit
+- [x] Nimble Hobbit
 - [ ] Now for Wrath, Now for Ruin!
-- [ ] Protector of Gondor
+- [x] Protector of Gondor
 - [ ] Reprieve
 - [ ] Rosie Cotton of South Lane
 - [ ] Samwise the Stouthearted
@@ -62,18 +61,18 @@ starter-deck/special cards and basic lands.
 - [ ] Tale of Tinúviel
 - [ ] Took Reaper
 - [ ] War of the Last Alliance
-- [ ] Westfold Rider
+- [x] Westfold Rider
 - [ ] You Cannot Pass!
 
 ### Blue
 
-- [ ] Arwen's Gift
+- [x] Arwen's Gift
 - [ ] The Bath Song
 - [ ] Bewitching Leechcraft
-- [ ] Bill Ferny, Bree Swindler
+- [x] Bill Ferny, Bree Swindler
 - [ ] Birthday Escape
 - [ ] Borne Upon a Wind
-- [ ] Captain of Umbar
+- [x] Captain of Umbar
 - [ ] Council's Deliberation
 - [ ] Deceive the Messenger
 - [ ] Dreadful as the Storm
@@ -108,10 +107,10 @@ starter-deck/special cards and basic lands.
 
 ### Black
 
-- [ ] Bitter Downfall
+- [x] Bitter Downfall
 - [ ] The Black Breath
 - [ ] Call of the Ring
-- [ ] Cirith Ungol Patrol
+- [x] Cirith Ungol Patrol
 - [ ] Claim the Precious
 - [ ] Dunland Crebain
 - [ ] Easterling Vanguard
@@ -152,16 +151,16 @@ starter-deck/special cards and basic lands.
 - [ ] Battle-Scarred Goblin
 - [ ] Book of Mazarbul
 - [ ] Breaking of the Fellowship
-- [ ] Cast into the Fire
+- [x] Cast into the Fire
 - [ ] Display of Power
-- [ ] Éomer, Marshal of Rohan
-- [ ] Éomer of the Riddermark
-- [ ] Erebor Flamesmith
-- [ ] Erkenbrand, Lord of Westfold
+- [x] Éomer, Marshal of Rohan
+- [x] Éomer of the Riddermark
+- [x] Erebor Flamesmith
+- [x] Erkenbrand, Lord of Westfold
 - [ ] Fall of Cair Andros
 - [ ] Fear, Fire, Foes!
 - [ ] Fiery Inscription
-- [ ] Fire of Orthanc
+- [x] Fire of Orthanc
 - [ ] Foray of Orcs
 - [ ] Gimli, Counter of Kills
 - [ ] Gimli's Axe
@@ -190,22 +189,22 @@ starter-deck/special cards and basic lands.
 
 ### Green
 
-- [ ] Bag End Porter
+- [x] Bag End Porter
 - [ ] Bombadil's Song
-- [ ] Brandywine Farmer
+- [x] Brandywine Farmer
 - [ ] Celeborn the Wise
 - [ ] Chance-Met Elves
 - [ ] Delighted Halfling
 - [ ] Dúnedain Rangers
-- [ ] Elven Chorus
-- [ ] Elven Farsight
+- [x] Elven Chorus
+- [x] Elven Farsight
 - [ ] Enraged Huorn
-- [ ] Entish Restoration
-- [ ] Ent's Fury
-- [ ] Fall of Gil-galad
-- [ ] Fangorn, Tree Shepherd
-- [ ] Galadhrim Bow
-- [ ] Galadhrim Guide
+- [x] Entish Restoration
+- [x] Ent's Fury
+- [x] Fall of Gil-galad
+- [x] Fangorn, Tree Shepherd
+- [x] Galadhrim Bow
+- [x] Galadhrim Guide
 - [ ] Generous Ent
 - [ ] Gift of Strands
 - [ ] Glorfindel, Dauntless Rescuer
@@ -232,19 +231,19 @@ starter-deck/special cards and basic lands.
 ### Multicolor
 
 - [ ] Aragorn, Company Leader
-- [ ] Aragorn, the Uniter
-- [ ] Arwen, Mortal Queen
+- [x] Aragorn, the Uniter
+- [x] Arwen, Mortal Queen
 - [ ] Arwen Undómiel
 - [ ] The Balrog, Durin's Bane
 - [ ] Bilbo, Retired Burglar
-- [ ] Butterbur, Bree Innkeeper
-- [ ] Denethor, Ruling Steward
-- [ ] Doors of Durin
+- [x] Butterbur, Bree Innkeeper
+- [x] Denethor, Ruling Steward
+- [x] Doors of Durin
 - [ ] Elrond, Master of Healing
 - [ ] Éowyn, Fearless Knight
 - [ ] Faramir, Prince of Ithilien
 - [ ] Flame of Anor
-- [ ] Friendly Rivalry
+- [x] Friendly Rivalry
 - [ ] Frodo Baggins
 - [ ] Galadriel of Lothlórien
 - [ ] Gandalf the Grey
@@ -279,7 +278,7 @@ starter-deck/special cards and basic lands.
 
 ### Artifact
 
-- [ ] Andúril, Flame of the West
+- [x] Andúril, Flame of the West
 - [ ] Barrow-Blade
 - [ ] Ent-Draught Basin
 - [ ] Glamdring
@@ -339,11 +338,11 @@ starter-deck/special cards and basic lands.
 
 ### Green
 
-- [ ] Elanor Gardner
+- [x] Elanor Gardner
 
 ### Multicolor
 
-- [ ] Aragorn and Arwen, Wed
+- [x] Aragorn and Arwen, Wed
 - [ ] Sauron, the Lidless Eye
 
 ### White
@@ -372,7 +371,7 @@ starter-deck/special cards and basic lands.
 
 ### Artifact
 
-- [ ] Bilbo's Ring
+- [x] Bilbo's Ring
 - [ ] Trailblazer's Boots
 
 ### Land
@@ -385,7 +384,7 @@ starter-deck/special cards and basic lands.
 
 ### White
 
-- [ ] Eagle of Deliverance
+- [x] Eagle of Deliverance
 
 ### Blue
 
