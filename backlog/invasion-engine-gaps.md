@@ -139,7 +139,7 @@ cards, not one.
 | #6 | **Pyre Zombie** | `TriggeredAbility.activeZone = Zone.GRAVEYARD` + `triggerCondition` already drive graveyard-functional triggers; `TriggerDetector` scans graveyard cards (`TriggerDetector.kt:359-405`). Only check: confirm the `triggeredAbility { }` builder surfaces `activeZone`/`triggerZone`; if not, add the one setter. |
 | #12 | **Backlash**, **Agonizing Demise** (kicked) | `EffectTarget.TargetController` already exists (`EffectTarget.kt:57-62`), plus `ControllerOfTriggeringEntity`. Backlash = `DealDamage(amount = DynamicAmounts.targetPower(0), target = EffectTarget.TargetController)`; Agonizing Demise riders on `Conditions.WasKicked`. |
 | #20 | **Goblin Spy** | `MiscStaticAbilities.LookAtTopOfLibrary` / `PlayFromTopOfLibrary` exist (`MiscStaticAbilities.kt:162-201`). One nuance: Goblin Spy reveals to **all** players (public), `LookAtTopOfLibrary` is private. Add a sibling `RevealTopOfLibrary` data object (public reveal, no play permission) mirroring the existing ones — ~5 lines, not a new system. |
-| #2 (half) | **Coalition Victory** | "A creature of each color" = `Compare(DynamicAmounts.colorsAmongPermanents(Player.You, creatureFilter), GTE, Fixed(5))` (a single 5-color creature satisfies it — matches the official ruling, and `Aggregation.DISTINCT_COLORS` caps at 5). "A land of each basic land type" = `Compare(DynamicAmounts.domain(Player.You), GTE, Fixed(5))`. Combine with `Conditions.All(...)` → win-the-game effect. No new primitive. |
+| #2 (half) | **Coalition Victory** | ✅ **Implemented** (`inv/cards/CoalitionVictory.kt`). "A creature of each color" = `Compare(DynamicAmounts.colorsAmongPermanents(Player.You, GameObjectFilter.Creature), GTE, Fixed(5))` (a single 5-color creature satisfies it — matches the official ruling, and `Aggregation.DISTINCT_COLORS` caps at 5). "A land of each basic land type" = `Conditions.BasicLandTypesAtLeast(5)`. Combined with `Conditions.All(...)` inside a `ConditionalEffect` → `Effects.WinGame()`. No new primitive. |
 | #4 (runtime) | **Rewards of Diversity**, **Pure Reflection** (trigger half) | `SpellCastEvent(player = Player.Opponent / Player.Each)` is already matched at runtime (`TriggerMatcher.matchesPlayer`, lines 668-675). Rewards of Diversity = trigger on `Player.Opponent` + multicolored filter, payoff to `Player.TriggeringPlayer`. Only ergonomic gap: facade constants (see #4 below). |
 
 ---
@@ -180,6 +180,11 @@ cards, not one.
 
 **What exists.** `DynamicAmounts.colorsAmongPermanents(player, filter)` (DISTINCT_COLORS, caps at 5)
 and `DynamicAmounts.domain(player)` (DISTINCT_BASIC_LAND_SUBTYPES). Both already do the counting.
+
+**Status.** ✅ **Coalition Victory implemented** (`inv/cards/CoalitionVictory.kt`, scenario test
+`CoalitionVictoryScenarioTest`) — pure composition, no engine change. **Spirit of Resistance still
+blocked on #7** (it needs a continuous "prevent all damage to you" static; the five-color condition
+half is ready).
 
 **Plan.** No new primitive — **compose**.
 - Coalition Victory: see the "already buildable" table above.
