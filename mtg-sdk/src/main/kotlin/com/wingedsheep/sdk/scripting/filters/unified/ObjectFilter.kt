@@ -337,6 +337,11 @@ data class GameObjectFilter(
         cardPredicates = cardPredicates + CardPredicate.SharesCreatureTypeWith(entity)
     )
 
+    /** Must share a color with the referenced entity */
+    fun sharingColorWith(entity: EntityReference) = copy(
+        cardPredicates = cardPredicates + CardPredicate.SharesColorWith(entity)
+    )
+
     // =============================================================================
     // Fluent Builder Methods - State Predicates
     // =============================================================================

@@ -246,7 +246,14 @@ Then **Rewards of Diversity** = `opponentCasts(multicolored)` → `GainLife(2, P
 
 ---
 
-### #5 — `SharesColorWith` filter · Spreading Plague
+### #5 — `SharesColorWith` filter · Spreading Plague ✅ DONE
+
+> **Implemented (primitive + card).** `CardPredicate.SharesColorWith(entity)` +
+> `GameObjectFilter.sharingColorWith(entity)`, evaluated via projected colors in `PredicateEvaluator`
+> (colorless → no match). Plus a reusable `excludeTriggering` flag on `CardSource.BattlefieldMatching`
+> threaded through `destroyAllPipeline` / `Effects.DestroyAll(…, excludeTriggering = true)` so "all
+> *other* … with it" triggers spare the triggering creature. Spreading Plague authored in
+> `definitions/inv/cards/SpreadingPlague.kt`; covered by `SpreadingPlagueScenarioTest`.
 
 **What exists.** `CardPredicate.SharesCreatureTypeWith(entity)` +
 `GameObjectFilter.sharingCreatureTypeWith(entity)` (`ObjectFilter.kt:335`). No color analogue.

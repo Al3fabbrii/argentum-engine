@@ -156,8 +156,9 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 ### Destruction & exile
 
 - `Destroy(target)` — destroy target (respects indestructible).
-- `DestroyAll(filter, noRegenerate?, storeDestroyedAs?)` — destroy all matching; optionally save the ID list for
-  follow-up.
+- `DestroyAll(filter, noRegenerate?, storeDestroyedAs?, excludeTriggering?)` — destroy all matching; optionally
+  save the ID list for follow-up. `excludeTriggering = true` spares the triggering entity, for "destroy all
+  *other* … with it" triggers (Spreading Plague).
 - `DestroyAllAndAttached(filter, noRegenerate?)` — also destroys auras/equipment on the matching permanents.
 - `DestroyAllEquipmentOnTarget(target)` — wreck the gear attached to a creature.
 - `Exile(target)` — exile target.
@@ -564,6 +565,11 @@ Every `TargetRequirement` carries count semantics (defaults shown):
 - `.withChosenColor()` — `CardPredicate.HasChosenColor`: matches the color chosen during the current
   effect's resolution (read from `EffectContext.chosenColor`, set by `Effects.ChooseColorThen`). Use with
   `AggregateBattlefield(Player.Each, …)` for "for each permanent of that color" (Coalition Dragon cycle).
+- `.sharingColorWith(entity)` — `CardPredicate.SharesColorWith(entity)`: shares ≥1 (projected) color with
+  a referenced entity (e.g. `EntityReference.Triggering`). Mirror of `.sharingCreatureTypeWith(entity)`.
+  Colorless entities share no color (never match). Used by Spreading Plague ("destroy all other creatures
+  that share a color with it") — pair with `Effects.DestroyAll(filter, excludeTriggering = true)` so the
+  triggering creature itself is spared.
 - `.power(n)` / `.minPower(n)` / `.maxPower(n)` — P/T comparator.
 - `.manaValue(n)` / `.manaValueAtMost(n)` / `.manaValueAtLeast(n)` — mana-value comparator.
 - `.manaValueAtMostX()` — mana value ≤ the X chosen for the source spell/ability.
