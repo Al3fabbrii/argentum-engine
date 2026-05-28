@@ -91,7 +91,6 @@ object TokenCreationReplacementHelper {
                 when (effect) {
                     is DoubleTokenCreation -> doublings += 1
                     is ModifyTokenCount -> modifier += effect.modifier
-                    else -> {}
                 }
             }
         }
