@@ -1140,13 +1140,15 @@ object Effects {
         creatureTypes: Set<String>,
         keywords: Set<Keyword> = emptySet(),
         count: Int = 1,
-        controller: EffectTarget? = null
+        controller: EffectTarget? = null,
+        imageUri: String? = null
     ): Effect = CreateTokenEffect(
         count = DynamicAmount.Fixed(count),
         power = 0, toughness = 0,
         colors = colors, creatureTypes = creatureTypes, keywords = keywords,
         controller = controller,
-        dynamicPower = dynamicPower, dynamicToughness = dynamicToughness
+        dynamicPower = dynamicPower, dynamicToughness = dynamicToughness,
+        imageUri = imageUri
     )
 
     /**

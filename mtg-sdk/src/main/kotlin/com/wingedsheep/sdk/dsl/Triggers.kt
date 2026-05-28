@@ -755,6 +755,55 @@ object Triggers {
         binding = TriggerBinding.ANY,
     )
 
+    // -------------------------------------------------------------------------
+    // Spell cast by another player (any player / an opponent).
+    //
+    // `Player.Each` / `Player.Opponent` are matched at runtime by
+    // `TriggerMatcher.matchesPlayer`. Bind the payoff to the caster with
+    // `Player.TriggeringPlayer`.
+    // -------------------------------------------------------------------------
+
+    /**
+     * Whenever a player (any player, including you) casts a spell.
+     */
+    val AnyPlayerCastsSpell: TriggerSpec = TriggerSpec(
+        event = SpellCastEvent(player = Player.Each),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
+     * Whenever an opponent casts a spell.
+     */
+    val OpponentCastsSpell: TriggerSpec = TriggerSpec(
+        event = SpellCastEvent(player = Player.Opponent),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
+     * Whenever a player (any player, including you) casts a spell matching [spellFilter].
+     * Example: "Whenever a player casts a creature spell" → `anyPlayerCasts(GameObjectFilter.Creature)`.
+     */
+    fun anyPlayerCasts(
+        spellFilter: GameObjectFilter = GameObjectFilter.Any,
+        requires: Set<SpellCastPredicate> = emptySet(),
+    ): TriggerSpec = TriggerSpec(
+        event = SpellCastEvent(spellFilter = spellFilter, player = Player.Each, requires = requires),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
+     * Whenever an opponent casts a spell matching [spellFilter].
+     * Example: "Whenever an opponent casts a multicolored spell" →
+     * `opponentCasts(GameObjectFilter.Multicolored)`.
+     */
+    fun opponentCasts(
+        spellFilter: GameObjectFilter = GameObjectFilter.Any,
+        requires: Set<SpellCastPredicate> = emptySet(),
+    ): TriggerSpec = TriggerSpec(
+        event = SpellCastEvent(spellFilter = spellFilter, player = Player.Opponent, requires = requires),
+        binding = TriggerBinding.ANY
+    )
+
     // =========================================================================
     // Discard Triggers
     // =========================================================================

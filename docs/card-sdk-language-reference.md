@@ -272,7 +272,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `CreateToken(name, p, t, colors?, subtypes?, keywords?, count?, tapped?)` — make N tokens. `count` accepts an
   `Int` or a `DynamicAmount` (the latter for "create X tokens" wording — e.g. Verdeloth the Ancient passes
   `count = DynamicAmount.XValue` to make X Saprolings when kicked).
-- `CreateDynamicToken(...)` — tokens whose P/T is computed.
+- `CreateDynamicToken(dynamicPower, dynamicToughness, colors?, creatureTypes, keywords?, count?, controller?, imageUri?)` —
+  tokens whose P/T is computed at resolution (e.g. Pure Reflection's X/X Reflection where X = the cast spell's mana
+  value, via `DynamicAmounts.triggeringManaValue()`). `controller` directs who gets the token (e.g.
+  `EffectTarget.PlayerRef(Player.TriggeringPlayer)` for "that player creates …"); `imageUri` sets custom token art.
 - `CreateTokenCopyOfSelf(count?, tapped?)` — token copies of source.
 - `CreateTokenCopyOfTarget(target, count?, overridePower?, overrideToughness?, tapped?, attacking?, triggeredAbilities?, addedKeywords?, addedSupertypes?, removedSupertypes?, overrideColors?, overrideSubtypes?)` —
   token copy of another permanent (or a card in any zone — the executor copies the target's `CardComponent`,
@@ -550,6 +553,7 @@ Every `TargetRequirement` carries count semantics (defaults shown):
 - `Filters.Permanent` — permanent card.
 - `Filters.NonlandPermanent` — nonland permanent.
 - `Filters.WithSubtype(subtype)` — card of a given subtype.
+- `GameObjectFilter.Multicolored` — multicolored card (two or more colors; `CardPredicate.IsMulticolored`).
 
 **Chained predicates**
 
@@ -836,6 +840,17 @@ Named sugar for the common type-primitive cases; reach for `youCastSpell(...)` p
 - `YouCastHistoric` — artifact / legendary / Saga.
 - `YouCastSubtype(subtype)` — tribal helper: spell with matching subtype.
 - `AnySpellOrAbilityOnStack` — any object hits the stack.
+
+**Other casters.** The same shape, scoped to a different caster via the runtime
+`Player.Each` / `Player.Opponent` matching on `SpellCastEvent`. Bind the payoff to the
+caster with `EffectTarget.PlayerRef(Player.TriggeringPlayer)`.
+
+- `AnyPlayerCastsSpell` — any player (including you) casts a spell.
+- `OpponentCastsSpell` — an opponent casts a spell.
+- `anyPlayerCasts(spellFilter?, requires?)` — factory; e.g. `anyPlayerCasts(GameObjectFilter.Creature)`
+  for "whenever a player casts a creature spell" (Pure Reflection).
+- `opponentCasts(spellFilter?, requires?)` — factory; e.g. `opponentCasts(GameObjectFilter.Multicolored)`
+  for "whenever an opponent casts a multicolored spell" (Rewards of Diversity).
 
 **Factory** — `youCastSpell(spellFilter?, requires: Set<SpellCastPredicate>)`. The
 `requires` set is conjunctive — every predicate must hold for the trigger to fire.

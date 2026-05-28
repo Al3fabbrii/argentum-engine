@@ -92,6 +92,7 @@ data class GameObjectFilter(
         val Noncreature = GameObjectFilter(cardPredicates = listOf(CardPredicate.IsNoncreature))
         val Nonenchantment = GameObjectFilter(cardPredicates = listOf(CardPredicate.IsNonenchantment))
         val Token = GameObjectFilter(cardPredicates = listOf(CardPredicate.IsToken))
+        val Multicolored = GameObjectFilter(cardPredicates = listOf(CardPredicate.IsMulticolored))
 
         // Combined type filters
         val InstantOrSorcery = GameObjectFilter(
