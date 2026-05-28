@@ -1108,6 +1108,28 @@ object Effects {
     ): Effect = CreateTokenEffect(count, power, toughness, colors, creatureTypes, keywords, controller = controller, imageUri = imageUri, legendary = legendary)
 
     /**
+     * Create a dynamic number of creature tokens — the count is evaluated at resolution
+     * time (e.g. "create X 1/1 green Saproling creature tokens" for Verdeloth the Ancient,
+     * where X is the kicker amount read via [DynamicAmount.XValue]). Distinct from the
+     * `Int`-count overload above; callers pass `count = DynamicAmount.XValue` etc.
+     */
+    fun CreateToken(
+        count: DynamicAmount,
+        power: Int,
+        toughness: Int,
+        colors: Set<Color> = emptySet(),
+        creatureTypes: Set<String>,
+        keywords: Set<Keyword> = emptySet(),
+        controller: EffectTarget? = null,
+        imageUri: String? = null,
+        legendary: Boolean = false
+    ): Effect = CreateTokenEffect(
+        count = count, power = power, toughness = toughness, colors = colors,
+        creatureTypes = creatureTypes, keywords = keywords,
+        controller = controller, imageUri = imageUri, legendary = legendary
+    )
+
+    /**
      * Create creature tokens with dynamic power/toughness evaluated at resolution time.
      * Used for cards like Kin-Tree Invocation where P/T depends on game state.
      */

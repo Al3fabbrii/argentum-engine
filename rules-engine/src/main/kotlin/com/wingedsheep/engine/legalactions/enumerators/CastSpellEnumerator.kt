@@ -1258,6 +1258,18 @@ class CastSpellEnumerator : ActionEnumerator {
                     ?.sources?.map { it.entityId }
             }
 
+            // Kicker {X} (e.g. Verdeloth the Ancient): the kicked cost carries {X}, so the
+            // client must prompt for X exactly like a base-cost X spell. The chosen X flows
+            // through CastSpell.xValue → SpellOnStackComponent.xValue → the ETB event's
+            // xValue, which "create X tokens" reads via DynamicAmount.XValue.
+            val kickedHasXCost = kickedCost.hasX
+            val kickedMaxAffordableX: Int? = if (kickedHasXCost) {
+                val availableSources = context.manaSolver.getAvailableManaCount(state, playerId, precomputedSources = context.availableManaSources)
+                val fixedCost = kickedCost.cmc  // X contributes 0 to CMC
+                val xSymbolCount = kickedCost.xCount.coerceAtLeast(1)
+                ((availableSources - fixedCost) / xSymbolCount).coerceAtLeast(0)
+            } else null
+
             // Check additional cost payability (e.g., sacrifice a creature)
             var kickerCostInfo: AdditionalCostData? = null
             var canPayKickerAdditionalCost = true
@@ -1326,6 +1338,8 @@ class CastSpellEnumerator : ActionEnumerator {
                             manaCostString = kickedCostString,
                             autoTapPreview = kickedAutoTapPreview,
                             additionalCostInfo = kickerCostInfo,
+                            hasXCost = kickedHasXCost,
+                            maxAffordableX = kickedMaxAffordableX,
                             requiresDamageDistribution = kickerRequiresDamageDistribution,
                             totalDamageToDistribute = kickerTotalDamage,
                             minDamagePerTarget = kickerMinDamagePerTarget
@@ -1345,6 +1359,8 @@ class CastSpellEnumerator : ActionEnumerator {
                             manaCostString = kickedCostString,
                             autoTapPreview = kickedAutoTapPreview,
                             additionalCostInfo = kickerCostInfo,
+                            hasXCost = kickedHasXCost,
+                            maxAffordableX = kickedMaxAffordableX,
                             requiresDamageDistribution = kickerRequiresDamageDistribution,
                             totalDamageToDistribute = kickerTotalDamage,
                             minDamagePerTarget = kickerMinDamagePerTarget
@@ -1359,7 +1375,9 @@ class CastSpellEnumerator : ActionEnumerator {
                     affordable = canAffordKicked,
                     manaCostString = kickedCostString,
                     autoTapPreview = kickedAutoTapPreview,
-                    additionalCostInfo = kickerCostInfo
+                    additionalCostInfo = kickerCostInfo,
+                    hasXCost = kickedHasXCost,
+                    maxAffordableX = kickedMaxAffordableX
                 ))
             }
 
