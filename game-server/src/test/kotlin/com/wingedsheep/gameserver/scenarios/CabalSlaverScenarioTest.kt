@@ -1,8 +1,8 @@
 package com.wingedsheep.gameserver.scenarios
 
-import com.wingedsheep.engine.core.ChooseOptionDecision
-import com.wingedsheep.engine.core.OptionChosenResponse
+import com.wingedsheep.engine.core.ChooseReplacementDecision
 import com.wingedsheep.engine.core.PassPriority
+import com.wingedsheep.engine.core.ReplacementChosenResponse
 import com.wingedsheep.gameserver.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
@@ -20,16 +20,18 @@ import io.kotest.matchers.types.shouldBeInstanceOf
  */
 class CabalSlaverScenarioTest : ScenarioTestBase() {
 
-    private fun ScenarioTestBase.TestGame.chooseCreatureType(typeName: String) {
+    /** Perform an Artificial Evolution text-change via the single [ChooseReplacementDecision]. */
+    private fun ScenarioTestBase.TestGame.chooseReplacement(from: String, to: String) {
         val decision = getPendingDecision()
         decision.shouldNotBeNull()
-        decision.shouldBeInstanceOf<ChooseOptionDecision>()
-        val options = decision.options
-        val index = options.indexOf(typeName)
-        withClue("Creature type '$typeName' should be in options $options") {
-            (index >= 0) shouldBe true
+        decision.shouldBeInstanceOf<ChooseReplacementDecision>()
+        val fromIndex = decision.fromOptions.indexOf(from)
+        val toIndex = decision.toOptions.indexOf(to)
+        withClue("'$from' should be in fromOptions and '$to' in toOptions") {
+            (fromIndex >= 0) shouldBe true
+            (toIndex >= 0) shouldBe true
         }
-        submitDecision(OptionChosenResponse(decision.id, index))
+        submitDecision(ReplacementChosenResponse(decision.id, fromIndex, toIndex))
     }
 
     init {
@@ -192,8 +194,7 @@ class CabalSlaverScenarioTest : ScenarioTestBase() {
                 game.resolveStack()
 
                 // Choose FROM: Goblin → TO: Elf
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Elf")
+                game.chooseReplacement("Goblin", "Elf")
 
                 // Now attack with Elvish Warrior - should trigger discard
                 game.passUntilPhase(Phase.COMBAT, Step.DECLARE_ATTACKERS)
@@ -228,8 +229,7 @@ class CabalSlaverScenarioTest : ScenarioTestBase() {
                 game.castSpell(1, "Artificial Evolution", cabalSlaver)
                 game.resolveStack()
 
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Elf")
+                game.chooseReplacement("Goblin", "Elf")
 
                 // Attack with Goblin Sledder - should NOT trigger (now watches for Elves)
                 game.passUntilPhase(Phase.COMBAT, Step.DECLARE_ATTACKERS)

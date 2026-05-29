@@ -1,8 +1,8 @@
 package com.wingedsheep.gameserver.scenarios
 
-import com.wingedsheep.engine.core.ChooseOptionDecision
-import com.wingedsheep.engine.core.OptionChosenResponse
+import com.wingedsheep.engine.core.ChooseReplacementDecision
 import com.wingedsheep.engine.core.PassPriority
+import com.wingedsheep.engine.core.ReplacementChosenResponse
 import com.wingedsheep.engine.mechanics.layers.SerializableModification
 import com.wingedsheep.gameserver.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
@@ -28,16 +28,18 @@ import io.kotest.matchers.types.shouldBeInstanceOf
  */
 class ThoughtboundPrimocScenarioTest : ScenarioTestBase() {
 
-    private fun ScenarioTestBase.TestGame.chooseCreatureType(typeName: String) {
+    /** Perform an Artificial Evolution text-change via the single [ChooseReplacementDecision]. */
+    private fun ScenarioTestBase.TestGame.chooseReplacement(from: String, to: String) {
         val decision = getPendingDecision()
         decision.shouldNotBeNull()
-        decision.shouldBeInstanceOf<ChooseOptionDecision>()
-        val options = decision.options
-        val index = options.indexOf(typeName)
-        withClue("Creature type '$typeName' should be in options $options") {
-            (index >= 0) shouldBe true
+        decision.shouldBeInstanceOf<ChooseReplacementDecision>()
+        val fromIndex = decision.fromOptions.indexOf(from)
+        val toIndex = decision.toOptions.indexOf(to)
+        withClue("'$from' should be in fromOptions and '$to' in toOptions") {
+            (fromIndex >= 0) shouldBe true
+            (toIndex >= 0) shouldBe true
         }
-        submitDecision(OptionChosenResponse(decision.id, index))
+        submitDecision(ReplacementChosenResponse(decision.id, fromIndex, toIndex))
     }
 
     init {
@@ -195,8 +197,7 @@ class ThoughtboundPrimocScenarioTest : ScenarioTestBase() {
                 val primoc = game.findPermanent("Thoughtbound Primoc")!!
                 game.castSpell(1, "Artificial Evolution", primoc)
                 game.resolveStack()
-                game.chooseCreatureType("Wizard")
-                game.chooseCreatureType("Cleric")
+                game.chooseReplacement("Wizard", "Cleric")
 
                 // Advance to next upkeep (P2's turn → P1's turn → upkeep)
                 game.passUntilPhase(Phase.BEGINNING, Step.UPKEEP)

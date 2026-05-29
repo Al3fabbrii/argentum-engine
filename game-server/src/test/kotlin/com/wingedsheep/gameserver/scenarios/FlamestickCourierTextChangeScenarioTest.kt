@@ -1,8 +1,8 @@
 package com.wingedsheep.gameserver.scenarios
 
 import com.wingedsheep.engine.core.ActivateAbility
-import com.wingedsheep.engine.core.ChooseOptionDecision
-import com.wingedsheep.engine.core.OptionChosenResponse
+import com.wingedsheep.engine.core.ChooseReplacementDecision
+import com.wingedsheep.engine.core.ReplacementChosenResponse
 import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.gameserver.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
@@ -11,7 +11,7 @@ import com.wingedsheep.sdk.scripting.AdditionalCostPayment
 import io.kotest.assertions.withClue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 
 /**
@@ -23,16 +23,18 @@ import io.kotest.matchers.types.shouldBeInstanceOf
  */
 class FlamestickCourierTextChangeScenarioTest : ScenarioTestBase() {
 
-    private fun ScenarioTestBase.TestGame.chooseCreatureType(typeName: String) {
+    /** Perform an Artificial Evolution text-change via the single [ChooseReplacementDecision]. */
+    private fun ScenarioTestBase.TestGame.chooseReplacement(from: String, to: String) {
         val decision = getPendingDecision()
         decision.shouldNotBeNull()
-        decision.shouldBeInstanceOf<ChooseOptionDecision>()
-        val options = decision.options
-        val index = options.indexOf(typeName)
-        withClue("Creature type '$typeName' should be in options $options") {
-            (index >= 0) shouldNotBe false
+        decision.shouldBeInstanceOf<ChooseReplacementDecision>()
+        val fromIndex = decision.fromOptions.indexOf(from)
+        val toIndex = decision.toOptions.indexOf(to)
+        withClue("'$from' should be in fromOptions and '$to' in toOptions") {
+            (fromIndex >= 0) shouldBe true
+            (toIndex >= 0) shouldBe true
         }
-        submitDecision(OptionChosenResponse(decision.id, index))
+        submitDecision(ReplacementChosenResponse(decision.id, fromIndex, toIndex))
     }
 
     init {
@@ -54,8 +56,7 @@ class FlamestickCourierTextChangeScenarioTest : ScenarioTestBase() {
                 val courier = game.findPermanent("Flamestick Courier")!!
                 game.castSpell(1, "Artificial Evolution", courier)
                 game.resolveStack()
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Bird")
+                game.chooseReplacement("Goblin", "Bird")
 
                 // Now activate Flamestick Courier's ability targeting Sage Aven (a Bird)
                 val cardDef = cardRegistry.getCard("Flamestick Courier")!!
@@ -92,8 +93,7 @@ class FlamestickCourierTextChangeScenarioTest : ScenarioTestBase() {
                 val courier = game.findPermanent("Flamestick Courier")!!
                 game.castSpell(1, "Artificial Evolution", courier)
                 game.resolveStack()
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Bird")
+                game.chooseReplacement("Goblin", "Bird")
 
                 // Try to activate Flamestick Courier's ability targeting Raging Goblin
                 val cardDef = cardRegistry.getCard("Flamestick Courier")!!
@@ -133,8 +133,7 @@ class FlamestickCourierTextChangeScenarioTest : ScenarioTestBase() {
                 val sledder = game.findPermanent("Goblin Sledder")!!
                 game.castSpell(1, "Artificial Evolution", sledder)
                 game.resolveStack()
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Bird")
+                game.chooseReplacement("Goblin", "Bird")
 
                 // Activate Goblin Sledder's ability: sacrifice Sage Aven (a Bird), target Storm Crow
                 val cardDef = cardRegistry.getCard("Goblin Sledder")!!
@@ -176,8 +175,7 @@ class FlamestickCourierTextChangeScenarioTest : ScenarioTestBase() {
                 val sledder = game.findPermanent("Goblin Sledder")!!
                 game.castSpell(1, "Artificial Evolution", sledder)
                 game.resolveStack()
-                game.chooseCreatureType("Goblin")
-                game.chooseCreatureType("Bird")
+                game.chooseReplacement("Goblin", "Bird")
 
                 // Try to activate Goblin Sledder's ability: sacrifice Raging Goblin
                 // The cost now requires sacrificing a Bird, but Raging Goblin is a Goblin

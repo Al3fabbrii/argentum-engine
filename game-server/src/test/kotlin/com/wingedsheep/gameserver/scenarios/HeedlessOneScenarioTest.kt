@@ -1,8 +1,8 @@
 package com.wingedsheep.gameserver.scenarios
 
 import com.wingedsheep.engine.core.CastSpell
-import com.wingedsheep.engine.core.ChooseOptionDecision
-import com.wingedsheep.engine.core.OptionChosenResponse
+import com.wingedsheep.engine.core.ChooseReplacementDecision
+import com.wingedsheep.engine.core.ReplacementChosenResponse
 import com.wingedsheep.engine.mechanics.layers.StateProjector
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
@@ -26,16 +26,18 @@ class HeedlessOneScenarioTest : ScenarioTestBase() {
 
     private val stateProjector = StateProjector()
 
-    private fun ScenarioTestBase.TestGame.chooseCreatureType(typeName: String) {
+    /** Perform an Artificial Evolution text-change via the single [ChooseReplacementDecision]. */
+    private fun ScenarioTestBase.TestGame.chooseReplacement(from: String, to: String) {
         val decision = getPendingDecision()
         decision.shouldNotBeNull()
-        decision.shouldBeInstanceOf<ChooseOptionDecision>()
-        val options = decision.options
-        val index = options.indexOf(typeName)
-        withClue("Creature type '$typeName' should be in options $options") {
-            (index >= 0) shouldBe true
+        decision.shouldBeInstanceOf<ChooseReplacementDecision>()
+        val fromIndex = decision.fromOptions.indexOf(from)
+        val toIndex = decision.toOptions.indexOf(to)
+        withClue("'$from' should be in fromOptions and '$to' in toOptions") {
+            (fromIndex >= 0) shouldBe true
+            (toIndex >= 0) shouldBe true
         }
-        submitDecision(OptionChosenResponse(decision.id, index))
+        submitDecision(ReplacementChosenResponse(decision.id, fromIndex, toIndex))
     }
 
     init {
@@ -114,8 +116,7 @@ class HeedlessOneScenarioTest : ScenarioTestBase() {
                 // Cast Artificial Evolution targeting Heedless One, change Elf → Crocodile
                 game.castSpell(2, "Artificial Evolution", heedlessOne)
                 game.resolveStack()
-                game.chooseCreatureType("Elf")
-                game.chooseCreatureType("Crocodile")
+                game.chooseReplacement("Elf", "Crocodile")
 
                 // Heedless One now counts Crocodiles instead of Elves.
                 // Text replacement also changes its type line from "Elf Avatar" to "Crocodile Avatar",
