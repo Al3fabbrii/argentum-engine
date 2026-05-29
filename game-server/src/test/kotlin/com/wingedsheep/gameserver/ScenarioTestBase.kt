@@ -23,6 +23,7 @@ import com.wingedsheep.mtg.sets.definitions.xln.IxalanSet
 import com.wingedsheep.mtg.sets.definitions.khm.KaldheimSet
 import com.wingedsheep.mtg.sets.definitions.ktk.KhansOfTarkirSet
 import com.wingedsheep.mtg.sets.definitions.lci.LostCavernsOfIxalanSet
+import com.wingedsheep.mtg.sets.definitions.arn.ArabianNightsSet
 import com.wingedsheep.mtg.sets.definitions.lea.AlphaSet
 import com.wingedsheep.mtg.sets.definitions.lgn.LegionsSet
 import com.wingedsheep.mtg.sets.definitions.lrw.LorwynSet
@@ -97,6 +98,7 @@ abstract class ScenarioTestBase : FunSpec() {
     protected val cardRegistry = CardRegistry().apply {
         register(PredefinedTokens.allTokens)
         register(AlphaSet.cards); register(AlphaSet.basicLands)
+        register(ArabianNightsSet.cards)
         register(AetherdriftSet.cards)
         register(AvacynRestoredSet.cards); register(AvacynRestoredSet.basicLands)
         register(AvatarTheLastAirbenderSet.cards)

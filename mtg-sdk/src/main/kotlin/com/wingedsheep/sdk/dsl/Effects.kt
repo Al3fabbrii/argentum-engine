@@ -49,6 +49,7 @@ import com.wingedsheep.sdk.scripting.effects.SuccessCriterion
 import com.wingedsheep.sdk.scripting.effects.GrantDamageBonusEffect
 import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
 import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
+import com.wingedsheep.sdk.scripting.effects.DrawRevealDiscardUnlessEffect
 import com.wingedsheep.sdk.scripting.effects.EachPlayerReturnsPermanentToHandEffect
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.GrantMayPlayFromExileEffect
@@ -304,6 +305,15 @@ object Effects {
      */
     fun DrawUpTo(maxCards: Int, target: EffectTarget = EffectTarget.Controller): Effect =
         DrawUpToEffect(maxCards, target)
+
+    /**
+     * Draw a card, reveal it, and discard it unless it matches [filter].
+     * Models "Draw a card and reveal it. If it isn't a [type], discard it." (Sindbad).
+     */
+    fun DrawRevealDiscardUnless(
+        filter: GameObjectFilter,
+        target: EffectTarget = EffectTarget.Controller
+    ): Effect = DrawRevealDiscardUnlessEffect(filter, target)
 
     /**
      * Draw X cards, then for each card drawn, discard a card unless you sacrifice a permanent.
