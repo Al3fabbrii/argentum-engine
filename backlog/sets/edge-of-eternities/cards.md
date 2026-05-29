@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 232 / 261
+**Implemented:** 233 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -86,7 +86,7 @@
 - [x] Fungal Colossus
 - [x] Galactic Wayfarer
 - [x] Galvanizing Sawship
-- [ ] Genemorph Imago
+- [x] Genemorph Imago
 - [x] Gene Pollinator
 - [x] Germinating Wurm
 - [x] Gigastorm Titan
