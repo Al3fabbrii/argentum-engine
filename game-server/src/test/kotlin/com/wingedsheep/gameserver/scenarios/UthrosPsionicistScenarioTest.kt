@@ -135,6 +135,44 @@ class UthrosPsionicistScenarioTest : ScenarioTestBase() {
                     effective.cmc shouldBe 1
                 }
             }
+
+            test("cost increase applies before the reduction, flooring the generic at {0} (CR 601.2f)") {
+                // Glowrider taxes noncreature spells +{1}; Uthros reduces the second spell by {2}.
+                // Per CR 601.2f the total cost is the base cost plus increases minus reductions, and the
+                // generic component can't drop below {0}. Opt is {U} (0 generic): 0 + 1 − 2 floors to {0},
+                // leaving {U} (CMC 1). Applying the reduction before the increase would instead floor 0 − 2
+                // to {0} and then add {1}, giving {1}{U} (CMC 2) — so CMC 1 confirms the correct ordering.
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardOnBattlefield(1, "Uthros Psionicist")
+                    .withCardOnBattlefield(1, "Glowrider") // Noncreature spells cost {1} more
+                    .withCardInHand(1, "Shock")
+                    .withCardInHand(1, "Opt") // {U}
+                    .withLandsOnBattlefield(1, "Mountain", 2) // Shock is taxed to {1}{R}
+                    .withLandsOnBattlefield(1, "Island", 2)
+                    .withCardInLibrary(1, "Island")
+                    .withCardInLibrary(1, "Island")
+                    .withCardInLibrary(2, "Island")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                // First spell of the turn (Shock — itself taxed to {1}{R} by Glowrider).
+                val shockResult = game.castSpellTargetingPlayer(1, "Shock", 2)
+                withClue("Shock should cast: ${shockResult.error}") {
+                    shockResult.error shouldBe null
+                }
+                game.resolveStack()
+
+                // Opt is now the second spell: {U} +{1} (Glowrider) −{2} (Uthros), floored → {U}.
+                val opt = cardRegistry.getCard("Opt")!!
+                val costCalc = CostCalculator(cardRegistry)
+                val effective = costCalc.calculateEffectiveCost(game.state, opt, game.player1Id)
+
+                withClue("Second spell Opt: {U} +{1} −{2} floored at {0} → {U} (CMC 1)") {
+                    effective.cmc shouldBe 1
+                }
+            }
         }
     }
 }
