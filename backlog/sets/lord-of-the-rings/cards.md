@@ -82,7 +82,7 @@ starter-deck/special cards and basic lands.
 - [ ] Goldberry, River-Daughter
 - [x] Grey Havens Navigator
 - [x] Hithlain Knots
-- [ ] Horses of the Bruinen
+- [x] Horses of the Bruinen
 - [x] Ioreth of the Healing House
 - [x] Isolation at Orthanc
 - [x] Ithilien Kingfisher
