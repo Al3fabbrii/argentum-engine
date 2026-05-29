@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 227 / 261
+**Implemented:** 228 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -39,7 +39,7 @@
 - [x] Codecracker Hound
 - [x] Comet Crawler
 - [ ] Command Bridge
-- [ ] Consult the Star Charts
+- [x] Consult the Star Charts
 - [ ] Cosmogoyf
 - [x] Cosmogrand Zenith
 - [x] Cryogen Relic
