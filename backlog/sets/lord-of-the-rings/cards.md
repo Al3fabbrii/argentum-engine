@@ -392,7 +392,7 @@ starter-deck/special cards and basic lands.
 
 ### Black
 
-- [ ] Warg Rider
+- [x] Warg Rider
 
 ### Red
 
