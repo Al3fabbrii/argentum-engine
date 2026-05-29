@@ -2,11 +2,15 @@ package com.wingedsheep.gameserver.scenarios
 
 import com.wingedsheep.engine.core.ActivateAbility
 import com.wingedsheep.engine.core.CardsDiscardedEvent
+import com.wingedsheep.engine.core.CardsDrawnEvent
 import com.wingedsheep.engine.core.CardsRevealedEvent
 import com.wingedsheep.engine.core.GameEvent
 import com.wingedsheep.gameserver.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Triggers
+import com.wingedsheep.sdk.dsl.card
 import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
@@ -16,6 +20,17 @@ import io.kotest.matchers.shouldBe
  * "{T}: Draw a card and reveal it. If it isn't a land card, discard it."
  */
 class SindbadScenarioTest : ScenarioTestBase() {
+
+    /** "Whenever you draw a card, you gain 1 life." — proves Sindbad's draw fires draw triggers. */
+    private val lifeOnDraw = card("Life On Draw") {
+        manaCost = "{1}"
+        typeLine = "Enchantment"
+
+        triggeredAbility {
+            trigger = Triggers.YouDraw
+            effect = Effects.GainLife(1)
+        }
+    }
 
     /** Activate Sindbad's tap ability, resolve it, and return every event emitted. */
     private fun activateSindbad(game: TestGame): List<GameEvent> {
@@ -37,6 +52,8 @@ class SindbadScenarioTest : ScenarioTestBase() {
     }
 
     init {
+        cardRegistry.register(lifeOnDraw)
+
         context("Sindbad's draw-reveal-discard ability") {
 
             test("discards a drawn nonland card") {
@@ -55,6 +72,41 @@ class SindbadScenarioTest : ScenarioTestBase() {
                 }
                 withClue("Discarded card should not remain in hand") {
                     game.handSize(1) shouldBe 0
+                }
+            }
+
+            test("emits a CardsDrawnEvent for the drawn card so draw triggers can see it") {
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardOnBattlefield(1, "Sindbad")
+                    .withCardInLibrary(1, "Grizzly Bears")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val events = activateSindbad(game)
+
+                val draws = events.filterIsInstance<CardsDrawnEvent>()
+                withClue("Sindbad's draw must emit the canonical CardsDrawnEvent") {
+                    draws.any { it.playerId == game.player1Id && it.cardIds.size == 1 }.shouldBeTrue()
+                }
+            }
+
+            test("drawing with Sindbad fires a 'whenever you draw a card' trigger") {
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardOnBattlefield(1, "Sindbad")
+                    .withCardOnBattlefield(1, "Life On Draw")
+                    .withCardInLibrary(1, "Grizzly Bears")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                activateSindbad(game)
+
+                val life = game.getClientState(1).players.first { it.playerId == game.player1Id }.life
+                withClue("Life On Draw should have gained 1 life off Sindbad's draw") {
+                    life shouldBe 21
                 }
             }
 
