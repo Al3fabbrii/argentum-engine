@@ -190,7 +190,7 @@ starter-deck/special cards and basic lands.
 ### Green
 
 - [x] Bag End Porter
-- [ ] Bombadil's Song
+- [x] Bombadil's Song
 - [x] Brandywine Farmer
 - [ ] Celeborn the Wise
 - [ ] Chance-Met Elves
