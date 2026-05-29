@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 230 / 261
+**Implemented:** 231 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -58,7 +58,7 @@
 - [x] Divert Disaster
 - [x] Dockworker Drone
 - [x] Drill Too Deep
-- [ ] Drix Fatemaker
+- [x] Drix Fatemaker
 - [x] Dual-Sun Adepts
 - [x] Dual-Sun Technique
 - [x] Dubious Delicacy
