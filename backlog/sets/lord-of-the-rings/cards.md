@@ -334,7 +334,7 @@ starter-deck/special cards and basic lands.
 
 ### Red
 
-- [ ] Assault on Osgiliath
+- [x] Assault on Osgiliath
 
 ### Green
 
