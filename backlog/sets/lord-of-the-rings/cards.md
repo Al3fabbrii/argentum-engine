@@ -97,7 +97,7 @@ starter-deck/special cards and basic lands.
 - [ ] Saruman the White
 - [x] Saruman's Trickery
 - [ ] Scroll of Isildur
-- [ ] Soothing of Sméagol
+- [x] Soothing of Sméagol
 - [x] Stern Scolding
 - [x] Storm of Saruman
 - [ ] Surrounded by Orcs
