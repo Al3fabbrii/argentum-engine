@@ -94,7 +94,7 @@ starter-deck/special cards and basic lands.
 - [x] Pelargir Survivor
 - [ ] Press the Enemy
 - [ ] Rangers of Ithilien
-- [ ] Saruman the White
+- [x] Saruman the White
 - [x] Saruman's Trickery
 - [ ] Scroll of Isildur
 - [x] Soothing of Sméagol
