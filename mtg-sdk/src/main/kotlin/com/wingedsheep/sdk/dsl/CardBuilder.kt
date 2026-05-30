@@ -13,6 +13,7 @@ import com.wingedsheep.sdk.scripting.costs.PayCost
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
+import com.wingedsheep.sdk.scripting.effects.CreateTokenEffect
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.GrantKeywordEffect
 import com.wingedsheep.sdk.scripting.effects.ModalEffect
@@ -355,6 +356,45 @@ class CardBuilder(private val name: String) {
                     toughnessModifier = perBlockerBeyondFirst,
                     target = EffectTarget.TriggeringEntity
                 )
+            )
+        )
+    }
+
+    /**
+     * Add Mobilize N (Tarkir: Dragonstorm) — keyword ability + triggered ability.
+     *
+     * "Whenever this creature attacks, create N tapped and attacking 1/1 red Warrior
+     * creature tokens. Sacrifice those tokens at the beginning of the next end step."
+     *
+     * The keyword ability is display-only (no separate Mobilize handler exists); the
+     * behavior lives entirely in the attack-triggered ability wired here. The tokens
+     * enter tapped and attacking via [CreateTokenEffect.tapped]/[CreateTokenEffect.attacking],
+     * and their end-of-turn sacrifice is scheduled via [CreateTokenEffect.sacrificeAtStep]
+     * (the sacrifice sibling of `exileAtStep`), which the executor turns into one delayed
+     * [com.wingedsheep.sdk.scripting.effects.SacrificeTargetEffect] per created token.
+     */
+    fun mobilize(n: Int) {
+        keywordAbilityList.add(KeywordAbility.mobilize(n))
+        val tokenWord = if (n == 1) "token" else "tokens"
+        val pronoun = if (n == 1) "it" else "those tokens"
+        val article = if (n == 1) "a" else "$n"
+        triggeredAbilities.add(
+            TriggeredAbility.create(
+                trigger = Triggers.Attacks.event,
+                binding = Triggers.Attacks.binding,
+                effect = CreateTokenEffect(
+                    count = DynamicAmount.Fixed(n),
+                    power = 1,
+                    toughness = 1,
+                    colors = setOf(Color.RED),
+                    creatureTypes = setOf("Warrior"),
+                    tapped = true,
+                    attacking = true,
+                    sacrificeAtStep = Step.END
+                ),
+                descriptionOverride = "Whenever this creature attacks, create $article tapped " +
+                    "and attacking 1/1 red Warrior creature $tokenWord. Sacrifice $pronoun at the " +
+                    "beginning of the next end step."
             )
         )
     }

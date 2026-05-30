@@ -1347,6 +1347,11 @@ composite abilities).
 - `Renown(n)` — first combat damage to a player grants renown counters.
 - `Fabricate(n)` — ETB choose +1/+1 counters or Servo tokens.
 - `Tribute(n)` — opponent chooses ETB bonus.
+- `Mobilize(n)` — +N tapped-and-attacking 1/1 red Warrior tokens on attack (Tarkir: Dragonstorm, Mardu).
+  Display-only; wire the behavior with the `card { mobilize(n) }` builder helper, which adds this keyword
+  ability plus a "whenever this attacks" triggered `CreateTokenEffect` (`tapped = true`, `attacking = true`)
+  whose `sacrificeAtStep = Step.END` schedules one delayed `SacrificeTargetEffect` per created token at the
+  next end step (mirrors `rampage()`). `n` may be any fixed value (Mobilize 1/2/3, …).
 - `Toxic(n)` — adds poison counters on combat damage.
 - `Cycling(cost)` — pay cost, discard, draw a card.
 - `BasicLandcycling(cost)` — cycling that fetches a basic land type.
