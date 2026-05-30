@@ -19,6 +19,14 @@ import com.wingedsheep.sdk.scripting.targets.TargetPlayer
  * The target player is only relevant when the spell is kicked, so it is declared as an
  * optional target (minCount 0). When unkicked, no target need be chosen; the kicked
  * discard simply never resolves.
+ *
+ * Approximation: strictly, a *kicked* Probe requires a target player. Kicker is chosen
+ * while casting (CR 601.2b) and targets are then announced (CR 601.2c), so the targeted
+ * clause is only mandatory once the spell is kicked. The SDK has no kicker-conditional
+ * target requirement, so a kicked cast could legally be made with no target — in which
+ * case the discard fizzles. A dedicated card-specific primitive isn't worth it for one
+ * card; if a second kicked-only-target card appears, add a general "required-iff-kicked"
+ * target flag.
  */
 val Probe = card("Probe") {
     manaCost = "{2}{U}"

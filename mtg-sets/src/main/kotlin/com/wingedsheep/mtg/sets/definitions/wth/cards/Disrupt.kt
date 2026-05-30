@@ -1,4 +1,4 @@
-package com.wingedsheep.mtg.sets.definitions.inv.cards
+package com.wingedsheep.mtg.sets.definitions.wth.cards
 
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
@@ -12,6 +12,9 @@ import com.wingedsheep.sdk.model.Rarity
  *
  * Counter target instant or sorcery spell unless its controller pays {1}.
  * Draw a card.
+ *
+ * Weatherlight is Disrupt's earliest real-expansion printing; the Invasion
+ * printing is a reprint row (see inv/cards/DisruptReprint.kt).
  */
 val Disrupt = card("Disrupt") {
     manaCost = "{U}"
@@ -25,9 +28,9 @@ val Disrupt = card("Disrupt") {
     }
 
     metadata {
-        rarity = Rarity.UNCOMMON
-        collectorNumber = "51"
-        artist = "Paolo Parente"
-        imageUri = "https://cards.scryfall.io/normal/front/c/0/c000a02f-6b7e-4925-a938-59e645e980d7.jpg?1562933600"
+        rarity = Rarity.COMMON
+        collectorNumber = "37"
+        artist = "Adam Rex"
+        imageUri = "https://cards.scryfall.io/normal/front/c/6/c6cc89b0-9acf-452b-ac1a-bc7e90eb32fc.jpg?1562803281"
     }
 }

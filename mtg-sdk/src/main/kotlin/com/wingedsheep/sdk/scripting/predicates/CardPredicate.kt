@@ -621,7 +621,8 @@ sealed interface CardPredicate : TextReplaceable<CardPredicate> {
     /**
      * Matches only activated abilities on the stack (not triggered abilities or spells).
      * Mana abilities never use the stack, so they can't be matched. Used by cards like
-     * Bind / Stifle's activated-only mode: "Counter target activated ability."
+     * Bind: "Counter target activated ability." (Stifle counters either kind and uses the
+     * broader [IsActivatedOrTriggeredAbility].)
      */
     @SerialName("IsActivatedAbility")
     @Serializable
