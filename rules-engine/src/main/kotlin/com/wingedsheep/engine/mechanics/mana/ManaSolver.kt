@@ -30,6 +30,7 @@ import com.wingedsheep.sdk.scripting.effects.AddDynamicManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaOfChoiceEffect
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
+import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.values.ManaColorSet
 import com.wingedsheep.sdk.scripting.effects.ManaRestriction
 import com.wingedsheep.sdk.scripting.effects.ManaSpellRider
@@ -1810,26 +1811,47 @@ class ManaSolver(
                 // Honor activation restrictions (e.g. "only during your turn").
                 if (!activationRestrictionsSatisfied(state, playerId, entityId, ability)) continue
 
-                when (val effect = ability.effect) {
-                    is AddManaOfChoiceEffect -> if (effect.colorSet is ManaColorSet.AnyColor) {
-                        val amount = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1
-                        anyColorTotal += amount
-                    }
-                    is AddManaEffect -> {
-                        val amount = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1
-                        specificColorTotal[effect.color] =
-                            (specificColorTotal[effect.color] ?: 0) + amount
-                    }
-                    is AddColorlessManaEffect -> {
-                        val amount = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1
-                        colorlessTotal += amount
-                    }
-                    else -> {}
+                // Recurse into the effect so multi-mana sacrifice abilities expressed as a
+                // CompositeEffect (e.g. Irrigation Ditch's "{T}, Sacrifice: Add {G}{U}",
+                // `Effects.Composite(AddMana(GREEN), AddMana(BLUE))`) are counted in full
+                // rather than dropping to the unhandled `else` branch and contributing zero.
+                val produced = manaProducedByEffect(ability.effect)
+                anyColorTotal += produced.anyColorMana
+                for ((color, amount) in produced.specificMana) {
+                    specificColorTotal[color] = (specificColorTotal[color] ?: 0) + amount
                 }
+                colorlessTotal += produced.colorlessMana
             }
         }
 
         return TapPermanentsBonusMana(anyColorTotal, specificColorTotal, colorlessTotal)
+    }
+
+    /**
+     * Mana produced by a single mana-ability effect, recursing into [CompositeEffect].
+     *
+     * Used by the "bonus mana" affordability helpers (e.g. [calculateSacrificeSelfBonusMana])
+     * so an ability that adds several mana via `Effects.Composite(AddMana(...), AddMana(...))`
+     * is counted in full. Without the recursion such an effect falls into the `else` branch and
+     * contributes nothing, so a spell payable only by that ability is wrongly reported
+     * unaffordable (Irrigation Ditch's {G}{U} → casting Nomadic Elf, {1}{G}).
+     */
+    private fun manaProducedByEffect(effect: Effect): TapPermanentsBonusMana = when (effect) {
+        is AddManaOfChoiceEffect ->
+            if (effect.colorSet is ManaColorSet.AnyColor) {
+                TapPermanentsBonusMana(anyColorMana = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1)
+            } else {
+                TapPermanentsBonusMana()
+            }
+        is AddManaEffect ->
+            TapPermanentsBonusMana(
+                specificMana = mapOf(effect.color to ((effect.amount as? DynamicAmount.Fixed)?.amount ?: 1))
+            )
+        is AddColorlessManaEffect ->
+            TapPermanentsBonusMana(colorlessMana = (effect.amount as? DynamicAmount.Fixed)?.amount ?: 1)
+        is CompositeEffect ->
+            effect.effects.fold(TapPermanentsBonusMana()) { acc, sub -> acc + manaProducedByEffect(sub) }
+        else -> TapPermanentsBonusMana()
     }
 
     /**
