@@ -806,7 +806,8 @@ class PayOrSufferExecutor(
     private fun buildTapPrompt(cost: PayCost.Tap, sourceName: String, sufferEffect: Effect): String {
         val desc = cost.filter.description
         val typeText = if (cost.count == 1) {
-            "${if (desc.first().lowercaseChar() in "aeiou") "an" else "a"} untapped $desc you control"
+            // The article always precedes "untapped", so it is always "an".
+            "an untapped $desc you control"
         } else {
             "${cost.count} untapped ${desc}s you control"
         }

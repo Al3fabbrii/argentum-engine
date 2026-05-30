@@ -259,8 +259,8 @@ sealed interface PayCost : TextReplaceable<PayCost> {
             append("tap ")
             val filterDesc = filter.description
             if (count == 1) {
-                append(if (filterDesc.first().lowercaseChar() in "aeiou") "an" else "a")
-                append(" untapped $filterDesc you control")
+                // The article always precedes "untapped", so it is always "an".
+                append("an untapped $filterDesc you control")
             } else {
                 append("$count untapped ${filterDesc}s you control")
             }
