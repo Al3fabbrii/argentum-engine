@@ -24,6 +24,10 @@ import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.ManaSymbol
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.AttackTax
+import com.wingedsheep.sdk.scripting.CantAttackUnlessCoAttacker
+import com.wingedsheep.sdk.scripting.filters.unified.Scope
+import com.wingedsheep.engine.handlers.PredicateEvaluator
+import com.wingedsheep.engine.handlers.PredicateContext
 
 /**
  * Handles the declare attackers step of combat.
@@ -42,6 +46,7 @@ internal class AttackPhaseManager(
 ) {
 
     private val dynamicAmountEvaluator = com.wingedsheep.engine.handlers.DynamicAmountEvaluator()
+    private val predicateEvaluator = PredicateEvaluator()
 
     /**
      * Validate and declare attackers.
@@ -86,6 +91,14 @@ internal class AttackPhaseManager(
                     return ExecutionResult.error(state, error)
                 }
             }
+        }
+
+        // Check co-attacker requirements (Scarred Puma — "can't attack unless a black or
+        // green creature also attacks"). Depends on the whole proposed attacker group, not
+        // the defender, so it's validated here rather than via an AttackDefenderRule.
+        val coAttackerValidation = validateCoAttackerRequirements(state, projected, attackers.keys)
+        if (coAttackerValidation != null) {
+            return ExecutionResult.error(state, coAttackerValidation)
         }
 
         // Check must-attack requirements (Taunt)
@@ -286,6 +299,38 @@ internal class AttackPhaseManager(
         for (rule in attackRestrictionRules) {
             val error = rule.check(ctx)
             if (error != null) return error
+        }
+        return null
+    }
+
+    /**
+     * Validate "can't attack unless [X] also attacks" restrictions ([CantAttackUnlessCoAttacker]).
+     *
+     * For each proposed attacker carrying the restriction, at least one *other* attacker in the
+     * same declaration must match the restriction's filter (evaluated with projected state so
+     * color/type-changing effects are honored). Self never counts as its own co-attacker.
+     */
+    private fun validateCoAttackerRequirements(
+        state: GameState,
+        projected: ProjectedState,
+        attackerIds: Set<EntityId>
+    ): String? {
+        for (attackerId in attackerIds) {
+            val cardComponent = state.getEntity(attackerId)?.get<CardComponent>() ?: continue
+            val cardDef = cardRegistry.getCard(cardComponent.cardDefinitionId) ?: continue
+            val restrictions = cardDef.staticAbilities
+                .filterIsInstance<CantAttackUnlessCoAttacker>()
+                .filter { it.filter.scope is Scope.Self }
+            for (restriction in restrictions) {
+                val context = PredicateContext(controllerId = projected.getController(attackerId) ?: attackerId)
+                val satisfied = attackerIds.any { otherId ->
+                    otherId != attackerId &&
+                        predicateEvaluator.matches(state, projected, otherId, restriction.coAttackerFilter, context)
+                }
+                if (!satisfied) {
+                    return "${cardComponent.name} ${restriction.description}"
+                }
+            }
         }
         return null
     }

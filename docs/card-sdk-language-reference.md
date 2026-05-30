@@ -1097,6 +1097,11 @@ staticAbility {
   via `AttackBlockTaxPerCreatureType`.
 - `CantBeAttackedWithout(keyword)` — Form of the Dragon-style "Creatures without flying can't
   attack you." defender-side restriction.
+- `CantAttackUnlessCoAttacker(coAttackerFilter, filter = source)` — "This creature can't attack
+  unless [a creature matching coAttackerFilter] also attacks" (Scarred Puma). Unlike
+  `CantAttackUnless` (which is defender-relative), this depends on the whole proposed attacker
+  group, so it's validated against the other declared attackers at declaration time (projected
+  state; self never counts as its own co-attacker).
 
 **Spell cost statics — `ModifySpellCost`**
 
