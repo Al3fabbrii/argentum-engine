@@ -5,12 +5,19 @@ import com.wingedsheep.engine.state.components.battlefield.AttachedToComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.gameserver.ScenarioTestBase
+import com.wingedsheep.gameserver.session.GameSession
+import com.wingedsheep.gameserver.session.PlayerSession
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
 import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
+import io.mockk.mockk
+import org.springframework.web.socket.WebSocketSession
 
 /**
  * Scenario tests for the Invasion split cards (Pain // Suffering, Stand // Deliver, Wax // Wane)
@@ -49,6 +56,61 @@ class InvasionSplitCardsScenarioTest : ScenarioTestBase() {
                     game.state.getHand(game.player2Id).none {
                         game.state.getEntity(it)?.get<CardComponent>()?.name == "Forest"
                     } shouldBe true
+                }
+            }
+
+            // Regression: the legal-action enumerator must read each split face's own
+            // targetRequirements. Previously the SPLIT branch emitted a bare cast action with no
+            // validTargets, so the client reported "no valid targets available" when casting Pain.
+            test("legal actions surface both faces' targets (enumerator regression)") {
+                val game = scenario()
+                    .withPlayers()
+                    .withCardInHand(1, "Pain // Suffering")
+                    .withLandsOnBattlefield(1, "Swamp", 1)
+                    .withLandsOnBattlefield(1, "Mountain", 4)
+                    .withLandsOnBattlefield(2, "Forest", 1)
+                    .withCardInLibrary(1, "Swamp")
+                    .withCardInLibrary(2, "Forest")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val session = GameSession(cardRegistry = cardRegistry)
+                val mockWs1 = mockk<WebSocketSession>(relaxed = true) { every { id } returns "ws1" }
+                val mockWs2 = mockk<WebSocketSession>(relaxed = true) { every { id } returns "ws2" }
+                session.injectStateForTesting(
+                    game.state,
+                    mapOf(
+                        game.player1Id to PlayerSession(mockWs1, game.player1Id, "Player1"),
+                        game.player2Id to PlayerSession(mockWs2, game.player2Id, "Player2"),
+                    )
+                )
+
+                val legalActions = session.getLegalActions(game.player1Id)
+
+                val painAction = legalActions.find { it.description == "Cast Pain" }
+                withClue("Legal actions should include 'Cast Pain'") { painAction.shouldNotBeNull() }
+                withClue("Pain (target player) must require targets") {
+                    painAction!!.requiresTargets shouldBe true
+                }
+                withClue("Pain should offer both players as valid targets") {
+                    val vt = painAction!!.validTargets
+                    vt.shouldNotBeNull()
+                    vt shouldContain game.player1Id
+                    vt shouldContain game.player2Id
+                }
+
+                val sufferingAction = legalActions.find { it.description == "Cast Suffering" }
+                withClue("Legal actions should include 'Cast Suffering'") { sufferingAction.shouldNotBeNull() }
+                withClue("Suffering (target land) must require targets") {
+                    sufferingAction!!.requiresTargets shouldBe true
+                }
+                val targetLand = game.state.getBattlefield(game.player2Id).first {
+                    game.state.getEntity(it)?.get<CardComponent>()?.name == "Forest"
+                }
+                withClue("Suffering should offer the opponent's land as a valid target") {
+                    sufferingAction!!.validTargets.shouldNotBeNull()
+                    sufferingAction.validTargets!! shouldContain targetLand
                 }
             }
 
