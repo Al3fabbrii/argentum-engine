@@ -187,6 +187,31 @@ data class CantAttackUnless(
 }
 
 /**
+ * This creature can't attack unless another creature being declared as an attacker in the
+ * same declaration matches [coAttackerFilter]. Used for cards like Scarred Puma
+ * ("This creature can't attack unless a black or green creature also attacks").
+ *
+ * Unlike [CantAttackUnless], this restriction depends on the set of co-attackers rather than
+ * on the defending player, so it is checked against the full proposed attacker group at
+ * declaration time. The creature itself is never counted as its own co-attacker.
+ *
+ * @property coAttackerFilter The filter a *different* attacking creature must match.
+ * @property filter What this ability applies to.
+ */
+@SerialName("CantAttackUnlessCoAttacker")
+@Serializable
+data class CantAttackUnlessCoAttacker(
+    val coAttackerFilter: com.wingedsheep.sdk.scripting.GameObjectFilter,
+    val filter: GroupFilter = GroupFilter.source()
+) : StaticAbility {
+    override val description: String = "can't attack unless ${coAttackerFilter.description} also attacks"
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
+        val newFilter = filter.applyTextReplacement(replacer)
+        return if (newFilter !== filter) copy(filter = newFilter) else this
+    }
+}
+
+/**
  * This creature can't block unless a condition is met.
  * Checked at block declaration time when the attacking player is known.
  *
