@@ -1,9 +1,12 @@
 package com.wingedsheep.engine.scenarios
 
+import com.wingedsheep.engine.legalactions.LegalActionEnumerator
+import com.wingedsheep.engine.mechanics.mana.ManaSolver
 import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.mtg.sets.definitions.inv.cards.IrrigationDitch
 import com.wingedsheep.mtg.sets.definitions.inv.cards.NomadicElf
+import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
@@ -15,10 +18,10 @@ import io.kotest.matchers.shouldBe
  *   {T}: Add {W}
  *   {T}, Sacrifice this land: Add {G}{U}
  *
- * The auto-pay solver must never silently sacrifice the land to produce the {G}/{U}.
- * Because the source also has the sacrifice-free {W} ability, the whole-source
- * `requiresSacrifice` flag is false, so the fix tags {G}/{U} individually as
- * sacrifice-only and strips them from the auto-pay source list.
+ * Sacrificing for {G}{U} is a legal way to pay — so a spell that needs green (Nomadic Elf,
+ * {1}{G}) must be *shown as playable*. But, exactly like sacrificing a Treasure for mana, the
+ * sacrifice has to be a deliberate player action: the auto-pay solver must never silently
+ * sacrifice the land. The {W} path is sacrifice-free and stays available to auto-pay.
  */
 class IrrigationDitchAutoTapTest : FunSpec({
 
@@ -36,6 +39,27 @@ class IrrigationDitchAutoTapTest : FunSpec({
         return driver
     }
 
+    test("Nomadic Elf ({1}{G}) is shown as playable via Irrigation Ditch's sacrifice ability") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        val activePlayer = driver.activePlayer!!
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        driver.putPermanentOnBattlefield(activePlayer, "Irrigation Ditch")
+        driver.putPermanentOnBattlefield(activePlayer, "Island")
+        driver.putCardInHand(activePlayer, "Nomadic Elf")
+
+        // Affordable: the only green comes from "{T}, Sacrifice: Add {G}{U}", but the spell is
+        // still a legal play (the player can opt into the sacrifice), so canPay reports true...
+        val solver = ManaSolver(driver.cardRegistry)
+        solver.canPay(driver.state, activePlayer, ManaCost.parse("{1}{G}")) shouldBe true
+
+        // ...and it surfaces as a legal cast action for the player to choose.
+        val actions = LegalActionEnumerator.create(driver.cardRegistry).enumerate(driver.state, activePlayer)
+        val offered = actions.any { it.toString().contains("Nomadic Elf", ignoreCase = true) }
+        offered shouldBe true
+    }
+
     test("auto-pay refuses to sacrifice Irrigation Ditch to cast Nomadic Elf ({1}{G})") {
         val driver = createDriver()
         driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
@@ -47,7 +71,8 @@ class IrrigationDitchAutoTapTest : FunSpec({
         val elf = driver.putCardInHand(activePlayer, "Nomadic Elf")
 
         // The only source of {G} is Irrigation Ditch's "{T}, Sacrifice: Add {G}{U}" ability.
-        // Auto-pay must not pick it — there is no sacrifice-free way to make green.
+        // Auto-pay must not pick it — there is no sacrifice-free way to make green, and the
+        // sacrifice must be a deliberate choice.
         val result = driver.castSpell(activePlayer, elf)
 
         result.isSuccess shouldBe false
