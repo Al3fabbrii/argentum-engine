@@ -29,6 +29,24 @@ data class ShuffleLibraryEffect(
     override fun applyTextReplacement(replacer: TextReplacer): Effect = this
 }
 
+/**
+ * Emit a `ScriedEvent` after a scry pipeline finishes resolving. Appended internally
+ * by [com.wingedsheep.sdk.dsl.LibraryPatterns.scry] so that "Whenever you scry"
+ * triggers ([com.wingedsheep.sdk.dsl.Triggers.WheneverYouScry]) fire exactly once
+ * per scry, carrying the actual number of cards looked at.
+ *
+ * Card authors should not use this directly; it is wired into the scry primitive.
+ */
+@SerialName("EmitScriedEvent")
+@Serializable
+data class EmitScriedEventEffect(
+    val count: DynamicAmount
+) : Effect {
+    override val description: String = ""
+
+    override fun applyTextReplacement(replacer: TextReplacer): Effect = this
+}
+
 
 /**
  * Destination for searched cards.

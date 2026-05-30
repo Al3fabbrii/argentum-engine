@@ -11,6 +11,7 @@ import com.wingedsheep.sdk.scripting.effects.Chooser
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
 import com.wingedsheep.sdk.scripting.effects.Effect
+import com.wingedsheep.sdk.scripting.effects.EmitScriedEventEffect
 import com.wingedsheep.sdk.scripting.effects.ForEachTargetEffect
 import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
 import com.wingedsheep.sdk.scripting.effects.GatherUntilMatchEffect
@@ -154,7 +155,9 @@ object LibraryPatterns {
                 from = "toTop",
                 destination = CardDestination.ToZone(Zone.LIBRARY, placement = ZonePlacement.Top),
                 order = CardOrder.ControllerChooses
-            )
+            ),
+            // Fire "Whenever you scry" triggers (CR 701.18) after the pipeline finishes.
+            EmitScriedEventEffect(count = DynamicAmount.Fixed(count))
         )
     )
 
