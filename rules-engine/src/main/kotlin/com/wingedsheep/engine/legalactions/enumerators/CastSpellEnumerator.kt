@@ -17,6 +17,7 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.model.CardDefinition
+import com.wingedsheep.sdk.model.CardFace
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.AdditionalCost
 import com.wingedsheep.sdk.scripting.KeywordAbility
@@ -83,31 +84,8 @@ class CastSpellEnumerator : ActionEnumerator {
             }
 
             if (cardDef.layout == com.wingedsheep.sdk.model.CardLayout.SPLIT && cardDef.cardFaces.isNotEmpty()) {
-                val isSorceryFace = cardDef.cardFaces.all { face ->
-                    !face.typeLine.isInstant
-                }
-                if (isSorceryFace && !context.canPlaySorcerySpeed) continue
-                val cachedSources = context.availableManaSources
                 cardDef.cardFaces.forEachIndexed { faceIndex, face ->
-                    val effectiveCost = context.costCalculator
-                        .calculateEffectiveCostWithAlternativeBase(state, cardDef, face.manaCost, playerId)
-                    val canAffordFace = context.manaSolver
-                        .canPay(state, playerId, effectiveCost, precomputedSources = cachedSources)
-                    if (!canAffordFace) return@forEachIndexed
-                    val autoTapPreviewFace = if (context.skipAutoTapPreview) null else {
-                        context.manaSolver
-                            .solve(state, playerId, effectiveCost, precomputedSources = cachedSources)
-                            ?.sources?.map { it.entityId }
-                    }
-                    result.add(
-                        LegalAction(
-                            actionType = "CastSpell",
-                            description = "Cast ${face.name}",
-                            action = CastSpell(playerId, cardId, faceIndex = faceIndex),
-                            manaCostString = effectiveCost.toString(),
-                            autoTapPreview = autoTapPreviewFace,
-                        )
-                    )
+                    enumerateSplitFace(context, cardId, cardDef, faceIndex, face, result)
                 }
                 continue
             }
@@ -1650,6 +1628,103 @@ class CastSpellEnumerator : ActionEnumerator {
             autoTapPreview = modeAutoTapPreview,
             targetInfos = modeTargetInfos,
             allTargetRequirementsSatisfied = allTargetRequirementsSatisfied
+        )
+    }
+
+    // =========================================================================
+    // Split face (CR 709)
+    // =========================================================================
+
+    /**
+     * Emit a [LegalAction] for casting one face of a split-layout card from hand (CR 709.4 —
+     * only the chosen half goes on the stack and is evaluated for legality).
+     *
+     * Each face has its own mana cost, type line (so timing is per-face), and — crucially —
+     * its own `targetRequirements`. Reading the face's targets here is what makes targeted
+     * split halves (Pain // Suffering, Stand // Deliver, Wax // Wane) actually offer their
+     * targets to the client; without it the cast surfaces with no valid targets even though
+     * the validation layer ([CastSpellHandler]) reads from the face script and expects them.
+     *
+     * Modal effects, alternative costs, blight, behold, kicker, and convoke on a split half
+     * are not yet wired up — cards that need them can extend this method later.
+     */
+    private fun enumerateSplitFace(
+        context: EnumerationContext,
+        cardId: EntityId,
+        cardDef: CardDefinition,
+        faceIndex: Int,
+        face: CardFace,
+        result: MutableList<LegalAction>,
+    ) {
+        val state = context.state
+        val playerId = context.playerId
+
+        // Per-face timing: the chosen half's own type line governs sorcery-speed restriction.
+        if (!face.typeLine.isInstant && !context.canPlaySorcerySpeed) return
+
+        val cachedSources = context.availableManaSources
+        val effectiveCost = context.costCalculator
+            .calculateEffectiveCostWithAlternativeBase(state, cardDef, face.manaCost, playerId)
+        if (!context.manaSolver.canPay(state, playerId, effectiveCost, precomputedSources = cachedSources)) return
+
+        val autoTapPreview = if (context.skipAutoTapPreview) null else {
+            context.manaSolver
+                .solve(state, playerId, effectiveCost, precomputedSources = cachedSources)
+                ?.sources?.map { it.entityId }
+        }
+        val manaCostString = effectiveCost.toString()
+
+        val targetReqs = face.script.targetRequirements
+        if (targetReqs.isEmpty()) {
+            result.add(
+                LegalAction(
+                    actionType = "CastSpell",
+                    description = "Cast ${face.name}",
+                    action = CastSpell(playerId, cardId, faceIndex = faceIndex),
+                    manaCostString = manaCostString,
+                    autoTapPreview = autoTapPreview,
+                )
+            )
+            return
+        }
+
+        val targetInfos = context.targetUtils.buildTargetInfos(state, playerId, targetReqs)
+        if (!context.targetUtils.allRequirementsSatisfied(targetInfos)) return
+        val firstReq = targetReqs.first()
+        val firstInfo = targetInfos.first()
+
+        // Auto-select a sole legal player target (e.g. "target player" in a 2-player game where
+        // only one player is legal), matching the normal cast path's UX.
+        val canAutoSelect = targetReqs.size == 1 &&
+            context.targetUtils.shouldAutoSelectPlayerTarget(firstReq, firstInfo.validTargets)
+        if (canAutoSelect) {
+            val autoTarget = ChosenTarget.Player(firstInfo.validTargets.first())
+            result.add(
+                LegalAction(
+                    actionType = "CastSpell",
+                    description = "Cast ${face.name}",
+                    action = CastSpell(playerId, cardId, faceIndex = faceIndex, targets = listOf(autoTarget)),
+                    manaCostString = manaCostString,
+                    autoTapPreview = autoTapPreview,
+                )
+            )
+            return
+        }
+
+        result.add(
+            LegalAction(
+                actionType = "CastSpell",
+                description = "Cast ${face.name}",
+                action = CastSpell(playerId, cardId, faceIndex = faceIndex),
+                validTargets = firstInfo.validTargets,
+                requiresTargets = true,
+                targetCount = firstReq.count,
+                minTargets = firstReq.effectiveMinCount,
+                targetDescription = firstReq.description,
+                targetRequirements = if (targetInfos.size > 1) targetInfos else null,
+                manaCostString = manaCostString,
+                autoTapPreview = autoTapPreview,
+            )
         )
     }
 
