@@ -37,6 +37,7 @@ import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.scripting.LookAtFaceDownCreatures
 import com.wingedsheep.sdk.scripting.LookAtTopOfLibrary
+import com.wingedsheep.sdk.scripting.OpponentsPlayWithHandsRevealed
 import com.wingedsheep.sdk.scripting.PlayFromTopOfLibrary
 import com.wingedsheep.sdk.scripting.RevealTopOfLibrary
 import com.wingedsheep.sdk.scripting.conditions.AllConditions
@@ -345,8 +346,12 @@ class ClientStateTransformer(
             Zone.LIBRARY -> false
             // During a Mindslaver-style hijack the controller (actor) sees what the
             // affected player sees of their own hand. Spectators never gain visibility.
+            // A non-spectator viewer also sees an opponent's hand while they control a
+            // permanent that makes their opponents play with hands revealed (Seer's Vision).
             Zone.HAND -> debugMode || zoneKey.ownerId == viewingPlayerId ||
-                (!isSpectator && state.actorFor(zoneKey.ownerId) == viewingPlayerId)
+                (!isSpectator && state.actorFor(zoneKey.ownerId) == viewingPlayerId) ||
+                (!isSpectator && zoneKey.ownerId != viewingPlayerId &&
+                    revealsOpponentHandsTo(state, viewingPlayerId))
             Zone.BATTLEFIELD,
             Zone.GRAVEYARD,
             Zone.STACK,
@@ -366,6 +371,21 @@ class ClientStateTransformer(
             val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
             val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
             if (cardDef.script.staticAbilities.any { it is PlayFromTopOfLibrary || it is RevealTopOfLibrary }) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * Check if [playerId] controls a permanent with [OpponentsPlayWithHandsRevealed]
+     * (e.g., Seer's Vision). While they do, their opponents' hands are visible to them.
+     */
+    private fun revealsOpponentHandsTo(state: GameState, playerId: EntityId): Boolean {
+        for (entityId in state.getBattlefield(playerId)) {
+            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
+            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
+            if (cardDef.script.staticAbilities.any { it is OpponentsPlayWithHandsRevealed }) {
                 return true
             }
         }
