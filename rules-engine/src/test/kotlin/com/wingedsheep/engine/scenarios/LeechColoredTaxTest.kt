@@ -47,7 +47,7 @@ class LeechColoredTaxTest : FunSpec({
     )
 
     fun redPips(cost: ManaCost): Int =
-        cost.symbols.count { it is ManaSymbol.Colored && (it as ManaSymbol.Colored).color == Color.RED }
+        cost.symbols.count { it is ManaSymbol.Colored && it.color == Color.RED }
 
     data class Fixture(val driver: GameTestDriver, val calculator: CostCalculator, val registry: CardRegistry)
 
