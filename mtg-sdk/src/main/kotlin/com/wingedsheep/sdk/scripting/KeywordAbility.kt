@@ -718,6 +718,7 @@ sealed interface KeywordAbility {
         fun renown(n: Int): KeywordAbility = Numeric(Keyword.RENOWN, n)
         fun fabricate(n: Int): KeywordAbility = Numeric(Keyword.FABRICATE, n)
         fun tribute(n: Int): KeywordAbility = Numeric(Keyword.TRIBUTE, n)
+        fun mobilize(n: Int): KeywordAbility = Numeric(Keyword.MOBILIZE, n)
 
         /**
          * Hideaway N — display tag for the parameterized hideaway keyword. The

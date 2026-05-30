@@ -153,6 +153,19 @@ enum class Keyword(val displayName: String) {
     FABRICATE("Fabricate"),
     TRIBUTE("Tribute"),
 
+    /**
+     * Mobilize N (Tarkir: Dragonstorm, Mardu). "Whenever this creature attacks,
+     * create N tapped and attacking 1/1 red Warrior creature tokens. Sacrifice
+     * those tokens at the beginning of the next end step."
+     *
+     * The keyword ability is display-only; the behavior lives in an attack-triggered
+     * ability wired by the `mobilize(n)` DSL helper on
+     * [com.wingedsheep.sdk.dsl.CardBuilder] — a [com.wingedsheep.sdk.scripting.effects.CreateTokenEffect]
+     * that creates the tapped-and-attacking tokens and schedules their sacrifice at
+     * the next end step via `sacrificeAtStep`.
+     */
+    MOBILIZE("Mobilize"),
+
     // ── Ability words (display prefix, no uniform mechanic) ──
     /**
      * Eerie (Duskmourn: House of Horror).
