@@ -606,6 +606,18 @@ sealed interface CardPredicate : TextReplaceable<CardPredicate> {
     }
 
     /**
+     * Matches only activated abilities on the stack (not triggered abilities or spells).
+     * Mana abilities never use the stack, so they can't be matched. Used by cards like
+     * Bind / Stifle's activated-only mode: "Counter target activated ability."
+     */
+    @SerialName("IsActivatedAbility")
+    @Serializable
+    data object IsActivatedAbility : CardPredicate {
+        override val description: String = "activated ability"
+        override fun applyTextReplacement(replacer: TextReplacer): CardPredicate = this
+    }
+
+    /**
      * Matches a spell or ability on the stack at least one of whose chosen targets
      * matches [subfilter]. Player targets are skipped (they aren't card-like and have
      * no game-object filter to match against). Used by cards like Teferi's Response
