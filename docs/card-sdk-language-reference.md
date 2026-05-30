@@ -1252,6 +1252,10 @@ concerns — the `ClientStateTransformer` reveals the top card for `PlayFromTopO
   play, no full public reveal. (Precognition Field = instants/sorceries)
 - `LookAtTopOfLibrary` — *private*: the controller may look at their own top card any time (revealed
   only to them, not opponents). (Lens of Clarity, Vizier of the Menagerie)
+- `OpponentsPlayWithHandsRevealed` — visibility-only, the opponent-facing sibling of
+  `RevealTopOfLibrary`: each opponent of the controller plays with their hand publicly visible to
+  that controller (no other game effect). Handled entirely by the client state transformer's
+  hand-masking seam. (**Seer's Vision**)
 
 > Multiple lord effects on one card → multiple `staticAbility { }` blocks.
 

@@ -306,6 +306,25 @@ data object LookAtFaceDownCreatures : StaticAbility {
 }
 
 /**
+ * Your opponents play with their hands revealed.
+ * Used for Seer's Vision and similar "opponents reveal hands" enchantments.
+ *
+ * This is a visibility-only static ability, the opponent-facing sibling of
+ * [RevealTopOfLibrary]. Each opponent of this ability's controller plays with their
+ * hand publicly visible to that controller. It grants no other game effect.
+ *
+ * The engine treats it purely as a masking concern: the [com.wingedsheep] ClientStateTransformer
+ * reveals an opponent's hand to a viewing player who controls a permanent with this
+ * ability. No projector/state change is involved.
+ */
+@SerialName("OpponentsPlayWithHandsRevealed")
+@Serializable
+data object OpponentsPlayWithHandsRevealed : StaticAbility {
+    override val description: String = "Your opponents play with their hands revealed."
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility = this
+}
+
+/**
  * You may cast this card from specified zones (e.g., graveyard, exile).
  * This is an intrinsic property of the card, checked when the card is in a matching zone.
  * Used for Squee, the Immortal (graveyard + exile).
