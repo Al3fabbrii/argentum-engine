@@ -72,6 +72,29 @@ data class GrantHexproofFromOwnColorsToGroup(
 }
 
 /**
+ * Grants each affected creature "hexproof from monocolored" — they can't be the targets of
+ * monocolored (exactly one color, CR 105.2) spells or abilities opponents control. Colorless
+ * and multicolored sources are unaffected.
+ *
+ * Used by Dragonfire Blade ("Equipped creature ... has hexproof from monocolored."). The
+ * default filter applies it to the attached creature; pass a wider [GroupFilter] for cards that
+ * blanket a group.
+ *
+ * @property filter The group of creatures that gain the hexproof
+ */
+@SerialName("GrantHexproofFromMonocoloredToGroup")
+@Serializable
+data class GrantHexproofFromMonocoloredToGroup(
+    val filter: GroupFilter = GroupFilter.attachedCreature()
+) : StaticAbility {
+    override val description: String = "${filter.description} have hexproof from monocolored"
+    override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
+        val newFilter = filter.applyTextReplacement(replacer)
+        return if (newFilter !== filter) copy(filter = newFilter) else this
+    }
+}
+
+/**
  * Grants each affected creature protection from the colors of permanents the source's
  * controller currently controls. The protection set is board-derived and re-evaluated at
  * projection (after Layer 5), so it tracks the controller's permanents in real time; a

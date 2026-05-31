@@ -700,8 +700,14 @@ class CardBuilder(private val name: String) {
      * Add an equip ability with the specified cost.
      * This sets the equipCost metadata and generates the activated ability
      * (Equip: attach to target creature you control, sorcery speed).
+     *
+     * [genericCostReduction] optionally reduces the generic portion of the equip cost by a
+     * dynamic amount evaluated when the ability is activated. Reductions that read the chosen
+     * equip target (e.g. `DynamicAmounts.targetColorCount()` for "costs {1} less to activate
+     * for each color of the creature it targets" — Dragonfire Blade) resolve against the
+     * selected target creature; the engine locks the reduction in before the cost is paid.
      */
-    fun equipAbility(cost: String) {
+    fun equipAbility(cost: String, genericCostReduction: DynamicAmount? = null) {
         equipCost = ManaCost.parse(cost)
         activatedAbilities.add(
             ActivatedAbility(
@@ -713,6 +719,7 @@ class CardBuilder(private val name: String) {
                 ),
                 isManaAbility = false,
                 timing = TimingRule.SorcerySpeed,
+                genericCostReduction = genericCostReduction,
             )
         )
     }
