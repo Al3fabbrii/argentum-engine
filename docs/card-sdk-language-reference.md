@@ -415,8 +415,8 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `DestroySourceOfTargetedAbilityEffect` — when the targeted stack object is a permanent's activated/triggered ability, destroy that source permanent. Compose *before* the counter step so the ability component is still readable (Teferi's Response).
 - `CopyTargetSpellEffect(target)` — copy a spell on the stack.
 - `CopyTargetTriggeredAbilityEffect(target)` — copy a triggered ability on the stack.
-- `CopyNextSpellCastEffect` — copy the next spell its controller casts.
-- `CopyEachSpellCastEffect` — copy every spell cast this turn.
+- `CopyNextSpellCastEffect(copies = 1, spellFilter = InstantOrSorcery)` (facade `Effects.CopyNextSpellCast(copies, spellFilter)`) — when its controller next casts a spell matching `spellFilter` this turn, create `copies` copies of it. `spellFilter` is a `GameObjectFilter` matched against the spell as it's cast, so the default "instant or sorcery" (Howl of the Horde) can be widened — e.g. `GameObjectFilter.Creature` for "copy the next creature spell." Consumed after one matching cast. Non-matching casts leave the entry waiting.
+- `CopyEachSpellCastEffect(copies = 1, spellFilter = InstantOrSorcery)` (facade `Effects.CopyEachSpellCast(copies, spellFilter)`) — the persistent sibling: copies **every** spell matching `spellFilter` the controller casts for the rest of the turn (The Mirari Conjecture Ch. III). Same `spellFilter` parameterization as above.
 - `CopyCardIntoCollectionEffect(source, storeAs)` (facade `Effects.CopyCardIntoCollection(source, storeAs)`) — copy a **card in a zone** (not a spell on the stack), publishing the copy's entity id to pipeline collection `storeAs`. Per Rule 707.12 the copy is created in the card's current zone under the effect's controller and tagged as a stack-style copy, so once cast it becomes a token if it's a permanent spell and ceases to exist if it's an instant/sorcery (Rule 707.10). Pair with `CastFromCollectionWithoutPayingCostEffect(from)` (facade `Effects.CastFromCollectionWithoutPayingCost(from)`, wrap in `MayEffect` for "you may cast") to express "copy a card, then cast the copy" — e.g. **Shiko, Paragon of the Way**: `Composite(MoveToZoneEffect(target, Zone.EXILE), Effects.CopyCardIntoCollection(target, "copy"), MayEffect(Effects.CastFromCollectionWithoutPayingCost("copy")))`. A copy that is never cast is swept up by the Rule 707.10a state-based action (`PhantomCardCopiesCheck`), so no explicit cleanup step is needed.
 - `CastAnyNumberFromCollectionWithoutPayingCostEffect(from)` (facade `Effects.CastAnyNumberFromCollectionWithoutPayingCost(from)`) — the multi-cast sibling of `CastFromCollectionWithoutPayingCostEffect`. **During this effect's resolution**, the controller is offered the cards in pipeline collection `from` (filtered to those still in exile) one at a time and may cast each for free until they decline; each cast's targets / X / modes flow through the normal cast machinery. Because the casts go through the synthesized-cast path (like Cascade), card-type **timing restrictions are ignored** and no lingering "you may play it later" permission is granted — cards left uncast just stay where they are (the controller can't wait until later in the turn). Hand it the eligible set: filter the collection upstream (e.g. nonland + `FilterCollection(ManaValueAtMost(...))`). Models "you may cast any number of spells with mana value X or less from among them without paying their mana costs" — e.g. **Kotis, the Fangkeeper**: `GatherCards(TopOfLibrary(damage, TriggeringPlayer)) → MoveCollection(→ exile) → FilterCollection(Nonland) → FilterCollection(ManaValueAtMost(damage)) → CastAnyNumberFromCollectionWithoutPayingCostEffect("castable")`. Also used by **Villainous Wealth** (the same chain off an {X} sorcery) and **Etali, Primal Storm** (exile the top card of each library, no MV cap).
 - `ChangeTargetEffect(spell, newTarget)` — change a spell's target.
@@ -543,12 +543,15 @@ Composed pipelines (`GatherCards → SelectFromCollection → MoveCollection` sh
 - `mayPay(cost, effect)` — optionally pay cost to trigger an effect.
 - `mayPayOrElse(cost, ifPaid, ifNotPaid)` — pay-or-else fork.
 - `blight(amount, player?)` — Blight X additional cost glue.
+- `bolster(amount)` — Bolster N (CR 701.36): controller chooses a creature with the least toughness among
+  creatures they control and puts N +1/+1 counters on it. Non-targeting; no-op with no creatures. Composes
+  Gather → `FilterCollection(CollectionFilter.LeastToughness)` → `SelectFromCollection(ChooseExactly 1)` →
+  `AddCountersToCollection(+1/+1)`. Toughness is read from projected state for the least-toughness comparison.
 - `forage(afterEffect?)` — Forage cost; choose card-from-hand to play.
 - `loot(draw?, discard?)` — "draw N, discard M" loop.
 - `rummage(count?)` — discard then draw.
 - `connive(target?)` — draw 1, discard 1, then put a +1/+1 counter on `target` if the discard was a nonland (CR 702.166). Also exposed as `Effects.Connive(target)`.
 - `readTheRunes()` — "draw X cards; for each, discard a card unless you sacrifice a permanent." Composes `RepeatDynamicTimesEffect(XValue, ChooseActionEffect(...))` with feasibility guards. Exposed as `Effects.ReadTheRunes()`.
-- `drain(amount, target)` — deal N damage, gain N life.
 - `eachOpponentMayPutFromHand(filter?)` — each opponent may dump a matching card.
 - `putFromHand(filter?, count?, entersTapped?)` — you may put N from hand onto battlefield.
 - `incubate(n)` — make an Incubator token with N counters.
@@ -1191,6 +1194,11 @@ staticAbility {
   among the permanents the source's controller controls, recomputed at projection (Layer 6, after
   Layer 5 colors) so it tracks the board in real time. Colorless permanents add no color. (Pledge of
   Loyalty)
+- `GrantHexproofFromMonocoloredToGroup(filter = attachedCreature())` — "[filter] have hexproof from
+  monocolored" — adds the projected keyword `HEXPROOF_FROM_MONOCOLORED`, which blocks targeting by
+  monocolored (exactly one color, CR 105.2) spells and abilities opponents control. Colorless and
+  multicolored sources are unaffected; the controller can still target their own creatures. (Dragonfire
+  Blade)
 - `GrantCardType(cardType, filter)` / `RemoveCardType(cardType, filter)` — Layer 4 type-changing statics that add or
   remove a card type (e.g. `"CREATURE"`). `RemoveCardType` backs Impending's "isn't a creature while it has a time
   counter" (wrapped in a `ConditionalStaticAbility`); reuse it for any "it's no longer a [type]" effect.
@@ -1470,7 +1478,14 @@ composite abilities).
   `ActivateAbilityHandler` pays the mana and exiles the card from the graveyard. Declares `Keyword.RENEW` for display.
 - `Morph(cost)` — cast face-down for `{3}`, flip for cost.
 - `Unmorph(cost, effect)` — turn-face-up cost + bonus effect.
-- `Equip(cost)` — Equipment attach cost.
+- `Equip(cost)` — Equipment attach cost. The `equipAbility(cost, genericCostReduction = …)` DSL
+  form optionally reduces the generic portion of the equip cost by a `DynamicAmount` evaluated at
+  activation. Reductions that read the chosen equip target (e.g. `DynamicAmounts.targetColorCount()`
+  for "costs {1} less to activate for each color of the creature it targets" — Dragonfire Blade)
+  resolve against the picked target. Backed by `ActivatedAbility.genericCostReduction`: the
+  `ActivateAbilityHandler` locks the per-target reduction in before paying; the legal-action
+  enumerator gates affordability on the cheapest reachable cost (largest reduction over the
+  currently-legal targets) since the target isn't chosen until activation.
 - `Fortify(cost)` — Aura-like attach cost on lands.
 
 ```kotlin
@@ -1684,6 +1699,11 @@ Numbers computed at resolution time.
   mana spent to cast that spell was less than its mana value" gates (Unravel).
   Desugars to `EntityProperty(EntityReference.Target(index), EntityNumericProperty.ManaSpent)`.
   Returns 0 if the target isn't a spell on the stack.
+- `DynamicAmounts.targetColorCount(index)` / `DynamicAmounts.colorCountOf(entity)` — number of
+  distinct colors of the indexed cast-time target / any `EntityReference`. Desugars to
+  `EntityProperty(entity, EntityNumericProperty.ColorCount)`. Read from projected state for
+  battlefield permanents (honors layer-5 color-changing — a creature turned colorless counts 0).
+  Powers "for each color of [it]" amounts, e.g. Dragonfire Blade's equip cost reduction.
 - `CardNumericProperty(card, property)` — generic numeric property accessor.
 
 ### Triggering-entity shortcuts (`DynamicAmounts.*` facades)
@@ -2122,8 +2142,9 @@ Card authors rarely reference these directly; they are created/updated by the ma
   `RingBearerCantBeBlockedByGreaterPowerRule`; the ≥2/≥3/≥4 triggered abilities are appended to the bearer by
   `TriggerAbilityResolver` (see `TheRingAbilities`). For card triggers/checks use `Triggers.RingTemptsYou`
   ("Whenever the Ring tempts you") and `Conditions.SourceIsRingBearer` ("if this is your Ring-bearer").
-- **Amass [subtype] N (CR 701.47)** — `Effects.Amass(count, subtype = "Orc")` (fixed) or
-  `Effects.Amass(amount, subtype)` (a `DynamicAmount`, for "amass Orcs X"). If the controller controls no Army
+- **Amass [subtype] N (CR 701.47)** — `Effects.Amass(count, subtype)` (fixed) or
+  `Effects.Amass(amount, subtype)` (a `DynamicAmount`, for "amass Orcs X"). `subtype` is required (no default) —
+  the amassed Army's type is printed on each card (Orcs for the LTR cards). If the controller controls no Army
   creature, a 0/0 black `[subtype]` Army token is created first (composing `CreateTokenEffect`); then they put N
   +1/+1 counters on an Army they control (a `SelectCardsDecision` resolved by `AmassContinuation` picks which one
   when they control several) and that Army becomes the subtype if it isn't already. The counter/subtype back half

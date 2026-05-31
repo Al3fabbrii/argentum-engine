@@ -284,6 +284,14 @@ object DynamicAmounts {
     fun targetManaSpent(index: Int = 0): DynamicAmount =
         DynamicAmount.EntityProperty(EntityReference.Target(index), EntityNumericProperty.ManaSpent)
 
+    /** Number of distinct colors of the indexed cast-time target ("for each color of the creature it targets"). */
+    fun targetColorCount(index: Int = 0): DynamicAmount =
+        DynamicAmount.EntityProperty(EntityReference.Target(index), EntityNumericProperty.ColorCount)
+
+    /** Number of distinct colors of any referenced entity. */
+    fun colorCountOf(entity: EntityReference): DynamicAmount =
+        DynamicAmount.EntityProperty(entity, EntityNumericProperty.ColorCount)
+
     fun sacrificedPower(index: Int = 0): DynamicAmount =
         DynamicAmount.EntityProperty(EntityReference.Sacrificed(index), EntityNumericProperty.Power)
 

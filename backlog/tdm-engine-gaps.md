@@ -4,8 +4,8 @@ Cross-reference of the **252 remaining (unimplemented) TDM cards** against the e
 capabilities (SDK reference + source verification, May 2026). Generated to scope what must be
 built before the set can be completed.
 
-**Status:** 49 / 271 implemented (18%). All five wedge clan keywords (Tier 1), every Tier-2
-primitive, and all but one Tier-3 one-off are now built — only item 18 remains.
+**Status:** 50 / 271 implemented (18%). All five wedge clan keywords (Tier 1), every Tier-2
+primitive, and every Tier-3 one-off are now built — all engine gaps are closed.
 Card list comes from `scripts/card-status --list --set TDM`. Oracle text pulled from Scryfall
 (`set:tdm`, 277 printings → 271 unique cards).
 
@@ -43,7 +43,7 @@ What follows are the **genuine gaps** — elements no current SDK primitive expr
 
 > **Update (May 2026):** Tier 1 (all five clan keywords + Decayed) and Tier 2 (keyword counters,
 > leaves-graveyard trigger, one-shot counter doubling, group P/T doubling) are **complete**, as are
-> Tier-3 items 11–17, 19, and 20. Only **item 18** remains.
+> all Tier-3 items 11–20. Every identified engine gap is now closed.
 
 ---
 
@@ -201,9 +201,20 @@ the overwhelming majority of the set.
     nonland → keep MV ≤ X → cast any number for free.
     → **Kotis, the Fangkeeper**
 
-18. **Per-activation cost reduction by a target's color count.** Equip cost "costs {1} less to
-    activate for each color of the creature it targets." Cost statics target spells; none reduces an
-    activated (equip) cost by the chosen target's color count.
+18. **Per-activation cost reduction by a target's color count.** ✅ **DONE.** Equip cost "costs {1}
+    less to activate for each color of the creature it targets." No new cost-reduction machinery was
+    needed: `ActivatedAbility.genericCostReduction` already reduces an activated ability's generic
+    cost by a `DynamicAmount` evaluated at activation. The gap was that it was evaluated without the
+    chosen target. Added the `EntityNumericProperty.ColorCount` numeric property (read off projected
+    colors, mirroring `SubtypeCount`) so `DynamicAmounts.targetColorCount()` reads the equip target's
+    color count, and threaded `action.targets` into `ActivateAbilityHandler.applyGenericCostReduction`
+    so the reduction resolves against the picked target. The legal-action enumerator gates
+    affordability on the cheapest reachable cost (largest reduction over the currently-legal targets)
+    since no target is chosen at enumeration time, and the handler re-derives the exact per-target cost
+    at activation. The `equipAbility(cost, genericCostReduction = …)` DSL form wires it on the card.
+    Also added "hexproof from monocolored" (`GrantHexproofFromMonocoloredToGroup` static +
+    `HEXPROOF_FROM_MONOCOLORED` projected keyword + a CR-105.2 monocolored-source targeting check) for
+    the equipped-creature half of the card.
     → **Dragonfire Blade**
 
 19. **Opponent-scoped continuous cast prohibition.** ✅ **DONE.** "Your opponents can't cast spells
@@ -234,7 +245,7 @@ the overwhelming majority of the set.
    modest. Unlocks ~30 cards quickly.
 2. ✅ **Renew** (enumerator extension) + **Harmonize** (new alt-cost) — bigger lifts, ~22 cards.
 3. ✅ **Keyword counters + Decayed + leaves-graveyard trigger** (Tier 2) — small, scattered unlocks.
-4. **Tier-3 one-offs** as the relevant legendaries / rares come up. *(remaining work — item 18)*
+4. ✅ **Tier-3 one-offs** as the relevant legendaries / rares come up. *(complete)*
 
 The clan keywords (Tier 1) cover the bulk of the remaining cards. Behold and Omen already being done
 means Temur spells and the 13 DFC dragons are essentially ready once the shared supporting effects

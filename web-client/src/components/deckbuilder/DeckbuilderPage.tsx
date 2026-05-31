@@ -9,7 +9,8 @@
  * Decoupled from gameStore — runs offline. Persistence is via useDeckLibrary
  * (localStorage). Server validation reuses POST /api/decks/validate.
  */
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   useDeckLibrary,
@@ -23,6 +24,7 @@ import { PrintingPicker, type PrintingDTO } from './PrintingPicker'
 import { ManaCost, ManaSymbol } from '@/components/ui/ManaSymbols'
 import { HoverCardPreview } from '@/components/ui/HoverCardPreview'
 import { useDfcHoverFlip } from '@/components/ui/useDfcHoverFlip'
+import { SetIcon } from '@/components/ui/SetIcon'
 import { getCardImageUrl } from '@/utils/cardImages'
 import {
   parseQuery,
@@ -2781,6 +2783,12 @@ function SetCombobox({
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // The combobox sits in a scrolling sidebar (`.left` has overflow), which would clip a wider
+  // dropdown. Render the panel in a portal anchored to the input so it can overflow the sidebar
+  // and sit above the card grid.
+  const [panelPos, setPanelPos] = useState<{ top: number; left: number; width: number } | null>(null)
 
   const selected = useMemo(() => sets.find((s) => s.code === value) ?? null, [sets, value])
 
@@ -2808,16 +2816,38 @@ function SetCombobox({
   }, [sorted, search])
 
   // Close on outside click. mousedown (not click) so a selection inside fires before close.
+  // The panel is portaled out of rootRef, so check it separately.
   useEffect(() => {
     if (!open) return
     function onDown(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) {
         setOpen(false)
         setSearch('')
       }
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
+  }, [open])
+
+  // Anchor the portaled panel to the input, and keep it pinned while the sidebar scrolls or the
+  // window resizes. Runs before paint to avoid a flash at the origin.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPanelPos(null)
+      return
+    }
+    const reposition = () => {
+      const rect = rootRef.current?.getBoundingClientRect()
+      if (rect) setPanelPos({ top: rect.bottom + 4, left: rect.left, width: rect.width })
+    }
+    reposition()
+    window.addEventListener('scroll', reposition, true) // capture: catch ancestor scrolls too
+    window.addEventListener('resize', reposition)
+    return () => {
+      window.removeEventListener('scroll', reposition, true)
+      window.removeEventListener('resize', reposition)
+    }
   }, [open])
 
   // When opening, point the active row at the current selection so Enter is a no-op
@@ -2872,7 +2902,11 @@ function SetCombobox({
   return (
     <div className={styles.setCombobox} ref={rootRef}>
       <div className={`${styles.setComboInput} ${open ? styles.setComboInputOpen : ''}`}>
-        <span className={styles.setComboIcon} aria-hidden="true">⌕</span>
+        {selected && !open ? (
+          <SetIcon code={selected.code} className={styles.setComboIcon} />
+        ) : (
+          <span className={styles.setComboIcon} aria-hidden="true">⌕</span>
+        )}
         <input
           ref={inputRef}
           type="text"
@@ -2907,8 +2941,13 @@ function SetCombobox({
           </button>
         )}
       </div>
-      {open && (
-        <div className={styles.setComboPanel}>
+      {open && panelPos &&
+        createPortal(
+        <div
+          ref={panelRef}
+          className={styles.setComboPanel}
+          style={{ top: panelPos.top, left: panelPos.left, minWidth: panelPos.width }}
+        >
           <div className={styles.setComboPanelHeader}>
             <span className={styles.setComboCount}>
               {filtered.length} {filtered.length === 1 ? 'set' : 'sets'}
@@ -2981,6 +3020,7 @@ function SetCombobox({
                     commit(s.code)
                   }}
                 >
+                  <SetIcon code={s.code} className={styles.setComboOptionIcon} />
                   <span className={styles.setComboOptionName}>{s.name}</span>
                   <span className={styles.setComboOptionMeta}>
                     <span className={styles.setComboOptionYear}>{year}</span>
@@ -2993,7 +3033,8 @@ function SetCombobox({
               <li className={styles.setComboEmpty}>No sets match "{search}"</li>
             )}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )

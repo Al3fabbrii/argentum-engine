@@ -675,6 +675,9 @@ class ClientStateTransformer(
             ?.distinct()
             ?: emptyList()
 
+        // Hexproof from monocolored (CR 105.2) — a quality, not a color, so it rides its own flag.
+        val hexproofFromMonocolored = projectedValues?.keywords?.contains("HEXPROOF_FROM_MONOCOLORED") ?: false
+
         // Add PROTECTION keyword when protections are present
         val keywords = if (protections.isNotEmpty()) rawKeywords + Keyword.PROTECTION else rawKeywords
 
@@ -1021,6 +1024,7 @@ class ClientStateTransformer(
             abilityFlags = abilityFlags,
             protections = protections,
             hexproofFromColors = hexproofFromColors,
+            hexproofFromMonocolored = hexproofFromMonocolored,
             counters = counters,
             isTapped = isTapped,
             hasSummoningSickness = hasSummoningSickness,
@@ -1809,12 +1813,12 @@ class ClientStateTransformer(
         if (pendingCopies.isNotEmpty()) {
             val totalCopies = pendingCopies.sumOf { it.copies }
             val sourceName = pendingCopies.joinToString(", ") { it.sourceName }
-            val copyWord = if (totalCopies == 1) "copy" else "copies"
+            val filterDesc = pendingCopies.map { it.spellFilter.description }.distinct().joinToString("/")
             effects.add(
                 ClientPlayerEffect(
                     effectId = "pending_spell_copy",
                     name = "Copy Spell",
-                    description = "Your next instant or sorcery spell will be copied $totalCopies time(s) ($sourceName)",
+                    description = "Your next $filterDesc spell will be copied $totalCopies time(s) ($sourceName)",
                     icon = "copy-spell"
                 )
             )
