@@ -94,10 +94,20 @@ import com.wingedsheep.engine.state.components.player.PlayerCitysBlessingCompone
 
 /**
  * Evaluates conditions from the SDK against the game state.
+ *
+ * [defaultProjection] is forwarded to this evaluator's [DynamicAmountEvaluator] for battlefield
+ * reads when a caller doesn't thread a projection. Resolution-time callers leave the default
+ * (the canonical lazy [GameState.projectedState]). A mid-projection caller — the
+ * [com.wingedsheep.engine.mechanics.layers.EffectApplicator] evaluating a source condition while
+ * the projection is still being computed — must swap in a non-reentrant projection, otherwise an
+ * aggregate `Compare` (e.g. "while you control N+ creatures") re-enters the lazy `projectedState`
+ * initializer and recurses until the stack overflows.
  */
-class ConditionEvaluator {
+class ConditionEvaluator(
+    defaultProjection: (GameState) -> ProjectedState = { it.projectedState }
+) {
 
-    private val dynamicAmountEvaluator = DynamicAmountEvaluator(this)
+    private val dynamicAmountEvaluator = DynamicAmountEvaluator(this, defaultProjection)
 
     /**
      * Evaluate a condition at resolution time, when a full [EffectContext] is available.
