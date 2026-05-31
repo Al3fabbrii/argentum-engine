@@ -180,6 +180,9 @@ internal class EffectApplicator(
                         values.keywords.add("HEXPROOF_FROM_$colorName")
                     }
                 }
+                is Modification.GrantHexproofFromMonocolored -> {
+                    values.keywords.add("HEXPROOF_FROM_MONOCOLORED")
+                }
                 is Modification.GrantProtectionFromControlledColors -> {
                     // Protection from the colors of permanents the source's controller controls
                     // (e.g., Pledge of Loyalty). Read the projected controller + projected colors

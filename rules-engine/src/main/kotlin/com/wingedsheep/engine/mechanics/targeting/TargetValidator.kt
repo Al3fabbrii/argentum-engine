@@ -263,6 +263,11 @@ class TargetValidator {
                     return "$cardName has hexproof from ${color.displayName.lowercase()}"
                 }
             }
+            // Hexproof from monocolored: a source with exactly one color can't target (CR 105.2).
+            if (sourceColors.size == 1 && projected.hasKeyword(entityId, "HEXPROOF_FROM_MONOCOLORED")) {
+                val cardName = state.getEntity(entityId)?.get<CardComponent>()?.name ?: "target"
+                return "$cardName has hexproof from monocolored"
+            }
         }
         return null
     }

@@ -1206,6 +1206,11 @@ staticAbility {
   among the permanents the source's controller controls, recomputed at projection (Layer 6, after
   Layer 5 colors) so it tracks the board in real time. Colorless permanents add no color. (Pledge of
   Loyalty)
+- `GrantHexproofFromMonocoloredToGroup(filter = attachedCreature())` — "[filter] have hexproof from
+  monocolored" — adds the projected keyword `HEXPROOF_FROM_MONOCOLORED`, which blocks targeting by
+  monocolored (exactly one color, CR 105.2) spells and abilities opponents control. Colorless and
+  multicolored sources are unaffected; the controller can still target their own creatures. (Dragonfire
+  Blade)
 - `GrantCardType(cardType, filter)` / `RemoveCardType(cardType, filter)` — Layer 4 type-changing statics that add or
   remove a card type (e.g. `"CREATURE"`). `RemoveCardType` backs Impending's "isn't a creature while it has a time
   counter" (wrapped in a `ConditionalStaticAbility`); reuse it for any "it's no longer a [type]" effect.
@@ -1485,7 +1490,14 @@ composite abilities).
   `ActivateAbilityHandler` pays the mana and exiles the card from the graveyard. Declares `Keyword.RENEW` for display.
 - `Morph(cost)` — cast face-down for `{3}`, flip for cost.
 - `Unmorph(cost, effect)` — turn-face-up cost + bonus effect.
-- `Equip(cost)` — Equipment attach cost.
+- `Equip(cost)` — Equipment attach cost. The `equipAbility(cost, genericCostReduction = …)` DSL
+  form optionally reduces the generic portion of the equip cost by a `DynamicAmount` evaluated at
+  activation. Reductions that read the chosen equip target (e.g. `DynamicAmounts.targetColorCount()`
+  for "costs {1} less to activate for each color of the creature it targets" — Dragonfire Blade)
+  resolve against the picked target. Backed by `ActivatedAbility.genericCostReduction`: the
+  `ActivateAbilityHandler` locks the per-target reduction in before paying; the legal-action
+  enumerator gates affordability on the cheapest reachable cost (largest reduction over the
+  currently-legal targets) since the target isn't chosen until activation.
 - `Fortify(cost)` — Aura-like attach cost on lands.
 
 ```kotlin
@@ -1699,6 +1711,11 @@ Numbers computed at resolution time.
   mana spent to cast that spell was less than its mana value" gates (Unravel).
   Desugars to `EntityProperty(EntityReference.Target(index), EntityNumericProperty.ManaSpent)`.
   Returns 0 if the target isn't a spell on the stack.
+- `DynamicAmounts.targetColorCount(index)` / `DynamicAmounts.colorCountOf(entity)` — number of
+  distinct colors of the indexed cast-time target / any `EntityReference`. Desugars to
+  `EntityProperty(entity, EntityNumericProperty.ColorCount)`. Read from projected state for
+  battlefield permanents (honors layer-5 color-changing — a creature turned colorless counts 0).
+  Powers "for each color of [it]" amounts, e.g. Dragonfire Blade's equip cost reduction.
 - `CardNumericProperty(card, property)` — generic numeric property accessor.
 
 ### Triggering-entity shortcuts (`DynamicAmounts.*` facades)

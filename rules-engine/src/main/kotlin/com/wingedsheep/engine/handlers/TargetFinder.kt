@@ -526,9 +526,11 @@ class TargetFinder(
             sourceColors = state.getEntity(sourceId)?.get<CardComponent>()
                 ?.colors?.map { it.name }?.toSet() ?: emptySet()
         }
-        return sourceColors.any { colorName ->
-            projected.hasKeyword(entityId, "HEXPROOF_FROM_$colorName")
+        if (sourceColors.any { colorName -> projected.hasKeyword(entityId, "HEXPROOF_FROM_$colorName") }) {
+            return true
         }
+        // Hexproof from monocolored: a source with exactly one color can't target (CR 105.2).
+        return sourceColors.size == 1 && projected.hasKeyword(entityId, "HEXPROOF_FROM_MONOCOLORED")
     }
 
     /**

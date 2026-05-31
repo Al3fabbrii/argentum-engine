@@ -740,6 +740,11 @@ class DynamicAmountEvaluator(
             // (including Changeling) are honored. Falls back to base subtypes off the battlefield.
             is EntityNumericProperty.SubtypeCount ->
                 resolveSubtypeCount(state, entityId, useProjected, explicitProjected)
+
+            // Read from projected state when available so layer-5 color-changing effects are
+            // honored. Falls back to the printed colors off the battlefield.
+            is EntityNumericProperty.ColorCount ->
+                resolveColorCount(state, entityId, useProjected, explicitProjected)
         }
     }
 
@@ -754,6 +759,21 @@ class DynamicAmountEvaluator(
             if (projectedSubtypes.isNotEmpty()) return projectedSubtypes.size
         }
         return state.getEntity(entityId)?.get<CardComponent>()?.typeLine?.subtypes?.size ?: 0
+    }
+
+    private fun resolveColorCount(
+        state: GameState,
+        entityId: EntityId,
+        useProjected: Boolean,
+        explicitProjected: ProjectedState?
+    ): Int {
+        // For battlefield permanents the projected color set is authoritative even when empty —
+        // a creature turned colorless by a layer-5 effect must count 0, not fall back to its
+        // printed colors. Off the battlefield (or when projection isn't requested) use base colors.
+        if (useProjected && entityId in state.getBattlefield()) {
+            return resolveProjection(state, explicitProjected).getColors(entityId).size
+        }
+        return state.getEntity(entityId)?.get<CardComponent>()?.colors?.size ?: 0
     }
 
     /**

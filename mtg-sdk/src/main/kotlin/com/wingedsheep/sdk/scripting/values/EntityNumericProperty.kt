@@ -82,4 +82,19 @@ sealed interface EntityNumericProperty {
     data object SubtypeCount : EntityNumericProperty {
         override val description: String = "the number of its subtypes"
     }
+
+    /**
+     * The number of distinct colors this entity has, read from projected state when
+     * available (so layer-5 color-changing effects are honored). A colorless entity
+     * counts 0; a monocolored entity 1; a five-color entity 5 (CR 105.2 — there are
+     * five colors).
+     *
+     * Powers "for each color of [entity]" amounts — e.g. Dragonfire Blade's equip cost
+     * reduction reads `EntityProperty(EntityReference.Target(0), ColorCount)`.
+     */
+    @SerialName("ColorCount")
+    @Serializable
+    data object ColorCount : EntityNumericProperty {
+        override val description: String = "the number of its colors"
+    }
 }

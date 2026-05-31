@@ -71,6 +71,7 @@ import com.wingedsheep.engine.handlers.PredicateEvaluator
 import com.wingedsheep.engine.handlers.PredicateContext
 import com.wingedsheep.engine.handlers.CostPaymentChoices
 import com.wingedsheep.engine.state.components.identity.OwnerComponent
+import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.sdk.core.Zone
 import kotlin.reflect.KClass
 
@@ -181,7 +182,7 @@ class ActivateAbilityHandler(
         // Apply ability-specific generic cost reduction (e.g., The Dominion Bracelet's
         // "{X} less, where X is this creature's power"). Per Scryfall ruling, the reduced
         // cost is locked in here, before costs are paid.
-        val effectiveCost = applyGenericCostReduction(rawCost, ability, state, action.sourceId, action.playerId)
+        val effectiveCost = applyGenericCostReduction(rawCost, ability, state, action.sourceId, action.playerId, action.targets)
         val effectiveTargetReqs = if (textReplacement != null) {
             ability.targetRequirements.map { it.applyTextReplacement(textReplacement) }
         } else {
@@ -361,7 +362,7 @@ class ActivateAbilityHandler(
         }
         // Apply ability-specific generic cost reduction (e.g., The Dominion Bracelet's
         // "{X} less, where X is this creature's power"). Locked in before payment.
-        val effectiveCost = applyGenericCostReduction(rawCost, ability, state, action.sourceId, action.playerId)
+        val effectiveCost = applyGenericCostReduction(rawCost, ability, state, action.sourceId, action.playerId, action.targets)
 
         val executeAbilityContext = buildAbilityPaymentContext(cardComponent, state.projectedState, action.sourceId)
 
@@ -998,21 +999,26 @@ class ActivateAbilityHandler(
     /**
      * Apply [ActivatedAbility.genericCostReduction] to the mana portion of [cost].
      * The reduction is evaluated against the activating entity (e.g., the equipped creature
-     * for The Dominion Bracelet, whose granted ability reduces by the creature's power).
-     * Per Scryfall ruling, this is locked in before costs are paid.
+     * for The Dominion Bracelet, whose granted ability reduces by the creature's power) and,
+     * when present, the chosen [targets] — so reductions that read the target the player picked
+     * (e.g. Dragonfire Blade's "costs {1} less to activate for each color of the creature it
+     * targets") resolve against that target. Per Scryfall ruling, this is locked in before costs
+     * are paid.
      */
     private fun applyGenericCostReduction(
         cost: AbilityCost,
         ability: ActivatedAbility,
         state: GameState,
         sourceId: EntityId,
-        controllerId: EntityId
+        controllerId: EntityId,
+        targets: List<ChosenTarget>
     ): AbilityCost {
         val reduction = ability.genericCostReduction ?: return cost
         val reductionContext = EffectContext(
             sourceId = sourceId,
             controllerId = controllerId,
-            opponentId = null
+            opponentId = null,
+            targets = targets
         )
         val amount = DynamicAmountEvaluator().evaluate(state, reduction, reductionContext)
         if (amount <= 0) return cost
