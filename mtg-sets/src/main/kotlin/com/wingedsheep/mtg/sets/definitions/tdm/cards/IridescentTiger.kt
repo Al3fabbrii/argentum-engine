@@ -6,21 +6,17 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 
 /**
- * Iridescent Tiger
- * {4}{R}
- * Creature — Cat
- * 3/4
+ * Iridescent Tiger — Tarkir: Dragonstorm #109
+ * {4}{R} · Creature — Cat · 3/4
  *
  * When this creature enters, if you cast it, add {W}{U}{B}{R}{G}.
  *
- * The "add {W}{U}{B}{R}{G}" produces exactly one mana of each color, modeled as a
- * composite of five single-color [Effects.AddMana]. This is a triggered ability (it
- * uses the stack), not a mana ability, so it can be responded to. The intervening-if
- * "if you cast it" is gated by [Conditions.WasCast] — the trigger does nothing if the
- * creature entered without being cast.
+ * The "if you cast it" clause is an intervening-if on the enters trigger, modeled as
+ * [Conditions.WasCast] on the EntersBattlefield trigger — so the mana is only produced
+ * when the creature was cast (not when put onto the battlefield by another effect). The
+ * five-color mana is a composite of five single-color [Effects.AddMana] additions.
  */
 val IridescentTiger = card("Iridescent Tiger") {
     manaCost = "{4}{R}"
@@ -33,16 +29,13 @@ val IridescentTiger = card("Iridescent Tiger") {
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
         triggerCondition = Conditions.WasCast
-        effect = CompositeEffect(
-            listOf(
-                Effects.AddMana(Color.WHITE),
-                Effects.AddMana(Color.BLUE),
-                Effects.AddMana(Color.BLACK),
-                Effects.AddMana(Color.RED),
-                Effects.AddMana(Color.GREEN)
-            )
+        effect = Effects.Composite(
+            Effects.AddMana(Color.WHITE),
+            Effects.AddMana(Color.BLUE),
+            Effects.AddMana(Color.BLACK),
+            Effects.AddMana(Color.RED),
+            Effects.AddMana(Color.GREEN)
         )
-        description = "When this creature enters, if you cast it, add {W}{U}{B}{R}{G}."
     }
 
     metadata {
@@ -51,7 +44,5 @@ val IridescentTiger = card("Iridescent Tiger") {
         artist = "Fajareka Setiawan"
         flavorText = "The power of the dragonstorms transformed not only the land but many of the creatures within it."
         imageUri = "https://cards.scryfall.io/normal/front/e/3/e3abbc8b-2bf8-478e-a541-f8019d150054.jpg?1743213469"
-        ruling("2025-04-04", "Iridescent Tiger's ability isn't a mana ability. It uses the stack and can be responded to.")
-        ruling("2025-04-04", "Iridescent Tiger's ability triggers if you cast it from any zone. It doesn't trigger if you put Iridescent Tiger onto the battlefield without casting it.")
     }
 }

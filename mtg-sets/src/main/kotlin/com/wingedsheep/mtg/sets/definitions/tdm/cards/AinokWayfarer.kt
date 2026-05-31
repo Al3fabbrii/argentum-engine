@@ -2,7 +2,6 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
 import com.wingedsheep.sdk.core.Counters
 import com.wingedsheep.sdk.core.Zone
-import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
@@ -11,7 +10,6 @@ import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.CardDestination
 import com.wingedsheep.sdk.scripting.effects.CardSource
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
-import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.SelectFromCollectionEffect
@@ -20,19 +18,21 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
 /**
- * Ainok Wayfarer
- * {1}{G}
- * Creature — Dog Scout
- * 1/1
+ * Ainok Wayfarer — Tarkir: Dragonstorm #134
+ * {1}{G} · Creature — Dog Scout · 1/1
  *
- * When this creature enters, mill three cards. You may put a land card from among them
- * into your hand. If you don't, put a +1/+1 counter on this creature. (To mill three
- * cards, put the top three cards of your library into your graveyard.)
+ * When this creature enters, mill three cards. You may put a land card from among
+ * them into your hand. If you don't, put a +1/+1 counter on this creature.
  *
- * Modeled as the Town Greeter mill-then-take pipeline: gather the top three, send them
- * to the graveyard (the mill), then optionally pull a land card back into hand. The
- * "if you don't" counter is gated on the selected collection being empty — whether the
- * player declined or no land was milled, the counter goes on.
+ * Modeled as the atomic gather → mill → (IfYouDo select-land-into-hand else
+ * +1/+1 counter) pipeline:
+ *   1. Gather the top three cards as "milled".
+ *   2. Move all three into the graveyard — this is the actual mill (emits the mill /
+ *      put-into-graveyard events the Mill keyword and graveyard triggers care about).
+ *   3. IfYouDo: optionally select a land from among the milled three and put it into
+ *      hand. Success is gated on the "chosen" collection becoming non-empty
+ *      ([SuccessCriterion.CollectionNonEmpty]); if no land is taken (declined or none
+ *      present), the "if you don't" branch adds a +1/+1 counter to this creature.
  */
 val AinokWayfarer = card("Ainok Wayfarer") {
     manaCost = "{1}{G}"
@@ -40,14 +40,13 @@ val AinokWayfarer = card("Ainok Wayfarer") {
     typeLine = "Creature — Dog Scout"
     power = 1
     toughness = 1
-    oracleText = "When this creature enters, mill three cards. You may put a land card from among " +
-        "them into your hand. If you don't, put a +1/+1 counter on this creature. (To mill three " +
-        "cards, put the top three cards of your library into your graveyard.)"
+    oracleText = "When this creature enters, mill three cards. You may put a land card from among them into your hand. If you don't, put a +1/+1 counter on this creature."
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
         effect = CompositeEffect(
             listOf(
+                // Mill three: gather the top three, then move them to the graveyard.
                 GatherCardsEffect(
                     source = CardSource.TopOfLibrary(DynamicAmount.Fixed(3)),
                     storeAs = "milled"
@@ -56,28 +55,36 @@ val AinokWayfarer = card("Ainok Wayfarer") {
                     from = "milled",
                     destination = CardDestination.ToZone(Zone.GRAVEYARD)
                 ),
-                SelectFromCollectionEffect(
-                    from = "milled",
-                    selection = SelectionMode.ChooseUpTo(DynamicAmount.Fixed(1)),
-                    filter = GameObjectFilter.Land,
-                    storeSelected = "selected",
-                    showAllCards = true,
-                    prompt = "You may put a land card into your hand",
-                    selectedLabel = "Put in hand",
-                    remainderLabel = "Leave in graveyard"
-                ),
-                MoveCollectionEffect(
-                    from = "selected",
-                    destination = CardDestination.ToZone(Zone.HAND)
-                ),
-                ConditionalEffect(
-                    condition = Conditions.Not(Conditions.CollectionContainsMatch("selected")),
-                    effect = Effects.AddCounters(Counters.PLUS_ONE_PLUS_ONE, 1, EffectTarget.Self)
+                // You may put a land card from among them into your hand.
+                // If you don't, put a +1/+1 counter on this creature.
+                // Success is gated on whether a land actually reached your hand:
+                // SuccessCriterion.Auto probes the terminal hand move's destination
+                // zone, so the "if you don't" counter only fires when the player
+                // declines or no land is among the milled cards. There is no "if you do"
+                // payoff, so that branch is an empty composite.
+                Effects.IfYouDo(
+                    action = CompositeEffect(
+                        listOf(
+                            SelectFromCollectionEffect(
+                                from = "milled",
+                                selection = SelectionMode.ChooseUpTo(DynamicAmount.Fixed(1)),
+                                filter = GameObjectFilter.Land,
+                                storeSelected = "chosen",
+                                storeRemainder = "leftInGraveyard",
+                                selectedLabel = "Put in hand"
+                            ),
+                            MoveCollectionEffect(
+                                from = "chosen",
+                                destination = CardDestination.ToZone(Zone.HAND),
+                                revealed = true
+                            )
+                        )
+                    ),
+                    ifYouDo = Effects.Composite(),
+                    ifYouDont = Effects.AddCounters(Counters.PLUS_ONE_PLUS_ONE, 1, EffectTarget.Self)
                 )
             )
         )
-        description = "When this creature enters, mill three cards. You may put a land card from " +
-            "among them into your hand. If you don't, put a +1/+1 counter on this creature."
     }
 
     metadata {
