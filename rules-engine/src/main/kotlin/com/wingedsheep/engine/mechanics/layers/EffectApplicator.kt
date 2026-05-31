@@ -22,7 +22,13 @@ internal class EffectApplicator(
     private val dynamicAmountEvaluator: DynamicAmountEvaluator
 ) {
 
-    private val conditionEvaluator = ConditionEvaluator()
+    // Source conditions are evaluated while the projection is still being built. Hand the
+    // ConditionEvaluator a non-reentrant projection (mirroring StateProjector's own evaluator):
+    // reaching for the canonical lazy GameState.projectedState here would re-enter our own
+    // initializer and recurse until the stack overflows (e.g. a Layer-7 conditional P/T static
+    // ability whose source condition counts creatures via a battlefield aggregate). The empty
+    // projection falls back to base CardComponent values, exactly as CDA resolution does.
+    private val conditionEvaluator = ConditionEvaluator(defaultProjection = { ProjectedState(it, emptyMap()) })
 
     fun applyEffect(
         effect: ContinuousEffect,
