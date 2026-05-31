@@ -224,6 +224,14 @@ surface can skip this step — but say so explicitly rather than silently leavin
 
 ## Step 7: Tests — match the pyramid
 
+**The engine (`rules-engine`) tests are the most important part of this step and the bar is high:
+they must cover the *complete* rules of the mechanic and its edge cases, not just the happy path.**
+The engine is the source of truth — if it implements a rule wrong, no amount of SDK or client
+testing catches it. Treat the rules and rulings you researched in Step 1.3 as the spec and make the
+engine tests prove every clause of that spec. SDK round-trip and client tests are supporting layers;
+do not let them substitute for thorough engine coverage. A feature is under-tested until an engine
+test would fail if any rule it implements were broken.
+
 Pick the layer that proves the feature, per `docs/architecture-principles.md` §5:
 
 - **SDK round-trip / unit** (`mtg-sdk`) — new data type serializes and composes as intended.
