@@ -31,7 +31,12 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
 
 ## HIGH — clear violations worth fixing
 
-### 1. `TapTargetCreaturesEffect` — magic-number `20` + hardcoded creature type
+### 1. `TapTargetCreaturesEffect` — magic-number `20` + hardcoded creature type ✅ DONE
+- **Resolution:** `TapTargetCreaturesEffect` deleted from `TapEffects.kt` (file now holds only
+  `TapUntapEffect`, `TapUntapCollectionEffect`, `PhaseOutEffect`). Icy Blast no longer passes
+  `maxTargets = 20` — it composes `Effects.TapEachTarget().then(...)` and lets
+  `TargetCreature(optional = true, dynamicMaxCount = XValue)` own the count. Regression-guarded by
+  `TapEachTargetScenarioTest`.
 - **Location:** `scripting/effects/TapEffects.kt:48`
 - **Standards:** #3 (magic constant / unparameterized), #4 (monolith)
 - **Why:** Bakes "creatures" into the name and carries a bare `maxTargets: Int`.
@@ -44,7 +49,11 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
   tap-collection recipe); let `TargetCreature` + `unlimited` / `dynamicMaxCount` own the count.
   Icy Blast drops the `20` sentinel. Delete `TapTargetCreaturesEffect`.
 
-### 2. Three `CreateGlobalTriggeredAbility*` effects differing only by lifetime
+### 2. Three `CreateGlobalTriggeredAbility*` effects differing only by lifetime ✅ DONE
+- **Resolution:** Collapsed to a single `CreateGlobalTriggeredAbilityEffect(ability, duration =
+  Duration.Permanent, descriptionOverride)` at `PlayerEffects.kt:168`. The three lifetime-specific
+  variants are deleted; `descriptionOverride` preserved. Facade passes through so card call sites
+  are unchanged.
 - **Location:** `scripting/effects/PlayerEffects.kt:161, 185, 206`
 - **Standards:** #3 (parameterize over duration), #4 (3→1 collapse)
 - **Why:** `…UntilEndOfTurnEffect`, `…PermanentEffect`, and `…WithDurationEffect(ability, duration)`
@@ -105,7 +114,11 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
 
 ## MEDIUM — generalize / decompose
 
-### 5. `ChooseColorAndGrantProtectionTo{Group,Target}Effect` — the monolith the combinator replaces
+### 5. `ChooseColorAndGrantProtectionTo{Group,Target}Effect` — the monolith the combinator replaces ✅ DONE
+- **Resolution:** Both monoliths deleted. A `GrantProtectionFromChosenColorEffect` atom now exists
+  (`ProtectionEffects.kt:63`) alongside the existing `GrantHexproofFromChosenColorEffect`, and
+  protection is expressed via the `ChooseColorThenEffect` combinator — matching the
+  hexproof / can't-be-blocked siblings.
 - **Location:** `scripting/effects/ProtectionEffects.kt:26, 52`
 - **Standards:** #4, #5
 - **Why:** Exactly the monolith `ChooseColorThenEffect` (same file, line 76) was written to replace.
@@ -117,7 +130,10 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
   `ChooseColorThen(GrantProtectionFromChosenColor(...))` (+ `ForEachInGroup` for the group case).
   Delete the zero-user Group variant first.
 
-### 6. `LifeAuctionEffect` — named/shaped for one card
+### 6. `LifeAuctionEffect` — named/shaped for one card ✅ DONE
+- **Resolution:** Renamed to `OpenLifeBidEffect` (`AuctionEffects.kt:33`) and generalized over
+  participants via `participant: Player` (defaults to `Player.Opponent`; Mages' Contest passes
+  `Player.ControllerOf("target spell")`). `onWin` runs only when the caster is high bidder.
 - **Location:** `scripting/effects/AuctionEffects.kt:28`
 - **Standards:** #2, #4
 - **Why:** Doc says "implements the Mages' Contest shape." Assumes exactly caster + one opponent;
@@ -126,7 +142,12 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
 - **Fix:** The alternating-bid decision machinery may justify a bespoke _type_, but rename off the
   card (e.g. `OpenLifeBidEffect`) and generalize over participants (player filter).
 
-### 7. `TargetSharesMostCommonColor` vs `ColorIsMostCommon` — duplicated tally logic
+### 7. `TargetSharesMostCommonColor` vs `ColorIsMostCommon` — duplicated tally logic ⚠️ PARTIAL
+- **Resolution (partial):** The duplicated tally is gone — both conditions now route through a
+  single shared `ConditionEvaluator.mostCommonColors(state, projected)` helper, so evaluators can't
+  drift. The two conditions remain separate SDK types (not folded into one parametric
+  `MostCommonColorCondition(subject)` nor redefined as an `Any(...)` composition), so the "name the
+  mechanic" half of the fix is still open.
 - **Location:** `scripting/conditions/BattlefieldConditions.kt:201, 225`
 - **Standards:** #2/#3, drift risk
 - **Why:** Copy-pasted "most common color across all permanents, ties included" evaluation; the
@@ -222,10 +243,11 @@ handful of users, and #1/#3/#4 contradict patterns already established elsewhere
 Each touches shared SDK types with cross-layer wiring, so route through the **`add-feature`** flow
 (executor + full trace + tests + `card-sdk-language-reference.md` update) rather than a quick edit.
 
-1. #1 `TapTargetCreaturesEffect` (kills the `20` sentinel)
-2. #2 `CreateGlobalTriggeredAbility*` 3→1 collapse
-3. #3 `CreaturesSharingTypeWithEntity` delete
+1. #1 `TapTargetCreaturesEffect` (kills the `20` sentinel) ✅ done
+2. #2 `CreateGlobalTriggeredAbility*` 3→1 collapse ✅ done
+3. #3 `CreaturesSharingTypeWithEntity` delete ✅ done
 4. #4 `IsFirstSpellOfTypeCastThisTurn` delete ✅ done
-5. #5 delete zero-user protection-Group variant; then MEDIUM batch
-6. #9 inline single-card `EffectPatterns` helpers
-7. LOW cleanup
+5. #5 protection combinator ✅ done · #6 `OpenLifeBidEffect` rename ✅ done · #7 shared tally ⚠️ partial (types not yet merged)
+6. Remaining MEDIUM: #8 `CopyNextSpellCast` spellFilter (not done)
+7. #9 inline single-card `EffectPatterns` helpers (not done — all 15 still present)
+8. LOW cleanup (not done; ordinal still emits "21th"/"22th")
