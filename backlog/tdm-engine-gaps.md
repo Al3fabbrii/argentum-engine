@@ -193,9 +193,14 @@ the overwhelming majority of the set.
     activated (equip) cost by the chosen target's color count.
     → **Dragonfire Blade**
 
-19. **Opponent-scoped continuous cast prohibition.** "Your opponents can't cast spells during your
-    turn." Current cast restrictions are self-controller-scoped (`RestrictSpellsCastPerTurn`); needs a
-    player-group prohibition gated on your turn.
+19. **Opponent-scoped continuous cast prohibition.** ✅ **DONE.** "Your opponents can't cast spells
+    during your turn." Added the `OpponentsCantCastSpells(onlyDuringYourTurn)` static ability —
+    modeled on Mana Maze's `CantCastSpellsSharingColorWithLastCast` (a continuous restriction read at
+    cast-legality time, never on the stack). Enforced via one `CastPermissionUtils` helper OR'd into
+    the central `cantCastSpells` gate, so it covers every casting zone (hand, flashback/harmonize,
+    exile, top of library) uniformly; control is read from projected state. `onlyDuringYourTurn = true`
+    gives Voice of Victory; `false` covers Grand Abolisher's cast clause. Deliberately not filtered —
+    a "can't cast spells with even mana value" (Void Winnower) prohibition is left as a future sibling.
     → **Voice of Victory**
 
 20. **Sacrifice-a-token as a cost** (minor — verify a token-only sacrifice-cost filter exists).
