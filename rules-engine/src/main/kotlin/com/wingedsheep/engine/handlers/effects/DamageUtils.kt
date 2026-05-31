@@ -328,16 +328,35 @@ object DamageUtils {
     }
 
     /**
+     * Whether [targetId] has not yet had counters put on it this turn — i.e. the placement about
+     * to happen is the first this turn. Read *before* [markCounterPlacedOnCreature] sets the
+     * marker, to stamp [com.wingedsheep.engine.core.CountersAddedEvent.firstThisTurn] for
+     * "the first time counters have been put on that creature this turn" triggers (Stalwart
+     * Successor). Only meaningful for creatures; non-creature targets return false.
+     */
+    fun isFirstCounterThisTurn(state: GameState, targetId: EntityId): Boolean {
+        if (!state.projectedState.isCreature(targetId)) return false
+        return state.getEntity(targetId)
+            ?.has<com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent>() != true
+    }
+
+    /**
      * Mark that [placerId] put one or more counters on the creature [targetId] this turn.
      * Only marks when [targetId] is a creature in the projected state.
-     * Sets the PutCounterOnCreatureThisTurnComponent on the placing player's entity.
-     * Used for conditions like "if you put a counter on a creature this turn" (Lasting Tarfire).
+     * Sets the PutCounterOnCreatureThisTurnComponent on the placing player's entity (for
+     * "if you put a counter on a creature this turn", Lasting Tarfire) and the per-creature
+     * [com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent]
+     * marker (for "first time counters this turn" triggers, Stalwart Successor).
      */
     fun markCounterPlacedOnCreature(state: GameState, placerId: EntityId, targetId: EntityId): GameState {
         if (!state.projectedState.isCreature(targetId)) return state
-        return state.updateEntity(placerId) { container ->
-            container.with(com.wingedsheep.engine.state.components.player.PutCounterOnCreatureThisTurnComponent)
-        }
+        return state
+            .updateEntity(placerId) { container ->
+                container.with(com.wingedsheep.engine.state.components.player.PutCounterOnCreatureThisTurnComponent)
+            }
+            .updateEntity(targetId) { container ->
+                container.with(com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent)
+            }
     }
 
     /**
