@@ -107,13 +107,6 @@ object EffectPatterns {
         MiscPatterns.sequence(*effects)
 
     // =========================================================================
-    // Drain (MiscPatterns)
-    // =========================================================================
-
-    fun drain(amount: Int, target: EffectTarget): CompositeEffect =
-        MiscPatterns.drain(amount, target)
-
-    // =========================================================================
     // Gift Pattern (Bloomburrow)
     // =========================================================================
 

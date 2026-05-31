@@ -9,12 +9,10 @@ import com.wingedsheep.sdk.scripting.effects.CardDestination
 import com.wingedsheep.sdk.scripting.effects.Chooser
 import com.wingedsheep.sdk.scripting.effects.ChooseActionEffect
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
-import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.EffectChoice
 import com.wingedsheep.sdk.scripting.effects.FeasibilityCheck
 import com.wingedsheep.sdk.scripting.effects.ForEachPlayerEffect
-import com.wingedsheep.sdk.scripting.effects.GainLifeEffect
 import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.OptionalCostEffect
@@ -33,7 +31,7 @@ import com.wingedsheep.sdk.scripting.values.EffectVariable
 /**
  * Small utility effect patterns that don't fit a larger domain category:
  * optional costs, sacrifice, reflexive triggers, store/reference, sequence,
- * drain, and multi-player utility effects.
+ * and multi-player utility effects.
  */
 object MiscPatterns {
 
@@ -121,13 +119,6 @@ object MiscPatterns {
 
     fun sequence(vararg effects: Effect): CompositeEffect =
         CompositeEffect(effects.toList())
-
-    fun drain(amount: Int, target: EffectTarget): CompositeEffect = CompositeEffect(
-        listOf(
-            DealDamageEffect(amount, target),
-            GainLifeEffect(amount, EffectTarget.Controller)
-        )
-    )
 
     fun eachPlayerReturnsPermanentToHand(): ForEachPlayerEffect = ForEachPlayerEffect(
         players = Player.ActivePlayerFirst,
