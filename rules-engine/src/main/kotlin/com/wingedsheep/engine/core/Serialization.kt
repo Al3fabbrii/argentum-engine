@@ -397,6 +397,7 @@ val engineSerializersModule = SerializersModule {
         subclass(WasDealtCombatDamageThisTurnComponent::class)
         subclass(AdditionalCombatPhasesComponent::class)
         subclass(CantCastSpellsComponent::class)
+        subclass(CantActivateLoyaltyAbilitiesComponent::class)
         subclass(CardsLeftGraveyardThisTurnComponent::class)
         subclass(CreaturesDiedThisTurnComponent::class)
         subclass(DamageBonusComponent::class)
