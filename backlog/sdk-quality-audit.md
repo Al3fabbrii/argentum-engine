@@ -157,7 +157,16 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
   an `Any(...)` composition over it (or fold both into one parametric
   `MostCommonColorCondition(subject)`). At minimum share the tally so evaluators can't drift.
 
-### 8. `CopyNextSpellCastEffect` / `CopyEachSpellCastEffect` — hardcoded "instant or sorcery"
+### 8. `CopyNextSpellCastEffect` / `CopyEachSpellCastEffect` — hardcoded "instant or sorcery" ✅ DONE
+- **Resolution:** Both effects now carry `spellFilter: GameObjectFilter =
+  GameObjectFilter.InstantOrSorcery` (descriptions read `${spellFilter.description} spell`), plumbed
+  through `PendingSpellCopy.spellFilter` and the two executors. `CastSpellHandler` no longer gates on
+  a global `isInstant || isSorcery` check — it matches each pending entry's filter against the spell
+  just cast via `predicateEvaluator.matches(...)`, consuming only matched non-persistent entries and
+  leaving non-matching ones waiting. Facades (`Effects.CopyNextSpellCast` /
+  `CopyEachSpellCast`) take the optional `spellFilter`; existing callers (Howl of the Horde, Rimefire
+  Torque, The Mirari Conjecture) are unchanged via the default. `ClientStateTransformer` badge text is
+  filter-driven. Covered by `CopySpellCastFilterTest`. See `card-sdk-language-reference.md`.
 - **Location:** `scripting/effects/StackEffects.kt:581, 606`
 - **Standards:** #3 (baked-in filter)
 - **Why:** Spell type hardcoded in description and behavior; can't express "copy the next creature
@@ -292,7 +301,7 @@ Each touches shared SDK types with cross-layer wiring, so route through the **`a
 3. #3 `CreaturesSharingTypeWithEntity` delete ✅ done
 4. #4 `IsFirstSpellOfTypeCastThisTurn` delete ✅ done
 5. #5 protection combinator ✅ done · #6 `OpenLifeBidEffect` rename ✅ done · #7 shared tally ⚠️ partial (types not yet merged)
-6. Remaining MEDIUM: #8 `CopyNextSpellCast` spellFilter (not done)
+6. Remaining MEDIUM: #8 `CopyNextSpellCast` spellFilter ✅ done
 7. #9 inline single-card `EffectPatterns` helpers ✅ done (all 15 inlined + deleted; borderline 5 kept)
 8. LOW cleanup (not done; ordinal still emits "21th"/"22th")
 7. #9 inline single-card `EffectPatterns` helpers (not done — all 15 still present)
