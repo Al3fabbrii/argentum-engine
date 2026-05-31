@@ -23,6 +23,7 @@ import { PrintingPicker, type PrintingDTO } from './PrintingPicker'
 import { ManaCost, ManaSymbol } from '@/components/ui/ManaSymbols'
 import { HoverCardPreview } from '@/components/ui/HoverCardPreview'
 import { useDfcHoverFlip } from '@/components/ui/useDfcHoverFlip'
+import { SetIcon } from '@/components/ui/SetIcon'
 import { getCardImageUrl } from '@/utils/cardImages'
 import {
   parseQuery,
@@ -2872,7 +2873,11 @@ function SetCombobox({
   return (
     <div className={styles.setCombobox} ref={rootRef}>
       <div className={`${styles.setComboInput} ${open ? styles.setComboInputOpen : ''}`}>
-        <span className={styles.setComboIcon} aria-hidden="true">⌕</span>
+        {selected && !open ? (
+          <SetIcon code={selected.code} className={styles.setComboIcon} />
+        ) : (
+          <span className={styles.setComboIcon} aria-hidden="true">⌕</span>
+        )}
         <input
           ref={inputRef}
           type="text"
@@ -2981,6 +2986,7 @@ function SetCombobox({
                     commit(s.code)
                   }}
                 >
+                  <SetIcon code={s.code} className={styles.setComboOptionIcon} />
                   <span className={styles.setComboOptionName}>{s.name}</span>
                   <span className={styles.setComboOptionMeta}>
                     <span className={styles.setComboOptionYear}>{year}</span>

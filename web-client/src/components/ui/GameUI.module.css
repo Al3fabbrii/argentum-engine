@@ -1329,6 +1329,12 @@
   border-style: dashed;
 }
 
+.setChipIcon {
+  flex-shrink: 0;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
 .setChipName {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1494,6 +1500,18 @@
 .setPickerRowActive .setPickerCheck {
   background: var(--color-accent-dark);
   border-color: var(--color-accent-dark);
+}
+
+.setPickerIcon {
+  flex-shrink: 0;
+  width: 1.4em;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.setPickerRowActive .setPickerIcon {
+  color: var(--text-primary);
 }
 
 .setPickerName {

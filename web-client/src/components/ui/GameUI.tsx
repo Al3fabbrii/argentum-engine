@@ -4,6 +4,7 @@ import { useGameStore, type LobbyState, type TournamentState } from '@/store/gam
 import type { SealedCardInfo, TournamentFormat } from '@/types'
 import { getCardImageUrl } from '@/utils/cardImages.ts'
 import { ManaCost } from './ManaSymbols'
+import { SetIcon } from './SetIcon'
 import { randomBackground } from '@/utils/background.ts'
 import { ReplayViewer, type GameSummary } from '../admin/ReplayViewer'
 import type { ReplayData } from '@/replay/reconstructSnapshots.ts'
@@ -814,6 +815,7 @@ function LobbyOverlay({
         className={`${styles.setPickerRow} ${isSelected ? styles.setPickerRowActive : ''}`}
       >
         <span className={styles.setPickerCheck} aria-hidden>{isSelected ? '✓' : ''}</span>
+        <SetIcon code={set.code} className={styles.setPickerIcon} />
         <span className={styles.setPickerName}>{set.name}</span>
         {set.incomplete && <span className={styles.setPartialBadge}>partial</span>}
         {released && <span className={styles.setReleaseDate}>{released}</span>}
@@ -1054,6 +1056,7 @@ function LobbyOverlay({
                         className={`${styles.setChip} ${isAnyDraft ? styles.setChipDraft : ''} ${set.incomplete ? styles.setChipPartial : ''}`}
                         title={set.incomplete ? `${set.name} — partial (reduced card pool)` : set.name}
                       >
+                        <SetIcon code={set.code} className={styles.setChipIcon} />
                         <span className={styles.setChipName}>{set.name}</span>
                         <button
                           type="button"

@@ -1093,6 +1093,14 @@
   font-style: normal;
 }
 
+.setComboOptionIcon {
+  font-size: 1.2rem;
+  width: 1.4em;
+  text-align: center;
+  color: var(--text-secondary, var(--text-primary));
+  align-self: center;
+}
+
 .setComboOptionName {
   flex: 1;
   min-width: 0;
