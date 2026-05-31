@@ -360,6 +360,29 @@ object DamageUtils {
     }
 
     /**
+     * Stamp the per-permanent [com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent]
+     * marker on [targetId] and report whether this is the first counter placement on it this turn
+     * (read *before* the marker is set), so the caller can populate
+     * [com.wingedsheep.engine.core.CountersAddedEvent.firstThisTurn] for "first time counters this
+     * turn" intervening-if triggers (Stalwart Successor).
+     *
+     * Unlike [isFirstCounterThisTurn] + [markCounterPlacedOnCreature], this performs no
+     * projected creature/zone check, so it also covers the enters-with-counters path where the
+     * permanent is not yet on the battlefield (CR confirms a permanent entering with counters has
+     * those counters "put on" it). Stamping the marker on a non-creature is harmless: the trigger's
+     * own "creature you control" filter re-checks type. This intentionally does *not* set the
+     * placer's "you put a counter on a creature this turn" marker — that path stays as it was.
+     */
+    fun recordCounterPlacement(state: GameState, targetId: EntityId): Pair<GameState, Boolean> {
+        val first = state.getEntity(targetId)
+            ?.has<com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent>() != true
+        val newState = state.updateEntity(targetId) { container ->
+            container.with(com.wingedsheep.engine.state.components.battlefield.ReceivedCountersThisTurnComponent)
+        }
+        return newState to first
+    }
+
+    /**
      * Track that [sourceId] dealt damage to [targetCreatureId] this turn.
      * Updates the DamageDealtToCreaturesThisTurnComponent on the source entity.
      * Used for triggers like Soul Collector's "whenever a creature dealt damage by this creature this turn dies".

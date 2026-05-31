@@ -94,6 +94,32 @@ class StalwartSuccessorScenarioTest : ScenarioTestBase() {
                 }
             }
 
+            test("a creature you control entering with counters triggers Stalwart") {
+                // CR: a permanent entering with counters has those counters "put on" it (the
+                // controller is the one putting them), so Stalwart's "first time counters this
+                // turn" trigger fires. Dockworker Drone enters with one +1/+1 counter; Stalwart
+                // adds a second.
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardOnBattlefield(1, "Stalwart Successor")
+                    .withCardInHand(1, "Dockworker Drone")
+                    .withLandsOnBattlefield(1, "Plains", 2)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val cast = game.castSpell(1, "Dockworker Drone")
+                withClue("Casting Dockworker Drone should succeed: ${cast.error}") {
+                    cast.error shouldBe null
+                }
+                game.resolveStack()
+
+                val drone = game.findPermanent("Dockworker Drone")!!
+                withClue("Dockworker Drone should have 2 +1/+1 counters (enters-with + Stalwart)") {
+                    plusOneCounters(game, drone) shouldBe 2
+                }
+            }
+
             test("counters on a creature an opponent controls do not trigger Stalwart") {
                 val game = scenario()
                     .withPlayers("Player", "Opponent")
