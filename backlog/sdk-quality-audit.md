@@ -165,7 +165,17 @@ User counts are caller _files_ in `mtg-sets/src/main` (worktree copies excluded)
 - **Users:** CopyNextSpellCast 2, CopyEachSpellCast 1.
 - **Fix:** Add `spellFilter: GameObjectFilter = GameObjectFilter.InstantOrSorcery` to both.
 
-### 9. Single-card helpers in `EffectPatterns` (should be inlined)
+### 9. Single-card helpers in `EffectPatterns` (should be inlined) ✅ DONE
+- **Resolution:** All 15 helpers inlined into their sole callers and deleted from the SDK — both the
+  `EffectPatterns.kt` facade entry and the delegate body (`putCreatureFromHandSharingTypeWithTapped`
+  had only the inline facade body). Two helpers turned out to also have a single *rules-engine
+  scenario-test* caller not counted in the `mtg-sets` sweep (`GoblinMachinistTest` →
+  `revealUntilNonlandModifyStats`, `SupremeInquisitorTest` → `searchTargetLibraryExile`); both tests
+  now inline the body too. 12 of the 15 were documented in `card-sdk-language-reference.md` — those
+  entries were removed (correcting the original Fix note below, which wrongly assumed none were
+  documented). Orphaned imports pruned from `EffectPatterns`/`HandPatterns`/`LibraryPatterns`/
+  `CreatureTypePatterns`/`ExilePatterns`. The borderline five and the LOW dead-facade cleanup are
+  **not** part of this change.
 - **Standards:** #6 (no single-use patterns), #4 (each is a `CompositeEffect` 1:1 recipe — pure
   composition of atoms already in the facade, no new primitive earned).
 - **Why:** 15 helpers are whole-card scripts lifted into the `EffectPatterns` facade and its delegate
@@ -276,5 +286,5 @@ Each touches shared SDK types with cross-layer wiring, so route through the **`a
 4. #4 `IsFirstSpellOfTypeCastThisTurn` delete ✅ done
 5. #5 protection combinator ✅ done · #6 `OpenLifeBidEffect` rename ✅ done · #7 shared tally ⚠️ partial (types not yet merged)
 6. Remaining MEDIUM: #8 `CopyNextSpellCast` spellFilter (not done)
-7. #9 inline single-card `EffectPatterns` helpers (not done — all 15 still present)
+7. #9 inline single-card `EffectPatterns` helpers ✅ done (all 15 inlined + deleted; borderline 5 kept)
 8. LOW cleanup (not done; ordinal still emits "21th"/"22th")
