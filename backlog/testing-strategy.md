@@ -163,15 +163,19 @@ into a single entry point is optional polish, not required.
 _Outcome: engine gained the fluent builder immediately; one harness, no duplication; the 104
 game-server scenario tests compile and pass with only 3 one-token receiver-type edits._
 
-### Phase 2 — Point the skills at the engine harness
+### Phase 2 — Point the skills at the engine harness (DONE)
 
-- Update `add-card` `examples.md` scenario template + the `add-feature`
-  "`ScenarioTestBase` scope" bullet to teach the engine harness
-  (`com.wingedsheep.engine.support.ScenarioTestBase`, package
-  `com.wingedsheep.engine.scenarios`). Resolves the template inconsistency Phase 0
-  left open.
-- Document both styles in one place (probably `docs/` or a testFixtures KDoc):
-  "live-game (`GameTestDriver`) vs static-board (`scenario { }`) — when to use which."
+- ✅ Updated `add-card` `examples.md` scenario template (package
+  `com.wingedsheep.engine.scenarios`, import `com.wingedsheep.engine.support.ScenarioTestBase`)
+  and the `add-feature` "Scenario" + "Harness & scope" bullets to teach the engine harness.
+  Resolves the template inconsistency Phase 0 left open. (`add-card/SKILL.md` already pointed at
+  the engine path from Phase 0.)
+- ✅ Documented both styles in two places: the `examples.md` template preamble and
+  `docs/architecture-principles.md` §5.2 now both name live-game (`GameTestDriver`) vs
+  static-board (`ScenarioTestBase`) and where each lives.
+- ✅ Deleted `docs/adding-new-cards-workflow.md` (superseded by the `add-card` skill) and removed
+  its two links from `docs/card-sdk-language-reference.md`. Its stale
+  `game-server/src/test/.../scenarios/` template is gone with it.
 
 ### Phase 3 — Migrate misplaced tests *on touch* (no big bang)
 

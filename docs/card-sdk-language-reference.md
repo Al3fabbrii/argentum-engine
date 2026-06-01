@@ -2,8 +2,8 @@
 
 A complete catalog of every building block available to card authors in the Argentum
 Engine `mtg-sdk`, with a one-line description for each. Designed to be scanned and
-searched. For step-by-step authoring workflow see [`api-guide.md`](api-guide.md) and
-[`adding-new-cards-workflow.md`](adding-new-cards-workflow.md); for hard cases see
+searched. For step-by-step authoring workflow see [`api-guide.md`](api-guide.md) (and use the
+`add-card` skill); for hard cases see
 [`managing-complex-and-rare-abilities.md`](managing-complex-and-rare-abilities.md).
 
 **Maintenance rule:** this document is the canonical SDK catalog. **Every change to the
@@ -2412,6 +2412,5 @@ Card authors rarely reference these directly; they are created/updated by the ma
 | Dynamic amounts    | `mtg-sdk/src/main/kotlin/.../scripting/values/DynamicAmount.kt` |
 | Real card examples | `mtg-sets/src/main/kotlin/.../definitions/blb/cards/`           |
 
-For step-by-step authoring workflow see [`api-guide.md`](api-guide.md) and
-[`adding-new-cards-workflow.md`](adding-new-cards-workflow.md);
+For step-by-step authoring workflow see [`api-guide.md`](api-guide.md) (and use the `add-card` skill);
 for hard cases see [`managing-complex-and-rare-abilities.md`](managing-complex-and-rare-abilities.md).

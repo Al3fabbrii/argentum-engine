@@ -1384,8 +1384,11 @@ can construct any `GameState` directly and assert against the output state — n
 
 **Question: Does each card work correctly in realistic game situations?**
 
-Scenario tests are the primary verification for card correctness. They use `ScenarioTestBase`, which
-provides a declarative builder for constructing specific board states:
+Scenario tests are the primary verification for card correctness, and they live in the engine
+(`rules-engine`, package `com.wingedsheep.engine.scenarios`). They use
+`com.wingedsheep.engine.support.ScenarioTestBase` (in `rules-engine/src/testFixtures`), which
+provides a declarative builder for constructing specific board states. (`GameTestDriver`, alongside it,
+is the live-game alternative when a test needs the real turn/priority flow.)
 
 ```kotlin
 class GravediggerScenarioTest : ScenarioTestBase() {

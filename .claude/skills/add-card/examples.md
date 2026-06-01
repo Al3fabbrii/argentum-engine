@@ -474,10 +474,23 @@ fun MyNew(param1: Int, target: EffectTarget = EffectTarget.ContextTarget(0)): Ef
 
 ## Scenario Test Template
 
-```kotlin
-package com.wingedsheep.gameserver.scenarios
+Scenario tests live in the engine: `rules-engine/src/test/kotlin/com/wingedsheep/engine/scenarios/`.
+The engine is the source of truth, so a card's behavior is proven there — **not** in `game-server`
+(which only tests frontend ↔ engine concerns: masking, DTO shape, protocol).
 
-import com.wingedsheep.gameserver.ScenarioTestBase
+There are two setup styles, both backed by the real `ActionProcessor` and the full card catalog:
+
+- **Static board (shown below)** — `com.wingedsheep.engine.support.ScenarioTestBase`'s fluent
+  `scenario().withCardOnBattlefield(...).build()` builder plus name-based `castSpell` /
+  `declareAttackers` / decision sugar. Best for an exact board state and a focused interaction.
+- **Live game** — `com.wingedsheep.engine.support.GameTestDriver` with `initGame`/`initMirrorMatch`,
+  `passPriorityUntil(...)`, real turns/priority/mana. Best when the test needs the actual turn
+  structure. (Most existing engine scenario tests use this style.)
+
+```kotlin
+package com.wingedsheep.engine.scenarios
+
+import com.wingedsheep.engine.support.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
 import io.kotest.assertions.withClue

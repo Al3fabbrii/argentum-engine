@@ -238,18 +238,24 @@ Pick the layer that proves the feature, per `docs/architecture-principles.md` §
 - **SDK round-trip / unit** (`mtg-sdk`) — new data type serializes and composes as intended.
 - **Engine unit/integration** (`rules-engine`) — the executor/projector/detector behaves in
   isolation; construct `GameState` directly and assert on the result.
-- **Scenario** (`ScenarioTestBase`) — the feature works in a realistic board state, exercised
-  through a card that uses it. **Every rule you looked up in Step 1.3 must have a paired test that
-  asserts the engine behaves as the CR / oracle rulings say** — including the tricky edge cases
-  (replacement vs. trigger ordering, last-known info, layer interactions, timing/priority windows,
-  zero/multiple instances). A rule cited in a code comment without a test that pins it down is a gap
-  (`review-changes` §5). Cover the edge cases you traced in Step 4. **These belong in `rules-engine`** —
-  the engine is the source of truth, so a feature's rules are proven there, not in `game-server`.
-  `game-server` tests only cover what is genuinely a game-server concern: the interaction between the
-  frontend and the engine (state masking, DTO transformation, session/tournament orchestration). Do
-  not write a `game-server` scenario test to prove engine behavior.
-- **`ScenarioTestBase` scope** — only registered sets load; define inline test cards via
-  `CardDefinition.creature(...)` + `cardRegistry.register(...)` in `init { }` for anything else.
+- **Scenario** (`com.wingedsheep.engine.support.ScenarioTestBase`) — the feature works in a realistic
+  board state, exercised through a card that uses it. **Every rule you looked up in Step 1.3 must have
+  a paired test that asserts the engine behaves as the CR / oracle rulings say** — including the tricky
+  edge cases (replacement vs. trigger ordering, last-known info, layer interactions, timing/priority
+  windows, zero/multiple instances). A rule cited in a code comment without a test that pins it down is
+  a gap (`review-changes` §5). Cover the edge cases you traced in Step 4. **These belong in
+  `rules-engine`** (package `com.wingedsheep.engine.scenarios`, under
+  `rules-engine/src/test/kotlin/com/wingedsheep/engine/scenarios/`) — the engine is the source of truth,
+  so a feature's rules are proven there, not in `game-server`. `game-server` tests only cover what is
+  genuinely a game-server concern: the interaction between the frontend and the engine (state masking,
+  DTO transformation, session/tournament orchestration). Do not write a `game-server` scenario test to
+  prove engine behavior.
+- **Harness & scope** — two setup styles, both in `rules-engine/src/testFixtures` and backed by the
+  real `ActionProcessor`: `ScenarioTestBase` (fluent static board: `scenario().withCardOnBattlefield(...)
+  .build()` + name-based actions/decision sugar) and `GameTestDriver` (live game: real turns, priority,
+  mana). Both register the full `MtgSetCatalog` plus test-only cards (`TestCards.all`) and the predefined
+  tokens — so any printed card is available by name. For a card that doesn't exist yet, define an inline
+  test card via `CardDefinition.creature(...)` and `cardRegistry.register(...)` in `init { }`.
 
 Run them yourself: `just test` / `just test-rules` / `just test-class <Name>` (or the direct
 gradle module command). Don't trust a description — confirm green. If a registry/executor/evaluator
