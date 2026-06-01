@@ -315,7 +315,8 @@ time (it's how Invasion was done):
 - Update [`docs/card-sdk-language-reference.md`](docs/card-sdk-language-reference.md) in the same
   change whenever you add or change anything in the SDK.
 - Verify Comprehensive Rules numbers via the official WotC rules page <https://magic.wizards.com/en/rules>
-  (read the linked plain-text `.txt` download) before citing them in code, comments, or commit messages.
+  before citing them in code, comments, or commit messages. The linked plain-text `.txt` is too large to fetch
+  into context — download it and `grep` locally.
 - Run `just build` (simple changes) or `just test` (new effects/engine changes) and confirm green
   before opening the PR.
 

@@ -13,9 +13,9 @@ Guidance for Claude Code working in this repository.
   designing each new SDK type for reuse, full cross-layer tracing, and performance + UX review.
 - **Verify MTG rule numbers before citing them.** Rule numbers are easy to misremember (613.8 vs 613.7, 704.5 vs
   704.6, etc.). Whenever you reference a specific rule number in code comments, commit messages, PR descriptions,
-  or chat, look it up first via the official WotC rules page <https://magic.wizards.com/en/rules> and read the
-  linked plain-text Comprehensive Rules (the `.txt` download) to confirm the number matches the actual rule text.
-  If you can't verify, describe the rule by name instead of guessing a number.
+  or chat, look it up first via the official WotC rules page <https://magic.wizards.com/en/rules>. The linked
+  plain-text Comprehensive Rules `.txt` is too large to fetch into context — download it (e.g. `curl -o`) and
+  `grep` it locally for the rule number/text. If you can't verify, describe the rule by name instead of guessing a number.
 
 ## Project Overview
 

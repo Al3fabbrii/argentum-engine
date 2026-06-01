@@ -143,7 +143,7 @@ Whenever the diff (code, comments, commit message, or PR body) cites a CR rule n
 **verify it online** before accepting it:
 
 ```
-WebFetch https://magic.wizards.com/en/rules   # official WotC rules page; follow to the plain-text .txt Comprehensive Rules
+WebFetch https://magic.wizards.com/en/rules   # official WotC rules page; grab the .txt link, then `curl` it down and grep locally (too large to fetch into context)
 WebFetch https://api.scryfall.com/cards/named?exact=<card>&set=<code>   # Oracle text
 ```
 
