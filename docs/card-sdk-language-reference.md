@@ -365,8 +365,8 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   until end of turn to each of its three freshly-created Warriors with one `GrantKeyword` per token. For a *named*
   token (creature or otherwise) with its own abilities — Treasure, Munitions, Cragflame — add a `CardDefinition`
   to `PredefinedTokens.kt` and expose an `Effects.Create<Name>Token()` facade that wraps
-  `CreatePredefinedTokenEffect("<Name>", count)`. `CreateTokenEffect(..., nonCreature = true)` exists as a
-  lower-level escape hatch for ad-hoc noncreature tokens but no card should reach for it directly.
+  `CreatePredefinedTokenEffect("<Name>", count)`. The predefined-token registry already supports noncreature type
+  lines (e.g. Munitions' `typeLine = "Artifact"`) and embedded triggered abilities.
 - `CreateDynamicToken(dynamicPower, dynamicToughness, colors?, creatureTypes, keywords?, count?, controller?, imageUri?)` —
   tokens whose P/T is computed at resolution (e.g. Pure Reflection's X/X Reflection where X = the cast spell's mana
   value, via `DynamicAmounts.triggeringManaValue()`). `controller` directs who gets the token (e.g.

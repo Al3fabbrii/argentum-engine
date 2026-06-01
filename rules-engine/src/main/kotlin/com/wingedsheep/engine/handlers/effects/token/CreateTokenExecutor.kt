@@ -101,19 +101,14 @@ class CreateTokenExecutor(
             val typeLinePrefix = buildString {
                 if (effect.legendary) append("Legendary ")
                 if (effect.artifactToken) append("Artifact ")
-                if (!effect.nonCreature) append("Creature")
-            }.trim()
-            val typeLineString = if (effect.creatureTypes.isNotEmpty()) {
-                "$typeLinePrefix - ${effect.creatureTypes.joinToString(" ")}"
-            } else {
-                typeLinePrefix
+                append("Creature")
             }
             val tokenComponent = CardComponent(
                 cardDefinitionId = "token:${effect.creatureTypes.joinToString("-")}",
                 name = tokenName,
                 manaCost = ManaCost.ZERO,
-                typeLine = TypeLine.parse(typeLineString),
-                baseStats = if (effect.nonCreature) null else CreatureStats(tokenPower, tokenToughness),
+                typeLine = TypeLine.parse("$typeLinePrefix - ${effect.creatureTypes.joinToString(" ")}"),
+                baseStats = CreatureStats(tokenPower, tokenToughness),
                 baseKeywords = effect.keywords,
                 colors = effect.colors,
                 ownerId = tokenControllerId,

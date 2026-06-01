@@ -494,7 +494,7 @@ class TriggerMatcher(
                         if (!hasSubtype && !isChangelingCreatureType) return false
                     }
                     is com.wingedsheep.sdk.scripting.predicates.CardPredicate.IsNontoken -> {
-                        // Token-ness is intrinsic; LKI is required because 704.5s sweeps the
+                        // Token-ness is intrinsic; LKI is required because 704.5d sweeps the
                         // token entity before the matcher runs on death triggers, and the
                         // entity may also be unreachable after a bounce/exile by the time
                         // we check. For enter-battlefield events the entity is still in state

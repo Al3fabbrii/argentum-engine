@@ -150,8 +150,8 @@ X ≥ 6. "Lose X life" is already expressible.
 leaves-battlefield damage trigger as a `triggeredAbility { }` block) and exposed
 `Effects.CreateMunitionsToken(count)` as the facade. The predefined-token path automatically
 picks up the LTB trigger via `cardRegistry.getCard("Munitions")` in `TriggerAbilityResolver`,
-so no executor change was needed. `CreateTokenEffect.nonCreature` remains as a lower-level
-escape hatch for ad-hoc noncreature tokens (no card uses it directly).
+so no token-creation change was needed — the predefined-token registry already supports
+noncreature type lines and embedded abilities.
 
 ---
 

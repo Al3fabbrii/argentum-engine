@@ -96,13 +96,7 @@ data class CreateTokenEffect(
     val exileAtStep: Step? = null,
     val sacrificeAtStep: Step? = null,
     /** Counters to place on the token when it enters the battlefield. */
-    val initialCounters: Map<String, Int> = emptyMap(),
-    /**
-     * When true the token has no Creature type — used for non-creature tokens
-     * (e.g., the Munitions artifact token from Weapons Manufacturing). [power]
-     * and [toughness] are ignored and the token enters without [CreatureStats].
-     */
-    val nonCreature: Boolean = false
+    val initialCounters: Map<String, Int> = emptyMap()
 ) : Effect {
     constructor(
         count: Int,
@@ -119,32 +113,23 @@ data class CreateTokenEffect(
 
     override val description: String = buildString {
         append("Create ")
-        val tokenKind = buildString {
-            val colorWords = colors.joinToString(" and ") { it.displayName.lowercase() }
-            if (!nonCreature) {
-                append("$power/$toughness ")
-            }
-            if (colorWords.isNotEmpty()) append("$colorWords ")
-            else if (!nonCreature || artifactToken || legendary) append("colorless ")
-            if (legendary) append("legendary ")
-            if (creatureTypes.isNotEmpty()) {
-                append(creatureTypes.joinToString(" "))
-                append(" ")
-            }
-            if (artifactToken) append("artifact ")
-            append(if (nonCreature) "token" else "creature token")
-        }
         when (val c = count) {
             is DynamicAmount.Fixed -> {
-                append(if (c.amount == 1) "a " else "${c.amount} ")
-                append(tokenKind)
+                append(if (c.amount == 1) "a" else "${c.amount}")
+                append(" $power/$toughness ")
+                append(colors.joinToString(" and ") { it.displayName.lowercase() })
+                append(" ")
+                append(creatureTypes.joinToString(" "))
+                append(" creature token")
                 if (c.amount != 1) append("s")
             }
             else -> {
                 append(c.description)
+                append(" $power/$toughness ")
+                append(colors.joinToString(" and ") { it.displayName.lowercase() })
                 append(" ")
-                append(tokenKind)
-                append("s")
+                append(creatureTypes.joinToString(" "))
+                append(" creature tokens")
             }
         }
         if (keywords.isNotEmpty()) {
