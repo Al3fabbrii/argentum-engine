@@ -73,8 +73,8 @@ the next card? Does the name match the semantics?*
    dynamic amounts, modal/choice shapes, and replacement effects. **Most features are 80% already
    built.** Find the closest existing primitive before designing a new one.
 3. **Research the actual MTG rules online — don't work from memory.** Before designing anything,
-   look up how the mechanic *actually* works in the Comprehensive Rules at
-   <https://yawgatog.com/resources/magic-rules/>, and check Gatherer / Scryfall oracle rulings for
+   look up how the mechanic *actually* works in the Comprehensive Rules via the official WotC rules page
+   <https://magic.wizards.com/en/rules> (read the linked plain-text `.txt` download), and check Gatherer / Scryfall oracle rulings for
    the cards that use it (<https://gatherer.wizards.com/> · <https://scryfall.com/>). Use `WebSearch`
    / `WebFetch` to pull the relevant CR section and any official rulings. Mechanics are full of
    edge cases that are easy to misremember — replacement vs. trigger ordering, what counts as
@@ -268,8 +268,8 @@ signature changed, run the broader module suite.
 1. `just build` (no new behavior to exercise) or `just test` (new effects/engine changes). Fix only
    failures your change caused; if a pre-existing/other-agent test fails, report it and stop
    (`CLAUDE.md` collaboration rules — never revert or stash others' work).
-2. **Verify CR rule numbers** you cite in code/comments/commit at
-   <https://yawgatog.com/resources/magic-rules/> before committing — they're easy to misremember.
+2. **Verify CR rule numbers** you cite in code/comments/commit via the official WotC rules page
+   <https://magic.wizards.com/en/rules> (read the linked plain-text `.txt` download) before committing — they're easy to misremember.
    Describe the rule by name if you can't confirm the number.
 3. Commit with a message describing the capability (e.g. `Add <mechanic> support to the engine`).
    End the message with the project's `Co-Authored-By` trailer. Commit to the current branch; don't
