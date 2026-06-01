@@ -73,8 +73,14 @@ class AmassExecutor(
             )
             // Preserve the AmassedArmy pipeline entry produced by AmassResolution so a
             // composite "Amass X. Then [effect using amassed Army's power]" still threads
-            // the just-amassed token into the follow-up effect.
-            return applied.copy(events = createResult.events + applied.events)
+            // the just-amassed token into the follow-up effect. Merge both halves' pipeline
+            // state (the token-creation step doesn't stash any today, but if it ever does we
+            // mustn't drop it); `applied` wins on key conflict so the amass slot is authoritative.
+            return applied.copy(
+                events = createResult.events + applied.events,
+                updatedCollections = createResult.updatedCollections + applied.updatedCollections,
+                updatedSubtypeGroups = createResult.updatedSubtypeGroups + applied.updatedSubtypeGroups
+            )
         }
 
         // Exactly one Army → no choice to make.
