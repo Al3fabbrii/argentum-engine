@@ -130,12 +130,14 @@ data class RestrictedManaEntry(
 )
 
 /**
- * Tracks how many turns this player has taken so far in the game (CR 500.X / 502.X).
+ * Tracks how many turns this player has taken so far in the game.
  *
- * Incremented by [com.wingedsheep.engine.core.TurnManager.startTurn] every time a
- * player becomes the active player, *after* skipped turns resolve — so it only
- * counts turns the player actually took, not skipped ones. Initialized to 0 in
- * GameInitializer; the value is 1 once they're partway through their first turn.
+ * Per CR 500.1 each turn consists of five phases, and CR 500.11 / 614.10a make a
+ * skipped turn "proceed past as though it didn't exist" — so this counter is
+ * incremented inside [com.wingedsheep.engine.core.TurnManager.startTurn], which
+ * only runs for turns the player actually takes. Skipped turns don't fire it.
+ * Initialized to 0 in GameInitializer; the value is 1 once they're partway
+ * through their first taken turn.
  *
  * Used by cards like Starting Town: "this land enters tapped unless it's your
  * first, second, or third turn of the game." Eval-side condition is

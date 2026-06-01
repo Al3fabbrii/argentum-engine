@@ -114,9 +114,10 @@ class TurnManager(
             }
         }
 
-        // Increment the active player's turn-taken counter (CR 500.X — count only
-        // turns the player actually takes, not skipped ones, so this fires here
-        // rather than ahead of the skip check).
+        // Increment the active player's turn-taken counter. CR 500.11 / 614.10a
+        // make a skipped turn "proceed past as though it didn't exist", so a
+        // skipped turn should not count — the increment lives here, downstream of
+        // the SkipNextTurn consumption path that decides whether a turn runs at all.
         newState = newState.updateEntity(playerId) { container ->
             val prev = container.get<PlayerTurnsTakenComponent>() ?: PlayerTurnsTakenComponent()
             container.with(prev.increment())

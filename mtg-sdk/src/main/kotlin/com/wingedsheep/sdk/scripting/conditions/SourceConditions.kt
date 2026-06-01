@@ -70,6 +70,11 @@ data object YouControlSource : Condition {
 @SerialName("ControllerTurnsTakenAtMost")
 @Serializable
 data class ControllerTurnsTakenAtMost(val threshold: Int) : Condition {
+    init {
+        require(threshold >= 1) {
+            "ControllerTurnsTakenAtMost threshold must be >= 1 (turns are 1-indexed)"
+        }
+    }
     override val description: String = "it's your ${turnsOrdinal(threshold)} turn of the game"
     override fun applyTextReplacement(replacer: TextReplacer): Condition = this
 
@@ -78,7 +83,22 @@ data class ControllerTurnsTakenAtMost(val threshold: Int) : Condition {
             1 -> "first"
             2 -> "first or second"
             3 -> "first, second, or third"
-            else -> "first through ${n}th"
+            4 -> "first, second, third, or fourth"
+            5 -> "first, second, third, fourth, or fifth"
+            // Above 5 the printed phrasings switch to "first through Nth" wording —
+            // accept any int and fall back to that compact form.
+            else -> "first through ${n}${ordinalSuffix(n)}"
+        }
+
+        private fun ordinalSuffix(n: Int): String {
+            val mod100 = n % 100
+            if (mod100 in 11..13) return "th"
+            return when (n % 10) {
+                1 -> "st"
+                2 -> "nd"
+                3 -> "rd"
+                else -> "th"
+            }
         }
     }
 }
