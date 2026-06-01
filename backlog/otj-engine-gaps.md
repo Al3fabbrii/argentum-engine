@@ -1,0 +1,213 @@
+# Outlaws of Thunder Junction — Engine Gap Analysis
+
+Cross-reference of the **254 remaining (unimplemented) OTJ cards** against the engine's actual
+capabilities (SDK reference + source verification, June 2026). Generated to scope what must be
+built before the set can be completed.
+
+**Status:** 17 / 271 implemented (6%). Card list from `scripts/card-status --list --set OTJ`.
+Oracle text pulled from Scryfall (`set:otj unique:cards`, 276 printings → 271 unique cards + 5
+basics).
+
+## Bottom line
+
+OTJ is built around a small set of named mechanics, **most of which the engine already supports**:
+Plot, Spree, "commit a crime", the Outlaw creature-type group, Treasure, and Crew are all done.
+The **one headline keyword gap is Saddle / Mount** (17 cards) — there is zero engine support for
+it. Everything else is a handful of small recurring primitives plus ~12 genuinely one-off cards.
+Once Saddle lands, the overwhelming majority of the set is buildable today (standard creatures,
+removal, Deserts, Plot/Spree spells, crime payoffs, token-makers).
+
+### Already supported — no new engine work
+
+- **Plot** (CR 718) — full special-action support: `KeywordAbility.Plot`, `PlotEnumerator`,
+  `PlottedComponent`, `CardPlottedEvent`, sorcery-speed gate, cast-plotted-from-exile. **38 cards.**
+  (Aloe Alchemist, Aven Interrupter, Demonic Ruckus, Fblthp, Jace Reawakened, Outlaw Stitcher,
+  Slickshot Show-Off, Stingerback Terror, …)
+- **Spree** — modal "choose one or more additional costs" casting via the existing modal
+  per-mode-additional-cost path (`CastSpellEnumerator`, `ModalPerModeAdditionalCostTest`).
+  **21 cards.** (Three Steps Ahead, Smuggler's Surprise, Final Showdown, Rush of Dread,
+  Great Train Heist, Trash the Town, …)
+- **Commit a crime** trigger — `CommitCrimeEvent` + `CrimeDetector` (targeting opponents / their
+  permanents / cards / spells / planeswalkers), emitted once per cast or activation in
+  `StackResolver`. `Triggers.youCommitCrime` / `Conditions.YouCommittedACrimeThisTurn` work.
+  **26 cards.** (Forsaken Miner — already implemented — Marchesa, Magda, Oko the Ringleader,
+  Vadmir, Nimble Brigand, …)
+- **Outlaw** creature-type group (Assassin, Mercenary, Pirate, Rogue, Warlock) —
+  `Filters.OutlawCreature` / `NonOutlawCreature`, `Subtype.OUTLAW_TYPES`. (Double Down,
+  Hellspur Posse Boss, Laughing Jasper Flint, affinity-for-outlaws, …)
+- **Treasure** tokens, **Crew N** keyword, **Desert** subtype (`Subtype.DESERT`),
+  landcycling / typecycling — all present.
+- Building blocks several gaps below compose: keyword counters
+  (flying/first-strike/deathtouch/trample/lifelink/indestructible), tapped-and-attacking tokens,
+  "next end step" / event-based delayed triggers, impulse draw (`MayPlayFromExile`),
+  copy-spell-on-stack, copy-card-in-zone-then-cast, becomes-copy/clone, `NthSpellCast` trigger
+  (first/second spell each turn), modal spells, exile-until-leaves (O-Ring), dynamic/mass P/T,
+  `ExchangeControlEffect`, `DoubleCountersEffect`, divided damage, sacrifice-a-token cost,
+  exile-from-graveyard cost, `EntersWithChoice(COLOR/MODE)`, Saga + planeswalker frameworks.
+
+What follows are the **genuine gaps** — elements no current SDK primitive expresses.
+
+---
+
+## Tier 1 — Headline keyword (17 cards, highest leverage)
+
+### 1. Saddle N + Mount subtype — **the one big gap**
+
+Zero engine references to "saddle" anywhere in `mtg-sdk/src` or `rules-engine/src`. (The `Mount`
+subtype *string* already exists in `Subtype.kt`, so Mount-referencing filters like "you control a
+Mount" work — only the keyword action and saddled state are missing.)
+
+Saddle is an activated special action: **"Tap any number of other untapped creatures you control
+with total power N or greater: This Mount becomes saddled until end of turn. Saddle only as a
+sorcery."** Mounts then gate abilities on the saddled state — "Whenever this Mount attacks **while
+saddled**, …" or "As long as it's saddled, …".
+
+**Needs:**
+- A new `Keyword.SADDLE(n)` + a `card { saddle(n) }` DSL builder (mirrors `crew(n)`).
+- A **special-action / activated-ability** that taps a chosen set of other untapped creatures whose
+  **total power ≥ N** (reuses the same "choose creatures totalling power X" selection that Convoke /
+  Harmonize's tap-for-power already model on the cost side), sorcery-speed gated.
+- A **`SaddledComponent`** (saddled-until-end-of-turn state, cleared in cleanup), analogous to the
+  crewed/animated transient states.
+- A trigger condition **"attacks while saddled"** and a static condition **"as long as it's
+  saddled"** — the attack-trigger plumbing already exists; this is one new `Condition.SourceIsSaddled`.
+
+→ **All 17 Mounts:** Archmage's Newt, Bounding Felidar, Bridled Bighorn, Calamity Galloping Inferno,
+  Caustic Bronco, Congregation Gryff, Drover Grizzly, Fortune Loyal Steed, Giant Beaver, Gila
+  Courser, Ornery Tumblewagg, Quilled Charger, Rambling Possum, Seraphic Steed, Stubborn
+  Burrowfiend, The Gitrog Ravenous Ride, Trained Arynx.
+
+---
+
+## Tier 2 — Small recurring primitives
+
+### 2. "Contributed this turn" set-tracker (saddled-it / crewed-it)
+
+Several Mounts and one Vehicle pay off the **set of creatures that saddled / crewed this permanent
+this turn** — to put counters on them, bounce them, or count them. Crew and (the new) Saddle both
+perform the action but record nothing afterward. Needs one shared per-permanent, per-turn
+**"contributors this turn"** record (cleared each turn) with a `DynamicAmount.Count` / collection
+gather over it.
+
+→ Giant Beaver, Ornery Tumblewagg, Rambling Possum (saddlers get counters / bounce),
+  The Gitrog Ravenous Ride & Calamity (consume the saddlers), **Luxurious Locomotive** (Treasure per
+  creature that crewed it this turn). Same shape — build once, share between Saddle and Crew.
+
+### 3. `DynamicAmount` over spells cast this turn (filtered, per-player, exclude-self)
+
+The data exists (`GameState.spellsCastThisTurnByPlayer: Map<EntityId, List<CastSpellRecord>>`) and
+there is a `YouCastSpellsThisTurn` **condition**, but **no `DynamicAmount`** that reads a *count* of
+(optionally filtered: noncreature; optionally "other than this spell") spells a player cast this
+turn. Add a `DynamicAmount.SpellsCastThisTurn(player, filter, excludeSelf)`.
+
+→ **Thunder Salvo** ("2 plus the number of other spells you've cast this turn"), **Magebane Lizard**
+  ("noncreature spells they've cast this turn").
+
+### 4. "Cast from your hand" cast-zone qualifier on the spell-cast tracker
+
+`CastSpellRecord` (verified: `typeLine, manaValue, colors, isFaceDown, paidWithTreasureMana`) has
+**no source-zone field**, so "you haven't cast a spell **from your hand** this turn" can't be
+distinguished from plotted / flashback / impulse casts. Add a `fromHand` (or `sourceZone`) flag to
+`CastSpellRecord` and a `fromHand` qualifier on the condition.
+
+→ Inventive Wingsmith, Prairie Dog, Canyon Crab, Emergent Haunting, Jem Lightfoote, Wrangler of the
+  Damned, Annie Flash the Veteran. (Stoic Sphinx says "haven't cast a spell this turn" with no zone
+  qualifier — buildable today.)
+
+### 5. "Cast for free / no mana was spent" cast-state condition
+
+`WasCast` covers only "wasn't cast." The clause **"or no mana was spent to cast it"** (true for free
+casts like Plot, which *are* casts) has no primitive. Stamp a "mana paid == 0 at cast" flag on the
+cast record and expose `Condition.NoManaSpentToCast` (OR-composed with `not(WasCast)`).
+
+→ Freestrider Commando (enters with 2 counters if cast for free), Satoru the Infiltrator (per-batch
+  "none were cast or no mana was spent").
+
+### 6. `CARDS_DRAWN` turn-tracker + characteristic-defining P/T from it
+
+`TurnTracker` has no `CARDS_DRAWN` accumulator, so "power equal to the number of cards you've drawn
+this turn" can't be expressed. Add the tracker (engine accumulates on draw events) and read it via
+`DynamicAmount.TurnTracking` for a CDA power.
+
+→ Duelist of the Mind.
+
+---
+
+## Tier 3 — One-off complex cards (each needs unique new functionality)
+
+7. **Copy an activated/triggered ability already on the stack.** Only `CopyTargetSpell` (+ a
+   triggered-ability copy) exists — no effect to copy a target **activated** ability, and no trigger
+   predicate for "an ability that targets a creature or player." Needs a `CopyTargetAbility` effect +
+   a targets-something trigger filter.
+   → **Ertha Jo, Frontier Mentor**; also the copy-activated-ability mode of **Return the Favor**.
+
+8. **Aura "becomes attached" trigger + control-for-as-long-as-attached + MV-on-attach condition.**
+   No "becomes attached" trigger event, no MV-comparison-on-attachment condition, and no control
+   duration tied to "while this Aura remains attached." Three small new pieces.
+   → **Eriette, the Beguiler**.
+
+9. **Characteristic-defining base P/T on a created token.** Token `dynamicPower/Toughness` are
+   evaluated once at creation; there's no Layer-7b CDA "set base P/T = a dynamic count" granted to a
+   token (here "= the number of lands you control", recomputed continuously).
+   → **Bonny Pall, Clearcutter** (the Beau token).
+
+10. **Additional upkeep steps inserted into the current turn.** Extra *combat* phases and extra
+    *turns* are supported, but not inserting N extra upkeep steps after the current phase.
+    → **Obeka, Splitter of Seconds**.
+
+11. **"Tap an artifact (token) for mana" trigger + reflexive same-type mana.** The tap-for-mana
+    trigger is land-only (`LandTappedForMana`); needs generalization to artifact/permanent-tapped-for-mana
+    plus a reflexive effect that mirrors the mana type the tapped object produced.
+    → **Roxanne, Starfall Savant** (second ability; her Meteorite-token half is buildable).
+
+12. **Become a copy of a card in this Equipment's linked exile, while attached.** `BecomesCopyOfTarget`
+    copies a battlefield target; making the equipped creature a copy of the *card sitting in this
+    Equipment's linked exile* (for as long as attached) is a new copy-source + attachment-linked-copy
+    duration. The exile-on-ETB half is supported.
+    → **Assimilation Aegis**.
+
+13. **Conditional attack-tax + a new block-tax static.** `AttackTax` exists but is unconditional and
+    defender-side. Archangel needs (a) the attack tax gated on "as long as this is untapped," and
+    (b) a brand-new **block-tax** ("creatures can't block unless their controller pays {1} each")
+    gated on "as long as this is attacking," with declare-blockers payment enforcement.
+    → **Archangel of Tithes**.
+
+14. **Group flicker (mass blink) + repeat-the-whole-effect X+1 times.** No group exile-and-return
+    effect and no generic "repeat this process X more times" loop wrapper.
+    → **Another Round**.
+
+15. **Targeted reanimate-attached for Auras/Equipment.** Only `ReturnSelfToBattlefieldAttached`
+    (source = self) exists. This mode targets a *separate* graveyard Aura/Equipment and attaches it to
+    a chosen creature on arrival — a targeted reanimate-attached effect.
+    → **One Last Job** (third Spree mode only; modes 1–2 buildable).
+
+16. **Inline "excess damage dealt this way" captured within one resolving spell.** Excess damage is
+    only surfaced as a *trigger* payload (`DealsDamageEvent(requireExcess=true)`), not as a value
+    usable later in the same resolving spell. Needs a reflexive/stored excess amount feeding a
+    dynamic-count token create.
+    → **Hell to Pay** (tapped Treasures = excess damage dealt).
+
+17. **Condition on the type of a permanent sacrificed as an activated-ability cost.** No primitive
+    exposes the identity/type of the cost-sacrificed permanent to a follow-up effect. Needs to record
+    the cost-sacrificed entity + a `WasSacrificedThisWayMatching(filter)` condition.
+    → **Boneyard Desecrator** ("if an outlaw was sacrificed this way, create a Treasure").
+
+18. **Move a face-up exiled card owned by a player to their graveyard (minor).** No primitive targets
+    a face-up card in the exile zone owned by a given player and moves it to that player's graveyard.
+    → **Binding Negotiation** (secondary clause only; its hand-discard half is buildable).
+
+---
+
+## Recommended build order
+
+1. **Saddle N + Mount** (Tier 1) — the single highest-leverage feature; unlocks 17 cards. Build the
+   keyword, the tap-creatures-totalling-power-N special action (reuse Convoke/Harmonize selection),
+   the `SaddledComponent`, and the "while saddled" condition.
+2. **Tier 2 shared primitives** — the contributors-this-turn tracker (#2, shared by Saddle and
+   Crew), the spells-cast `DynamicAmount` (#3), the `fromHand` cast-zone flag (#4), the cast-for-free
+   condition (#5), `CARDS_DRAWN` (#6). Small, each unlocks a few scattered cards.
+3. **Tier-3 one-offs** as the relevant legendaries / rares come up — none block large numbers of
+   cards; pick them off individually.
+
+With Plot, Spree, Crime, Outlaw, Treasure, and Crew already done, **roughly 220 of the 254 remaining
+cards are buildable today**; Saddle plus the Tier-2/Tier-3 items close the rest.
