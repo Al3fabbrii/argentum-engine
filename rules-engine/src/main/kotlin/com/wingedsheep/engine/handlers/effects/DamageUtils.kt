@@ -256,7 +256,11 @@ object DamageUtils {
         val targetName = targetContainer?.get<CardComponent>()?.name
         val targetIsPlayer = targetContainer?.get<LifeTotalComponent>() != null
         val targetIsFaceDown = targetContainer?.has<FaceDownComponent>() == true
-        events.add(DamageDealtEvent(sourceId, targetId, effectiveAmount, false, sourceName = sourceName, targetName = targetName, targetIsPlayer = targetIsPlayer, targetWasFaceDown = targetIsFaceDown))
+        // Capture the recipient's controller + creature-ness now, while it's still on the
+        // battlefield, so recipient-based triggers match even if it dies to this damage (LKI).
+        val targetControllerId = projected.getController(targetId)
+        val targetWasCreature = projected.isCreature(targetId)
+        events.add(DamageDealtEvent(sourceId, targetId, effectiveAmount, false, sourceName = sourceName, targetName = targetName, targetIsPlayer = targetIsPlayer, targetWasFaceDown = targetIsFaceDown, targetControllerId = targetControllerId, targetWasCreature = targetWasCreature))
 
         // Lifelink: if the source has lifelink, its controller gains life equal to the damage dealt (Rule 702.15)
         if (sourceId != null) {

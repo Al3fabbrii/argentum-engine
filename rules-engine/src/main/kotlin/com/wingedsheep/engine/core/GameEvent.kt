@@ -122,7 +122,18 @@ data class DamageDealtEvent(
     val sourceName: String? = null,
     val targetName: String? = null,
     val targetIsPlayer: Boolean = false,
-    val targetWasFaceDown: Boolean = false
+    val targetWasFaceDown: Boolean = false,
+    /**
+     * The recipient's controller at the instant the damage was dealt (CR 603.10 last-known
+     * information). Lets recipient-based damage triggers ("whenever a creature you control / an
+     * opponent controls is dealt damage") still match a recipient that left the battlefield to
+     * the same damage event — combat-damage state-based actions strip the dead creature's
+     * `ControllerComponent` before trigger detection runs. `null` for players and for events
+     * emitted before this was captured.
+     */
+    val targetControllerId: EntityId? = null,
+    /** Whether the recipient was a creature when the damage was dealt (LKI, see [targetControllerId]). */
+    val targetWasCreature: Boolean = false
 ) : GameEvent
 
 /**
