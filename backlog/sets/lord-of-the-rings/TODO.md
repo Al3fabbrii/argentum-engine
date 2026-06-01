@@ -10,22 +10,22 @@ Verify status anytime with: `scripts/card-status --set LTR` (and `--list --set L
 
 ## Status
 
-Draft cards at **171/261**. Every remaining unchecked card in `cards.md` (excluding the five
+Draft cards at **172/261**. Every remaining unchecked card in `cards.md` (excluding the five
 basic lands, which `basicLandsFallback` covers) needs at least one new engine primitive — see
 the "Engine gaps blocking the remaining cards" section below. Each card is listed under the
 primitive it is waiting on, with the exact blocking clause. Stop and open a dedicated PR per
 gap rather than approximating.
 
-Three cards have residual blockers that don't share a clean reusable gap with anything else;
+Two cards have residual blockers that don't share a clean reusable gap with anything else;
 they're listed here so they don't get lost:
 
 - **Grishnákh, Brash Instigator** — needs pipeline state threaded into target-predicate
   filters (its "with power ≤ the amassed Army's power" filter resolves the reference to
   `null` during targeting today).
-- **Shagrat, Loot Bearer** — needs attach-Equipment-on-attack.
-- **The Mouth of Sauron** — needs a dynamic Amass amount keyed to a targeted player's
-  graveyard (expressible by composing existing dynamic-amount primitives in this card's
-  implementation).
+- **Shagrat, Loot Bearer** — `AttachTargetEquipmentToCreatureEffect` exists and
+  `DynamicAmounts.attachmentsOnSelf()` reads the attachment count, but the count is
+  *all attachments* (Equipment + Auras + Fortifications) — Shagrat's "X = the number of
+  Equipment attached" needs an Equipment-filtered AttachmentCount to be rules-faithful.
 
 ## Data sources — do NOT hit the network
 
