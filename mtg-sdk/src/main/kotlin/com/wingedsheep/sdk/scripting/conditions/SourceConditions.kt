@@ -56,6 +56,34 @@ data object YouControlSource : Condition {
 }
 
 /**
+ * Condition: "it's [threshold] or less of the controller's turn of the game".
+ *
+ * True when the controller (resolved through context) has taken at most
+ * [threshold] turns so far — i.e. `PlayerTurnsTakenComponent.count <= threshold`.
+ * Note the counter is incremented at turn start, so during the controller's
+ * first turn it reads 1, not 0.
+ *
+ * Used by cards like Starting Town: "this land enters tapped unless it's your
+ * first, second, or third turn of the game" — that's
+ * `ControllerTurnsTakenAtMost(3)`.
+ */
+@SerialName("ControllerTurnsTakenAtMost")
+@Serializable
+data class ControllerTurnsTakenAtMost(val threshold: Int) : Condition {
+    override val description: String = "it's your ${turnsOrdinal(threshold)} turn of the game"
+    override fun applyTextReplacement(replacer: TextReplacer): Condition = this
+
+    companion object {
+        private fun turnsOrdinal(n: Int): String = when (n) {
+            1 -> "first"
+            2 -> "first or second"
+            3 -> "first, second, or third"
+            else -> "first through ${n}th"
+        }
+    }
+}
+
+/**
  * Condition: "if this creature is your Ring-bearer" (CR 701.52e).
  *
  * True when the source permanent is on the battlefield under the ability's controller and has the

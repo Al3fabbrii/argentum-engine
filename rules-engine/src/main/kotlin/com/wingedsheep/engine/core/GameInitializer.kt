@@ -7,6 +7,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.components.identity.*
 import com.wingedsheep.engine.state.components.player.LandDropsComponent
+import com.wingedsheep.engine.state.components.player.PlayerTurnsTakenComponent
 import com.wingedsheep.engine.state.components.player.ManaPoolComponent
 import com.wingedsheep.engine.state.components.player.MulliganStateComponent
 import com.wingedsheep.sdk.core.Color
@@ -182,6 +183,7 @@ class GameInitializer(
                 LifeTotalComponent(startingLife),
                 ManaPoolComponent(),
                 LandDropsComponent(),
+                PlayerTurnsTakenComponent(count = 0),
                 MulliganStateComponent(
                     mulligansTaken = 0,
                     hasKept = config.skipMulligans  // Auto-keep if skipping mulligans

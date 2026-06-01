@@ -393,6 +393,7 @@ val engineSerializersModule = SerializersModule {
         subclass(ManaPoolComponent::class)
         subclass(LandDropsComponent::class)
         subclass(MulliganStateComponent::class)
+        subclass(PlayerTurnsTakenComponent::class)
         subclass(SkipCombatPhasesComponent::class)
         subclass(SkipDrawStepComponent::class)
         subclass(SkipUntapComponent::class)
