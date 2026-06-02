@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 24 / 190
+**Implemented:** 25 / 190
 ---
 
 - [ ] Action News Crew
@@ -59,7 +59,7 @@
 - [x] Guac & Marshmallow Pizza
 - [x] Hamato Guardian Stance
 - [x] Hard-Won Jitte
-- [ ] Henchbots
+- [x] Henchbots
 - [ ] High-Flying Ace
 - [ ] Ice Cream Kitty
 - [x] Illegitimate Business
