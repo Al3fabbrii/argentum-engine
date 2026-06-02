@@ -321,6 +321,13 @@ class CostCalculator(
                 val spellsCast = state.playerSpellsCastThisTurn[casterId] ?: 0
                 addGenericIncrease(spellsCast * modification.amountPerSpell)
             }
+            is CostModification.IncreaseGenericIfAnyTargetMatches -> {
+                if (chosenTargets.isNotEmpty() &&
+                    anyTargetMatchesFilter(state, casterId, chosenTargets, modification.filter)
+                ) {
+                    addGenericIncrease(modification.amount)
+                }
+            }
             is CostModification.IncreaseLife -> {
                 // Life is not part of the mana cost — collected separately via
                 // [calculateAdditionalLifeCost] and paid alongside mana in CastSpellHandler.
@@ -885,6 +892,7 @@ class CostCalculator(
             // CostCalculator has no entity context; predicate has no static answer here.
             is CardPredicate.ManaValueAtMostEntity -> false
             is CardPredicate.ManaValueAtMostEntityManaSpent -> false
+            is CardPredicate.PowerGreaterThanEntity -> false
             CardPredicate.ManaValueIsEven -> cardDef.manaCost.cmc % 2 == 0
             CardPredicate.ManaValueIsOdd -> cardDef.manaCost.cmc % 2 != 0
 

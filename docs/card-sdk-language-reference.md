@@ -762,6 +762,9 @@ Every `TargetRequirement` carries count semantics (defaults shown):
 - `.manaValueEqualsX()` — mana value **exactly equal** to the number chosen for the source spell/ability
   (set by `Effects.ChooseNumberThen`; resolution-time only — matches nothing without a chosen number). Used by Void.
 - `.manaValueAtMostEntity(ref)` — mana value ≤ a referenced entity's mana value (e.g. Kodama of the East Tree).
+- `.powerGreaterThanEntity(ref)` — power strictly greater than a referenced entity's projected power. Used by
+  Éowyn, Fearless Knight ("exile target creature an opponent controls with greater power") — combine
+  with `EntityReference.Source` to express "greater power than the ability's source".
 - `.manaValueAtMostEntityManaSpent(ref)` — mana value ≤ the mana **actually spent** to cast a referenced
   entity. Reads the live `SpellOnStackComponent` buckets while the entity is still a spell, or the
   `CastRecordComponent` snapshot once it has resolved onto the battlefield (0 if it was never cast).
@@ -910,6 +913,11 @@ sealed set for attack-time facts beyond the basics.
 - `BlocksOrBecomesBlockedBy(filter)` — either direction, partner-filtered;
   sole consumer of `BlocksOrBecomesBlockedByEvent`. Prefer `blocks(attackerFilter=...)`
   when only the blocking direction should fire.
+- `AttacksAndIsntBlocked` — SELF. Fires once per attacker that reaches end of
+  Declare Blockers with no creatures declared as blockers (CR 509.3g). Backed by
+  `BecomesUnblockedEvent` matched against `BlockersDeclaredEvent`. Used for
+  Merchant Ship: "Whenever this creature attacks and isn't blocked, you gain 2 life."
+  (SELF only — an ANY-binding filtered variant isn't wired in `TriggerMatcher` yet.)
 
 **`AttackPredicate`** — extensible "facts about an attack declaration."
 Adding a new attack-time mechanic is one new sealed-case + one matcher branch
@@ -1236,6 +1244,46 @@ Triggers.youCastSpell(
 
 ---
 
+## 8.5 State-triggered abilities (CR 603.8)
+
+A **state-triggered ability** fires whenever a game-state condition becomes true, rather
+than in response to a `GameEvent`. The engine polls the condition at every priority pass
+and emits the trigger on each false → true transition. Once it has fired, a per-permanent
+`StateTriggerLatchesComponent` latch suppresses re-firing until the condition next
+evaluates false again (CR 603.8).
+
+> **Latch note.** The printed CR 603.8 resets after the ability *leaves the stack* and
+> re-triggers if the condition is still true. This engine resets on the condition next
+> being *false* instead — equivalent for "sacrifice this creature" cards (source leaves,
+> condition clears) but divergent for a state trigger that leaves source and condition
+> intact. No such card exists yet; reset-on-leaves-the-stack should be wired before one is
+> authored.
+
+```kotlin
+stateTriggeredAbility {
+    condition = Conditions.YouControl(
+        GameObjectFilter.Land.withSubtype("Island"),
+        negate = true,
+    )
+    effect = Effects.SacrificeTarget(EffectTarget.Self)
+    description = "When you control no Islands, sacrifice this creature"
+}
+```
+
+- `condition` — any `Condition`. Evaluated with the source permanent as
+  `EffectContext.sourceId`; `Player.You` references resolve to the source's controller.
+- `effect` — fires when the condition transitions false → true. Resolves on the stack
+  like an ordinary triggered ability.
+- `description` (optional) — overrides the auto-generated text.
+
+Used for Dandân, Island Fish Jasconius, Merchant Ship ("When you control no Islands,
+sacrifice this creature"), Serendib Djinn ("When you control no lands, sacrifice this
+creature"), and similar "static cleanup" wording in early sets. Differs from an
+intervening-if triggered ability — there is no event to gate on; the engine watches the
+condition itself.
+
+---
+
 ## 9. Static abilities
 
 ```kotlin
@@ -1361,7 +1409,10 @@ staticAbility {
   `ReduceColored(symbols)`, `ReduceColoredPerUnit(symbols, source)`, `IncreaseGeneric(amount)`,
   `IncreaseColored(symbols)` (colored tax — adds colored pips, e.g. the Invasion Leeches'
   "White spells you cast cost {W} more"), `IncreaseGenericPerOtherSpellThisTurn(amountPerSpell)`,
-  `IncreaseLife(amount)`.
+  `IncreaseGenericIfAnyTargetMatches(amount, filter)` (target-gated tax — "{N} more if it targets
+  a Dragon", Dragon's Prey; the increase analogue of the `FixedIfAnyTargetMatches` reduction;
+  applies only once a matching target is chosen, so affordability enumeration treats it as not
+  applying), `IncreaseLife(amount)`.
   Reduction `source: CostReductionSource` covers fixed amounts, counts of permanents/cards in
   zones, target gates, and a few mechanic-specific shapes — e.g. `Fixed`, `CreaturesYouControl`,
   `ArtifactsYouControl`, `PermanentsYouControlMatching(filter)` (the filtered "you control" count —
@@ -2159,6 +2210,16 @@ staticAbility { ability = GrantLandwalkOfChosenType() }
 - `ChooseActionEffect(choices)` — pick one effect from a list.
 - `ChooseColorThenEffect(whenChosen)` — pick a color, then apply a function of the color.
 - `GrantHexproofFromChosenColorEffect(target)` / `GrantProtectionFromChosenColorEffect(target)` — atoms that run inside `ChooseColorThen` and read the chosen color from context (hexproof / protection from that color). Wrap in `ForEachInGroup` for "creatures you control gain protection from the chosen color" (Akroma's Blessing).
+- `Effects.ForEachColorOf(source, effect)` — the **non-interactive sibling of `ChooseColorThen`**:
+  runs `effect` once per color of the entity referenced by `source`, with that color set as the
+  context's chosen color, so the same per-color atoms (`GrantProtectionFromChosenColor`,
+  `GrantHexproofFromChosenColor`, `GrantCantBeBlockedByChosenColor`, …) compose inside it. Source
+  colors come from projected state while the source is on the battlefield (Layer-5 / Devoid honored),
+  else its base `CardComponent.colors` (LKI); a colorless source runs zero times (CR 105.2). For
+  "[group] gain protection from each of `source`'s colors", wrap a group iteration in it —
+  `Effects.ForEachColorOf(source, ForEachInGroupEffect(group, GrantProtectionFromChosenColor(Self)))`
+  — and, when `source` is the about-to-leave permanent, place it before the exile/destroy step
+  (`Composite(ForEachColorOf(…), Exile(…))`) so its colors are still readable (Éowyn, Fearless Knight).
 - `ChooseCreatureTypeEffect(...)` — pause for creature-type selection.
 - `Effects.ChooseCardName(storeAs, prompt?, excludeBasicLandNames?)` — name a card (`ChooseOptionEffect(OptionType.CARD_NAME)`); the chosen name is stored in `chosenValues[storeAs]`. Options are every registry card name (searchable list, not free text); `excludeBasicLandNames` drops the five basics. Match cards by it with `GameObjectFilter.namedFromVariable(storeAs)`. (Desperate Research)
 - `Effects.StoreCardName(from, storeAs)` — capture the name of the first card in collection `from` into `chosenValues[storeAs]`. The "choose a card, then act on cards of that name" counterpart to `ChooseCardName`. (Lobotomy)
