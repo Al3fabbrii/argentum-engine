@@ -117,16 +117,15 @@ trigger + haste) to a specific permanent put onto the battlefield. Put-from-hand
 
 ---
 
-## 17. Once-per-turn gating for triggered abilities (counters-placed → draw)
+## 17. Once-per-turn gating for triggered abilities (counters-placed → draw) — RESOLVED
 
 **Cards:** Terrasymbiosis.
 
-**Clause:** "Whenever you put one or more +1/+1 counters on a creature you control, you may draw that
-many cards. Do this only once each turn."
-
-**Plan:** The trigger and "draw that many"
-(`ContextPropertyKey.TRIGGER_COUNTERS_PLACED_AMOUNT`) likely exist; the gap is a generic
-"do this only once each turn" limiter on a triggered ability.
+**Resolution:** No engine work was needed. `TriggeredAbility.oncePerTurn` already exists
+(used by Scavenger's Talent, Mechan Assembler, etc.), `Triggers.PlusOneCountersPlacedOnYourCreature`
+covers the counters-placed trigger, and `DynamicAmount.ContextProperty(TRIGGER_COUNTERS_PLACED_AMOUNT)`
+is the "that many" amount. Pairing them with `optional = true` for the "may" gives the full
+ability.
 
 ---
 
