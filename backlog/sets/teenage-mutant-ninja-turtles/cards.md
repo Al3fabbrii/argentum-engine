@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 43 / 190
+**Implemented:** 44 / 190
 ---
 
 - [ ] Action News Crew
@@ -126,7 +126,7 @@
 - [ ] Pizza Face, Gastromancer
 - [ ] Prehistoric Pet
 - [x] Primordial Pachyderm
-- [ ] Punk Frogs
+- [x] Punk Frogs
 - [ ] Purple Dragon Punks
 - [ ] Putrid Pals
 - [ ] Quintessential Katana
