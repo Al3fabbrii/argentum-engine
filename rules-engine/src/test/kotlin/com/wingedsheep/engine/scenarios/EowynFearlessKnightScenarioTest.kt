@@ -12,6 +12,9 @@ import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.core.Supertype
 import com.wingedsheep.sdk.core.TypeLine
+import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Targets
+import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.CreatureStats
 import com.wingedsheep.sdk.model.Deck
@@ -72,13 +75,33 @@ class EowynFearlessKnightScenarioTest : FunSpec({
     // so the grant should produce zero protection effects.
     val ColorlessBrute = bear("Colorless Brute", "{4}", 4, 4)
 
+    // 4/4 printed-RED Bear — legal target by power. Used to prove the grant follows the target's
+    // PROJECTED colors, not its printed ones, after a Layer-5 recolor.
+    val CrimsonBrute = bear("Crimson Brute", "{3}{R}", 4, 4)
+
     // My 1/1 mono-white legendary — should gain protection from the exiled creature's colours.
     val MyLegend = legendaryKnight("Test Legend", "{W}", 1, 1)
+
+    // {G} instant: "target creature becomes green until end of turn" — a Layer-5 colour change so a
+    // printed-RED creature projects as GREEN, letting us assert the grant reads projected colours.
+    val VerdantWash = card("Verdant Wash") {
+        manaCost = "{G}"
+        colorIdentity = "G"
+        typeLine = "Instant"
+        oracleText = "Target creature becomes green until end of turn."
+        spell {
+            val t = target("target creature", Targets.Creature)
+            effect = Effects.ChangeColor(t, setOf(Color.GREEN))
+        }
+    }
 
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
         driver.registerCards(
-            TestCards.all + listOf(EowynFearlessKnight, DimirBear, EqualRedBear, SmallBear, ColorlessBrute, MyLegend)
+            TestCards.all + listOf(
+                EowynFearlessKnight, DimirBear, EqualRedBear, SmallBear,
+                ColorlessBrute, CrimsonBrute, MyLegend, VerdantWash,
+            )
         )
         return driver
     }
@@ -234,5 +257,50 @@ class EowynFearlessKnightScenarioTest : FunSpec({
             .hasKeyword(myLegend, "PROTECTION_FROM_BLUE") shouldBe false
         StateProjector().project(driver.state)
             .hasKeyword(myLegend, "PROTECTION_FROM_BLACK") shouldBe false
+    }
+
+    test("grant follows the target's projected colors after a Layer-5 recolor, not its printed colors") {
+        val driver = createDriver()
+        driver.initMirrorMatch(
+            deck = Deck.of("Plains" to 20, "Mountain" to 20),
+            startingLife = 20,
+        )
+
+        val me = driver.activePlayer!!
+        val opponent = driver.getOpponent(me)
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        // Opponent's 4/4 is printed RED, but a Layer-5 effect will recolor it to GREEN before Éowyn
+        // exiles it. The grant must read GREEN (projected), never RED (base printed).
+        val crimsonBrute = driver.putCreatureOnBattlefield(opponent, "Crimson Brute")
+        val myLegend = driver.putCreatureOnBattlefield(me, "Test Legend")
+
+        // Recolor the Brute to green until end of turn.
+        val wash = driver.putCardInHand(me, "Verdant Wash")
+        driver.giveMana(me, Color.GREEN, 1)
+        driver.castSpell(me, wash, listOf(crimsonBrute)).isSuccess shouldBe true
+        driver.bothPass()
+
+        // Sanity: projection now reports GREEN over the printed RED.
+        val recolored = StateProjector().project(driver.state)
+        recolored.getColors(crimsonBrute) shouldContain "GREEN"
+        recolored.getColors(crimsonBrute) shouldNotContain "RED"
+
+        // Éowyn enters and exiles the (now-green) Brute; her power 3 < 4, so it's a legal target.
+        val eowyn = driver.putCardInHand(me, "Éowyn, Fearless Knight")
+        driver.giveMana(me, Color.RED, 1)
+        driver.giveMana(me, Color.WHITE, 1)
+        driver.giveMana(me, Color.WHITE, 2)
+        driver.castSpell(me, eowyn).isSuccess shouldBe true
+        driver.bothPass()
+        driver.submitTargetSelection(me, listOf(crimsonBrute))
+        driver.bothPass()
+
+        (crimsonBrute in driver.state.getBattlefield()) shouldBe false
+
+        // Protection follows the projected colour (GREEN), not the printed colour (RED).
+        val projected = StateProjector().project(driver.state)
+        projected.hasKeyword(myLegend, "PROTECTION_FROM_GREEN") shouldBe true
+        projected.hasKeyword(myLegend, "PROTECTION_FROM_RED") shouldBe false
     }
 })

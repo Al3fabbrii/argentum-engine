@@ -45,7 +45,7 @@ class GrantProtectionFromColorsOfEntityExecutor : EffectExecutor<GrantProtection
         val sourceId = resolveEntityId(effect.source, context, state)
             ?: return EffectResult.success(state)
 
-        val colors = readColorsAsLastKnown(state, sourceId)
+        val colors = readSourceColors(state, sourceId)
         if (colors.isEmpty()) return EffectResult.success(state)
 
         val matchingIds = BattlefieldFilterUtils.findMatchingOnBattlefield(
@@ -105,11 +105,11 @@ class GrantProtectionFromColorsOfEntityExecutor : EffectExecutor<GrantProtection
                 context.pipeline.storedCollections[EntityReference.AmassedArmy.STORAGE_KEY]?.firstOrNull()
         }
 
-    private fun readColorsAsLastKnown(state: GameState, entityId: EntityId): Set<String> {
+    private fun readSourceColors(state: GameState, entityId: EntityId): Set<String> {
         // On battlefield → projection is authoritative, including an empty set (the source is
-        // legitimately colorless via Devoid or a Layer-5 "becomes colorless" effect). Off
-        // battlefield → no projectedValues entry exists, so fall back to base printed colors
-        // as LKI.
+        // legitimately colorless via Devoid or a Layer-5 "becomes colorless" effect) and any
+        // colors added by a Layer-5 effect. Off battlefield → no projectedValues entry exists,
+        // so fall back to base printed colors as last-known-information.
         if (state.getBattlefield().contains(entityId)) {
             return state.projectedState.getColors(entityId)
         }
