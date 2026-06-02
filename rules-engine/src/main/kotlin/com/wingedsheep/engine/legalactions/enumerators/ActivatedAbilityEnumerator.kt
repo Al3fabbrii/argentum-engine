@@ -174,6 +174,8 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
                 var blightCreatures: List<EntityId> = emptyList()
                 var discardCost: AbilityCost.Discard? = null
                 var discardTargets: List<EntityId>? = null
+                var craftCost: AbilityCost.Craft? = null
+                var craftMaterials: List<EntityId> = emptyList()
                 var costAffordable = true
 
                 when (effectiveCost) {
@@ -436,6 +438,21 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
                                         break
                                     }
                                 }
+                                is AbilityCost.Craft -> {
+                                    // Combined BF+GY material pool (CR 702.167a-b). Records the cost
+                                    // and full candidate list so the UI can render BF + GY side-by-side.
+                                    val battlefieldMaterials = projected.getBattlefieldControlledBy(playerId)
+                                        .filter { it != entityId }
+                                        .filter { context.predicateEvaluator.matches(state, projected, it, subCost.filter, com.wingedsheep.engine.handlers.PredicateContext(controllerId = playerId)) }
+                                    val graveyardMaterials = state.getZone(ZoneKey(playerId, Zone.GRAVEYARD))
+                                        .filter { context.predicateEvaluator.matches(state, state.projectedState, it, subCost.filter, com.wingedsheep.engine.handlers.PredicateContext(controllerId = playerId)) }
+                                    if (battlefieldMaterials.size + graveyardMaterials.size < subCost.minCount) {
+                                        costCanBePaid = false
+                                        break
+                                    }
+                                    craftCost = subCost
+                                    craftMaterials = battlefieldMaterials + graveyardMaterials
+                                }
                                 else -> {}
                             }
                         }
@@ -515,7 +532,8 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
                     counterRemovalCreatures,
                     hasForageCost, forageGraveyardCards, forageFoodTargets,
                     blightCost, blightCreatures,
-                    discardCost, discardTargets
+                    discardCost, discardTargets,
+                    craftCost, craftMaterials
                 )
 
                 // Calculate X cost info for activated abilities with X in their mana cost
@@ -808,8 +826,19 @@ class ActivatedAbilityEnumerator : ActionEnumerator {
         blightCost: AbilityCost.Blight? = null,
         blightCreatures: List<EntityId> = emptyList(),
         discardCost: AbilityCost.Discard? = null,
-        discardTargets: List<EntityId>? = null
+        discardTargets: List<EntityId>? = null,
+        craftCost: AbilityCost.Craft? = null,
+        craftMaterials: List<EntityId> = emptyList()
     ): AdditionalCostData? {
+        if (craftCost != null) {
+            return AdditionalCostData(
+                description = craftCost.description,
+                costType = "Craft",
+                validCraftMaterials = craftMaterials,
+                craftMinCount = craftCost.minCount,
+                counterRemovalCreatures = counterRemovalCreatures
+            )
+        }
         if (tapTargets != null && tapCost != null) {
             return AdditionalCostData(
                 description = tapCost.description,

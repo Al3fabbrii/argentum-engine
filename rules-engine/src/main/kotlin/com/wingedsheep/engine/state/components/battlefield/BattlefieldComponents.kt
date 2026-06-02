@@ -526,6 +526,23 @@ data class LinkedExileComponent(
 ) : Component
 
 /**
+ * Cards exiled to pay the Craft activation cost that put this permanent onto the battlefield
+ * (CR 702.167c). Attached fresh by
+ * [com.wingedsheep.engine.handlers.effects.permanent.types.ReturnSelfFromExileTransformedExecutor]
+ * when the Craft ability resolves; read by the `DynamicAmount.CraftedMaterialsTotalPower`
+ * evaluator on the back face.
+ *
+ * Stripped on every battlefield entry by [applyBattlefieldEntry] — Rule 400.7 makes the
+ * re-entering object a new object, so a Mastercraft Raptor that subsequently leaves and
+ * returns by some other means (blink, reanimate) starts fresh with no crafted materials.
+ * The craft-return effect explicitly re-attaches it on its specific entry path.
+ */
+@Serializable
+data class CraftedFromExiledComponent(
+    val exiledIds: List<EntityId> = emptyList()
+) : Component
+
+/**
  * Marks a permanent as having been dealt damage this turn.
  * Cleared at end of turn by CleanupPhaseManager.
  * Used for StatePredicate.WasDealtDamageThisTurn.
