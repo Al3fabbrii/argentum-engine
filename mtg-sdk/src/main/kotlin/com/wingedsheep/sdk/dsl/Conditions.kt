@@ -333,6 +333,17 @@ object Conditions {
         Compare(DynamicAmount.LifeTotal(Player.You), ComparisonOperator.GTE, DynamicAmount.Fixed(threshold))
 
     /**
+     * If the controller has taken at most [threshold] turns so far — i.e. it's
+     * one of their first [threshold] turns of the game. The counter increments at
+     * turn start (so during their first turn it reads 1).
+     *
+     * Used by Starting Town: "enters tapped unless it's your first, second, or
+     * third turn of the game" — pass `threshold = 3`.
+     */
+    fun ControllerTurnsTakenAtMost(threshold: Int): ConditionInterface =
+        com.wingedsheep.sdk.scripting.conditions.ControllerTurnsTakenAtMost(threshold)
+
+    /**
      * If you have more life than an opponent.
      */
     val MoreLifeThanOpponent: ConditionInterface =

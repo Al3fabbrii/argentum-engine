@@ -27,6 +27,7 @@ import com.wingedsheep.engine.state.components.identity.FaceDownComponent
 import com.wingedsheep.engine.state.components.identity.LifeTotalComponent
 import com.wingedsheep.engine.state.components.identity.RingBearerComponent
 import com.wingedsheep.engine.state.components.player.LandDropsComponent
+import com.wingedsheep.engine.state.components.player.PlayerTurnsTakenComponent
 import com.wingedsheep.engine.state.components.player.WasDealtCombatDamageThisTurnComponent
 import com.wingedsheep.sdk.core.CounterType
 import com.wingedsheep.sdk.core.Keyword
@@ -51,6 +52,7 @@ import com.wingedsheep.sdk.scripting.conditions.IsNotYourTurn
 import com.wingedsheep.sdk.scripting.conditions.IsYourTurn
 import com.wingedsheep.sdk.scripting.conditions.NotCondition
 import com.wingedsheep.sdk.scripting.conditions.OpponentSpellOnStack
+import com.wingedsheep.sdk.scripting.conditions.ControllerTurnsTakenAtMost
 import com.wingedsheep.sdk.scripting.conditions.SourceCastForImpending
 import com.wingedsheep.sdk.scripting.conditions.SourceIsModified
 import com.wingedsheep.sdk.scripting.conditions.SourceChosenModeIs
@@ -148,6 +150,18 @@ class ConditionEvaluator(
 
             is IsYourTurn -> ctx.controllerId?.let { state.activePlayerId == it } ?: false
             is IsNotYourTurn -> ctx.controllerId?.let { state.activePlayerId != it } ?: false
+
+            // Reads the controller's PlayerTurnsTakenComponent (incremented in
+            // TurnManager.startTurn). Returns false when there's no controller
+            // (e.g. some projection-time evaluations) — the unless-branch then
+            // falls through, which matches "enters tapped" for the default case.
+            is ControllerTurnsTakenAtMost -> {
+                val controllerId = ctx.controllerId
+                val taken = controllerId?.let {
+                    state.getEntity(it)?.get<PlayerTurnsTakenComponent>()?.count
+                }
+                taken != null && taken <= condition.threshold
+            }
 
             is SourcePlottedOnPriorTurn -> {
                 val sourceId = ctx.sourceId

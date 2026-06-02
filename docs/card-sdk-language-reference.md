@@ -1763,6 +1763,10 @@ contexts.
 - `IsYourTurn` — it's your turn.
 - `IsNotYourTurn` — it's an opponent's turn.
 - `IsInPhase(phase)` — currently in `BEGINNING | MAIN | COMBAT | …`.
+- `ControllerTurnsTakenAtMost(n)` — the controller has taken at most N turns so far
+  (1-indexed once they're partway through their first turn). Reads
+  `PlayerTurnsTakenComponent` set by `TurnManager.startTurn`. Used by Starting Town
+  ("your first, second, or third turn of the game" → `n = 3`).
 
 ### Per-turn counts
 
