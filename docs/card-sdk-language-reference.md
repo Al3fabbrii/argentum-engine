@@ -910,6 +910,12 @@ sealed set for attack-time facts beyond the basics.
 - `BlocksOrBecomesBlockedBy(filter)` — either direction, partner-filtered;
   sole consumer of `BlocksOrBecomesBlockedByEvent`. Prefer `blocks(attackerFilter=...)`
   when only the blocking direction should fire.
+- `AttacksAndIsntBlocked` — SELF. Fires once per attacker that reaches end of
+  Declare Blockers with no blockers assigned (CR 509.7). Backed by
+  `BecomesUnblockedEvent` matched against `BlockersDeclaredEvent`. Used for
+  Merchant Ship: "Whenever this creature attacks and isn't blocked, you gain 2 life."
+- `attacksAndIsntBlocked(filter)` — ANY-binding factory variant: "Whenever a
+  [filter] attacks and isn't blocked."
 
 **`AttackPredicate`** — extensible "facts about an attack declaration."
 Adding a new attack-time mechanic is one new sealed-case + one matcher branch
@@ -1233,6 +1239,39 @@ Triggers.youCastSpell(
     control on your next attack). With `fireOnce = false` (default) it fires on every matching event
     until expiry (double-strike combat damage). One-shot consumption happens when the trigger goes
     on the stack (`TriggerProcessor`), so a second matching event the same turn won't re-fire it.
+
+---
+
+## 8.5 State-triggered abilities (CR 603.8)
+
+A **state-triggered ability** fires whenever a game-state condition becomes true, rather
+than in response to a `GameEvent`. The engine polls the condition at every priority pass
+and emits the trigger on each false → true transition. Once it has fired, a per-permanent
+`StateTriggerLatchesComponent` latch suppresses re-firing until the condition next
+evaluates false again (CR 603.8d).
+
+```kotlin
+stateTriggeredAbility {
+    condition = Conditions.YouControl(
+        GameObjectFilter.Land.withSubtype("Island"),
+        negate = true,
+    )
+    effect = Effects.SacrificeTarget(EffectTarget.Self)
+    description = "When you control no Islands, sacrifice this creature"
+}
+```
+
+- `condition` — any `Condition`. Evaluated with the source permanent as
+  `EffectContext.sourceId`; `Player.You` references resolve to the source's controller.
+- `effect` — fires when the condition transitions false → true. Resolves on the stack
+  like an ordinary triggered ability.
+- `description` (optional) — overrides the auto-generated text.
+
+Used for Dandân, Island Fish Jasconius, Merchant Ship ("When you control no Islands,
+sacrifice this creature"), Serendib Djinn ("When you control no lands, sacrifice this
+creature"), and similar "static cleanup" wording in early sets. Differs from an
+intervening-if triggered ability — there is no event to gate on; the engine watches the
+condition itself.
 
 ---
 

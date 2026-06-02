@@ -519,6 +519,51 @@ sealed interface GameEvent : TextReplaceable<GameEvent> {
     }
 
     /**
+     * Synthetic "trigger" event used to wrap a [StateTriggeredAbility]'s effect into a
+     * [TriggeredAbility] when the engine enqueues a state trigger onto the stack
+     * (CR 603.8). This event is never matched against real game events — the engine
+     * detects state-trigger transitions via the [com.wingedsheep.engine.event.StateTriggerPoller]
+     * and produces a [com.wingedsheep.engine.event.PendingTrigger] directly.
+     */
+    @SerialName("StateConditionMetEvent")
+    @Serializable
+    data object StateConditionMetEvent : GameEvent {
+        override val description: String = "the state condition is met"
+        override fun applyTextReplacement(replacer: TextReplacer): GameEvent = this
+    }
+
+    /**
+     * When an attacking creature reaches the end of the Declare Blockers step with
+     * no blockers assigned to it (CR 509.7 — "becomes unblocked").
+     *
+     * Binding SELF = "when this creature attacks and isn't blocked",
+     * ANY = "whenever a creature attacks and isn't blocked" (filter=null),
+     * ANY + filter = "whenever a [filter] attacks and isn't blocked" (any controller).
+     *
+     * Mirrors [BecomesBlockedEvent]. Emitted once per unblocked attacker after
+     * blocker declaration is finalized for the current combat.
+     */
+    @SerialName("BecomesUnblockedEvent")
+    @Serializable
+    data class BecomesUnblockedEvent(
+        val filter: GameObjectFilter? = null
+    ) : GameEvent {
+        override val description: String = buildString {
+            if (filter != null) {
+                append("a ${filter.description} attacks and isn't blocked")
+            } else {
+                append("a creature attacks and isn't blocked")
+            }
+        }
+
+        override fun applyTextReplacement(replacer: TextReplacer): GameEvent {
+            val f = filter ?: return this
+            val newFilter = f.applyTextReplacement(replacer)
+            return if (newFilter !== f) copy(filter = newFilter) else this
+        }
+    }
+
+    /**
      * When this creature blocks or becomes blocked by a creature matching [partnerFilter].
      * Binding SELF = "when this creature blocks or becomes blocked by [filter]".
      *
