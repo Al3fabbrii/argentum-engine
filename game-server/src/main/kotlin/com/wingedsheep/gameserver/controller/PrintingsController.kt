@@ -82,11 +82,15 @@ class PrintingsController(
     /**
      * Newest-first by release date — what a deckbuilder picker should show at the top.
      * Printings missing a release date sort last (matches [PrintingRegistry.defaultPrinting]).
-     * Tiebreaker on `(setCode, collectorNumber)` for a stable, deterministic order.
+     * Within a release date the plain (non-alternate-frame) printing sorts ahead of its
+     * showcase/borderless variants, so the set-filter art override picks the normal printing
+     * and the picker lists the standard frame first. Final tiebreaker on
+     * `(setCode, collectorNumber)` for a stable, deterministic order.
      */
     private val printingOrder: Comparator<Printing> =
         compareBy<Printing> { it.releaseDate == null }
             .thenByDescending { it.releaseDate ?: "" }
+            .thenBy { it.isAlternateFrame }
             .thenBy { it.setCode }
             .thenBy { it.collectorNumber }
 

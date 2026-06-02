@@ -91,18 +91,23 @@ class PrintingRegistry {
 
     /**
      * Default printing for a card name. Newest by `releaseDate` (lexicographic ISO date),
-     * with printings missing a release date sorted last. When all candidates lack a date,
-     * the first-registered one wins. Returns null if no printings are known for that name.
+     * with printings missing a release date sorted last. Within the same release date, the
+     * plain (non-alternate-frame) printing wins so the deckbuilder catalog never defaults to
+     * a showcase/borderless variant — players still reach those through the printing picker.
+     * When all candidates lack a date, the first-registered one wins. Returns null if no
+     * printings are known for that name.
      */
     fun defaultPrinting(name: String): Printing? {
         val candidates = byName[name] ?: return null
         if (candidates.isEmpty()) return null
-        // Sort: dated entries first by descending date, undated last in registration order.
+        // Sort: dated entries first by descending date, plain frames before alternate frames,
+        // undated last in registration order.
         return candidates
             .withIndex()
             .sortedWith(
                 compareBy<IndexedValue<Printing>> { it.value.releaseDate == null }
                     .thenByDescending { it.value.releaseDate ?: "" }
+                    .thenBy { it.value.isAlternateFrame }
                     .thenBy { it.index }
             )
             .first()

@@ -59,6 +59,30 @@ class PrintingRegistryTest : FunSpec({
         registry.defaultPrinting("Lightning Bolt")?.setCode shouldBe "2X2"
     }
 
+    test("defaultPrinting prefers the plain frame over a same-set alternate-frame variant") {
+        val registry = PrintingRegistry()
+        // Showcase variant registered first to prove order doesn't decide it.
+        val showcase = bolt("ECL", "300", releaseDate = "2026-01-23")
+            .copy(frameEffects = listOf("showcase"))
+        val borderless = bolt("ECL", "350", releaseDate = "2026-01-23")
+            .copy(borderColor = "borderless")
+        val plain = bolt("ECL", "120", releaseDate = "2026-01-23")
+        registry.register(listOf(showcase, borderless, plain))
+
+        registry.defaultPrinting("Lightning Bolt") shouldBe plain
+    }
+
+    test("defaultPrinting still picks the newest set even when only its variant is alternate-frame") {
+        val registry = PrintingRegistry()
+        val oldPlain = bolt("M10", "146", releaseDate = "2009-07-17")
+        val newShowcase = bolt("ECL", "300", releaseDate = "2026-01-23")
+            .copy(frameEffects = listOf("showcase"))
+        registry.register(listOf(oldPlain, newShowcase))
+
+        // Release date dominates the alternate-frame tiebreaker: the newer set still wins.
+        registry.defaultPrinting("Lightning Bolt") shouldBe newShowcase
+    }
+
     test("defaultPrinting falls back to first-registered when dates are missing") {
         val registry = PrintingRegistry()
         val first = bolt("M10", "146")
