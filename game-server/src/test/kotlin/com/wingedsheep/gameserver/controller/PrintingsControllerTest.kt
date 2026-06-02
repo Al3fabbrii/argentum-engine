@@ -58,6 +58,46 @@ class PrintingsControllerTest : FunSpec({
         body.first().imageUri shouldBe "https://img/2x2.jpg"
     }
 
+    test("GET /api/cards/{name}/printings orders the plain frame ahead of same-set variants") {
+        // A set ships a normal printing plus showcase/borderless variants on the same release
+        // date. The plain printing must lead so the deckbuilder's set-filter art override picks
+        // it (it takes the first match for the set) and the picker lists the standard frame first.
+        val printings = PrintingRegistry().apply {
+            register(Printing(
+                oracleId = "bolt-oracle",
+                name = "Lightning Bolt",
+                setCode = "ECL",
+                collectorNumber = "300",
+                imageUri = "https://img/ecl-showcase.jpg",
+                releaseDate = "2026-01-23",
+                frameEffects = listOf("showcase"),
+            ))
+            register(Printing(
+                oracleId = "bolt-oracle",
+                name = "Lightning Bolt",
+                setCode = "ECL",
+                collectorNumber = "350",
+                imageUri = "https://img/ecl-borderless.jpg",
+                releaseDate = "2026-01-23",
+                borderColor = "borderless",
+            ))
+            register(Printing(
+                oracleId = "bolt-oracle",
+                name = "Lightning Bolt",
+                setCode = "ECL",
+                collectorNumber = "120",
+                imageUri = "https://img/ecl-plain.jpg",
+                releaseDate = "2026-01-23",
+            ))
+        }
+        val controller = PrintingsController(registry, printings)
+
+        val body = controller.getPrintingsForCard("Lightning Bolt").body.shouldNotBeNull()
+
+        body.first().collectorNumber shouldBe "120"
+        body.first().imageUri shouldBe "https://img/ecl-plain.jpg"
+    }
+
     test("GET /api/cards/{name}/printings falls back to a synthesised default when registry is empty") {
         // No printing rows wired — the controller has to derive one from the CardDefinition's
         // own setCode + metadata so the picker still surfaces a usable option.
