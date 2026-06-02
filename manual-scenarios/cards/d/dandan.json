@@ -3,9 +3,10 @@
   "player2Name": "Bob",
   "player1": {
     "lifeTotal": 20,
-    "hand": ["Island"],
+    "hand": ["Island", "Stone Rain"],
     "battlefield": [
       {"name": "Dandân", "summoningSickness": false},
+      {"name": "Island"},
       {"name": "Mountain"},
       {"name": "Mountain"}
     ],

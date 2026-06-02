@@ -3,9 +3,11 @@
   "player2Name": "Bob",
   "player1": {
     "lifeTotal": 20,
-    "hand": [],
+    "hand": ["Stone Rain"],
     "battlefield": [
       {"name": "Merchant Ship", "summoningSickness": false},
+      {"name": "Mountain"},
+      {"name": "Mountain"},
       {"name": "Island"}
     ],
     "library": ["Island", "Island", "Island"]
