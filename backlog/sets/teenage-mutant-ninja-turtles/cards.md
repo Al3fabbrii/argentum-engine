@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 12 / 190
+**Implemented:** 13 / 190
 ---
 
 - [ ] Action News Crew
@@ -46,7 +46,7 @@
 - [ ] Everything Pizza
 - [ ] Featherbrained Filcher
 - [ ] Foot Elite
-- [ ] Foot Headquarters
+- [x] Foot Headquarters
 - [ ] Foot Mystic
 - [ ] Foot Ninjas
 - [ ] Frog Butler
