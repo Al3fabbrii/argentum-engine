@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 46 / 190
+**Implemented:** 47 / 190
 ---
 
 - [ ] Action News Crew
@@ -130,7 +130,7 @@
 - [ ] Purple Dragon Punks
 - [ ] Putrid Pals
 - [ ] Quintessential Katana
-- [ ] Ragamuffin Raptor
+- [x] Ragamuffin Raptor
 - [ ] Raph & Leo, Sibling Rivals
 - [x] Raph & Mikey, Troublemakers
 - [ ] Raphael's Technique
