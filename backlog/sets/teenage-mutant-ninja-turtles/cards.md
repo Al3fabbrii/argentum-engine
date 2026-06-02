@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 25 / 190
+**Implemented:** 26 / 190
 ---
 
 - [ ] Action News Crew
@@ -60,7 +60,7 @@
 - [x] Hamato Guardian Stance
 - [x] Hard-Won Jitte
 - [x] Henchbots
-- [ ] High-Flying Ace
+- [x] High-Flying Ace
 - [ ] Ice Cream Kitty
 - [x] Illegitimate Business
 - [ ] Improvised Arsenal
