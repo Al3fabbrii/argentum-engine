@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 7 / 190
+**Implemented:** 8 / 190
 ---
 
 - [ ] Action News Crew
@@ -19,7 +19,7 @@
 - [x] Bot Bashing Time
 - [ ] Brilliance Unleashed
 - [ ] Broadcast Takeover
-- [ ] Buzz Bots
+- [x] Buzz Bots
 - [ ] Casey Jones, Jury-Rig Justiciar
 - [ ] Casey Jones, Vigilante
 - [ ] Chrome Dome
