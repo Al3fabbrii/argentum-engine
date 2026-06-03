@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 79 / 190
+**Implemented:** 80 / 190
 ---
 
 - [ ] Action News Crew
@@ -40,7 +40,7 @@
 - [x] Donatello, Turtle Techie
 - [x] Donatello, Way with Machines
 - [x] Dream Beavers
-- [ ] East Wind Avatar
+- [x] East Wind Avatar
 - [ ] EPF Point Squad
 - [ ] Escape Tunnel
 - [ ] Everything Pizza
