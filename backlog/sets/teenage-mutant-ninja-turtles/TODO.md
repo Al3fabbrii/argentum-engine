@@ -10,19 +10,30 @@ Verify status anytime with: `scripts/card-status --set TMT` (and `--list --set T
 
 ## Status
 
-27 / 190 implemented (basics excluded — handled by `basicLandsFallback`).
+79 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
+`cards.md` for the full checklist; the per-card commits on `tmt-scaffolding`
+all carry `flavorText` in metadata.
 
-Implemented so far (alphabetical):
-Agent Bishop · Man in Black, Anchovy & Banana Pizza, April · Reporter of the Weird,
-Armaggon · Future Shark, Bespoke Bō, Bot Bashing Time, Buzz Bots, Casey Jones ·
-Jury-Rig Justiciar, Cowabunga!, Death in the Family, Dimension X, Donatello · Turtle
-Techie, Donatello · Way with Machines, Dream Beavers, Featherbrained Filcher, Foot
-Headquarters, Frog Butler, Guac & Marshmallow Pizza, Hamato Guardian Stance,
-Hard-Won Jitte, Henchbots, High-Flying Ace, Ice Cream Kitty, Illegitimate Business,
-Mutant Town, Raph & Mikey · Troublemakers, TCRI Building.
+The remaining 111 cards mostly cluster on a handful of unresolved gaps:
+- **Sneak** — 26 cards (Gap A — unresolved)
+- **Alliance** — 10 cards (Gap C — unresolved; trigger composes, blocked only on
+  display-only `Keyword.ALLIANCE` + a one-call `alliance { … }` DSL helper)
+- **Disappear** — 9 cards (Gap B — unresolved)
+- **Class** — 3 cards (Gap U — unresolved)
+- **Mutagen token consumers** — ~5 cards (Gap W — unresolved)
+- **Vehicles / Crew** — 2 cards (Gap J)
+- **Sagas** — 2 cards (Gap K)
+- Plus various one-offs from Gaps M and N–KK
 
-New-mechanic work blocks the bulk of the set: 26 cards wait on Sneak, 9 on Disappear,
-10 on Alliance. See "Engine gaps blocking the remaining cards" below.
+Gaps **resolved this run** (cards previously listed as blocked now landed):
+- **Gap H — Affinity for artifacts**: `Krang, Master Mind` shipped via
+  `KeywordAbility.Affinity(CardType.ARTIFACT)`. No engine change required.
+- **Gap L (partial)** — Landfall (`Weather Maker`) and all five basic-land-
+  cycling variants (`Jennika` Plainscycling, `Stockman` Islandcycling, `Bebop
+  Warthog Warrior` Swampcycling, `Zog` Mountaincycling, `Rocksteady Crash
+  Courser` Forestcycling) all shipped composably via `KeywordAbility.
+  typecycling("<Basic>", "{N}")`. Fight (`Novel Nunchaku`) and the four Mill-
+  keyword cards remain unchecked but are believed composable.
 
 ## Data sources — do NOT hit the network
 
@@ -181,11 +192,9 @@ the turn" (CR 106.4b exception). Likely a flag on the mana pool entry that the e
 hooks skip.
 - **Raphael, Ninja Destroyer** — see Gap F.
 
-### Gap H — Affinity for artifacts (cost reduction) — 1 card
-**Engine change:** `AFFINITY` keyword exists; verify "Affinity for artifacts" cost-
-reduction wiring counts artifacts you control. If the wiring is parameterised (filter +
-displayPrefix), this is just a DSL call; if hard-coded for a specific filter, generalise.
-- **Krang, Master Mind** — "Affinity for artifacts."
+### Gap H — Affinity for artifacts (cost reduction) — RESOLVED
+**Engine change:** none — the existing `KeywordAbility.Affinity(CardType.ARTIFACT)`
+already works. Shipped as `Krang, Master Mind`.
 
 ### Gap I — "double the number of +1/+1 counters" — 1 card
 **Engine change:** an effect that doubles the count of a chosen counter kind on a
@@ -206,15 +215,21 @@ have Saga support; verify it's still functional and the chapter DSL is reachable
 - **The Cloning of Shredder**, **The Last Ronin** — chapter abilities only; no new
   Saga primitives expected.
 
-### Gap L — Landfall, Fight, Mill keyword, basic-land-cycling — verify
-**Engine change:** likely none — these all exist in older sets. Confirm during
-implementation; add the small gap PR if any are missing.
-- Landfall: `Weather Maker`
-- Fight: `Novel Nunchaku`
-- Mill keyword: `Does Machines`, `Kitsune's Technique`, `Paramecia Coloniex`,
-  `The Last Ronin`
-- Basic-land-cycling family (Plains/Island/Swamp/Mountain/Forest) — `KeywordAbility.Cycling`
-  with `searchFilter` already supports these (see `KeywordAbility.kt:217`).
+### Gap L — Landfall, Fight, Mill keyword, basic-land-cycling — partly RESOLVED
+**Engine change:** none for Landfall + basic-land-cycling (both shipped). Fight
+and Mill-keyword cards remain unchecked; expected composable.
+- Landfall: `Weather Maker` — **DONE**.
+- Basic-land-cycling family: `Jennika` (Plainscycling), `Stockman, Mad Fly-
+  entist` (Islandcycling), `Bebop, Warthog Warrior` (Swampcycling),
+  `Zog, Triceraton Castaway` (Mountaincycling), `Rocksteady, Crash Courser`
+  (Forestcycling) — all **DONE** via `KeywordAbility.typecycling`.
+- Fight: `Novel Nunchaku` — unchecked. ETB has an attach-then-"when you do,
+  fight" sub-trigger which is the actual blocker (see Gap AA shape), not Fight
+  itself.
+- Mill keyword: `Does Machines` (Class — Gap U), `Kitsune's Technique` (Sneak
+  — Gap A), `Paramecia Coloniex` (dies → "may exile … when you do, …" sub-
+  trigger — Gap AA shape), `The Last Ronin` (Saga + Sneak). Each of these is
+  blocked on a different gap; Mill itself is not the holdup.
 
 ### Gap M — one-off bespoke cards
 Each is its own PR; they don't share a clean reusable gap with others.
@@ -372,41 +387,83 @@ because the predicate reads the chosen target during cast.
 - **Grounded for Life** — "This spell costs {3} less to cast if it targets a
   tapped creature."
 
+### Gap EE — "may put a card from your hand on the bottom of your library. If you do, draw a card."
+**Engine change:** an optional bottom-of-library + conditional draw composite.
+Mirrors `EffectPatterns.rummage`/`loot` but the cost step is "bottom" instead
+of "discard." Could be added as `EffectPatterns.bottomThenDraw(n)` once.
+- **Manhole Missile** — also deals 3 damage on resolve; the damage half is
+  trivially composable, only the bottom-then-draw rider is missing.
+
+### Gap FF — "becomes an artifact creature with base P/T N/M" until end of turn
+**Engine change:** extend `Effects.BecomeCreature` (or add a sibling) so it can
+*add* card types instead of only granting Creature. Today it sets Creature +
+overrides base P/T, which is correct for an artifact target but loses the
+"becomes an artifact" wording when the target is a non-artifact creature.
+- **Mind Transfer Protocol** — "target artifact or creature becomes an artifact
+  creature with base power and toughness 4/5 until end of turn."
+
+### Gap GG — "may pay X life where X is a dynamic amount" as an optional cost
+**Engine change:** `Costs.PayLife` currently takes `Int`; need a
+`Costs.PayLife(DynamicAmount)` overload threaded through the trigger-cost
+pipeline so it can resolve at trigger time (e.g. equal to the triggering
+creature's power).
+- **Madame Null, Power Broker** — "Whenever another creature you control enters,
+  you may pay life equal to its power. If you do, put that many +1/+1 counters
+  on it."
+
+### Gap HH — "can't be blocked by creatures with power N or greater"
+**Engine change:** mirror of the existing
+`CantBeBlockedByCreaturesWithLessPower` static. Either add
+`CantBeBlockedByCreaturesWithGreaterPower` or parameterize the existing one
+with a `ComparisonOperator`.
+- **Prehistoric Pet** — "This creature can't be blocked by creatures with
+  greater power." (Also has an activated bounce that's already composable.)
+
+### Gap II — "you may tap or untap target creature" (controller chooses on resolution)
+**Engine change:** an effect (or a target-modal helper) that asks the
+controller to pick between tapping or untapping the chosen target. Today
+`TapUntapEffect` carries a fixed `tap: Boolean` chosen at script-write time.
+- **Sewer-veillance Cam** — Flash artifact whose ETB/LTB trigger says "you may
+  tap or untap target creature." Composable apart from the player choice.
+
+### Gap JJ — multi-subtype restricted mana
+**Engine change:** today `ManaRestriction.SubtypeSpellsOrAbilitiesOnly` takes a
+single subtype. Need a "this mana may be spent on a spell of subtype X *or* Y."
+- **Turtle Lair** — "Add one mana of any color. Spend this mana only to cast a
+  Ninja or Turtle spell." (The colorless `{T}: Add {C}` half plus the "Target
+  Ninja or Turtle can't be blocked this turn" activated ability are composable.)
+
+### Gap KK — "Spend this mana only to cast a [type] spell or to activate an ability"
+**Engine change:** today `ManaRestriction.CardTypeSpellsOrAbilitiesOnly`'s
+`allowAbilities` restricts to abilities **of [cardType] sources**. Need a
+variant that permits *any* activated ability (not just artifact-source).
+- **Purple Dragon Punks** — "{T}: Add {R}. Spend this mana only to cast an
+  artifact spell or to activate an ability."
+
 ---
 
 ## Composable — deferred for time
 
-These cards appear to compose from primitives the engine already has, but were
-skipped during the alphabetical first pass to keep pace. Pick them up next.
-
-- **Baxter Stockman** — ETB Robot token + begin-combat pump on target artifact
-  creature you control. Needs an inline `TargetFilter(GameObjectFilter(
-  cardPredicates = [IsCreature, IsArtifact]).youControl())`.
-- **Bebop, Warthog Warrior** — Menace + "Rhinos you control have menace" anthem
-  + Swampcycling {2}. All primitives exist; Swampcycling uses
-  `KeywordAbility.Cycling(searchFilter = …, displayPrefix = "Swampcycling")`.
-- **Dimensional Exile** — Aura "enchant basic land you control" with ETB exile
-  target creature until LTB. Need the basic-land-you-control aura target.
-- **Foot Elite** — attack-trigger pump "+1/+0 and gains indestructible UEOT" on
-  a target creature you control. Composes ModifyStats + GrantKeyword
-  (INDESTRUCTIBLE, EndOfTurn).
+All four of the previously deferred composable cards (`Baxter Stockman`, `Bebop,
+Warthog Warrior`, `Dimensional Exile`, `Foot Elite`) have now landed on
+`tmt-scaffolding`. This section will be repopulated if the next pass uncovers
+more "composable but skipped" entries.
 
 ---
 
 ## Skip log — cards inspected and skipped (alphabetical)
 
-Each row is a card encountered during the alphabetical pass that was not
-implemented in this session, with the underlying blocker. Gaps reference the
-sections above (existing Gap A–M or the new Gap N–DD).
+Each row is a card encountered during an alphabetical pass that was not
+implemented, with the underlying blocker. Gaps reference the sections above
+(existing Gap A–M or the new Gap N–KK). Rows previously marked
+"Composable — deferred" have all landed and been removed.
 
 | Card                                  | Blocker / Gap                               |
 |---------------------------------------|---------------------------------------------|
 | Action News Crew                      | Gap D (Channel)                             |
 | April O'Neil, Hacktivist              | Gap N (card-types-cast amount)              |
 | April O'Neil, Kunoichi Trainee        | Gap O (can't-be-blocked-by-power)           |
-| Baxter Stockman                       | Composable — deferred                       |
 | Bebop & Rocksteady                    | Gap P (unless-you-discard rider)            |
-| Bebop, Warthog Warrior                | Composable — deferred                       |
 | Brilliance Unleashed                  | Gap Q (typed-override reanimate token)      |
 | Broadcast Takeover                    | Gap R (mass gain-control UEOT)              |
 | Casey Jones, Vigilante                | Gap S (delayed next-upkeep trigger)         |
@@ -415,14 +472,17 @@ sections above (existing Gap A–M or the new Gap N–DD).
 | Courier of Comestibles                | Gap V (search-or-fail-then-token)           |
 | Crustacean Commando                   | Gap W (Mutagen token)                       |
 | Dark Leo & Shredder                   | Gap A (Sneak)                               |
-| Dimensional Exile                     | Composable — deferred                       |
 | Does Machines                         | Gap U (Class)                               |
 | Don & Leo, Problem Solvers            | Gap X (paired flicker)                      |
 | Don & Raph, Hard Science              | Gap Y (grant Affinity to next spell)        |
 | Donatello's Technique                 | Gap A (Sneak)                               |
 | Donatello, Gadget Master              | Gap A (Sneak) + token-with-overrides        |
 | Donatello, Mutant Mechanic            | Gap M (Pizza-Face-style type-grant)         |
-| Foot Elite                            | Composable — deferred                       |
+| East Wind Avatar                      | Gap C (Alliance)                            |
+| EPF Point Squad                       | Gap C (Alliance)                            |
+| Escape Tunnel                         | "Target creature with power 2 or less can't be blocked this turn" + sac-land filter |
+| Everything Pizza                      | Pentacolored sac activation that also draws + makes each opponent discard — bespoke |
+| Foot Mystic                           | Gap B (Disappear)                           |
 | Foot Ninjas                           | Gap A (Sneak)                               |
 | Fugitive Droid                        | Gap Z (artifact-ETB-this-turn + sac-counter)|
 | General Traag, Heart of Stone         | Gap AA (when-you-do sub-trigger)            |
@@ -430,3 +490,84 @@ sections above (existing Gap A–M or the new Gap N–DD).
 | Go Ninja Go                           | Gap BB (greatest-power-among amount)        |
 | Groundchuck & Dirtbag                 | Gap CC (tap-land-for-mana trigger)          |
 | Grounded for Life                     | Gap DD (cost reduction if target tapped)    |
+| Insectoid Exterminator                | Gap B (Disappear)                           |
+| Jennika's Technique                   | Gap A (Sneak)                               |
+| Karai's Technique                     | Gap A (Sneak)                               |
+| Karai, Future of the Foot             | Gap A (Sneak)                               |
+| Kitsune's Technique                   | Gap A (Sneak)                               |
+| Kitsune, Dragon's Daughter            | "Exchange control of two creatures controlled by different players" — bespoke |
+| Koya, Death from Above                | Delayed end-step "you may pay; if not, return that card" conditional — bespoke |
+| Krang & Shredder                      | Gap B (Disappear) + Gap M (cast-from-exile-without-paying chain) |
+| Leader's Talent                       | Gap U (Class)                               |
+| Leatherhead, Swamp Stalker            | Hexproof counter + "may remove a counter; when you do, …" (Gap AA shape) |
+| Leonardo's Technique                  | Gap A (Sneak)                               |
+| Leonardo, Big Brother                 | Gap A (Sneak)                               |
+| Leonardo, Cutting Edge                | Gap A (Sneak)                               |
+| Leonardo, Leader in Blue              | Gap A (Sneak) + sneak-was-paid rider        |
+| Leonardo, Sewer Samurai               | Gap A (Sneak)                               |
+| Lita, Little Orphan Amphibian         | Gap C (Alliance) + Gap E (mode-not-yet-chosen) |
+| Lord Dregg, Insect Invader            | Gap B (Disappear) + Gap M (Sacrifice-a-token cost) |
+| Madame Null, Power Broker             | Gap GG (may-pay-dynamic-life)               |
+| Manhole Missile                       | Gap EE (bottom-of-library-then-draw)        |
+| Michelangelo's Technique              | Gap A (Sneak)                               |
+| Michelangelo, Game Master             | Gap B (Disappear)                           |
+| Michelangelo, Improviser              | Gap A (Sneak)                               |
+| Michelangelo, Mutant BFF              | Gap W (Mutagen) + counter-doubling replacement |
+| Michelangelo, Weirdness to 11         | Gap W (Mutagen) + counter-doubling replacement |
+| Mighty Mutanimals                     | Gap C (Alliance)                            |
+| Mikey & Don, Party Planners           | Play-from-top + cast-Mutant/Ninja/Turtle-from-top — bespoke |
+| Mind Transfer Protocol                | Gap FF (BecomeCreature that adds Artifact)  |
+| Mondo Gecko                           | Discard-to-grant-color + hexproof-from-color combat trigger — bespoke |
+| Mutagen Man, Living Ooze              | Gap W (Mutagen) + activated-ability-cost-reduction static |
+| Mutant Chain Reaction                 | Gap W (Mutagen)                             |
+| Mutant Town Musicians                 | Gap C (Alliance)                            |
+| New Generation's Technique            | Gap A (Sneak)                               |
+| Ninja Teen                            | Gap U (Class)                               |
+| North Wind Avatar                     | "Put a card you own from outside the game into your hand" (wishboard) |
+| Northampton Farm                      | Custom land with linked-exile mechanic — bespoke |
+| Novel Nunchaku                        | "When you do, equipped creature fights" sub-trigger (Gap AA shape) |
+| Old Hob, Alleycat Blues               | Delayed-trigger "destroy it at the next end step" |
+| Ooze Spill                            | Gap W (Mutagen)                             |
+| Oroku Saki, Shredder Rising           | Gap A (Sneak)                               |
+| Paramecia Coloniex                    | Dies → "may exile; when you do …" sub-trigger (Gap AA shape) |
+| Party Dude                            | Gap U (Class)                               |
+| Pizza Face, Gastromancer              | Gap B (Disappear) + Gap M (type-grant on non-creature) |
+| Prehistoric Pet                       | Gap HH (can't-be-blocked-by-greater-power)  |
+| Purple Dragon Punks                   | Gap KK (artifact-spell-or-any-ability mana restriction) |
+| Putrid Pals                           | Gap B (Disappear)                           |
+| Raph & Leo, Sibling Rivals            | Additional combat phase + conditional untap |
+| Raphael's Technique                   | Gap A (Sneak)                               |
+| Raphael, Most Attitude                | Gap C (Alliance)                            |
+| Raphael, Ninja Destroyer              | Gap F (Enrage) + Gap G (persistent mana)    |
+| Raphael, the Nightwatcher             | Gap A (Sneak)                               |
+| Raphael, Tough Turtle                 | Gap C (Alliance)                            |
+| Rat King, Verminister                 | Gap B (Disappear) + Gap M (same-name reanimate) |
+| Ray Fillet, Man Ray                   | Gap W (Mutagen)                             |
+| Retro-Mutation                        | Type-overriding Aura + "loses all abilities" UEOT |
+| Return to the Sewers                  | Owner-chooses-top-or-bottom + Gap W (Mutagen) |
+| Sewer-veillance Cam                   | Gap II (tap-or-untap controller-chooses)    |
+| Shark Shredder, Killer Clone          | Gap A (Sneak)                               |
+| Shredder's Technique                  | Gap A (Sneak)                               |
+| Shredder, Unrelenting                 | Gap A (Sneak)                               |
+| Slash, Reptile Rampager               | Gap C (Alliance)                            |
+| Slithering Cryptid                    | Gap W (Mutagen)                             |
+| Splinter's Technique                  | Gap A (Sneak)                               |
+| Splinter, Hamato Yoshi                | Gap A (Sneak)                               |
+| Splinter, Radical Rat                 | "Ninja triggered ability triggers an additional time" — bespoke |
+| Technodrome                           | "Can't attack or block unless its power is 6 or greater" — Gap O-shape on self |
+| The Cloning of Shredder               | Gap K (Saga)                                |
+| The Last Ronin                        | Gap K (Saga) + Gap A (Sneak)                |
+| The Last Ronin's Technique            | Gap A (Sneak) + sneak-was-paid token rider  |
+| The Neutrinos                         | Gap C (Alliance)                            |
+| The Ooze                              | Gap W (Mutagen) + dies-with-counter trigger |
+| Tokka & Rahzar, Terrible Twos         | "Can't be countered" + mana-spent-less-than-MV trigger — bespoke |
+| Turncoat Kunoichi                     | Gap A (Sneak) + sneak-was-paid ETB rider    |
+| Turtle Blimp                          | Gap J (Crew / Vehicle)                      |
+| Turtle Lair                           | Gap JJ (multi-subtype mana restriction)     |
+| Turtle Van                            | Gap J (Crew / Vehicle) + Gap I (double counters) |
+| Turtles Forever                       | Wishboard tutor (outside-the-game search)   |
+| Turtles in Time                       | Mass bounce + shuffle-hand+gy-and-draw-7 + exile-self |
+| Venus, Torn Between Worlds            | "Damage dealt + survives" trigger condition + counter-bearer combat trigger |
+| West Wind Avatar                      | Gap B (Disappear) + Gap M (token-or-land sac filter) |
+| Wingnut, Bat on the Belfry            | Gap C (Alliance) + Gap M (choose-one-of-N-keywords) |
+| Zoo Escapees                          | Gap W (Mutagen)                             |

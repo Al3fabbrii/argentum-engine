@@ -6,16 +6,80 @@
 Counts below are cards in the set that use the mechanic. A card may appear under
 multiple entries (e.g. a creature with Flying + Sneak).
 
-**Implementation progress (27 / 190).** Mechanics already exercised by the cards
-landed so far: Flying, Vigilance, Trample, Haste, Flash, Deathtouch, Double
-strike, Reach (granted), Equip, ETB triggers, LTB triggers, begin-of-combat
-triggers, attack triggers, intervening-if conditions, exile-until-leaves,
-filtered "another permanent enters" triggers, Food artifact baseline, EntersTapped
-land replacement, multi-color mana abilities, GatherCards/SelectFromCollection/
-MoveCollection pipelines, scry, modal Or-predicate filters, ForEachTarget +
-ContextTarget, and the standard sacrifice-for-life/sac-for-draw Food activations.
-None of the **new TMT mechanics** (Sneak, Alliance, Disappear) are exercised yet —
-they remain blocked on the Gap A / B / C engine work documented in TODO.md.
+**Implementation progress (79 / 190).** Mechanics now exercised end-to-end on
+`tmt-scaffolding`:
+
+Evergreen keywords — Flying, Vigilance, Trample, Haste, Flash, Deathtouch,
+Menace, Reach (granted and printed), Indestructible, Ward, Equip, Double strike,
+First strike, Hexproof (granted UEOT).
+
+Returning / set-specific keywords — **Affinity** (`Krang, Master Mind`),
+**Landfall** (`Weather Maker`), **Kicker** (`Stomped by the Foot`), basic-land-
+cycling (`Jennika` Plainscycling, `Stockman, Mad Fly-entist` Islandcycling,
+`Bebop, Warthog Warrior` Swampcycling, `Zog, Triceraton Castaway`
+Mountaincycling, `Rocksteady, Crash Courser` Forestcycling).
+
+Triggers — ETB, LTB, begin-of-combat, attack, deals-combat-damage, you-gain-
+life, land-you-control-enters (Landfall), counter-placed-on-creature-you-control
+(with `oncePerTurn`), spell-cast filtered by card type, "permanent leaves the
+battlefield" (`Super Shredder`, ANY/OTHER binding via `ZoneChangeEvent`),
+"another creature you control dies" (with EntityReference.Triggering toughness
+read), filtered ETB ("a Ninja you control enters" auto-attach trigger), and
+intervening-if conditions ("if you control an artifact").
+
+Static abilities — Anthems via `GrantKeyword` over a `GroupFilter`
+(four-keyword Krang Utrom Warlord anthem; Rhino/Boar/Turtle/Squirrel-style
+tribal grants), `ConditionalStaticAbility` (`IsYourTurn` first-strike on Null
+Group), `CantAttackUnless` with a `Compare` condition, `CantBeBlockedByMoreThan`
+(self + tribal), `GrantTriggeredAbility` for granted equipped-creature triggers
+(`Quintessential Katana`), `GrantTriggeredAbilityEffect` UEOT (`Pain 101`,
+`Perigee Beckoner` pattern), `GrantDynamicStatsEffect` reading
+`AggregateBattlefield` (`Improvised Arsenal`, `Krang, Master Mind`).
+
+Costs and cost modification — Optional sacrifice as an additional cost
+(`Stomped by the Foot` kicker), `Costs.SacrificeAnother` over an Or-predicate
+filter (`Ice Cream Kitty`, `Metalhead`), Sacrifice-self for activated abilities,
+`Costs.RemoveCounterFromSelf` (`Weather Maker`), `ActivationRestriction
+.OncePerTurn` on activated abilities (`Shredder's Armor`), `ModifySpellCost`
+with `CostReductionSource.FixedIfControlFilter` (`Saved by the Shell`).
+
+Counters — `Counters.PLUS_ONE_PLUS_ONE`, `Counters.CHARGE` (`Weather Maker`),
+`Counters.STUN` (`Utrom Scientists`), counter-count read via
+`EntityNumericProperty.CounterCount` (`Savanti Romero`'s scaling draw).
+
+Dynamic amounts — `DynamicAmount.Count` of permanents/cards-in-hand/cards-in-
+graveyard, `DynamicAmount.Subtract`/`IfPositive` (Krang's draw-to-four ETB),
+`DynamicAmount.AggregateBattlefield` (Improvised Arsenal),
+`DynamicAmount.XValue` for X-cost token-makers (`Triceraton Commander`),
+`DynamicAmount.EntityProperty(Triggering, Toughness)` (`South Wind Avatar`),
+`ContextPropertyKey.TRIGGER_DAMAGE_AMOUNT` (`April, Reporter of the Weird`).
+
+Effect pipelines — `GatherCardsEffect → SelectFromCollectionEffect →
+MoveCollectionEffect` (Cowabunga!, Casey Jones Jury-Rig), modal "Choose one"
+(`Mouser Attack!`, `Shredder's Revenge`), `ConditionalEffect` with
+`Conditions.TargetSpellManaValueAtMost` (`Tainted Treats`),
+`RepeatDynamicTimesEffect` for X-token creation (`Sally Pride`),
+`ForEachInGroupEffect` over `StatePredicate.EnteredThisTurn` (`Renet`),
+`EffectPatterns.scry`, `EffectPatterns.loot`, `EffectPatterns.rummage`,
+`EffectPatterns.putFromHand` for "may put a land from your hand"
+(`Lessons from Life`).
+
+Lands and mana — `EntersTapped` replacement, single-color mana abilities,
+`AddAnyColorMana(1)` and `AddAnyColorMana(2)` (`Transdimensional Bovine`),
+`AddAnyColorMana(DynamicAmount.EntityProperty(Power))` (`Mona Lisa, Science
+Geek`), `AddColorlessMana(2)` (`Weather Maker`).
+
+Tokens — Standard Food, 1/1 colorless Robot (used by 5+ cards), 1/1 black
+Ninja (`Uneasy Alliance`), 2/2 red Mutant (Jennika, Sally Pride), X 2/2 white
+Dinosaur Soldier (`Triceraton Commander`), `CreateTokenCopyOfSelf` for self-
+cloning Equipment (`Improvised Arsenal`).
+
+**Still not exercised** — the three new TMT mechanics (Sneak, Alliance,
+Disappear), Class enchantments, Vehicles / Crew, Sagas, the Mutagen token, and
+all the bespoke Gap M / N–KK shapes catalogued in `TODO.md`. Notably the
+**Alliance trigger itself composes today** (the EntersBattlefield-of-another-
+creature-you-control event exists); only the `Keyword.ALLIANCE` display marker
++ DSL helper still need wiring before those 10 cards can land.
 
 ---
 
