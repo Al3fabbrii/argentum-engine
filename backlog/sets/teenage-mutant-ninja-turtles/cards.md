@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 65 / 190
+**Implemented:** 66 / 190
 ---
 
 - [ ] Action News Crew
@@ -165,7 +165,7 @@
 - [ ] Splinter, Radical Rat
 - [x] Squirrelanoids
 - [x] Stockman, Mad Fly-entist
-- [ ] Stomped by the Foot
+- [x] Stomped by the Foot
 - [x] Super Shredder
 - [ ] Tainted Treats
 - [x] TCRI Building
