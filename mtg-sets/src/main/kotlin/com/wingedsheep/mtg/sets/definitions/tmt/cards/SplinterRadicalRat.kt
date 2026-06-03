@@ -1,5 +1,6 @@
 package com.wingedsheep.mtg.sets.definitions.tmt.cards
 
+import com.wingedsheep.sdk.core.AbilityFlag
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
@@ -48,7 +49,7 @@ val SplinterRadicalRat = card("Splinter, Radical Rat") {
             "target Ninja",
             TargetCreature(filter = TargetFilter.Creature.withSubtype("Ninja"))
         )
-        effect = Effects.CantBlock(ninja)
+        effect = Effects.GrantKeyword(AbilityFlag.CANT_BE_BLOCKED, ninja)
     }
 
     metadata {

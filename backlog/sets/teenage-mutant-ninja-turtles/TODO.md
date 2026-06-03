@@ -273,11 +273,11 @@ Ixalan-era cards in older sets). Verify the trigger primitive is present; if not
 - **Raphael, Ninja Destroyer** — "Enrage — Whenever Raphael is dealt damage, add that
   much {R}. Until end of turn, you don't lose this mana as steps and phases end."
   Also needs the **"don't lose this mana as steps and phases end"** mana modifier
-  (CR 106.4b duration override) — see Gap G.
+  (CR 106.4 duration override) — see Gap G.
 
 ### Gap G — mana that doesn't empty at end of step/phase — 1 card
 **Engine change:** mana pool entry tagged "persists across steps/phases for the rest of
-the turn" (CR 106.4b exception). Likely a flag on the mana pool entry that the empty-mana
+the turn" (CR 106.4 exception). Likely a flag on the mana pool entry that the empty-mana
 hooks skip.
 - **Raphael, Ninja Destroyer** — see Gap F.
 
