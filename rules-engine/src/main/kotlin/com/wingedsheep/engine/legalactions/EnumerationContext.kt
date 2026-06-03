@@ -16,6 +16,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.player.CantActivateLoyaltyAbilitiesComponent
 import com.wingedsheep.engine.state.components.player.CantCastSpellsComponent
 import com.wingedsheep.engine.state.components.player.LandDropsComponent
+import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.model.EntityId
 
 /**
@@ -110,9 +111,17 @@ class EnumerationContext(
             (perSpellCastRestrictionPresent &&
                 castPermissionUtils.spellSpecificallyRestricted(state, playerId, cardId))
 
-    // Alternative casting costs from battlefield permanents (e.g., Jodah)
-    val alternativeCastingCosts by lazy {
-        costCalculator.findAlternativeCastingCosts(state, playerId)
+    // First spell of own turn may be cast without paying its mana cost (e.g., Weftwalking).
+    // Gated to the active player AND zero spells cast this turn — see CostCalculator.
+    val firstSpellOfTurnFreeCast: Boolean by lazy {
+        costCalculator.hasFirstSpellOfTurnFreeCast(state, playerId)
+    }
+
+    // Alternative casting costs from battlefield permanents (e.g., Jodah, plus a {0} entry for
+    // Weftwalking's first-spell-of-turn free cast when the gate is open).
+    val alternativeCastingCosts: List<ManaCost> by lazy {
+        val base = costCalculator.findAlternativeCastingCosts(state, playerId)
+        if (firstSpellOfTurnFreeCast) base + ManaCost.ZERO else base
     }
 
     // Cycling prevention

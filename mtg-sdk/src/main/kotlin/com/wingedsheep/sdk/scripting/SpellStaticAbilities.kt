@@ -284,6 +284,43 @@ data object CantCastSpellsSharingColorWithLastCast : StaticAbility {
  * @property spellFilter Which spells are forbidden (matched against the card being cast).
  * @property condition Optional timing/state gate, evaluated in the controller's context; null = always.
  */
+/**
+ * The first spell each player casts during each of their own turns may be cast without paying
+ * its mana cost. Used by Weftwalking ({4}{U}{U} Enchantment, Edge of Eternities): "The first
+ * spell each player casts during each of their turns may be cast without paying its mana cost."
+ *
+ * Per Rule 117.9 / 118.9b, "without paying its mana cost" means:
+ *  - the spell's mana cost is not paid (X = 0 for X spells),
+ *  - other mandatory additional costs still apply (kicker, behold, blight, etc.),
+ *  - alternative costs cannot be combined (so this can't be chained with flashback, etc.).
+ *
+ * The free-cast permission is **optional** ("may"), surfaced to the player as an alternative cost
+ * variant during cast-action enumeration. Gating, applied at cast time:
+ *  - it must currently be the casting player's turn (the spell is being cast on one of *their*
+ *    own turns, not on an opponent's turn via flash),
+ *  - the casting player must have cast no spells yet this turn (the "first spell" clause —
+ *    `GameState.spellsCastThisTurnByPlayer[caster]` is null or empty),
+ *  - when [controllerOnly] is true, only the source permanent's controller benefits.
+ *
+ * Modelled as a static ability on a permanent so that the permission tracks the permanent's
+ * presence on the battlefield — removing the permanent in response to the cast offer
+ * immediately revokes it.
+ *
+ * @property controllerOnly If true, only the source permanent's controller benefits (default:
+ *           false = each player on each of their own turns, the Weftwalking wording).
+ */
+@SerialName("MayCastFirstSpellOfTurnWithoutPayingMana")
+@Serializable
+data class MayCastFirstSpellOfTurnWithoutPayingMana(
+    val controllerOnly: Boolean = false
+) : StaticAbility {
+    override val description: String = if (controllerOnly) {
+        "The first spell you cast each turn may be cast without paying its mana cost"
+    } else {
+        "The first spell each player casts during each of their turns may be cast without paying its mana cost"
+    }
+}
+
 @SerialName("PlayersCantCastSpells")
 @Serializable
 data class PlayersCantCastSpells(

@@ -74,6 +74,7 @@ import com.wingedsheep.sdk.scripting.effects.DividedDamageEffect
 import com.wingedsheep.sdk.scripting.effects.ModalEffect
 import com.wingedsheep.sdk.scripting.effects.StormCopyEffect
 import com.wingedsheep.sdk.scripting.targets.TargetRequirement
+import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.GrantFlashToSpellType
 import com.wingedsheep.sdk.scripting.CastSpellTypesFromTopOfLibrary
@@ -315,8 +316,11 @@ class CastSpellHandler(
             if (conspireError != null) return conspireError
         }
 
-        // Calculate effective cost (free if PlayWithoutPayingCostComponent is present)
-        val playForFree = zoneResolver.hasPlayWithoutPayingCost(state, action.playerId, action.cardId)
+        // Calculate effective cost (free if PlayWithoutPayingCostComponent is present, or if the
+        // MayCastFirstSpellOfTurnWithoutPayingMana static (e.g. Weftwalking) is the chosen alt).
+        val playForFreeFromComponent = zoneResolver.hasPlayWithoutPayingCost(state, action.playerId, action.cardId)
+        val playForFree = playForFreeFromComponent ||
+            isFirstSpellOfTurnFreeCastChosen(state, action, cardDef, playForFreeFromComponent)
         // Split-layout (CR 709.3a) — only the chosen half is evaluated for legality. When
         // `faceIndex` is set, the cost is the face's printed mana cost passed through the
         // standard battlefield cost-modifier pipeline (CR 118.9a applies cost modifiers to
@@ -718,6 +722,40 @@ class CastSpellHandler(
 
     private fun isCastFromExile(state: GameState, cardId: EntityId): Boolean =
         state.turnOrder.any { ownerId -> cardId in state.getZone(ZoneKey(ownerId, Zone.EXILE)) }
+
+    /**
+     * Detects whether [action.useAlternativeCost] is the caster invoking the
+     * `MayCastFirstSpellOfTurnWithoutPayingMana` static (Weftwalking). True only when no
+     * higher-priority alt cost path applies (flashback / harmonize / warp / evoke / impending /
+     * selfAlt / Jodah-style `GrantAlternativeCastingCost`) and the gate is open (active player +
+     * zero spells cast this turn + a battlefield source granting the permission). When true, the
+     * cast is treated as `playForFree`: cost is {0} and downstream kicker / blight / behold /
+     * runtime-cost-increase guards are skipped — mirroring [PlayWithoutPayingCostComponent]
+     * semantics for the rest of the cast pipeline (matching how Cascade/Omniscience-style free
+     * casts already resolve in this engine).
+     */
+    private fun isFirstSpellOfTurnFreeCastChosen(
+        state: GameState,
+        action: CastSpell,
+        cardDef: CardDefinition?,
+        playForFreeFromComponent: Boolean,
+    ): Boolean {
+        if (!action.useAlternativeCost || playForFreeFromComponent || cardDef == null) return false
+        val hasFlashback = cardDef.keywordAbilities.any { it is KeywordAbility.Flashback } &&
+            zoneResolver.hasFlashbackPermission(state, action.playerId, action.cardId)
+        if (hasFlashback) return false
+        val hasHarmonize = HarmonizeGrants.effectiveHarmonize(state, action.cardId, cardDef) != null &&
+            zoneResolver.hasHarmonizePermission(state, action.playerId, action.cardId)
+        if (hasHarmonize) return false
+        val hasWarp = cardDef.keywordAbilities.any { it is KeywordAbility.Warp } &&
+            zoneResolver.hasWarpPermission(state, action.playerId, action.cardId)
+        if (hasWarp) return false
+        if (cardDef.keywordAbilities.any { it is KeywordAbility.Evoke }) return false
+        if (cardDef.keywordAbilities.any { it is KeywordAbility.Impending }) return false
+        if (cardDef.script.selfAlternativeCost != null) return false
+        if (costCalculator.findAlternativeCastingCosts(state, action.playerId).isNotEmpty()) return false
+        return costCalculator.hasFirstSpellOfTurnFreeCast(state, action.playerId)
+    }
 
     private fun validateConspire(
         state: GameState,
@@ -1305,8 +1343,11 @@ class CastSpellHandler(
         // successful cast.
         val linkedExileGranterEntry = zoneResolver.findLinkedExileGranterEntry(currentState, action.playerId, action.cardId)
 
-        // Calculate effective cost (free if PlayWithoutPayingCostComponent is present)
-        val playForFreeInExecute = zoneResolver.hasPlayWithoutPayingCost(currentState, action.playerId, action.cardId)
+        // Calculate effective cost (free if PlayWithoutPayingCostComponent is present, or if the
+        // MayCastFirstSpellOfTurnWithoutPayingMana static (e.g. Weftwalking) is the chosen alt).
+        val playForFreeFromComponentExecute = zoneResolver.hasPlayWithoutPayingCost(currentState, action.playerId, action.cardId)
+        val playForFreeInExecute = playForFreeFromComponentExecute ||
+            isFirstSpellOfTurnFreeCastChosen(currentState, action, cardDef, playForFreeFromComponentExecute)
         // Split-layout (CR 709.3a) — see validate() for the rationale. Mirror the override here.
         val faceManaCostOverrideExecute: ManaCost? = action.faceIndex?.let { idx ->
             cardDef?.cardFaces?.getOrNull(idx)?.manaCost

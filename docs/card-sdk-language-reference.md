@@ -1527,6 +1527,18 @@ riders, matching how the engine already treats e.g. City of Brass's damage durin
   Yawgmoth's Agenda (`MayCastFromGraveyard(Nonland)`); `lifeCost = 1, duringYourTurnOnly = true` for
   Festival of Embers. Pair with `MayPlayLandsFromGraveyard` for "play lands and cast spells from
   your graveyard". Lands are *played*, not cast, so they need the lands permission separately.
+- `MayCastFirstSpellOfTurnWithoutPayingMana(controllerOnly = false)` — the first spell each
+  player casts during each of their **own** turns may be cast without paying its mana cost
+  (Weftwalking). Gated at cast time by `CostCalculator.hasFirstSpellOfTurnFreeCast`: requires the
+  active player to be the caster, requires the caster to have cast zero spells this turn, and
+  requires a battlefield source with this static (the source's controller may be anyone unless
+  `controllerOnly = true`). Surfaces as an alt-cost entry (`{0}`) in
+  `EnumerationContext.alternativeCastingCosts`; `CastSpellHandler.isFirstSpellOfTurnFreeCastChosen`
+  resolves the priority chain so the static only wins when no keyword alt (flashback / harmonize /
+  warp / evoke / impending), no `selfAlternativeCost`, and no Jodah-style `GrantAlternativeCastingCost`
+  applies — when it does win the cast is treated as `playForFree` (cost zeroed, kicker / blight /
+  behold / runtime tax skipped, matching the existing `PlayWithoutPayingCostComponent` flow used
+  by Cascade and Omniscience).
 
 **Top-of-library reveal & play** (reveal the top card of a library, optionally with permission to
 play it from there). Visibility (public reveal to all players) and play permission are separate

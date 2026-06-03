@@ -1,0 +1,62 @@
+{
+  "player1Name": "Weftwalker",
+  "player2Name": "Opponent",
+  "player1": {
+    "lifeTotal": 20,
+    "hand": [
+      "Weftwalking",
+      "Lightning Bolt",
+      "Counterspell",
+      "Grizzly Bears"
+    ],
+    "battlefield": [
+      {"name": "Island", "tapped": false},
+      {"name": "Island", "tapped": false},
+      {"name": "Island", "tapped": false},
+      {"name": "Island", "tapped": false},
+      {"name": "Island", "tapped": false},
+      {"name": "Island", "tapped": false}
+    ],
+    "graveyard": [
+      "Opt",
+      "Counterspell",
+      "Doom Blade",
+      "Wrath of God"
+    ],
+    "library": [
+      "Serra Angel",
+      "Lightning Bolt",
+      "Doom Blade",
+      "Counterspell",
+      "Opt",
+      "Plains",
+      "Island",
+      "Forest",
+      "Grizzly Bears",
+      "Sengir Vampire"
+    ]
+  },
+  "player2": {
+    "lifeTotal": 20,
+    "hand": [],
+    "battlefield": [
+      {"name": "Mountain", "tapped": false},
+      {"name": "Mountain", "tapped": false}
+    ],
+    "graveyard": [],
+    "library": [
+      "Mountain",
+      "Mountain",
+      "Mountain",
+      "Mountain",
+      "Mountain"
+    ]
+  },
+  "phase": "PRECOMBAT_MAIN",
+  "activePlayer": 1,
+  "priorityPlayer": 1,
+  "player1StopAtSteps": [],
+  "player2StopAtSteps": [],
+  "player1OpponentStopAtSteps": [],
+  "player2OpponentStopAtSteps": []
+}
