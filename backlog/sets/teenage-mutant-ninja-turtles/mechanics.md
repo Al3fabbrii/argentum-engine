@@ -6,7 +6,7 @@
 Counts below are cards in the set that use the mechanic. A card may appear under
 multiple entries (e.g. a creature with Flying + Sneak).
 
-**Implementation progress (90 / 190).** Mechanics now exercised end-to-end on
+**Implementation progress (95 / 190).** Mechanics now exercised end-to-end on
 `tmt-scaffolding`:
 
 Evergreen keywords — Flying, Vigilance, Trample, Haste, Flash, Deathtouch,
@@ -95,6 +95,35 @@ Cross-card combinators landed since the previous progress note:
   `Printing` row pointing at the canonical FDN script; added Escape Tunnel
   as a TMT printing of the canonical MKM script. Both are wired via
   `CardDiscovery.findPrintingsIn` on `TeenageMutantNinjaTurtlesSet.printings`.
+- **Trigger-doubler over a subtype filter** — `AdditionalSourceTriggers
+  (sourceFilter = Creature.withSubtype("Ninja").youControl(), excludeSelf
+  = false)` ships Splinter, Radical Rat. Same shape ECL Twinflame Travelers
+  uses; only the subtype and excludeSelf flag differ.
+- **Additional combat phase rider** — `AddCombatPhaseEffect` (LTR Éomer,
+  Marshal of Rohan) ships Raph & Leo, Sibling Rivals. The printed *"if it's
+  the first combat phase of the turn"* intervening-if is approximated by
+  `oncePerTurn = true` (no `Conditions.IsFirstCombatPhase` primitive yet);
+  approximation documented in the card's docstring.
+- **Delayed destroy of a created token** — EOE Systems Override idiom:
+  `CreateTokenEffect` publishes the new token into `EffectTarget.ContextTarget
+  (0)`, then `CreateDelayedTriggerEffect(step = Step.END, effect =
+  MoveToZoneEffect(ContextTarget(0), GRAVEYARD, byDestruction = true))`
+  schedules a real *destroy* at the next end step (Old Hob, Alleycat Blues).
+  The `byDestruction = true` flag is load-bearing: it routes the cleanup
+  through the destroy pipeline so the second ability's UEOT indestructible
+  grant legitimately saves the token. (A `sacrificeAtStep` shortcut would
+  have silently mis-implemented that interaction.)
+- **Fixed-N power evasion** — `CantBeBlockedBy(GameObjectFilter.Creature
+  .powerAtLeast(N))` (BLB Azure Beastbinder) ships April O'Neil, Kunoichi
+  Trainee with N = 3. Closes Gap O.
+- **Graveyard reanimate as a typed-override token** — `MoveToZoneEffect
+  (GRAVEYARD → BATTLEFIELD)` followed by `ConditionalEffect(Not(
+  TargetMatchesFilter(Creature)), Effects.BecomeCreature(3, 3, keywords =
+  {FLYING}, creatureTypes = {"Robot"}, duration = Duration.Permanent))`
+  ships Brilliance Unleashed's Mode 2. The rider only fires when the
+  original card wasn't already an artifact creature card, faithful to
+  the printed wording. Closes Gap Q. Mirrors EOE Xu-Ifit's reanimate-with-
+  permanent-rider shape.
 
 **Still not exercised** — the three new TMT mechanics' canonical pieces still
 missing (Sneak alt-cost pipeline, Disappear's per-controller permanent-left

@@ -10,11 +10,11 @@ Verify status anytime with: `scripts/card-status --set TMT` (and `--list --set T
 
 ## Status
 
-90 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
+95 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
 `cards.md` for the full checklist; the per-card commits on `tmt-scaffolding`
 all carry `flavorText` in metadata.
 
-The remaining 100 cards mostly cluster on a handful of unresolved gaps:
+The remaining 95 cards mostly cluster on a handful of unresolved gaps:
 - **Sneak** — 26 cards (Gap A — unresolved)
 - **Disappear** — 9 cards (Gap B — unresolved)
 - **Alliance** — 4 cards left (Gap C — partly cleared; 6 shipped composably,
@@ -62,6 +62,39 @@ Gaps **resolved across the runs so far**:
   composing `GatherCards → SelectFromCollection(ChooseUpTo 1) → MoveCollection
   to Library bottom → ConditionalOnCollection(DrawCards)`. No new SDK shape;
   a future `EffectPatterns.bottomThenDraw(n)` would only be ergonomic sugar.
+- **Gap O — "can't be blocked by creatures with power N or greater" —
+  RESOLVED**: `April O'Neil, Kunoichi Trainee` shipped via the existing
+  `CantBeBlockedBy(GameObjectFilter.Creature.powerAtLeast(N))` static — same
+  shape BLB Azure Beastbinder uses. Fixed-N variant closed. The relative-
+  comparison sibling **Gap HH** ("with greater power" than source) remains
+  unresolved.
+- **Gap Q — graveyard reanimate as a typed-override token — RESOLVED**:
+  `Brilliance Unleashed` (Mode 2) shipped by composing `MoveToZoneEffect(...
+  GRAVEYARD → BATTLEFIELD)` with `ConditionalEffect(Not(TargetMatchesFilter
+  (Creature)), Effects.BecomeCreature(3, 3, keywords = {FLYING},
+  creatureTypes = {"Robot"}, duration = Duration.Permanent))`. Same idea as
+  the EOE Xu-Ifit reanimate-with-permanent-rider, but the rider only fires
+  when the original card wasn't already an artifact creature card.
+- **Splinter-style "triggers an additional time" filter** — `Splinter,
+  Radical Rat` shipped via the existing `AdditionalSourceTriggers` static
+  (same shape ECL Twinflame Travelers uses), parameterised on
+  `GameObjectFilter.Creature.withSubtype("Ninja").youControl()` with
+  `excludeSelf = false` so Splinter's own triggers count (printed "a Ninja
+  you control", no "another").
+- **Delayed destroy of a created token (Old Hob)** — `Old Hob, Alleycat
+  Blues` ships via the EOE Systems Override idiom: `CreateTokenEffect`
+  publishes the new token into `ContextTarget(0)`, then
+  `CreateDelayedTriggerEffect(step = Step.END, effect = MoveToZoneEffect
+  (ContextTarget(0), GRAVEYARD, byDestruction = true))` schedules a
+  faithful *destroy* at the next end step — so the second ability's UEOT
+  indestructible grant legitimately saves the token (a `sacrificeAtStep`
+  shortcut would have silently bypassed indestructible).
+- **Additional combat phase rider** — `Raph & Leo, Sibling Rivals` ships
+  via the existing `AddCombatPhaseEffect` (same shape as LTR Éomer, Marshal
+  of Rohan), with the printed *"if it's the first combat phase of the
+  turn"* intervening-if approximated by `oncePerTurn = true`. The
+  approximation is documented in the file's docstring; swap for
+  `Conditions.IsFirstCombatPhase` when that primitive lands.
 
 ## Data sources — do NOT hit the network
 
@@ -304,12 +337,10 @@ cards turn up wanting the same primitive.
 - **April O'Neil, Hacktivist** — end step: "draw a card for each card type among
   spells you've cast this turn."
 
-### Gap O — "can't be blocked by creatures with power N or greater"
-**Engine change:** a static / target-filtered evasion gating creatures by power.
-The blocking-static plumbing exists (`BlockingStaticAbilities.kt`); generalize to
-read the blocker's projected power.
-- **April O'Neil, Kunoichi Trainee** — "can't be blocked by creatures with power
-  3 or greater."
+### Gap O — "can't be blocked by creatures with power N or greater" — RESOLVED
+**Engine change:** none. `CantBeBlockedBy(GameObjectFilter.Creature.powerAtLeast(N))`
+already covers the fixed-N variant — shipped via April O'Neil, Kunoichi
+Trainee. The relative-comparison sibling is **Gap HH** below.
 
 ### Gap P — "unless you discard a card" cost-mitigation rider
 **Engine change:** a triggered-ability shape that says "sacrifice X unless you
@@ -317,13 +348,14 @@ read the blocker's projected power.
 - **Bebop & Rocksteady** — "Whenever Bebop & Rocksteady attack or block, sacrifice
   a permanent unless you discard a card."
 
-### Gap Q — graveyard reanimate as a typed-override token
-**Engine change:** a return-from-graveyard variant that puts the card on the
-battlefield as if it were a token with overridden card types, P/T, color, and
-granted keywords. Different from current copy-with-overrides (which targets a
-permanent in play) — this overrides a card on its way out of the graveyard.
-- **Brilliance Unleashed** — second mode: non-artifact-creature artifact card
-  comes back as "a 3/3 Robot artifact creature with flying."
+### Gap Q — graveyard reanimate as a typed-override token — RESOLVED
+**Engine change:** none. The `MoveToZoneEffect(GRAVEYARD → BATTLEFIELD) +
+ConditionalEffect(Not(TargetMatchesFilter(Creature)),
+Effects.BecomeCreature(... duration = Duration.Permanent))` chain models
+Brilliance Unleashed's second mode faithfully. The "becomes" rider only
+fires on the non-creature branch, matching the printed text. `BecomeCreature`
+with `duration = Duration.Permanent` mirrors EOE Xu-Ifit's reanimate-with-
+permanent-rider shape.
 
 ### Gap R — gain control of all matching permanents UEOT + untap + grant haste
 **Engine change:** a bulk gain-control effect over a filter (all artifacts an
@@ -500,9 +532,7 @@ the top of the Status section for what closed those.
 | Card                                  | Blocker / Gap                               |
 |---------------------------------------|---------------------------------------------|
 | April O'Neil, Hacktivist              | Gap N (card-types-cast amount)              |
-| April O'Neil, Kunoichi Trainee        | Gap O (can't-be-blocked-by-power)           |
 | Bebop & Rocksteady                    | Gap P (unless-you-discard rider)            |
-| Brilliance Unleashed                  | Gap Q (typed-override reanimate token)      |
 | Broadcast Takeover                    | Gap R (mass gain-control UEOT)              |
 | Chrome Dome                           | Gap T (copy-artifact + next-end-step sac)   |
 | Cool but Rude                         | Gap U (Class)                               |
@@ -557,7 +587,6 @@ the top of the Status section for what closed those.
 | North Wind Avatar                     | "Put a card you own from outside the game into your hand" (wishboard) |
 | Northampton Farm                      | Custom land with linked-exile mechanic — bespoke |
 | Novel Nunchaku                        | "When you do, equipped creature fights" sub-trigger (Gap AA shape) |
-| Old Hob, Alleycat Blues               | Delayed-trigger "destroy it at the next end step" |
 | Ooze Spill                            | Gap W (Mutagen)                             |
 | Oroku Saki, Shredder Rising           | Gap A (Sneak)                               |
 | Paramecia Coloniex                    | Dies → "may exile; when you do …" sub-trigger (Gap AA shape) |
@@ -566,7 +595,6 @@ the top of the Status section for what closed those.
 | Prehistoric Pet                       | Gap HH (can't-be-blocked-by-greater-power)  |
 | Purple Dragon Punks                   | Gap KK (artifact-spell-or-any-ability mana restriction) |
 | Putrid Pals                           | Gap B (Disappear)                           |
-| Raph & Leo, Sibling Rivals            | Additional combat phase + conditional untap |
 | Raphael's Technique                   | Gap A (Sneak)                               |
 | Raphael, Most Attitude                | Gap C (Alliance)                            |
 | Raphael, Ninja Destroyer              | Gap F (Enrage) + Gap G (persistent mana)    |
@@ -582,7 +610,6 @@ the top of the Status section for what closed those.
 | Slithering Cryptid                    | Gap W (Mutagen)                             |
 | Splinter's Technique                  | Gap A (Sneak)                               |
 | Splinter, Hamato Yoshi                | Gap A (Sneak)                               |
-| Splinter, Radical Rat                 | "Ninja triggered ability triggers an additional time" — bespoke |
 | Technodrome                           | "Can't attack or block unless its power is 6 or greater" — Gap O-shape on self |
 | The Cloning of Shredder               | Gap K (Saga)                                |
 | The Last Ronin                        | Gap K (Saga) + Gap A (Sneak)                |
