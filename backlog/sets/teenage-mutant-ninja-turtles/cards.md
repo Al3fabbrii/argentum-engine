@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 59 / 190
+**Implemented:** 60 / 190
 ---
 
 - [ ] Action News Crew
@@ -177,7 +177,7 @@
 - [ ] The Neutrinos
 - [ ] The Ooze
 - [ ] Tokka & Rahzar, Terrible Twos
-- [ ] Transdimensional Bovine
+- [x] Transdimensional Bovine
 - [ ] Triceraton Commander
 - [x] Tunnel Rats
 - [ ] Turncoat Kunoichi
