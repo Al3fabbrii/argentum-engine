@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 67 / 190
+**Implemented:** 68 / 190
 ---
 
 - [ ] Action News Crew
@@ -63,7 +63,7 @@
 - [x] High-Flying Ace
 - [x] Ice Cream Kitty
 - [x] Illegitimate Business
-- [ ] Improvised Arsenal
+- [x] Improvised Arsenal
 - [ ] Insectoid Exterminator
 - [ ] Jennika's Technique
 - [x] Jennika, Bad Apple Big Sister
