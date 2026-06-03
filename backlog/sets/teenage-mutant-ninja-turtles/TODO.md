@@ -10,22 +10,38 @@ Verify status anytime with: `scripts/card-status --set TMT` (and `--list --set T
 
 ## Status
 
-79 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
+90 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
 `cards.md` for the full checklist; the per-card commits on `tmt-scaffolding`
 all carry `flavorText` in metadata.
 
-The remaining 111 cards mostly cluster on a handful of unresolved gaps:
+The remaining 100 cards mostly cluster on a handful of unresolved gaps:
 - **Sneak** — 26 cards (Gap A — unresolved)
-- **Alliance** — 10 cards (Gap C — unresolved; trigger composes, blocked only on
-  display-only `Keyword.ALLIANCE` + a one-call `alliance { … }` DSL helper)
 - **Disappear** — 9 cards (Gap B — unresolved)
+- **Alliance** — 4 cards left (Gap C — partly cleared; 6 shipped composably,
+  the remaining 4 each have an *additional* unresolved blocker beyond Alliance
+  itself: `Lita` → Gap E modal-not-yet-chosen, `Raphael, Most Attitude` → exile-
+  and-may-cast chain, `The Neutrinos` → flicker-tapped-and-attacking, `The
+  Neutrinos` listed once). Pure Alliance is no longer a blocker on its own.
 - **Class** — 3 cards (Gap U — unresolved)
 - **Mutagen token consumers** — ~5 cards (Gap W — unresolved)
 - **Vehicles / Crew** — 2 cards (Gap J)
 - **Sagas** — 2 cards (Gap K)
 - Plus various one-offs from Gaps M and N–KK
 
-Gaps **resolved this run** (cards previously listed as blocked now landed):
+Gaps **resolved across the runs so far**:
+- **Gap C — Alliance (partly cleared)**: 6 of the 10 Alliance cards (`East
+  Wind Avatar`, `EPF Point Squad`, `Mighty Mutanimals`, `Mutant Town
+  Musicians`, `Raphael, Tough Turtle`, `Slash, Reptile Rampager`) shipped by
+  composing `Triggers.OtherCreatureEnters` directly. The `Keyword.ALLIANCE`
+  display marker is still absent, so the rendered card text doesn't get the
+  italic "Alliance —" prefix yet, but the trigger semantics are faithful.
+  Wiring the marker + `alliance { }` DSL helper is now purely a cosmetic /
+  ergonomics improvement.
+- **Gap D — Channel**: `Action News Crew` shipped via
+  `activatedAbility { activateFromZone = Zone.HAND }` with
+  `Costs.Composite(Mana("{6}"), DiscardSelf)`. The `Keyword.CHANNEL` display
+  marker is still absent — same caveat as Alliance: behavior is right, the
+  italic "Channel —" prefix doesn't render.
 - **Gap H — Affinity for artifacts**: `Krang, Master Mind` shipped via
   `KeywordAbility.Affinity(CardType.ARTIFACT)`. No engine change required.
 - **Gap L (partial)** — Landfall (`Weather Maker`) and all five basic-land-
@@ -34,6 +50,18 @@ Gaps **resolved this run** (cards previously listed as blocked now landed):
   Courser` Forestcycling) all shipped composably via `KeywordAbility.
   typecycling("<Basic>", "{N}")`. Fight (`Novel Nunchaku`) and the four Mill-
   keyword cards remain unchecked but are believed composable.
+- **Gap M — choose-one-of-N-keywords (sub-shape resolved)**: `Wingnut, Bat on
+  the Belfry` shipped via `ModalEffect(countsAsModalSpell = false)` carrying
+  three single-keyword `Mode.noTarget` entries. The general "choose a kind
+  from among <list>" pattern in Gap M is closed for keywords by this idiom.
+- **Gap S — delayed "at the beginning of your NEXT upkeep"**: `Casey Jones,
+  Vigilante` shipped via `CreateDelayedTriggerEffect(step = Step.UPKEEP,
+  fireOnlyOnControllersTurn = true, effect = …)`. The same pattern handles
+  any other "next upkeep" rider that surfaces later.
+- **Gap EE — bottom-of-library-then-draw**: `Manhole Missile` shipped by
+  composing `GatherCards → SelectFromCollection(ChooseUpTo 1) → MoveCollection
+  to Library bottom → ConditionalOnCollection(DrawCards)`. No new SDK shape;
+  a future `EffectPatterns.bottomThenDraw(n)` would only be ergonomic sugar.
 
 ## Data sources — do NOT hit the network
 
@@ -150,25 +178,29 @@ Triggers used across the 9 cards:
 - "Enters with two +1/+1 counters if ..." (1): `Putrid Pals` — needs
   `entersWith(counters, condition)` if not already supported.
 
-### Gap C — Alliance (ability-word trigger) — 10 cards
-**Engine change:** none — pure ability-word marker. Add `Keyword.ALLIANCE` (display only)
-and an `alliance { ... }` DSL helper that wires
-`Triggers.WheneverAnotherCreatureYouControlEnters { effect }`. Mirror the existing
-`flurry`, `eerie`, `vivid`, `fatefulBite` ability-word helpers — no new engine code.
+### Gap C — Alliance (ability-word trigger) — partly RESOLVED
+**Engine change:** still none required for behavior — `Triggers.OtherCreatureEnters`
+already does the right thing. What remains is purely cosmetic: add a display-only
+`Keyword.ALLIANCE` to the SDK enum + an `alliance { ... }` DSL helper (mirror
+`flurry`, `eerie`, `vivid`, `fatefulBite`) so the rendered card text gets the
+italic ability-word prefix.
 
-Cards: `East Wind Avatar`, `Lita, Little Orphan Amphibian`, `Mighty Mutanimals`,
-`Mutant Town Musicians`, `Raphael, Most Attitude`, `Raphael, Tough Turtle`,
-`Slash, Reptile Rampager`, `Wingnut, Bat on the Belfry`, `EPF Point Squad`,
-`The Neutrinos`. One of them (`Lita`) layers a "modal effect that hasn't been chosen
-this turn" rider — see Gap E.
+Shipped composably (6/10): `East Wind Avatar`, `EPF Point Squad`,
+`Mighty Mutanimals`, `Mutant Town Musicians`, `Raphael, Tough Turtle`,
+`Slash, Reptile Rampager`, plus `Wingnut, Bat on the Belfry` (which also
+needed the Gap M choose-one-of-keywords idiom — see below).
 
-### Gap D — Channel keyword/DSL helper — 1 card
-**Engine change:** `Channel` keyword + DSL helper that wires the discard-from-hand
-activated ability. The mechanic exists in spirit (Kamigawa), but no `KeywordAbility.Channel`
-entry exists in `KeywordAbility.kt`. Compose: activated ability with cost `{N}, Discard
-this card.` from hand zone.
-- **Action News Crew** — "Channel — {6}, Discard this card: Put a +1/+1 counter on each
-  creature you control. Draw a card."
+Still blocked on something *else*: `Lita, Little Orphan Amphibian` (Gap E
+modal-not-yet-chosen), `Raphael, Most Attitude` (exile-and-may-cast chain),
+`The Neutrinos` (flicker-tapped-and-attacking).
+
+### Gap D — Channel — RESOLVED (behavior); display marker still missing
+**Engine change:** none required for behavior. `Action News Crew` ships via
+`activatedAbility { activateFromZone = Zone.HAND }` paired with
+`Costs.Composite(Mana("{N}"), DiscardSelf)`. Cosmetic follow-up: add a display-
+only `Keyword.CHANNEL` + `channel { }` DSL helper so the rendered text gets
+the italic "Channel —" prefix. Same shape as the residual Alliance / Disappear
+cosmetic work.
 
 ### Gap E — modal "choose one that hasn't been chosen this turn" — 1 card
 **Engine change:** per-source memory of which modes have been chosen this turn,
@@ -244,9 +276,11 @@ Each is its own PR; they don't share a clean reusable gap with others.
   (Reveal-until per-opponent + cast-from-exile-without-paying via the Disappear rider.)
 - **West Wind Avatar** — "you may sacrifice a token or a land" (sacrifice filter:
   "token or land" — composes existing filters, just verify the disjunction works).
-- **Wingnut, Bat on the Belfry** — "Wingnut gains your choice of flying, menace, or
-  reach until end of turn." (Choose-one-of-N-keywords grant — generalises
-  Aragorn-style "choose a counter kind" from LTR Gap 7.)
+- **~~Wingnut, Bat on the Belfry~~ — RESOLVED**: "choose flying / menace / haste UEOT"
+  ships via `ModalEffect(countsAsModalSpell = false)` with three single-keyword
+  `Mode.noTarget` entries. The "choose-one-of-N-keywords UEOT grant" sub-shape
+  is closed for keywords by this idiom; the same composition generalises to any
+  "choose a kind from among <list of statics>" wording.
 - **Lord Dregg, Insect Invader** — "Sacrifice a token: Draw a card." (Token-filtered
   sacrifice cost on an activated ability; verify `AbilityCost.SacrificeFiltered`
   supports the token predicate.)
@@ -298,11 +332,12 @@ gain-control primitives are single-target (LTR Gap 37 covers duration-based).
 - **Broadcast Takeover** — "Gain control of all artifacts your opponents control
   until end of turn. Untap them. They gain haste until end of turn."
 
-### Gap S — delayed trigger "at the beginning of your NEXT upkeep"
-**Engine change:** delayed-trigger plumbing for "next" timing windows (not the
-end-of-turn cleanup the engine already wires up).
-- **Casey Jones, Vigilante** — ETB draw 3, then "at the beginning of your next
-  upkeep, discard three cards at random."
+### Gap S — delayed "at the beginning of your NEXT upkeep" — RESOLVED
+**Engine change:** none required. `CreateDelayedTriggerEffect(step = Step.UPKEEP,
+fireOnlyOnControllersTurn = true, effect = …)` already covers this — `Casey
+Jones, Vigilante` shipped via that combinator paired with the Urgoros random-
+discard pipeline. The same composition handles any future "at your next
+upkeep" rider.
 
 ### Gap T — copy-an-artifact-token with sacrifice at the next end step
 **Engine change:** activated "create a token that's a copy of target artifact you
@@ -387,12 +422,12 @@ because the predicate reads the chosen target during cast.
 - **Grounded for Life** — "This spell costs {3} less to cast if it targets a
   tapped creature."
 
-### Gap EE — "may put a card from your hand on the bottom of your library. If you do, draw a card."
-**Engine change:** an optional bottom-of-library + conditional draw composite.
-Mirrors `EffectPatterns.rummage`/`loot` but the cost step is "bottom" instead
-of "discard." Could be added as `EffectPatterns.bottomThenDraw(n)` once.
-- **Manhole Missile** — also deals 3 damage on resolve; the damage half is
-  trivially composable, only the bottom-then-draw rider is missing.
+### Gap EE — "may put a card from your hand on the bottom of your library. If you do, draw a card." — RESOLVED
+**Engine change:** none required. Composes inline as
+`GatherCards → SelectFromCollection(ChooseUpTo 1) → MoveCollection-to-
+Library-bottom → ConditionalOnCollection(DrawCards)`. `Manhole Missile`
+ships with this idiom. A future `EffectPatterns.bottomThenDraw(n)` would
+be ergonomic sugar but isn't required.
 
 ### Gap FF — "becomes an artifact creature with base P/T N/M" until end of turn
 **Engine change:** extend `Effects.BecomeCreature` (or add a sibling) so it can
@@ -456,17 +491,19 @@ more "composable but skipped" entries.
 Each row is a card encountered during an alphabetical pass that was not
 implemented, with the underlying blocker. Gaps reference the sections above
 (existing Gap A–M or the new Gap N–KK). Rows previously marked
-"Composable — deferred" have all landed and been removed.
+"Composable — deferred" have all landed and been removed. Likewise, cards
+that subsequently landed in later runs (the six Alliance composables,
+Action News Crew, Casey Jones Vigilante, Escape Tunnel, Manhole Missile,
+Wingnut) have been removed from the table — see the "Gaps resolved" list at
+the top of the Status section for what closed those.
 
 | Card                                  | Blocker / Gap                               |
 |---------------------------------------|---------------------------------------------|
-| Action News Crew                      | Gap D (Channel)                             |
 | April O'Neil, Hacktivist              | Gap N (card-types-cast amount)              |
 | April O'Neil, Kunoichi Trainee        | Gap O (can't-be-blocked-by-power)           |
 | Bebop & Rocksteady                    | Gap P (unless-you-discard rider)            |
 | Brilliance Unleashed                  | Gap Q (typed-override reanimate token)      |
 | Broadcast Takeover                    | Gap R (mass gain-control UEOT)              |
-| Casey Jones, Vigilante                | Gap S (delayed next-upkeep trigger)         |
 | Chrome Dome                           | Gap T (copy-artifact + next-end-step sac)   |
 | Cool but Rude                         | Gap U (Class)                               |
 | Courier of Comestibles                | Gap V (search-or-fail-then-token)           |
@@ -478,9 +515,6 @@ implemented, with the underlying blocker. Gaps reference the sections above
 | Donatello's Technique                 | Gap A (Sneak)                               |
 | Donatello, Gadget Master              | Gap A (Sneak) + token-with-overrides        |
 | Donatello, Mutant Mechanic            | Gap M (Pizza-Face-style type-grant)         |
-| East Wind Avatar                      | Gap C (Alliance)                            |
-| EPF Point Squad                       | Gap C (Alliance)                            |
-| Escape Tunnel                         | "Target creature with power 2 or less can't be blocked this turn" + sac-land filter |
 | Everything Pizza                      | Pentacolored sac activation that also draws + makes each opponent discard — bespoke |
 | Foot Mystic                           | Gap B (Disappear)                           |
 | Foot Ninjas                           | Gap A (Sneak)                               |
@@ -508,19 +542,16 @@ implemented, with the underlying blocker. Gaps reference the sections above
 | Lita, Little Orphan Amphibian         | Gap C (Alliance) + Gap E (mode-not-yet-chosen) |
 | Lord Dregg, Insect Invader            | Gap B (Disappear) + Gap M (Sacrifice-a-token cost) |
 | Madame Null, Power Broker             | Gap GG (may-pay-dynamic-life)               |
-| Manhole Missile                       | Gap EE (bottom-of-library-then-draw)        |
 | Michelangelo's Technique              | Gap A (Sneak)                               |
 | Michelangelo, Game Master             | Gap B (Disappear)                           |
 | Michelangelo, Improviser              | Gap A (Sneak)                               |
 | Michelangelo, Mutant BFF              | Gap W (Mutagen) + counter-doubling replacement |
 | Michelangelo, Weirdness to 11         | Gap W (Mutagen) + counter-doubling replacement |
-| Mighty Mutanimals                     | Gap C (Alliance)                            |
 | Mikey & Don, Party Planners           | Play-from-top + cast-Mutant/Ninja/Turtle-from-top — bespoke |
 | Mind Transfer Protocol                | Gap FF (BecomeCreature that adds Artifact)  |
 | Mondo Gecko                           | Discard-to-grant-color + hexproof-from-color combat trigger — bespoke |
 | Mutagen Man, Living Ooze              | Gap W (Mutagen) + activated-ability-cost-reduction static |
 | Mutant Chain Reaction                 | Gap W (Mutagen)                             |
-| Mutant Town Musicians                 | Gap C (Alliance)                            |
 | New Generation's Technique            | Gap A (Sneak)                               |
 | Ninja Teen                            | Gap U (Class)                               |
 | North Wind Avatar                     | "Put a card you own from outside the game into your hand" (wishboard) |
@@ -540,7 +571,6 @@ implemented, with the underlying blocker. Gaps reference the sections above
 | Raphael, Most Attitude                | Gap C (Alliance)                            |
 | Raphael, Ninja Destroyer              | Gap F (Enrage) + Gap G (persistent mana)    |
 | Raphael, the Nightwatcher             | Gap A (Sneak)                               |
-| Raphael, Tough Turtle                 | Gap C (Alliance)                            |
 | Rat King, Verminister                 | Gap B (Disappear) + Gap M (same-name reanimate) |
 | Ray Fillet, Man Ray                   | Gap W (Mutagen)                             |
 | Retro-Mutation                        | Type-overriding Aura + "loses all abilities" UEOT |
@@ -549,7 +579,6 @@ implemented, with the underlying blocker. Gaps reference the sections above
 | Shark Shredder, Killer Clone          | Gap A (Sneak)                               |
 | Shredder's Technique                  | Gap A (Sneak)                               |
 | Shredder, Unrelenting                 | Gap A (Sneak)                               |
-| Slash, Reptile Rampager               | Gap C (Alliance)                            |
 | Slithering Cryptid                    | Gap W (Mutagen)                             |
 | Splinter's Technique                  | Gap A (Sneak)                               |
 | Splinter, Hamato Yoshi                | Gap A (Sneak)                               |
@@ -569,5 +598,4 @@ implemented, with the underlying blocker. Gaps reference the sections above
 | Turtles in Time                       | Mass bounce + shuffle-hand+gy-and-draw-7 + exile-self |
 | Venus, Torn Between Worlds            | "Damage dealt + survives" trigger condition + counter-bearer combat trigger |
 | West Wind Avatar                      | Gap B (Disappear) + Gap M (token-or-land sac filter) |
-| Wingnut, Bat on the Belfry            | Gap C (Alliance) + Gap M (choose-one-of-N-keywords) |
 | Zoo Escapees                          | Gap W (Mutagen)                             |

@@ -6,7 +6,7 @@
 Counts below are cards in the set that use the mechanic. A card may appear under
 multiple entries (e.g. a creature with Flying + Sneak).
 
-**Implementation progress (79 / 190).** Mechanics now exercised end-to-end on
+**Implementation progress (90 / 190).** Mechanics now exercised end-to-end on
 `tmt-scaffolding`:
 
 Evergreen keywords — Flying, Vigilance, Trample, Haste, Flash, Deathtouch,
@@ -70,16 +70,37 @@ Lands and mana — `EntersTapped` replacement, single-color mana abilities,
 Geek`), `AddColorlessMana(2)` (`Weather Maker`).
 
 Tokens — Standard Food, 1/1 colorless Robot (used by 5+ cards), 1/1 black
-Ninja (`Uneasy Alliance`), 2/2 red Mutant (Jennika, Sally Pride), X 2/2 white
-Dinosaur Soldier (`Triceraton Commander`), `CreateTokenCopyOfSelf` for self-
-cloning Equipment (`Improvised Arsenal`).
+Ninja (`Uneasy Alliance`), 2/2 red Mutant (Jennika, Sally Pride, Mighty
+Mutanimals, Slash), X 2/2 white Dinosaur Soldier (`Triceraton Commander`),
+`CreateTokenCopyOfSelf` for self-cloning Equipment (`Improvised Arsenal`).
 
-**Still not exercised** — the three new TMT mechanics (Sneak, Alliance,
-Disappear), Class enchantments, Vehicles / Crew, Sagas, the Mutagen token, and
-all the bespoke Gap M / N–KK shapes catalogued in `TODO.md`. Notably the
-**Alliance trigger itself composes today** (the EntersBattlefield-of-another-
-creature-you-control event exists); only the `Keyword.ALLIANCE` display marker
-+ DSL helper still need wiring before those 10 cards can land.
+Cross-card combinators landed since the previous progress note:
+- **Alliance trigger** — composed via `Triggers.OtherCreatureEnters` for six
+  Alliance cards (East Wind Avatar, EPF Point Squad, Mighty Mutanimals,
+  Mutant Town Musicians, Raphael Tough Turtle, Slash Reptile Rampager). The
+  display-only `Keyword.ALLIANCE` is still absent, so the rendered card text
+  doesn't get the italic "Alliance —" prefix, but the trigger semantics are
+  faithful.
+- **Channel** — composed via `activatedAbility { activateFromZone = Zone.HAND }`
+  paired with `Costs.Composite(Mana, DiscardSelf)` (Action News Crew). Same
+  caveat: `Keyword.CHANNEL` is still absent from the display marker enum.
+- **Delayed "at your next upkeep"** — `CreateDelayedTriggerEffect(step =
+  Step.UPKEEP, fireOnlyOnControllersTurn = true)` (Casey Jones, Vigilante).
+- **Optional bottom-of-library + conditional draw** — Gather → Select(ChooseUpTo
+  1) → MoveCollection-to-library-bottom → ConditionalOnCollection(DrawCards)
+  (Manhole Missile).
+- **Choose one of N keywords UEOT** — `ModalEffect(countsAsModalSpell = false)`
+  with single-keyword `Mode.noTarget` entries (Wingnut, Bat on the Belfry).
+- **Reprint plumbing** — converted the duplicated TMT Negate script into a
+  `Printing` row pointing at the canonical FDN script; added Escape Tunnel
+  as a TMT printing of the canonical MKM script. Both are wired via
+  `CardDiscovery.findPrintingsIn` on `TeenageMutantNinjaTurtlesSet.printings`.
+
+**Still not exercised** — the three new TMT mechanics' canonical pieces still
+missing (Sneak alt-cost pipeline, Disappear's per-controller permanent-left
+tracking, the display markers for Alliance / Channel / Disappear), Class
+enchantments, Vehicles / Crew, Sagas, the Mutagen token, and the remaining
+bespoke Gap M / N–KK shapes catalogued in `TODO.md`.
 
 ---
 
