@@ -849,9 +849,13 @@ class TriggerMatcher(
                 if (!matchesCardPredicate(predicate, targetCard, projected, event.targetEntityId)) return false
             }
 
-            // Check controller predicate
+            // Check controller predicate. Spells on the stack aren't in projected state
+            // (only battlefield permanents are), so fall back to the spell's own controller
+            // component for spell-target events (Surrak, Elusive Hunter).
             if (trigger.targetFilter.controllerPredicate != null) {
-                val targetController = projected.getController(event.targetEntityId) ?: return false
+                val targetController = projected.getController(event.targetEntityId)
+                    ?: targetContainer.get<SpellOnStackComponent>()?.casterId
+                    ?: return false
                 when (trigger.targetFilter.controllerPredicate) {
                     is com.wingedsheep.sdk.scripting.predicates.ControllerPredicate.ControlledByYou -> {
                         if (targetController != controllerId) return false

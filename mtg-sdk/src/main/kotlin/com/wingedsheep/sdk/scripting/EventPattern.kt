@@ -922,12 +922,16 @@ sealed interface EventPattern : TextReplaceable<EventPattern> {
     // ---- Targeting Triggers ----
 
     /**
-     * When a permanent becomes the target of a spell or ability.
+     * When a permanent or spell becomes the target of a spell or ability.
      * Binding SELF = "when this creature becomes the target",
      * ANY = "whenever a creature you control becomes the target".
      *
-     * The [targetFilter] restricts what type of permanent can trigger this
-     * (e.g., Cleric creatures you control).
+     * The [targetFilter] restricts what type of object can trigger this
+     * (e.g., Cleric creatures you control). The filter is matched against the
+     * targeted object's card data, so it also matches spells on the stack — a
+     * creature spell you control matches a `Creature` filter (Surrak, Elusive
+     * Hunter: "a creature you control or a creature spell you control becomes
+     * the target").
      *
      * [byYou] restricts to spells or abilities controlled by the trigger's controller.
      * [firstTimeEachTurn] restricts to the first time each turn (used by Valiant).
