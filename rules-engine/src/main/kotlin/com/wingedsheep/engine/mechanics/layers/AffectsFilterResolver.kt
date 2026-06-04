@@ -346,6 +346,12 @@ internal class AffectsFilterResolver {
             }
         }
         StatePredicate.IsModified -> com.wingedsheep.engine.handlers.predicates.isModified(state, entityId)
+        is StatePredicate.AttachedToCardType -> {
+            val attached = container.get<com.wingedsheep.engine.state.components.battlefield.AttachedToComponent>()
+            val targetCard = attached?.let { state.getEntity(it.targetId) }
+                ?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()
+            targetCard != null && predicate.cardType in targetCard.typeLine.cardTypes
+        }
         StatePredicate.IsSaddled ->
             container.has<com.wingedsheep.engine.state.components.battlefield.SaddledComponent>()
         StatePredicate.IsWarpExiled ->
