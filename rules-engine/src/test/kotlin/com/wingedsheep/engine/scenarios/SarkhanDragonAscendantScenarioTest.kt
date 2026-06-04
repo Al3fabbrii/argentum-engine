@@ -84,6 +84,33 @@ class SarkhanDragonAscendantScenarioTest : ScenarioTestBase() {
                 }
             }
 
+            test("ETB: beholding a Dragon you control (battlefield) creates a Treasure without revealing") {
+                // No Dragon in hand — the only behold option is the Dragon already on the
+                // battlefield, exercising the "choose a permanent you control" branch (no reveal).
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardInHand(1, "Sarkhan, Dragon Ascendant")
+                    .withCardOnBattlefield(1, "Test Dragon", summoningSickness = false)
+                    .withLandsOnBattlefield(1, "Mountain", 2)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val dragon = game.findPermanent("Test Dragon")!!
+
+                val cast = game.castSpell(1, "Sarkhan, Dragon Ascendant")
+                withClue("Casting Sarkhan should succeed: ${cast.error}") { cast.error shouldBe null }
+                game.resolveStack()
+
+                withClue("A behold decision should be pending") { game.hasPendingDecision() shouldBe true }
+                game.selectCards(listOf(dragon)) // behold the Dragon we control
+                game.resolveStack()
+
+                withClue("Beholding a controlled Dragon creates a Treasure token") {
+                    game.findPermanents("Treasure").size shouldBe 1
+                }
+            }
+
             test("a Dragon entering puts a +1/+1 counter on Sarkhan and gives him flying") {
                 val game = scenario()
                     .withPlayers("Player", "Opponent")
