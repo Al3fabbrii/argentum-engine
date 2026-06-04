@@ -131,6 +131,84 @@ class LightstallInquisitorScenarioTest : ScenarioTestBase() {
                     game.state.getEntity(mountainId)?.get<CardComponent>()?.name shouldBe "Mountain"
                 }
             }
+
+            test("opponent cannot cast the exiled spell when they only have base-cost mana — the +{1} surcharge is enforced at cast time") {
+                // Grizzly Bears costs {1}{G}; the Lightstall surcharge raises it to {2}{G}.
+                // Two Forests is exactly enough for the base cost but one short of the surcharged cost,
+                // so a successful CastSpell here would prove the {1} clause is NOT being applied.
+                var builder = scenario()
+                    .withPlayers("Caster", "Opponent")
+                    .withCardInHand(1, "Lightstall Inquisitor")
+                    .withLandsOnBattlefield(1, "Plains", 1)
+                    .withCardInHand(2, "Grizzly Bears")
+                    // Decoy card so SelectFromCollection actually prompts the opponent
+                    // instead of auto-picking the single legal target.
+                    .withCardInHand(2, "Plains")
+                    .withLandsOnBattlefield(2, "Forest", 2)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                repeat(5) { builder = builder.withCardInLibrary(1, "Forest") }
+                repeat(5) { builder = builder.withCardInLibrary(2, "Forest") }
+                val game = builder.build()
+
+                val grizzlyId = game.findCardsInHand(2, "Grizzly Bears").single()
+
+                game.castSpell(1, "Lightstall Inquisitor")
+                game.resolveStack()
+                game.selectCards(listOf(grizzlyId))
+                game.resolveStack()
+
+                game.passUntilPhase(Phase.ENDING, Step.END)
+                game.passUntilPhase(Phase.BEGINNING, Step.UPKEEP)
+                game.passUntilPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+
+                val castResult = game.castSpellFromExile(2, "Grizzly Bears")
+                withClue("Casting at base cost {1}{G} with only 2 Forests must fail because the surcharge raises the effective cost to {2}{G}") {
+                    castResult.error shouldBe "Not enough mana to cast this spell"
+                }
+                withClue("The card stays in exile when the cast attempt fails") {
+                    game.state.getExile(game.player2Id).contains(grizzlyId) shouldBe true
+                }
+            }
+
+            test("opponent can cast the exiled spell when they have enough mana for the surcharged cost") {
+                // Surcharged cost is {2}{G}; three Forests cover it exactly. Resolving onto the
+                // battlefield proves the cost computation accepted the surcharge.
+                var builder = scenario()
+                    .withPlayers("Caster", "Opponent")
+                    .withCardInHand(1, "Lightstall Inquisitor")
+                    .withLandsOnBattlefield(1, "Plains", 1)
+                    .withCardInHand(2, "Grizzly Bears")
+                    // Decoy card so SelectFromCollection actually prompts the opponent.
+                    .withCardInHand(2, "Plains")
+                    .withLandsOnBattlefield(2, "Forest", 3)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                repeat(5) { builder = builder.withCardInLibrary(1, "Forest") }
+                repeat(5) { builder = builder.withCardInLibrary(2, "Forest") }
+                val game = builder.build()
+
+                val grizzlyId = game.findCardsInHand(2, "Grizzly Bears").single()
+
+                game.castSpell(1, "Lightstall Inquisitor")
+                game.resolveStack()
+                game.selectCards(listOf(grizzlyId))
+                game.resolveStack()
+
+                game.passUntilPhase(Phase.ENDING, Step.END)
+                game.passUntilPhase(Phase.BEGINNING, Step.UPKEEP)
+                game.passUntilPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+
+                val castResult = game.castSpellFromExile(2, "Grizzly Bears")
+                withClue("Three Forests cover the surcharged {2}{G} cost — cast must succeed") {
+                    castResult.error shouldBe null
+                }
+                game.resolveStack()
+
+                withClue("Grizzly Bears must resolve onto opponent's battlefield") {
+                    game.state.getBattlefield(game.player2Id).contains(grizzlyId) shouldBe true
+                }
+            }
         }
     }
 }

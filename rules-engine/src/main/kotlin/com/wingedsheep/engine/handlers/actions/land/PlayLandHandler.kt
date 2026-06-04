@@ -225,6 +225,13 @@ class PlayLandHandler(
             if (entersTapped != null) {
                 // Permission already forced tapped — skip the shock-land "pay life" prompt
                 // and any conditional script logic; the land is already on the battlefield tapped.
+                //
+                // Strict CR 616.1a says both replacements (Lightstall's "enters tapped" rider
+                // and the shock land's "you may pay 2 life; otherwise enters tapped") apply to
+                // the entry event and the controller picks which to resolve first. Either order
+                // ends with the land tapped, so the shock-land life-payment choice is always
+                // meaningless under a permission-forced-tapped grant. We elide the prompt
+                // rather than asking the player to make a no-op decision.
                 if (permissionForcesTapped) {
                     // Already handled: TappedComponent applied, control falls through to triggers/finish.
                 } else if (entersTapped.payLifeCost != null) {
