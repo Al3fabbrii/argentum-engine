@@ -121,7 +121,9 @@ sealed interface Duration {
     }
 
     /**
-     * Effect lasts while the source permanent remains tapped.
+     * Effect lasts while the source permanent remains tapped. One-way (CR 611.2b): once the
+     * source untaps or leaves the battlefield the effect ends for good — `EndedDurationExpiryCheck`
+     * removes it, so a later re-tap does not restart it.
      * Example: Everglove Courier "for as long as Everglove Courier remains tapped"
      */
     @SerialName("WhileSourceTapped")
@@ -133,11 +135,42 @@ sealed interface Duration {
     }
 
     /**
+     * Effect lasts while the source permanent remains tapped AND each affected entity's
+     * projected power stays less than or equal to the source's projected power. Gated
+     * per-frame by `StateProjector`: the source-tapped half is enforced when the floating
+     * effect is collected; the affected-power half is a post-Layer-7 fix-up that compares
+     * each affected entity's final projected power to the source's final projected power
+     * and reverts the controller for any entity that's stronger. The fix-up runs after
+     * Layer 7, so it picks up every pump source — base printed power, +1/+1 / -1/-1
+     * counters, Layer-7 floating pumps (Giant Growth, Aggressive Urge), and lord-style
+     * anthems.
+     *
+     * Like every "for as long as …" duration this is one-way (CR 611.2b): once the source
+     * untaps or an affected entity's power exceeds the source's, `EndedDurationExpiryCheck`
+     * (a state-based action) physically removes the effect, so a pump that later wears off —
+     * or a re-tap — does NOT restart it. The projection gate is the instantaneous view; the
+     * SBA makes the end permanent.
+     *
+     * Example: Old Man of the Sea — "for as long as Old Man of the Sea remains tapped
+     * and that creature's power remains less than or equal to Old Man of the Sea's power".
+     */
+    @SerialName("WhileSourceTappedAndAffectedPowerAtMostSource")
+    @Serializable
+    data class WhileSourceTappedAndAffectedPowerAtMostSource(
+        val sourceDescription: String = "this creature"
+    ) : Duration {
+        override val description =
+            "for as long as $sourceDescription remains tapped and that creature's power remains less than or equal to $sourceDescription's power"
+    }
+
+    /**
      * Effect lasts for as long as the effect's controller controls the affected object —
      * it ends the moment that object's controller becomes a different player ("for as long
      * as you control it"). Evaluated against the *projected* controller, so it responds to
      * every kind of control-changing effect (one-shot steals, Threaten, and static control
-     * Auras alike).
+     * Auras alike). One-way (CR 611.2b): the instant the controller loses the object the effect
+     * ends for good — `EndedDurationExpiryCheck` removes it, so regaining control does not
+     * restart it.
      *
      * Example: Suspend (CR 702.62g) — a creature played via suspend "gains haste until you
      * lose control of the spell or the permanent it becomes."
