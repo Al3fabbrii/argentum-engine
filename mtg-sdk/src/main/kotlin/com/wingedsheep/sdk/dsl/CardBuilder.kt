@@ -86,6 +86,12 @@ class BasicLandBuilder(private val landType: String) {
     var imageUri: String? = null
     var rarity: Rarity = Rarity.COMMON
 
+    /**
+     * Whether this basic-land variant is part of the draft/sealed product. Set `false` to keep the
+     * card defined but exclude it from the basic-land variants offered during limited deck building.
+     */
+    var inBooster: Boolean = true
+
     private val manaColor: Color = when (landType) {
         "Plains" -> Color.WHITE
         "Island" -> Color.BLUE
@@ -117,7 +123,8 @@ class BasicLandBuilder(private val landType: String) {
             rarity = rarity,
             artist = artist,
             flavorText = flavorText,
-            imageUri = imageUri
+            imageUri = imageUri,
+            inBooster = inBooster
         )
 
         return CardDefinition(
@@ -136,6 +143,14 @@ class BasicLandBuilder(private val landType: String) {
  */
 @DslMarker
 annotation class CardDsl
+
+/**
+ * Scryfall art for the 1/1 red Warrior token created by Mobilize (Tarkir: Dragonstorm).
+ * Every Mobilize card produces this identical token, so the image is shared here rather
+ * than duplicated per card.
+ */
+private const val MOBILIZE_WARRIOR_TOKEN_IMAGE =
+    "https://cards.scryfall.io/normal/front/7/e/7edc0515-a130-45a7-aa09-0e23bba41587.jpg?1742506712"
 
 @CardDsl
 class CardBuilder(private val name: String) {
@@ -450,6 +465,7 @@ class CardBuilder(private val name: String) {
                     toughness = 1,
                     colors = setOf(Color.RED),
                     creatureTypes = setOf("Warrior"),
+                    imageUri = MOBILIZE_WARRIOR_TOKEN_IMAGE,
                     tapped = true,
                     attacking = true,
                     sacrificeAtStep = Step.END
@@ -487,6 +503,7 @@ class CardBuilder(private val name: String) {
                     toughness = 1,
                     colors = setOf(Color.RED),
                     creatureTypes = setOf("Warrior"),
+                    imageUri = MOBILIZE_WARRIOR_TOKEN_IMAGE,
                     tapped = true,
                     attacking = true,
                     sacrificeAtStep = Step.END
