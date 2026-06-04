@@ -1575,12 +1575,18 @@ riders, matching how the engine already treats e.g. City of Brass's damage durin
   Yawgmoth's Agenda (`MayCastFromGraveyard(Nonland)`); `lifeCost = 1, duringYourTurnOnly = true` for
   Festival of Embers. Pair with `MayPlayLandsFromGraveyard` for "play lands and cast spells from
   your graveyard". Lands are *played*, not cast, so they need the lands permission separately.
-- `MayCastWithoutPayingManaCost(controllerOnly = false, firstSpellOfTurnOnly = false)` — a
+- `MayCastWithoutPayingManaCost(controllerOnly = false, firstSpellOfTurnOnly = false, spellFilter = Any)` — a
   battlefield permission to cast a spell without paying its mana cost (CR 118.9). Composable
   gates: `controllerOnly = true` restricts the benefit to the source's controller ("you" wording);
   `firstSpellOfTurnOnly = true` requires the caster to be the active player and to have cast
-  zero spells this turn. Weftwalking is `MayCastWithoutPayingManaCost(firstSpellOfTurnOnly = true)`;
-  a future "you may cast the first spell you cast each turn …" composes via both gates true.
+  zero spells this turn; `spellFilter` restricts *which* spells may be cast for free (card
+  predicates, matched in any zone — default `GameObjectFilter.Any` = every spell). Weftwalking is
+  `MayCastWithoutPayingManaCost(firstSpellOfTurnOnly = true)`; Dracogenesis is
+  `MayCastWithoutPayingManaCost(controllerOnly = true, spellFilter = GameObjectFilter.Any.withSubtype("Dragon"))`
+  ("You may cast Dragon spells without paying their mana costs"); a future "you may cast the first
+  spell you cast each turn …" composes via both gates true. The filter is enforced per-spell in
+  `CostCalculator.hasFreeCastPermission(state, casterId, spellCardDef)` (the enumerator threads the
+  card being cast through `EnumerationContext.freeCastPermissionFor(cardId)`).
   Cast-legality is checked by `CostCalculator.hasFreeCastPermission`. Surfaced as a dedicated
   `CastWithoutPayingManaCost` `LegalAction` variant routed through
   `CastSpell.useWithoutPayingManaCost = true` — emitted **alongside** Jodah-style
