@@ -878,8 +878,10 @@ work for abilities-on-stack (which carry no `CardComponent`).
 - `IsFaceDown` — currently face-down.
 - `HasCounter(type)` — has at least one counter of `type`.
 - `AttachedToCardType(cardType)` — Aura/Equipment whose `AttachedToComponent` points to a
-  permanent whose card includes the given top-level [`CardType`]. Used by filters like
-  "Aura attached to a land" (Pyramids) or "Equipment attached to a creature". False for
+  permanent that currently has the given top-level [`CardType`] in its **projected** type
+  set. Used by filters like "Aura attached to a land" (Pyramids) or "Equipment attached
+  to a creature". Reads the attached-to permanent's projected types, so a land animated
+  into a creature still matches `LAND` and additionally matches `CREATURE`. False for
   entities with no `AttachedToComponent`.
 - `IsWarpExiled` (filter builder `warpExiled()`) — card in exile via warp's
   end-of-turn delayed trigger (CR 702.185b).

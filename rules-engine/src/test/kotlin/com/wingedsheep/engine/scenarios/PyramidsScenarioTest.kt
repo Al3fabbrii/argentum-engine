@@ -198,4 +198,41 @@ class PyramidsScenarioTest : FunSpec({
         val ctx = PredicateContext(controllerId = active)
         evaluator.matchesStatePredicate(driver.state, land, predicate, ctx) shouldBe false
     }
+
+    test("AttachedToCardType reads the attached-to permanent's PROJECTED type — animated land matches CREATURE too") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Plains" to 20, "Forest" to 20), startingLife = 20)
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        val active = driver.activePlayer!!
+        val land = driver.putLandOnBattlefield(active, "Forest")
+        val aura = driver.putPermanentOnBattlefield(active, "Fishliver Oil")
+        driver.replaceState(driver.state.updateEntity(aura) { c -> c.with(AttachedToComponent(land)) })
+
+        // Animate the land via a Layer 4 AddType("CREATURE") floating effect — the base
+        // CardComponent still says LAND only, but projection should now show CREATURE too.
+        val animation = ActiveFloatingEffect(
+            id = EntityId.generate(),
+            effect = FloatingEffectData(
+                layer = Layer.TYPE,
+                modification = SerializableModification.AddType("CREATURE"),
+                affectedEntities = setOf(land)
+            ),
+            duration = Duration.EndOfTurn,
+            sourceId = null,
+            controllerId = active,
+            timestamp = System.currentTimeMillis()
+        )
+        driver.replaceState(driver.state.copy(floatingEffects = driver.state.floatingEffects + animation))
+
+        val ctx = PredicateContext(controllerId = active)
+        // LAND remains because projection keeps the base type.
+        evaluator.matchesStatePredicate(
+            driver.state, aura, StatePredicate.AttachedToCardType(CardType.LAND), ctx
+        ) shouldBe true
+        // CREATURE is only visible via projection — would fail if the predicate read base CardComponent.
+        evaluator.matchesStatePredicate(
+            driver.state, aura, StatePredicate.AttachedToCardType(CardType.CREATURE), ctx
+        ) shouldBe true
+    }
 })

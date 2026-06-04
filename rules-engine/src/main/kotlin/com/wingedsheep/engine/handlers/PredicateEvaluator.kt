@@ -755,13 +755,13 @@ class PredicateEvaluator {
             StatePredicate.IsModified -> com.wingedsheep.engine.handlers.predicates.isModified(state, entityId)
 
             // Attached-to-type — entity has an AttachedToComponent and the referenced
-            // permanent's card matches the requested CardType (Pyramids: "Aura attached
-            // to a land").
+            // permanent currently has the requested CardType (Pyramids: "Aura attached
+            // to a land"). Reads the attached-to permanent's projected types so that a
+            // permanent animated into a different type via continuous effects (e.g. a
+            // land turned into a creature) is matched correctly.
             is StatePredicate.AttachedToCardType -> {
                 val attached = container.get<AttachedToComponent>() ?: return false
-                val target = state.getEntity(attached.targetId) ?: return false
-                val targetCard = target.get<CardComponent>() ?: return false
-                predicate.cardType in targetCard.typeLine.cardTypes
+                state.projectedState.hasType(attached.targetId, predicate.cardType.name)
             }
 
             // Saddled marker — set by BecomeSaddledExecutor when a Saddle ability resolves
