@@ -64,6 +64,11 @@ check:
 card-status *ARGS:
     scripts/card-status {{ARGS}}
 
+# Build the Kotlin coverage tooling once so the recipes below can call its CLI (fast no-op when
+# up to date). The bridge + lenses live in the :tooling module (Kotlin port of the mtgish spike).
+_coverage-tool:
+    @./gradlew -q --console=plain :tooling:installDist
+
 # Predict engine coverage via the mtgish bridge — which missing cards are free vs blocked.
 # Whole set:   just coverage --set TMP            (implemented / FREE / blocked + leaderboard)
 #              just coverage --set TMP --free     (also list the free-to-implement cards)
@@ -71,8 +76,8 @@ card-status *ARGS:
 # One card:    just coverage --card "Shivan Dragon"
 # Trust check: just coverage --calibrate POR      (implemented cards must classify coverable)
 [group: 'build']
-coverage *ARGS:
-    python3 spike/mtgish-coverage/probe.py {{ARGS}}
+coverage *ARGS: _coverage-tool
+    @tooling/build/install/tooling/bin/tooling probe {{ARGS}}
 
 # Generation fidelity — could we AUTO-AUTHOR a card from mtgish? Diffs the bridge's output
 # against each card's compiled golden snapshot, tiering AUTO / SCAFFOLD / MISS.
@@ -81,33 +86,33 @@ coverage *ARGS:
 # Cross-set:  just coverage-fidelity --all          (generalization table — bridge applied unchanged)
 # One card:   just coverage-fidelity --emit "Shivan Dragon"   (prints generated cardDef DSL)
 [group: 'build']
-coverage-fidelity *ARGS:
-    python3 spike/mtgish-coverage/fidelity.py {{ARGS}}
+coverage-fidelity *ARGS: _coverage-tool
+    @tooling/build/install/tooling/bin/tooling fidelity {{ARGS}}
 
 # Auto-gen gap: of a set's UNIMPLEMENTED cards, how many could the bridge draft now?
 #   just coverage-gaps --set TMP                 # AUTOGEN / SCAFFOLD / BLOCKED + leaderboard
 #   just coverage-gaps --set TMP --list AUTOGEN  # list the draftable cards
 [group: 'build']
-coverage-gaps *ARGS:
-    python3 spike/mtgish-coverage/autogen.py --gaps {{ARGS}}
+coverage-gaps *ARGS: _coverage-tool
+    @tooling/build/install/tooling/bin/tooling autogen --gaps {{ARGS}}
 
 # Generate draft .kt files for a set's AUTOGEN-predicted missing cards into a STAGING dir.
 # DRAFTS ONLY — they must compile + pass a scenario test + be reviewed before use.
 #   just coverage-generate --set TMP             # -> spike/mtgish-coverage/generated/tmp/
 [group: 'build']
-coverage-generate *ARGS:
-    python3 spike/mtgish-coverage/autogen.py --write {{ARGS}}
+coverage-generate *ARGS: _coverage-tool
+    @tooling/build/install/tooling/bin/tooling autogen --write {{ARGS}}
 
 # COMPILE-VERIFICATION GATE — the real proof that AUTO cards are emittable, not just predicted.
 # Emits every whole-renderable card of a set into an isolated Gradle source set, COMPILES them,
 # serialises each via the same CardExporter the golden snapshots use, then diffs capabilities vs
 # golden. PASS = every emitted card compiles and capability-matches (0 mismatch); also reports how
-# many of the set it auto-emits. Portal: 169/184 emitted & verified, 0 mismatch.
+# many of the set it auto-emits. Portal: 184/184 emitted & verified, 0 mismatch.
 #   just coverage-verify --set POR
 [group: 'build']
-coverage-verify SET="POR":
+coverage-verify SET="POR": _coverage-tool
     ./gradlew :mtg-sets:verifyGeneratedCards -Pset={{SET}} --console=plain --rerun-tasks
-    python3 spike/mtgish-coverage/fidelity.py --gate {{SET}}
+    @tooling/build/install/tooling/bin/tooling fidelity --gate {{SET}}
 
 # Verify backlog/sets/*/cards.md headers match actual [x] / [x]+[ ] counts
 [group: 'build']
