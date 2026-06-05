@@ -23,7 +23,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Target creature gains flying until end of turn.
  * Draw a card.
  */
-val CloakofFeathers = card("Cloak of Feathers") {
+val CloakOfFeathers = card("Cloak of Feathers") {
     manaCost = "{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"

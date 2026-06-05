@@ -17,7 +17,7 @@ import com.wingedsheep.sdk.model.Rarity
  * 5/6
  * Flying
  */
-val DjinnoftheLamp = card("Djinn of the Lamp") {
+val DjinnOfTheLamp = card("Djinn of the Lamp") {
     manaCost = "{5}{U}{U}"
     colorIdentity = "U"
     typeLine = "Creature — Djinn"

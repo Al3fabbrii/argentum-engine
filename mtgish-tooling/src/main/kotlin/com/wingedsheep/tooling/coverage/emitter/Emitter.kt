@@ -4,6 +4,7 @@ import com.wingedsheep.tooling.coverage.asArr
 import com.wingedsheep.tooling.coverage.asInt
 import com.wingedsheep.tooling.coverage.asObj
 import com.wingedsheep.tooling.coverage.asStr
+import com.wingedsheep.tooling.coverage.asciiIdentifier
 import com.wingedsheep.tooling.coverage.jsonContains
 import com.wingedsheep.tooling.coverage.pascalToUpperSnake
 import com.wingedsheep.tooling.coverage.strField
@@ -28,7 +29,7 @@ object Emitter {
     ): RenderResult {
         val ctx = EmitCtx(keywords, scryfall?.strField("oracle_text"))
         val name = card["Name"].asStr() ?: ""
-        val ident = name.replace(Regex("[^A-Za-z0-9]"), "")
+        val ident = asciiIdentifier(name)
         val pt = card["CardPT"].asObj
 
         val permanent = isPermanent(card)

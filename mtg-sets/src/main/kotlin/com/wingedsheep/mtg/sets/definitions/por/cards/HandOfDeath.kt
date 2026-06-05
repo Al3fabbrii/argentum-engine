@@ -20,7 +20,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Sorcery
  * Destroy target nonblack creature.
  */
-val HandofDeath = card("Hand of Death") {
+val HandOfDeath = card("Hand of Death") {
     manaCost = "{2}{B}"
     colorIdentity = "B"
     typeLine = "Sorcery"

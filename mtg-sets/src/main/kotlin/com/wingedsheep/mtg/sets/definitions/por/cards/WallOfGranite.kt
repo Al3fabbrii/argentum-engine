@@ -17,7 +17,7 @@ import com.wingedsheep.sdk.model.Rarity
  * 0/7
  * Defender (This creature can't attack.)
  */
-val WallofGranite = card("Wall of Granite") {
+val WallOfGranite = card("Wall of Granite") {
     manaCost = "{2}{R}"
     colorIdentity = "R"
     typeLine = "Creature — Wall"

@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * 2/2
  * When this creature enters, return target creature to its owner's hand.
  */
-val ManoWar = card("Man-o'-War") {
+val ManOWar = card("Man-o'-War") {
     manaCost = "{2}{U}"
     colorIdentity = "U"
     typeLine = "Creature — Jellyfish"

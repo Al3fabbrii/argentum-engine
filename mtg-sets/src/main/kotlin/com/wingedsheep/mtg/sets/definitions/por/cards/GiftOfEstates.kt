@@ -19,7 +19,7 @@ import com.wingedsheep.sdk.scripting.effects.SearchDestination
  * Sorcery
  * If an opponent controls more lands than you, search your library for up to three Plains cards, reveal them, put them into your hand, then shuffle.
  */
-val GiftofEstates = card("Gift of Estates") {
+val GiftOfEstates = card("Gift of Estates") {
     manaCost = "{1}{W}"
     colorIdentity = "W"
     typeLine = "Sorcery"

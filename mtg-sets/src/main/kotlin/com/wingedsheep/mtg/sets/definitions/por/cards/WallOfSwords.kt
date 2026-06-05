@@ -18,7 +18,7 @@ import com.wingedsheep.sdk.model.Rarity
  * Defender (This creature can't attack.)
  * Flying
  */
-val WallofSwords = card("Wall of Swords") {
+val WallOfSwords = card("Wall of Swords") {
     manaCost = "{3}{W}"
     colorIdentity = "W"
     typeLine = "Creature — Wall"

@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  * Sorcery
  * Destroy all creatures. They can't be regenerated.
  */
-val WrathofGod = card("Wrath of God") {
+val WrathOfGod = card("Wrath of God") {
     manaCost = "{2}{W}{W}"
     colorIdentity = "W"
     typeLine = "Sorcery"

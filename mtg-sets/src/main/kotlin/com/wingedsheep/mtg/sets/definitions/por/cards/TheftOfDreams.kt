@@ -20,7 +20,7 @@ import com.wingedsheep.sdk.scripting.values.DynamicAmount
  * Sorcery
  * Draw a card for each tapped creature target opponent controls.
  */
-val TheftofDreams = card("Theft of Dreams") {
+val TheftOfDreams = card("Theft of Dreams") {
     manaCost = "{2}{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"

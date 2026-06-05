@@ -24,7 +24,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Cast this spell only during the declare attackers step and only if you've been attacked this step.
  * Return one or two target attacking creatures to their owner's hand.
  */
-val CommandofUnsummoning = card("Command of Unsummoning") {
+val CommandOfUnsummoning = card("Command of Unsummoning") {
     manaCost = "{2}{U}"
     colorIdentity = "U"
     typeLine = "Instant"

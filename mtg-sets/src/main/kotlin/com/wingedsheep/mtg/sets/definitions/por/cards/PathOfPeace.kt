@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Sorcery
  * Destroy target creature. Its owner gains 4 life.
  */
-val PathofPeace = card("Path of Peace") {
+val PathOfPeace = card("Path of Peace") {
     manaCost = "{3}{W}"
     colorIdentity = "W"
     typeLine = "Sorcery"

@@ -16,7 +16,7 @@ import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
  * Sorcery
  * Draw two cards.
  */
-val TouchofBrilliance = card("Touch of Brilliance") {
+val TouchOfBrilliance = card("Touch of Brilliance") {
     manaCost = "{3}{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"

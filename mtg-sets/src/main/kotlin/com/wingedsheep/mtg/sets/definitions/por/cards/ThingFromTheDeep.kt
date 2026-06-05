@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.scripting.effects.SacrificeSelfEffect
  * 9/9
  * Whenever this creature attacks, sacrifice it unless you sacrifice an Island.
  */
-val ThingfromtheDeep = card("Thing from the Deep") {
+val ThingFromTheDeep = card("Thing from the Deep") {
     manaCost = "{6}{U}{U}{U}"
     colorIdentity = "U"
     typeLine = "Creature — Leviathan"

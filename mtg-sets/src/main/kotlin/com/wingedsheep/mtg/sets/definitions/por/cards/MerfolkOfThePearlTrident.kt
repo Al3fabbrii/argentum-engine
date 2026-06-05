@@ -15,7 +15,7 @@ import com.wingedsheep.sdk.model.Rarity
  * Creature — Merfolk
  * 1/1
  */
-val MerfolkofthePearlTrident = card("Merfolk of the Pearl Trident") {
+val MerfolkOfThePearlTrident = card("Merfolk of the Pearl Trident") {
     manaCost = "{U}"
     colorIdentity = "U"
     typeLine = "Creature — Merfolk"

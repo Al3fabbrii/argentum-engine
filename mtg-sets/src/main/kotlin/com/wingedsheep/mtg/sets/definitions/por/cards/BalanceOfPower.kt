@@ -18,7 +18,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetOpponent
  * Sorcery
  * If target opponent has more cards in hand than you, draw cards equal to the difference.
  */
-val BalanceofPower = card("Balance of Power") {
+val BalanceOfPower = card("Balance of Power") {
     manaCost = "{3}{U}{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"

@@ -21,7 +21,7 @@ import java.util.Locale
 object Autogen {
     private fun genPackage(setCode: String) = "com.wingedsheep.mtg.sets.generated.${setCode.lowercase()}.cards"
     private fun draftPackage(setCode: String) = "com.wingedsheep.mtg.sets.definitions.${setCode.lowercase()}.cards"
-    private fun sourceFileName(name: String) = name.replace(Regex("[^A-Za-z0-9]"), "") + ".kt"
+    private fun sourceFileName(name: String) = asciiIdentifier(name) + ".kt"
 
     private fun isBasicLand(card: JsonObject): Boolean {
         val typeline = card["Typeline"]

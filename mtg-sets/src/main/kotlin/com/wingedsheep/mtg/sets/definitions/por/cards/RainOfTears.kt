@@ -19,7 +19,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetPermanent
  * Sorcery
  * Destroy target land.
  */
-val RainofTears = card("Rain of Tears") {
+val RainOfTears = card("Rain of Tears") {
     manaCost = "{1}{B}{B}"
     colorIdentity = "B"
     typeLine = "Sorcery"

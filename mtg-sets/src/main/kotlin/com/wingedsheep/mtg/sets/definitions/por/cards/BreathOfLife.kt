@@ -19,7 +19,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetObject
  * Sorcery
  * Return target creature card from your graveyard to the battlefield.
  */
-val BreathofLife = card("Breath of Life") {
+val BreathOfLife = card("Breath of Life") {
     manaCost = "{3}{W}"
     colorIdentity = "W"
     typeLine = "Sorcery"

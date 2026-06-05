@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetPermanent
  * Sorcery
  * Destroy two target lands.
  */
-val RainofSalt = card("Rain of Salt") {
+val RainOfSalt = card("Rain of Salt") {
     manaCost = "{4}{R}{R}"
     colorIdentity = "R"
     typeLine = "Sorcery"

@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import java.io.File
+import java.text.Normalizer
 
 /**
  * Shared infrastructure for the mtgish coverage tooling (the Kotlin port of
@@ -68,6 +69,20 @@ fun JsonElement?.strField(key: String): String? = field(key).asStr()
 
 /** Compact `json.dumps(node)` equivalent for the regex-on-blob helpers. */
 fun compact(node: JsonElement?): String = if (node == null) "null" else J.encodeToString(JsonElement.serializer(), node)
+
+/**
+ * Card name → PascalCase ASCII identifier, matching the hand-authored convention used for `val`
+ * names and source files: accents are transliterated (`Déjà Vu` → `DejaVu`), spaces and hyphens are
+ * word boundaries that capitalize the next word (`Path of Peace` → `PathOfPeace`,
+ * `Troll-Horn Cameo` → `TrollHornCameo`), and apostrophes are dropped *without* a boundary so the
+ * trailing fragment stays joined (`Esika's Chariot` → `EsikasChariot`).
+ */
+fun asciiIdentifier(name: String): String = Normalizer.normalize(name, Normalizer.Form.NFD)
+    .replace(Regex("\\p{M}+"), "")        // strip accents (combining marks left by NFD)
+    .replace(Regex("['’]"), "")      // apostrophes merge into the word — no capitalization break
+    .split(Regex("[^A-Za-z0-9]+"))        // every other non-alphanumeric run is a word boundary
+    .filter { it.isNotEmpty() }
+    .joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 
 // ---------------------------------------------------------------------------
 // Tree walkers — faithful ports of the recursive helpers in probe.py / emitter.py.

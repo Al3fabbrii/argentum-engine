@@ -22,7 +22,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Return target creature to its owner's hand.
  * Draw a card.
  */
-val SymbolofUnsummoning = card("Symbol of Unsummoning") {
+val SymbolOfUnsummoning = card("Symbol of Unsummoning") {
     manaCost = "{2}{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"

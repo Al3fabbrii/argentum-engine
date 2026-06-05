@@ -17,7 +17,7 @@ import com.wingedsheep.sdk.scripting.references.Player
  * Sorcery
  * Each player shuffles the cards from their hand into their library, then draws that many cards.
  */
-val WindsofChange = card("Winds of Change") {
+val WindsOfChange = card("Winds of Change") {
     manaCost = "{R}"
     colorIdentity = "R"
     typeLine = "Sorcery"

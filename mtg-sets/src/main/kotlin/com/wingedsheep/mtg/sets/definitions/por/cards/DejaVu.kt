@@ -20,7 +20,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetObject
  * Sorcery
  * Return target sorcery card from your graveyard to your hand.
  */
-val DjVu = card("Déjà Vu") {
+val DejaVu = card("Déjà Vu") {
     manaCost = "{2}{U}"
     colorIdentity = "U"
     typeLine = "Sorcery"
