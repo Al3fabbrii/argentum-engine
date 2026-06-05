@@ -975,15 +975,11 @@ export function DeckbuilderPage() {
     }
   }, [pinnedPrintings, pinnedPrintingArt])
 
-  // Currently-open printing picker. `anchor` is the chip's bounding box so the popover
-  // can position itself relative to the row that opened it. Stored at the page level so
-  // (a) the popover escapes the deck-list scroll container and (b) only one picker is
-  // ever open at a time without each row needing to know about the others.
-  const [pickerOpenFor, setPickerOpenFor] = useState<{ name: string; anchor: DOMRect } | null>(null)
-  const handleOpenPicker = useCallback(
-    (name: string, anchor: DOMRect) => setPickerOpenFor({ name, anchor }),
-    [],
-  )
+  // Currently-open printing picker. The picker renders as a centered modal, so it only
+  // needs the card name. Stored at the page level so only one picker is ever open at a
+  // time without each row needing to know about the others.
+  const [pickerOpenFor, setPickerOpenFor] = useState<{ name: string } | null>(null)
+  const handleOpenPicker = useCallback((name: string) => setPickerOpenFor({ name }), [])
   const handleClosePicker = useCallback(() => setPickerOpenFor(null), [])
 
   // Deck-mode left-rail card preview. Hover state is lifted out of DeckCentricView so the
@@ -1310,7 +1306,6 @@ export function DeckbuilderPage() {
         <PrintingPicker
           cardName={pickerOpenFor.name}
           pinned={pinnedPrintings[pickerOpenFor.name]}
-          anchor={pickerOpenFor.anchor}
           onPick={(ref) => {
             setPinnedPrinting(pickerOpenFor.name, ref)
             handleClosePicker()
@@ -3716,7 +3711,7 @@ function DeckListPanel({
   onSuggestBasics: () => void
   pinnedPrintings: Record<string, PrintingRef>
   pinnedPrintingArt: Record<string, { imageUri: string | null; backFaceImageUri: string | null }>
-  onOpenPicker: (name: string, anchor: DOMRect) => void
+  onOpenPicker: (name: string) => void
 }) {
   const grouped = useMemo(
     () => groupForDeckList(deckCards, catalog, commander),
@@ -3870,7 +3865,7 @@ const DeckRow = memo(function DeckRow({
   onEnter: (entry: { name: string; card: CardSummary | undefined }) => void
   onLeave: () => void
   pinnedPrinting: PrintingRef | undefined
-  onOpenPicker: (name: string, anchor: DOMRect) => void
+  onOpenPicker: (name: string) => void
 }) {
   const illegal =
     activeFormat !== null &&
@@ -4020,7 +4015,7 @@ const DeckRow = memo(function DeckRow({
           }`}
           onClick={(e) => {
             e.stopPropagation()
-            onOpenPicker(entry.name, e.currentTarget.getBoundingClientRect())
+            onOpenPicker(entry.name)
           }}
           title={
             pinnedPrinting
@@ -4236,7 +4231,7 @@ function DeckCentricView({
   onHoverEnter: (entry: { name: string; card: CardSummary | undefined }) => void
   onHoverLeave: () => void
   pinnedPrintings: Record<string, PrintingRef>
-  onOpenPicker: (name: string, anchor: DOMRect) => void
+  onOpenPicker: (name: string) => void
 }) {
   const grouped = useMemo(
     () => groupByCardType(deckCards, catalog, commander),
