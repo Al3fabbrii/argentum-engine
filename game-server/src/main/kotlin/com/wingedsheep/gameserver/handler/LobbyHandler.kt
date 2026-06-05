@@ -1420,7 +1420,8 @@ class LobbyHandler(
         logger.info("AI building sealed deck from pool of {} cards (heuristic={})", pool.size, heuristic)
 
         val aiProperties = gameProperties.ai
-        if (!heuristic && aiProperties.enabled && aiProperties.effectiveApiKey.isNotBlank()) {
+        val forceHeuristic = heuristic || aiProperties.heuristicDeckbuilding
+        if (!forceHeuristic && aiProperties.enabled && aiProperties.effectiveApiKey.isNotBlank()) {
             val llmDeck = tryLlmSealedDeck(pool, aiProperties)
             if (llmDeck != null) return llmDeck
             logger.info("AI LLM deckbuild failed, falling back to heuristic")

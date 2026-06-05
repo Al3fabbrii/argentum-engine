@@ -40,6 +40,8 @@ game:
     model: ${GAME_AI_MODEL:qwen/qwen3.6-plus:free}
     deckbuilding-model: ${GAME_AI_DECKBUILDING_MODEL:}
     open-router-api-key: ${OPENROUTER_API_KEY:}
+    # When true, AI sealed decks always use the deterministic heuristic builder (skips the LLM).
+    heuristic-deckbuilding: ${GAME_AI_HEURISTIC_DECKBUILDING:false}
 
 # Swagger UI - only enabled when dev endpoints are enabled
 springdoc:

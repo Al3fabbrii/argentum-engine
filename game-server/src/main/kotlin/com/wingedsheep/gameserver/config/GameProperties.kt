@@ -59,7 +59,12 @@ data class AiProperties(
     val reasoningEffort: String = "low",
     val maxRetries: Int = 2,
     val timeoutMs: Long = 300000,
-    val thinkingDelayMs: Long = 500
+    val thinkingDelayMs: Long = 500,
+    /**
+     * When true, AI sealed decks are always built with the deterministic heuristic builder,
+     * skipping the LLM regardless of per-request flags. Useful for fully local play vs AI.
+     */
+    val heuristicDeckbuilding: Boolean = false
 ) {
     /** Returns the model to use for deckbuilding — falls back to the gameplay model if not set. */
     val effectiveDeckbuildingModel: String get() = deckbuildingModel.ifBlank { model }
