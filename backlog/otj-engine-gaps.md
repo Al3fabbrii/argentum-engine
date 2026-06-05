@@ -138,14 +138,23 @@ distinguished from plotted / flashback / impulse casts. Add a `fromHand` (or `so
   Damned, Annie Flash the Veteran. (Stoic Sphinx says "haven't cast a spell this turn" with no zone
   qualifier — buildable today.)
 
-### 5. "Cast for free / no mana was spent" cast-state condition
+### 5. "Cast for free / no mana was spent" cast-state condition — ✅ DONE
 
-`WasCast` covers only "wasn't cast." The clause **"or no mana was spent to cast it"** (true for free
-casts like Plot, which *are* casts) has no primitive. Stamp a "mana paid == 0 at cast" flag on the
-cast record and expose `Condition.NoManaSpentToCast` (OR-composed with `not(WasCast)`).
+**Implemented:** `Conditions.NoManaSpentToCast` — the full oracle clause *"it wasn't cast or no mana
+was spent to cast it."* No new flag was needed: the engine only stamps the per-permanent
+`CastRecordComponent` (the mana-spent record) when total mana spent to cast was > 0, so its absence
+(or a zero total) is *exactly* "no mana was spent." The resolution-time evaluator reads that record
+off the source, returning true for both free / `{0}` casts **and** uncast permanents (reanimation,
+tokens, "put onto the battlefield"), and false the moment any mana is spent — including mana for
+additional costs or cost increases on an otherwise-free cast (the Freestrider Commando / Aven
+Interrupter ruling). One condition covers the whole clause; `All(WasCast, NoManaSpentToCast)` gives
+the narrower "cast, but for free" sense. Tests: `FreestriderCommandoScenarioTest` (normal cast →
+3/3 no counters; free cast → 5/5 with two counters).
 
-→ Freestrider Commando (enters with 2 counters if cast for free), Satoru the Infiltrator (per-batch
-  "none were cast or no mana was spent").
+→ **Freestrider Commando** built (`{2}{G}` 3/3 Plot, `EntersWithCounters(condition =
+  NoManaSpentToCast)`). Satoru, the Infiltrator now has its condition primitive, but still needs the
+  batch "Satoru and/or one or more other nontoken creatures enter" once-per-turn trigger before it's
+  buildable.
 
 ### 6. `CARDS_DRAWN` turn-tracker + characteristic-defining P/T from it
 
@@ -226,8 +235,8 @@ this turn" can't be expressed. Add the tracker (engine accumulates on draw event
 
 1. ✅ **Saddle N + Mount** (Tier 1) — done.
 2. **Tier 2 shared primitives** — ✅ contributors-this-turn tracker (#2), ✅ spells-cast
-   `DynamicAmount` (#3). Remaining: the `fromHand` cast-zone flag (#4), the cast-for-free condition
-   (#5), `CARDS_DRAWN` (#6). Small, each unlocks a few scattered cards. **Next up: #4 (`fromHand`).**
+   `DynamicAmount` (#3), ✅ cast-for-free condition (#5). Remaining: the `fromHand` cast-zone flag
+   (#4), `CARDS_DRAWN` (#6). Small, each unlocks a few scattered cards. **Next up: #4 (`fromHand`).**
 3. **Tier-3 one-offs** as the relevant legendaries / rares come up — none block large numbers of
    cards; pick them off individually.
 
