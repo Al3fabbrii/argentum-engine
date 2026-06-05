@@ -43,6 +43,12 @@ import {
   type ResolveResult,
 } from './parseArenaDeck'
 import {
+  encodeSharedDeck,
+  decodeSharedDeck,
+  buildShareUrl,
+  SHARE_PARAM,
+} from './shareDeck'
+import {
   detectProducedColors,
   suggestBasicLands,
   type BasicLand,
@@ -314,6 +320,45 @@ export function DeckbuilderPage() {
     // setSearchParams is intentionally excluded — see the comment above.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, deckId, getDeck])
+
+  // Load a shared deck carried in the URL (`?d=<code>`). The whole deck travels in the link
+  // (no server round-trip), so we decode it into the working deck as an *unsaved* draft —
+  // the recipient can tweak it and hit Save to add it to their own library. The `d` param is
+  // stripped immediately afterwards so it doesn't linger in the address bar, reload on every
+  // filter keystroke, or get re-shared by accident. Guarded by a ref so it fires once even as
+  // `searchParams` churns. A malformed code is silently ignored (param still stripped).
+  const sharedLoadedRef = useRef(false)
+  useEffect(() => {
+    const code = searchParams.get(SHARE_PARAM)
+    if (!code || sharedLoadedRef.current) return
+    sharedLoadedRef.current = true
+    const shared = decodeSharedDeck(code)
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev)
+        params.delete(SHARE_PARAM)
+        // Stamp the deck's format so the commander-format guard (which would otherwise
+        // wipe a just-loaded commander) and the legality filter both see it — same trick
+        // as the saved-deck hydration above, done in one URL write.
+        if (shared?.format) params.set('fmt', shared.format.toUpperCase())
+        return params
+      },
+      { replace: true },
+    )
+    if (!shared) return
+    setDeckName(shared.name || 'Shared deck')
+    setDeckCards(mergeCommanderIntoCards(shared.cards, shared.commander ?? null))
+    setCommander(shared.commander ?? null)
+    setActiveDeckId(null)
+    const pins: Record<string, PrintingRef> = { ...(shared.printings ?? {}) }
+    if (shared.commander && shared.commanderPrinting) pins[shared.commander] = shared.commanderPrinting
+    setPinnedPrintings(pins)
+    // setSearchParams is stable; searchParams churn is filtered by the ref guard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
+  // Transient "Link copied!" feedback for the Share button.
+  const [shareCopied, setShareCopied] = useState(false)
 
   // Import-from-text modal visibility.
   const [importOpen, setImportOpen] = useState(false)
@@ -773,6 +818,39 @@ export function DeckbuilderPage() {
     handleNew()
   }
 
+  // Build a self-contained share link for the current working deck and copy it to the
+  // clipboard. The deck is encoded into the URL itself (no server storage), so the link
+  // captures exactly what's on screen — saved or not — including the commander, format and
+  // any pinned printings. Mirrors the save path's commander-stripping so a shared deck
+  // re-imports without double-counting the commander.
+  const handleShare = async () => {
+    const designated = isCommanderFormat ? commander : null
+    const cardsForShare = stripCommanderFromCards(deckCards, designated)
+    if (Object.keys(cardsForShare).length === 0) return
+    const printings: Record<string, PrintingRef> = {}
+    for (const [name, ref] of Object.entries(pinnedPrintings)) {
+      if (name in cardsForShare) printings[name] = ref
+    }
+    const commanderPrinting = designated ? pinnedPrintings[designated] : undefined
+    const code = encodeSharedDeck({
+      name: deckName.trim() || 'Untitled deck',
+      cards: cardsForShare,
+      ...(Object.keys(printings).length > 0 ? { printings } : {}),
+      ...(activeFormat ? { format: activeFormat } : {}),
+      ...(designated ? { commander: designated } : {}),
+      ...(commanderPrinting ? { commanderPrinting } : {}),
+    })
+    const url = buildShareUrl(window.location.origin, code)
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareCopied(true)
+      window.setTimeout(() => setShareCopied(false), 2000)
+    } catch {
+      // Clipboard blocked (e.g. insecure context) — fall back to a copyable prompt.
+      window.prompt('Copy this deck link', url)
+    }
+  }
+
   const handleLoadSaved = (deck: SavedDeck) => {
     setDeckName(deck.name)
     setDeckCards(mergeCommanderIntoCards(deck.cards, deck.commander ?? null))
@@ -995,6 +1073,14 @@ export function DeckbuilderPage() {
           disabled={Object.keys(deckCards).length === 0}
         >
           Bulk edit / export
+        </button>
+        <button
+          className={styles.iconButton}
+          onClick={handleShare}
+          disabled={Object.keys(deckCards).length === 0}
+          title="Copy a shareable link to this deck"
+        >
+          {shareCopied ? 'Link copied!' : 'Share'}
         </button>
         <button className={styles.iconButton} onClick={handleNew}>
           New deck
