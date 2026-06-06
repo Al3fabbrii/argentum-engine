@@ -187,6 +187,14 @@ import com.wingedsheep.sdk.scripting.targets.TargetRequirement
  */
 object Effects {
 
+    /**
+     * Scryfall art for the white Spirit token created by Endure (Tarkir: Dragonstorm).
+     * Every Endure card produces this identical token (an N/N white Spirit), so the
+     * image is shared here rather than duplicated per card.
+     */
+    private const val ENDURE_SPIRIT_TOKEN_IMAGE =
+        "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763"
+
     // =========================================================================
     // Damage Effects
     // =========================================================================
@@ -2484,7 +2492,8 @@ object Effects {
                 colors = setOf(Color.WHITE),
                 creatureTypes = setOf("Spirit"),
                 dynamicPower = amount,
-                dynamicToughness = amount
+                dynamicToughness = amount,
+                imageUri = ENDURE_SPIRIT_TOKEN_IMAGE
             ),
             "Create a ${amount.description}/${amount.description} white Spirit creature token"
         ),

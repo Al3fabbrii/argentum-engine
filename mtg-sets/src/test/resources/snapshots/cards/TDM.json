@@ -948,6 +948,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 2
@@ -3517,6 +3518,7 @@
                                     "creatureTypes": [
                                         "Spirit"
                                     ],
+                                    "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                     "dynamicPower": {
                                         "type": "Fixed",
                                         "amount": 1
@@ -4654,6 +4656,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 3
@@ -6014,6 +6017,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 1
@@ -7526,6 +7530,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 2
@@ -7570,6 +7575,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 2
@@ -8305,6 +8311,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 1
@@ -8876,6 +8883,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": "XValue",
                                 "dynamicToughness": "XValue"
                             }
@@ -13805,6 +13813,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "Fixed",
                                     "amount": 2
@@ -14699,6 +14708,7 @@
                                         "creatureTypes": [
                                             "Spirit"
                                         ],
+                                        "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                         "dynamicPower": {
                                             "type": "Fixed",
                                             "amount": 1
@@ -18692,6 +18702,7 @@
                                 "creatureTypes": [
                                     "Spirit"
                                 ],
+                                "imageUri": "https://cards.scryfall.io/large/front/8/e/8ea4fc2f-95a4-49d0-b06e-b88d19637737.jpg?1743176763",
                                 "dynamicPower": {
                                     "type": "EntityProperty",
                                     "entity": "Source",
