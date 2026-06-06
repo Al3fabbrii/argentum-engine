@@ -9,12 +9,15 @@ import com.wingedsheep.engine.registry.CardRegistry
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.engine.state.components.combat.AttackersDeclaredThisCombatComponent
+import com.wingedsheep.engine.state.components.combat.GoadedComponent
 import com.wingedsheep.engine.state.components.combat.MustAttackPlayerComponent
 import com.wingedsheep.engine.state.components.combat.MustAttackThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.PlayerAttackedThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnComponent
 import com.wingedsheep.engine.state.components.combat.AttackingComponent
+import com.wingedsheep.engine.state.components.identity.LifeTotalComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
+import com.wingedsheep.engine.state.components.identity.PlayerComponent
 import com.wingedsheep.engine.state.components.player.ManaPoolComponent
 import com.wingedsheep.engine.mechanics.combat.rules.AttackCheckContext
 import com.wingedsheep.engine.mechanics.combat.rules.AttackDefenderRule
@@ -125,6 +128,12 @@ internal class AttackPhaseManager(
         val projectedMustAttackValidation = validateProjectedMustAttackRequirements(state, attackingPlayer, attackers)
         if (projectedMustAttackValidation != null) {
             return ExecutionResult.error(state, projectedMustAttackValidation)
+        }
+
+        // Check goaded requirements (CR 701.15b–c)
+        val goadValidation = validateGoadedRequirements(state, attackingPlayer, attackers, projected, opponents)
+        if (goadValidation != null) {
+            return ExecutionResult.error(state, goadValidation)
         }
 
         // Calculate (but don't pay) the attack tax. If non-zero, pause for the attacking
@@ -486,6 +495,77 @@ internal class AttackPhaseManager(
     }
 
     /**
+     * Validate goaded-creature requirements (CR 701.15b–c).
+     *
+     * Per CR 701.15b a goaded creature has two combat requirements:
+     *   1. It attacks each combat if able. We enforce this here by requiring every
+     *      valid attacker that carries [GoadedComponent] to appear in [attackers]
+     *      — same shape as the must-attack-this-turn check, just keyed off the
+     *      component instead.
+     *   2. It attacks a player other than each of its goaders if able. CR 701.15b
+     *      phrases this requirement in terms of a *player* — not a planeswalker — so
+     *      the "if able" lookup considers only opponent players, not their
+     *      planeswalkers. CR 701.15c stacks the requirement per goader. If every
+     *      opponent player the creature could legally attack is a goader, the
+     *      requirement is unsatisfiable, so the creature may attack a goader (and
+     *      must attack something, per requirement 1).
+     *
+     * The chosen defender may itself be a planeswalker; [defenderControllerOf] maps
+     * it to its controller so attacking a goader's planeswalker is still caught as
+     * "attacking the goader" when an unaffected player was available.
+     */
+    private fun validateGoadedRequirements(
+        state: GameState,
+        attackingPlayer: EntityId,
+        attackers: Map<EntityId, EntityId>,
+        projected: ProjectedState,
+        opponents: List<EntityId>
+    ): String? {
+        val validAttackers = getValidAttackers(state, attackingPlayer)
+
+        for (attackerId in validAttackers) {
+            val goaded = state.getEntity(attackerId)?.get<GoadedComponent>() ?: continue
+            val cardName = state.getEntity(attackerId)?.get<CardComponent>()?.name ?: "Creature"
+
+            if (attackerId !in attackers.keys) {
+                return "$cardName is goaded and must attack this combat if able"
+            }
+
+            // Is there a non-goader *player* this creature could legally attack right
+            // now (honoring per-defender restrictions)? Per CR 701.15b the "attack a
+            // player other than the goader" requirement only ever points at players,
+            // so planeswalkers are not part of this alternative pool.
+            val ctx = com.wingedsheep.engine.mechanics.combat.rules.AttackCheckContext(
+                state, projected, attackerId, attackingPlayer, cardRegistry
+            )
+            val hasNonGoaderPlayer = opponents.any { playerId ->
+                playerId !in goaded.goaderIds &&
+                    attackDefenderRules.all { rule -> rule.check(ctx, playerId) == null }
+            }
+            if (!hasNonGoaderPlayer) continue
+
+            val chosenDefenderId = attackers[attackerId] ?: continue
+            val chosenDefenderController = defenderControllerOf(state, projected, chosenDefenderId)
+            if (chosenDefenderController in goaded.goaderIds) {
+                val goaderName = state.getEntity(chosenDefenderController)?.get<PlayerComponent>()?.name
+                    ?: "their goader"
+                return "$cardName is goaded and must attack a player other than $goaderName if able"
+            }
+        }
+
+        return null
+    }
+
+    private fun defenderControllerOf(
+        state: GameState,
+        projected: ProjectedState,
+        defenderId: EntityId
+    ): EntityId {
+        if (state.getEntity(defenderId)?.has<LifeTotalComponent>() == true) return defenderId
+        return projected.getController(defenderId) ?: defenderId
+    }
+
+    /**
      * Validate projected "must attack" requirements (e.g., from Grand Melee).
      */
     private fun validateProjectedMustAttackRequirements(
@@ -553,6 +633,14 @@ internal class AttackPhaseManager(
         // 3. Projected mustAttack (static ability like Valley Dasher, Grand Melee)
         for (attackerId in validAttackers) {
             if (projected.mustAttack(attackerId)) {
+                mandatory.add(attackerId)
+            }
+        }
+
+        // 4. GoadedComponent (CR 701.15b) — individual creatures
+        for (attackerId in validAttackers) {
+            val container = state.getEntity(attackerId) ?: continue
+            if (container.has<GoadedComponent>()) {
                 mandatory.add(attackerId)
             }
         }
