@@ -2,7 +2,7 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Keyword
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -25,7 +25,7 @@ import com.wingedsheep.sdk.model.Rarity
  * targets and uses [Effects.DistributeCountersAmongTargets] (total = 3) so the player allocates
  * the +1/+1 counters across the chosen creatures at resolution. Chapter III grants trample and
  * lifelink to every creature you control until end of turn via two
- * [EffectPatterns.grantKeywordToAll] over [GroupFilter.AllCreaturesYouControl].
+ * [GroupPatterns.grantKeywordToAll] over [GroupFilter.AllCreaturesYouControl].
  */
 val RevivalOfTheAncestors = card("Revival of the Ancestors") {
     manaCost = "{1}{W}{B}{G}"
@@ -60,8 +60,8 @@ val RevivalOfTheAncestors = card("Revival of the Ancestors") {
     }
 
     sagaChapter(3) {
-        effect = EffectPatterns.grantKeywordToAll(Keyword.TRAMPLE, GroupFilter.AllCreaturesYouControl)
-            .then(EffectPatterns.grantKeywordToAll(Keyword.LIFELINK, GroupFilter.AllCreaturesYouControl))
+        effect = GroupPatterns.grantKeywordToAll(Keyword.TRAMPLE, GroupFilter.AllCreaturesYouControl)
+            .then(GroupPatterns.grantKeywordToAll(Keyword.LIFELINK, GroupFilter.AllCreaturesYouControl))
     }
 
     metadata {

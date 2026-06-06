@@ -1,6 +1,6 @@
 package com.wingedsheep.mtg.sets.definitions.tmt.cards
 
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
@@ -32,7 +32,7 @@ val Nobody = card("Nobody") {
             TargetPermanent(optional = true, filter = TargetFilter.Artifact.youControl().other())
         )
         effect = Effects.ReturnToHand(artifact)
-            .then(EffectPatterns.scry(1))
+            .then(LibraryPatterns.scry(1))
     }
 
     metadata {

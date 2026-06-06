@@ -11,7 +11,6 @@ import com.wingedsheep.sdk.scripting.conditions.ComparisonOperator
 import com.wingedsheep.sdk.scripting.effects.CardDestination
 import com.wingedsheep.sdk.scripting.effects.CardOrder
 import com.wingedsheep.sdk.scripting.effects.CardSource
-import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
@@ -52,7 +51,7 @@ val StillnessInMotion = card("Stillness in Motion") {
                     ComparisonOperator.EQ,
                     DynamicAmount.Fixed(0)
                 ),
-                effect = CompositeEffect(
+                effect = Effects.Composite(
                     listOf(
                         Effects.Exile(EffectTarget.Self),
                         GatherCardsEffect(

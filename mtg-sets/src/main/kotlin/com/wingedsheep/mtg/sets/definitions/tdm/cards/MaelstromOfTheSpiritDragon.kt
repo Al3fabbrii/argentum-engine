@@ -3,7 +3,7 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.dsl.Effects
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
@@ -27,7 +27,7 @@ import com.wingedsheep.sdk.scripting.values.ManaColorSet
  * [ManaRestriction.SubtypeSpellsOnly] for the subtypes "Dragon" and "Omen" — the new multi-subtype
  * spend restriction (a spell qualifies if its type line carries either subtype; the Omen face of a
  * modal DFC has the "Omen" subtype on the stack). The tutor is the atomic
- * [EffectPatterns.searchLibrary] pipeline (find a Dragon card, reveal it, to hand, then shuffle).
+ * [LibraryPatterns.searchLibrary] pipeline (find a Dragon card, reveal it, to hand, then shuffle).
  */
 val MaelstromOfTheSpiritDragon = card("Maelstrom of the Spirit Dragon") {
     typeLine = "Land"
@@ -61,7 +61,7 @@ val MaelstromOfTheSpiritDragon = card("Maelstrom of the Spirit Dragon") {
                 AbilityCost.SacrificeSelf
             )
         )
-        effect = EffectPatterns.searchLibrary(
+        effect = LibraryPatterns.searchLibrary(
             filter = GameObjectFilter.Any.withSubtype(Subtype.DRAGON),
             count = 1,
             reveal = true,

@@ -2,7 +2,7 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Keyword
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
@@ -18,7 +18,7 @@ import com.wingedsheep.sdk.scripting.effects.SearchDestination
  * Put those cards into your graveyard, then shuffle.
  *
  * The ETB is modelled as three sequential single-card library searches — one per color filter —
- * each via the atomic [EffectPatterns.searchLibrary] gather→select→move pipeline to the graveyard.
+ * each via the atomic [LibraryPatterns.searchLibrary] gather→select→move pipeline to the graveyard.
  * Only the final search shuffles, matching the single "then shuffle" at the end of the oracle text.
  * Each search removes its found card from the library before the next runs, so a card cannot be
  * chosen twice; a multicolor card (e.g. black-green) can satisfy whichever single color search the
@@ -38,20 +38,20 @@ val LotuslightDancers = card("Lotuslight Dancers") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = EffectPatterns.searchLibrary(
+        effect = LibraryPatterns.searchLibrary(
             filter = GameObjectFilter.Any.withColor(Color.BLACK),
             count = 1,
             destination = SearchDestination.GRAVEYARD,
             shuffleAfter = false
         ).then(
-            EffectPatterns.searchLibrary(
+            LibraryPatterns.searchLibrary(
                 filter = GameObjectFilter.Any.withColor(Color.GREEN),
                 count = 1,
                 destination = SearchDestination.GRAVEYARD,
                 shuffleAfter = false
             )
         ).then(
-            EffectPatterns.searchLibrary(
+            LibraryPatterns.searchLibrary(
                 filter = GameObjectFilter.Any.withColor(Color.BLUE),
                 count = 1,
                 destination = SearchDestination.GRAVEYARD,

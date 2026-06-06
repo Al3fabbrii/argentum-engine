@@ -14,7 +14,6 @@ import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.CREATED_TOKENS
 import com.wingedsheep.sdk.scripting.effects.CreateDelayedTriggerEffect
 import com.wingedsheep.sdk.scripting.effects.CreateTokenEffect
-import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
@@ -35,7 +34,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetPermanent
  * The delayed end-step destroy resolves the freshly-created token via
  * `EffectTarget.PipelineTarget(CREATED_TOKENS, 0)` — `CreateTokenEffect`
  * publishes new token ids into the `CREATED_TOKENS` pipeline collection
- * (see `EffectPatterns.incubate` for the established precedent).
+ * (see `MiscPatterns.incubate` for the established precedent).
  * `byDestruction = true` routes the cleanup through the destroy
  * pipeline so the second ability's UEOT indestructible grant
  * legitimately saves the token (a `sacrificeAtStep` shortcut would
@@ -61,7 +60,7 @@ val OldHobAlleycatBlues = card("Old Hob, Alleycat Blues") {
         ).then(
             CreateDelayedTriggerEffect(
                 step = Step.END,
-                effect = MoveToZoneEffect(
+                effect = Effects.Move(
                     target = EffectTarget.PipelineTarget(CREATED_TOKENS, 0),
                     destination = Zone.GRAVEYARD,
                     byDestruction = true,

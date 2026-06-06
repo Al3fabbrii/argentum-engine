@@ -1,6 +1,6 @@
 package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
@@ -20,7 +20,7 @@ import com.wingedsheep.sdk.scripting.values.DynamicAmount
  *
  * "You may discard your hand. If you do, draw …" is the standard
  * [MayEffect] + [IfYouDoEffect] pair (same shape as Vaultguard Trooper): the optional yes/no
- * wraps [EffectPatterns.discardHand]; on "yes" the hand is discarded (even if empty) and the draw
+ * wraps [HandPatterns.discardHand]; on "yes" the hand is discarded (even if empty) and the draw
  * fires. The draw amount is [DynamicAmount.SpellsCastThisTurn] for the controller (reads the
  * per-player `spellsCastThisTurnByPlayer` history), counting every spell cast this turn — Narset's
  * own spell included if it was cast this turn.
@@ -38,7 +38,7 @@ val NarsetJeskaiWaymaster = card("Narset, Jeskai Waymaster") {
         trigger = Triggers.YourEndStep
         effect = MayEffect(
             IfYouDoEffect(
-                action = EffectPatterns.discardHand(EffectTarget.Controller),
+                action = HandPatterns.discardHand(EffectTarget.Controller),
                 ifYouDo = Effects.DrawCards(DynamicAmount.SpellsCastThisTurn(Player.You))
             )
         )

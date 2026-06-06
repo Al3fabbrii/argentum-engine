@@ -1,6 +1,6 @@
 package com.wingedsheep.mtg.sets.definitions.tmt.cards
 
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
@@ -22,7 +22,7 @@ val LessonsFromLife = card("Lessons from Life") {
 
     spell {
         effect = Effects.DrawCards(3)
-            .then(EffectPatterns.putFromHand(filter = GameObjectFilter.Land, entersTapped = true))
+            .then(HandPatterns.putFromHand(filter = GameObjectFilter.Land, entersTapped = true))
     }
 
     metadata {

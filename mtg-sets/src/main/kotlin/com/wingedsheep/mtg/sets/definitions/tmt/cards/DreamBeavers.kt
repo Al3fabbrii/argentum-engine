@@ -1,7 +1,7 @@
 package com.wingedsheep.mtg.sets.definitions.tmt.cards
 
 import com.wingedsheep.sdk.core.Keyword
-import com.wingedsheep.sdk.dsl.EffectPatterns
+import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
@@ -33,7 +33,7 @@ val DreamBeavers = card("Dream Beavers") {
         trigger = Triggers.EntersBattlefield
         effect = Effects.LoseLife(1, EffectTarget.PlayerRef(Player.EachOpponent))
             .then(Effects.GainLife(1))
-            .then(EffectPatterns.scry(1))
+            .then(LibraryPatterns.scry(1))
     }
 
     metadata {
