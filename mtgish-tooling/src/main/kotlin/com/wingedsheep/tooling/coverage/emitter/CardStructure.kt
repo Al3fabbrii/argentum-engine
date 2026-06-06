@@ -46,8 +46,8 @@ internal fun EmitCtx.spellTarget(targets: List<JsonObject>?, actions: List<JsonO
 
 private fun EmitCtx.conditionDsl(ifNode: JsonElement?): String? {
     val blob = compact(ifNode)
-    if ("ControlsMorePermanentThanPlayer" in blob && "\"Land\"" in blob) { used.add("Conditions"); return "Conditions.OpponentControlsMoreLands" }
-    if ("ControlsMorePermanentThanPlayer" in blob && "\"Creature\"" in blob) { used.add("Conditions"); return "Conditions.OpponentControlsMoreCreatures" }
+    if ("ControlsMorePermanentThanPlayer" in blob && "\"Land\"" in blob) return "Conditions.OpponentControlsMoreLands"
+    if ("ControlsMorePermanentThanPlayer" in blob && "\"Creature\"" in blob) return "Conditions.OpponentControlsMoreCreatures"
     return null
 }
 
@@ -77,7 +77,6 @@ private fun EmitCtx.additionalCostLine(rule: JsonObject): String? {
     val cost = node["args"] as? JsonObject ?: return null
     if (cost.strField("_Cost") != "SacrificeAPermanent") return null
     val filter = gameObjectFilterDsl(cost["args"]) ?: return null
-    used.add("AdditionalCost")
     return "    additionalCost(AdditionalCost.SacrificePermanent($filter))"
 }
 
@@ -88,7 +87,6 @@ private fun EmitCtx.castRestrictionLines(rules: List<JsonObject>): List<String>?
         if (node.strField("_CastEffect") != "CantBeCastUnless") continue
         val blob = compact(node)
         if ("IsDuringDeclareAttackersStep" in blob && "IsAttacked" in blob) {
-            used.addAll(listOf("Step", "YouWereAttackedThisStep"))
             lines.add("        castOnlyDuring(Step.DECLARE_ATTACKERS)")
             lines.add("        castOnlyIf(YouWereAttackedThisStep)")
         } else {
@@ -147,7 +145,6 @@ internal fun EmitCtx.triggerBlock(rule: JsonObject): List<String>? {
         if (jsonContains(rule, "_Trigger", mtTrigger) && jsonContains(rule, "_Permanent", "ThisPermanent")) { spec = dsl; break }
     }
     if (spec == null) { reasons.add("trigger-shape"); return null }
-    used.add("Triggers")
     val (targets, actions) = extractEnvelope(rule)
     if (actions == null) { reasons.add("trigger-actions"); return null }
     val (tdsl, tvar) = spellTarget(targets, actions)
@@ -167,7 +164,6 @@ internal fun EmitCtx.activatedBlock(rule: JsonObject): List<String>? {
     if (costNode?.strField("_Cost") == "TapPermanent") cost = "AbilityCost.Tap"
     else if (costNode?.strField("_Cost") == "PayMana") cost = null  // mana costs need symbols -> SCAFFOLD
     if (cost == null) { reasons.add("activated-cost"); return null }
-    used.add("AbilityCost")
     val (targets, actions) = extractEnvelope(rule)
     if (actions == null) { reasons.add("activated-actions"); return null }
     val (tdsl, tvar) = spellTarget(targets, actions)
@@ -184,7 +180,6 @@ private fun EmitCtx.activationRestrictionLines(rule: JsonObject): List<String>? 
     if (rule.strField("_Rule") != "ActivatedWithModifiers") return emptyList()
     val blob = compact(rule)
     if ("ActivateOnlyIf" in blob && "IsTheirTurn" in blob && "IsBeforeAttackersDeclared" in blob) {
-        used.addAll(listOf("ActivationRestriction", "Step"))
         return listOf(
             "        restrictions = listOf(",
             "            ActivationRestriction.OnlyDuringYourTurn,",

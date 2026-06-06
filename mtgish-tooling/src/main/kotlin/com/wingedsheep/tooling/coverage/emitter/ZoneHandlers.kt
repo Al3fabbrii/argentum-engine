@@ -9,66 +9,57 @@ import kotlinx.serialization.json.JsonObject
 
 /** Zone movement: destroy / bounce / reanimate / search / look / mill. Argentum has no leaf
  *  destroy/discard verb — they compose from MoveToZone (single) / MoveCollection (mass). */
-internal val zoneHandlers: Map<String, ActionHandler> = buildMap {
-    fun reg(vararg keys: String, h: ActionHandler) = keys.forEach { put(it, h) }
+internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
 
-    reg("PutEachPermanentIntoItsOwnersHand") { node, _, _ ->  // bounce each chosen target
+    on("PutEachPermanentIntoItsOwnersHand") { node, _, _ ->  // bounce each chosen target
         if (jsonContains(node, "_Permanents", "Ref_TargetPermanents")) {
-            used.addAll(listOf("ForEachTargetEffect", "MoveToZoneEffect", "Zone", "EffectTarget"))
             "ForEachTargetEffect(listOf(MoveToZoneEffect(EffectTarget.ContextTarget(0), Zone.HAND)))"
         } else null
     }
 
-    reg("DestroyPermanent") { _, args, tvar ->
-        val tgt = refTarget(args, tvar) ?: return@reg null
-        used.addAll(listOf("MoveToZoneEffect", "Zone"))
+    on("DestroyPermanent") { _, args, tvar ->
+        val tgt = refTarget(args, tvar) ?: return@on null
         "MoveToZoneEffect($tgt, Zone.GRAVEYARD, byDestruction = true)"
     }
-    reg("DestroyEachPermanent", "DestroyEachPermanentNoRegen") { node, args, _ ->
+    on("DestroyEachPermanent", "DestroyEachPermanentNoRegen") { node, args, _ ->
         if (jsonContains(args, "_Permanents", "Ref_TargetPermanents")) {
-            used.addAll(listOf("ForEachTargetEffect", "MoveToZoneEffect", "Zone", "EffectTarget"))
             val noregen = if (node.strField("_Action") == "DestroyEachPermanentNoRegen") ", noRegenerate = true" else ""
-            return@reg "ForEachTargetEffect(listOf(MoveToZoneEffect(EffectTarget.ContextTarget(0), " +
+            return@on "ForEachTargetEffect(listOf(MoveToZoneEffect(EffectTarget.ContextTarget(0), " +
                 "Zone.GRAVEYARD, byDestruction = true$noregen)))"
         }
-        if (oracleText?.contains("target", ignoreCase = true) == true) return@reg null
-        used.addAll(listOf("ForEachInGroupEffect", "MoveToZoneEffect", "Zone", "EffectTarget"))
+        if (oracleText?.contains("target", ignoreCase = true) == true) return@on null
         val noregen = if (node.strField("_Action") == "DestroyEachPermanentNoRegen") "true" else "false"
-        val filter = groupFilterDsl(args) ?: return@reg null
+        val filter = groupFilterDsl(args) ?: return@on null
         "ForEachInGroupEffect($filter, MoveToZoneEffect(EffectTarget.Self, " +
             "Zone.GRAVEYARD, byDestruction = true), noRegenerate = $noregen)"
     }
 
-    reg("PutPermanentIntoItsOwnersHand") { _, args, tvar ->  // bounce
-        val tgt = refTarget(args, tvar) ?: return@reg null
-        used.addAll(listOf("MoveToZoneEffect", "Zone"))
+    on("PutPermanentIntoItsOwnersHand") { _, args, tvar ->  // bounce
+        val tgt = refTarget(args, tvar) ?: return@on null
         "MoveToZoneEffect($tgt, Zone.HAND)"
     }
 
-    reg("ShuffleGraveyardCardIntoLibrary") { _, args, tvar ->  // e.g. Alabaster Dragon
+    on("ShuffleGraveyardCardIntoLibrary") { _, args, tvar ->  // e.g. Alabaster Dragon
         val tgt = refTarget(args, tvar) ?: "EffectTarget.Self"
-        used.addAll(listOf("MoveToZoneEffect", "Zone", "ZonePlacement", "EffectTarget"))
         "MoveToZoneEffect($tgt, Zone.LIBRARY, ZonePlacement.Shuffled)"
     }
 
-    reg("SearchLibrary") { _, args, _ -> renderSearch(args) }
-    reg("LookAtTheTopNumberCardsOfLibrary", "LookAtTheTopNumberCardsOfPlayersLibrary") { node, args, tvar -> renderLook(node, args, tvar) }
+    on("SearchLibrary") { _, args, _ -> renderSearch(args) }
+    on("LookAtTheTopNumberCardsOfLibrary", "LookAtTheTopNumberCardsOfPlayersLibrary") { node, args, tvar -> renderLook(node, args, tvar) }
 
-    reg("PutGraveyardCardOntoBattlefield", "PutGraveyardCardIntoHand",
+    on("PutGraveyardCardOntoBattlefield", "PutGraveyardCardIntoHand",
         "ReturnDeadGraveyardCardToTopOfLibrary", "PutPermanentOnTopOfOwnersLibrary") { node, args, tvar ->
         val a = node.strField("_Action")
         // ReturnDead… ("return this card from the graveyard") often has no ref -> Self
         var tgt = refTarget(args, tvar)
         if (tgt == null) {
-            if (a == "ReturnDeadGraveyardCardToTopOfLibrary") { used.add("EffectTarget"); tgt = "EffectTarget.Self" } else return@reg null
+            if (a == "ReturnDeadGraveyardCardToTopOfLibrary") tgt = "EffectTarget.Self" else return@on null
         }
         val zone = mapOf(
             "PutGraveyardCardOntoBattlefield" to "BATTLEFIELD", "PutGraveyardCardIntoHand" to "HAND",
             "ReturnDeadGraveyardCardToTopOfLibrary" to "LIBRARY", "PutPermanentOnTopOfOwnersLibrary" to "LIBRARY",
         )[a]
-        used.addAll(listOf("MoveToZoneEffect", "Zone"))
         if (a == "PutPermanentOnTopOfOwnersLibrary" || a == "ReturnDeadGraveyardCardToTopOfLibrary") {
-            used.add("ZonePlacement")
             "MoveToZoneEffect($tgt, Zone.$zone, ZonePlacement.Top)"
         } else {
             "MoveToZoneEffect($tgt, Zone.$zone)"
@@ -77,7 +68,6 @@ internal val zoneHandlers: Map<String, ActionHandler> = buildMap {
 }
 
 internal fun EmitCtx.renderSearch(args: JsonElement?): String? {
-    used.add("EffectPatterns")
     val blob = compact(args)
     val dest = when {
         "PutFoundCardsOntoBattlefield" in blob -> "BATTLEFIELD"
@@ -85,7 +75,6 @@ internal fun EmitCtx.renderSearch(args: JsonElement?): String? {
         "PutSetAsideCardsOnTopOfLibrary" in blob || "OnTopOfLibrary" in blob -> "TOP_OF_LIBRARY"
         else -> "HAND"
     }
-    used.add("SearchDestination")
     val filt = landSearchFilterDsl(args)
     val count = findInteger(args)
     val parts = mutableListOf("filter = $filt")
@@ -96,17 +85,11 @@ internal fun EmitCtx.renderSearch(args: JsonElement?): String? {
 }
 
 internal fun EmitCtx.renderLook(node: JsonObject, args: JsonElement?, tvar: String?): String? {
-    used.add("EffectPatterns")
     val look = findInteger(node) ?: return null
     val blob = compact(node)
     if (oracleText?.contains("target", ignoreCase = true) == true) {
         if (node.strField("_Action") != "LookAtTheTopNumberCardsOfPlayersLibrary" || tvar == null) return null
         if ("PutAGenericCardIntoGraveyard" !in blob || "PutTheRemainingCardsOnTopOfLibraryInAnyOrder" !in blob) return null
-        used.addAll(listOf(
-            "CompositeEffect", "GatherCardsEffect", "CardSource", "DynamicAmount", "Player",
-            "SelectFromCollectionEffect", "SelectionMode", "MoveCollectionEffect", "CardDestination",
-            "Zone", "ZonePlacement", "CardOrder",
-        ))
         return "CompositeEffect(\n" +
             "        listOf(\n" +
             "            GatherCardsEffect(CardSource.TopOfLibrary(DynamicAmount.Fixed($look), Player.TargetOpponent), storeAs = \"looked\"),\n" +

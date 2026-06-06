@@ -3,7 +3,7 @@ package com.wingedsheep.tooling.coverage
 import kotlinx.serialization.json.JsonObject
 
 /**
- * Card-data wiring (port of probe.py's name/set plumbing): bridges Scryfall's canonical lists, the
+ * Card-data wiring: bridges Scryfall's canonical lists, the
  * repo's implemented names, and per-printing Scryfall metadata, all keyed by front-face name.
  */
 object Cards {

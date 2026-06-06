@@ -1,9 +1,10 @@
 package com.wingedsheep.tooling.coverage
 
 /**
- * The capability registry scanned from Kotlin source so it can't rot (port of probe.py Part 1 +
- * emitter.py's import resolver). The mtgish→Argentum bridge itself now lives as typed Kotlin under
- * the `bridge/` package — see [com.wingedsheep.tooling.coverage.bridge.Bridge].
+ * The capability registry scanned from Kotlin source so it can't rot: the set of effect SerialNames
+ * and Keyword members the bridge validates against, plus the symbol→import resolver the emitter's
+ * auto-import derivation uses. The mtgish→Argentum bridge itself lives as typed Kotlin under the
+ * `bridge/` package — see [com.wingedsheep.tooling.coverage.bridge.Bridge].
  */
 object Registry {
     /** Effect `@SerialName`s scanned from the effects package (nested-enum serialnames dropped). */

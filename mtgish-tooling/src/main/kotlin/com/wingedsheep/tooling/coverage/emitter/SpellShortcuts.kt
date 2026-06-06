@@ -16,7 +16,6 @@ internal fun EmitCtx.eachplayerMaydraw(card: JsonObject): String? {
     val blob = compact(rules)
     val mx = Regex(""""DrawUptoNumberCards".*?"args":\s*(\d+)""").find(blob) ?: return null
     val life = Regex(""""GainLifeForEach".*?"args":\s*(\d+)""").find(blob)
-    used.add("EffectPatterns")
     val lpc = if (life != null) ", lifePerCardNotDrawn = ${life.groupValues[1]}" else ""
     return "EffectPatterns.eachPlayerMayDraw(maxCards = ${mx.groupValues[1]}$lpc)"
 }
@@ -25,7 +24,6 @@ internal fun EmitCtx.eachplayerMaydraw(card: JsonObject): String? {
 internal fun EmitCtx.fluxEffect(card: JsonObject): String? {
     val blob = compact(card["Rules"])
     if ("TheNumberOfCardsDiscardedByPlayerThisWay" in blob && "DiscardAnyNumberOfCards" in blob) {
-        used.add("EffectPatterns")
         val bonus = if ("\"DrawACard\"" in blob) 1 else 0
         return "EffectPatterns.eachPlayerDiscardsDraws(controllerBonusDraw = $bonus)"
     }
@@ -36,7 +34,6 @@ internal fun EmitCtx.fluxEffect(card: JsonObject): String? {
 internal fun EmitCtx.windsEffect(card: JsonObject): String? {
     val blob = compact(card["Rules"])
     if ("ShuffleHandIntoLibrary" in blob && "NumCardsShuffledIntoLibraryThisWay" in blob) {
-        used.addAll(listOf("EffectPatterns", "Player"))
         return "EffectPatterns.wheelEffect(Player.Each)"
     }
     return null
@@ -48,7 +45,7 @@ internal fun EmitCtx.extraTurnEffect(card: JsonObject): String? {
     if (actions == null) return null
     val hasExtra = actions.any { it.strField("_Action") == "TakeAnExtraTurn" }
     val loseAfter = actions.any { it.strField("_Action") == "CreateFutureTrigger" && jsonContains(it, "_Action", "LoseTheGame") }
-    if (hasExtra && loseAfter) { used.add("TakeExtraTurnEffect"); return "TakeExtraTurnEffect(loseAtEndStep = true)" }
+    if (hasExtra && loseAfter) return "TakeExtraTurnEffect(loseAtEndStep = true)"
     return null
 }
 
@@ -59,7 +56,6 @@ internal fun EmitCtx.distributedSpell(card: JsonObject): List<String>? {
     val total = Regex(""""DistributeNumberAmongTargets","args":\{"_GameNumber":"Integer","args":(\d+)""").find(blob)
     val mx = Regex(""""BetweenOneAndNumberTargetPermanents","args":\[\{"_GameNumber":"Integer","args":(\d+)""").find(blob)
     if (total == null || mx == null) return null
-    used.addAll(listOf("TargetCreature", "DividedDamageEffect"))
     val m = mx.groupValues[1]
     return listOf(
         "    spell {",
@@ -73,7 +69,6 @@ internal fun EmitCtx.distributedSpell(card: JsonObject): List<String>? {
 internal fun EmitCtx.balanceEffect(card: JsonObject): List<String>? {
     val blob = compact(card["Rules"])
     if ("NumCardsInHandIs" in blob && "\"Minus\"" in blob && "TheNumberOfCardsInPlayersHand" in blob) {
-        used.addAll(listOf("DrawCardsEffect", "DynamicAmounts", "TargetOpponent"))
         return listOf(
             "    spell {",
             "        target = TargetOpponent()",

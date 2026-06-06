@@ -2,8 +2,8 @@ package com.wingedsheep.tooling.coverage.bridge
 
 /**
  * The hand-authored mtgish→Argentum bridge: a mtgish IR tag mapped to the Argentum capability that
- * realises it. THIS IS THE MAINTENANCE COST the spike measures — and now it's typed, modular Kotlin
- * instead of a 500-line JSON wall.
+ * realises it. This is the CAPABILITY dictionary — "can Argentum express this tag?" Its sibling, the
+ * RENDERING dictionary ("what Kotlin DSL does it emit?"), lives in `emitter/` (see `ACTION_HANDLERS`).
  *
  * The five kinds (see [MappingEntry]):
  *  - [keyword]   — maps to a `Keyword` enum member; the tag is validated against the scanned registry
@@ -38,9 +38,6 @@ object Bridge {
 
     /** Bare-key lookup (the emitter's rule-name keyword check). */
     operator fun get(value: String): MappingEntry? = entries[value]
-
-    /** Exposed for the parity test that diffs this bridge against the legacy mapping.json. */
-    val all: Map<String, MappingEntry> get() = entries
 }
 
 /** A bridge entry. `kind` is the verdict label the probe prints; `composes` are the primitives a

@@ -25,18 +25,28 @@ mtgish-tooling autogen   # write generated Kotlin drafts
 
 ## Data Flow
 
-1. `Mtgish.kt` loads mtgish card IR from `spike/mtgish-coverage/data/mtgish.lines.json`.
+1. `Mtgish.kt` loads mtgish card IR from `mtgish-tooling/data/mtgish.lines.json` (auto-downloaded, gitignored).
 2. `Cards.kt` joins mtgish names to Scryfall cached set data and existing Argentum card names.
 3. `bridge/*` maps mtgish tags to Argentum capabilities for coverage scoring.
 4. `emitter/*` renders Kotlin `card { ... }` DSL from mtgish rules.
 5. `mtg-sets:verifyGeneratedCards` compiles generated drafts and serializes them with the same exporter used for golden snapshots.
 6. `fidelity --gate SET` compares generated gameplay trees to golden snapshots, with a small allowlist of known-equivalent representations and Scryfall-oracle drift reporting.
 
-## Mapping mtgish to Argentum
+## Two dictionaries
 
-Coverage mappings live in `src/main/kotlin/com/wingedsheep/tooling/coverage/bridge/`.
+A mtgish tag is mapped in two independent places, each readable as a flat list of entries:
 
-Add mappings by editing the themed bridge files:
+| Dictionary | Question it answers | Lives in |
+|------------|---------------------|----------|
+| **Capability** (`bridge/`) | *Can* Argentum express this tag? | `coverage/bridge/*` |
+| **Rendering** (`emitter/`) | *What Kotlin DSL* does it emit?  | `coverage/emitter/*Handlers.kt` |
+
+The probe uses only the capability dictionary; the emitter uses both. The capability dictionary can
+say "yes" for a tag the emitter still declines to render exactly — that's the `SCAFFOLD` tier.
+
+### Capability dictionary (`bridge/`)
+
+Add mappings by editing the themed bridge files. Each entry is one line:
 
 ```kotlin
 effect("DrawNumberCards", "DrawCards")
@@ -52,25 +62,38 @@ Mapping kinds:
 - `envelope`: structural IR node whose nested children carry the real capability.
 - `supported`: accepted non-effect capability, such as trigger/cost vocabulary.
 
-The bridge answers “can Argentum express this?” It does not prove the emitter can render exact card source.
+`effect`/`keyword` tags are validated against a live scan of the SDK source, so a typo or a renamed
+SerialName surfaces as a coverage gap rather than rotting silently.
 
-## Rendering Kotlin Cards
+### Rendering dictionary (`emitter/`)
 
-Emitter code lives in `src/main/kotlin/com/wingedsheep/tooling/coverage/emitter/`.
+Each mtgish `_Action` tag maps to the Argentum Effect DSL string it emits. Entries are split across
+themed `*Handlers.kt` files and registered with one of two forms:
+
+```kotlin
+simple("Shuffle", "ShuffleLibraryEffect()")              // a constant, argument-free effect
+on("DrawNumberCards") { node, args, tvar -> ... }        // needs amount/target/filter recovery
+```
+
+Handlers do **not** track imports: `Shells.importsFor` derives the file's import block by scanning the
+emitted code for SDK symbols, so a handler is a pure `tag → DSL string` mapping. Return `null` whenever
+exact rendering isn't possible — the card downgrades to `SCAFFOLD` rather than emit something wrong.
 
 Important files:
 
-- `Emitter.kt`: whole-card assembly and shell rendering.
-- `ActionHandlers.kt`: central registry joining all `_Action` handler maps.
-- `TargetRecovery.kt`: target and filter reconstruction.
+- `ActionHandlers.kt`: the `actionHandlers { }` builder + the merged `_Action → handler` registry.
 - `DamageDrawLifeHandlers.kt`, `ZoneHandlers.kt`, `TapLayerStateHandlers.kt`, `PlayerContinuousHandlers.kt`: themed action handlers.
+- `TargetRecovery.kt`: target and filter reconstruction (the target/filter sub-dictionary).
 - `CardStructure.kt`: spell, triggered ability, and activated ability envelopes.
-- `Shells.kt`: mana cost, type line, metadata, imports.
+- `SpellShortcuts.kt`: whole-card shapes recognised as one named `EffectPatterns.*`.
+- `StaticAbilities.kt`: `PermanentRuleEffect → flags()/staticAbility { }`.
+- `Shells.kt`: mana cost, type line, metadata, KDoc, and the import auto-derivation.
+- `Emitter.kt`: whole-card assembly.
 
 To add support for a new mtgish action:
 
 1. Find the mtgish `_Action` value in a failing `fidelity --gate` or scaffold reason.
-2. Add a handler in the closest themed `*Handlers.kt` file.
+2. Add a `simple(...)` or `on(...) { }` entry in the closest themed `*Handlers.kt` file.
 3. If the handler needs target/filter support, add it to `TargetRecovery.kt` rather than widening filters.
 4. Return `null` when exact rendering is not possible. This deliberately downgrades the card to `SCAFFOLD`.
 5. Run `just coverage-verify POR` or another calibrated set before trusting the change.

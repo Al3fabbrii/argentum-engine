@@ -11,7 +11,7 @@ import kotlinx.serialization.json.booleanOrNull
 import java.util.Locale
 
 /**
- * GENERATION-fidelity probe (port of fidelity.py) — "could we auto-AUTHOR this card?", not merely
+ * GENERATION-fidelity probe — "could we auto-AUTHOR this card?", not merely
  * "is it covered?". Two ground truths: STATIC diffs the emitter's prediction against each card's
  * committed golden snapshot; COMPILED (--gate) diffs the serialised, compiled drafts vs golden.
  */
@@ -188,7 +188,7 @@ object Fidelity {
         val res = Emitter.renderCard(card, scryfall, effects, keywords,
             pkg = "com.wingedsheep.mtg.sets.generated.${setCode.lowercase()}.cards")
         println(res.text)
-        // Mirror Python's list repr (single-quoted items) for the trailing tier comment.
+        // Single-quoted list items, matching the committed golden tier comment format.
         val reasonsRepr = res.reasons.sorted().joinToString(", ", "[", "]") { "'$it'" }
         println("// fidelity tier: ${if (res.complete) "AUTO" else "SCAFFOLD"}" +
             (if (res.reasons.isNotEmpty()) " — unrecovered: $reasonsRepr" else ""))

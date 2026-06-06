@@ -27,22 +27,20 @@ data class RenderResult(val text: String, val complete: Boolean, val reasons: Se
 /**
  * Per-render state for the emitter. Created once per card; threaded implicitly as the receiver of
  * every emitter extension function so the "mapping" knowledge can live in small themed files rather
- * than one monolith. [used] drives the import block; [reasons] is the SCAFFOLD worklist.
+ * than one monolith. [reasons] is the SCAFFOLD worklist (the structures we couldn't render exactly).
+ *
+ * Imports are NOT tracked here — `Shells.assemble` derives them by scanning the emitted code for SDK
+ * symbols, so handlers stay pure `tag → DSL string` mappings.
  *
  * The actual rendering rules are spread across sibling files as `EmitCtx.*` extensions:
  *  - target/filter recovery → `TargetRecovery.kt`
  *  - the per-`_Action` handlers → `ActionHandlers.kt` + the themed `*Handlers.kt`
  *  - spell/trigger/activated structure → `CardStructure.kt`, whole-card shortcuts → `SpellShortcuts.kt`
- *  - static abilities → `StaticAbilities.kt`; shells + whole-card assembly → `Shells.kt` / `CardRenderer.kt`
+ *  - static abilities → `StaticAbilities.kt`; shells + whole-card assembly → `Shells.kt`
  */
 class EmitCtx(val keywords: Set<String>, val oracleText: String? = null) {
-    /** SerialNames/symbols the card uses → resolved to imports by [com.wingedsheep.tooling.coverage.Registry]. */
-    val used: MutableSet<String> = linkedSetOf("card", "Rarity")
     val reasons: MutableSet<String> = mutableSetOf()
 }
-
-/** A per-`_Action` rendering rule. Returns the Effect DSL string, or null → SCAFFOLD. */
-internal typealias ActionHandler = EmitCtx.(node: JsonObject, args: JsonElement?, tvar: String?) -> String?
 
 internal val SELF_REFS = setOf(
     "ThisPermanent", "Trigger_ThatCreature", "ThatEnteringPermanent", "Trigger_ThatPermanent",
@@ -70,7 +68,6 @@ internal fun EmitCtx.renderEffectList(actions: List<JsonObject>, tvar: String?):
     }
     if (rendered.isEmpty()) return null
     if (rendered.size == 1) return rendered[0]
-    used.add("CompositeEffect")
     val inner = rendered.joinToString(",\n            ")
     return "CompositeEffect(\n        listOf(\n            $inner\n        )\n    )"
 }
@@ -82,7 +79,7 @@ internal fun EmitCtx.renderEffectList(actions: List<JsonObject>, tvar: String?):
 /** A DSL amount for a plain int / X, or null (-> SCAFFOLD, never a broken emit). */
 internal fun EmitCtx.amount(node: JsonElement?): String? {
     val n = findInteger(node) ?: return null
-    if (n == "X") { used.add("DynamicAmount"); return "DynamicAmount.XValue" }
+    if (n == "X") return "DynamicAmount.XValue"
     return n.toString()
 }
 
@@ -103,24 +100,21 @@ internal fun EmitCtx.dynamicAmount(node: JsonElement?): String? {
     if (node !is JsonObject) return null
     val gn = node.strField("_GameNumber")
     when (gn) {
-        "Integer" -> { used.add("DynamicAmount"); return "DynamicAmount.Fixed(${node["args"].asInt()})" }
-        "XValue", "X", "ValueX" -> { used.add("DynamicAmount"); return "DynamicAmount.XValue" }
-        "PowerOfTheSacrificedCreature" -> { used.add("DynamicAmounts"); return "DynamicAmounts.sacrificedPower()" }
+        "Integer" -> return "DynamicAmount.Fixed(${node["args"].asInt()})"
+        "XValue", "X", "ValueX" -> return "DynamicAmount.XValue"
+        "PowerOfTheSacrificedCreature" -> return "DynamicAmounts.sacrificedPower()"
         "LifeTotalOfPlayer" -> {
-            used.addAll(listOf("DynamicAmount", "Player"))
             val player = if (jsonContains(node, "_Player", "Opponent")) "Player.Opponent" else "Player.You"
             return "DynamicAmount.LifeTotal($player)"
         }
         "HalfRoundedUp", "HalfRoundedDown" -> {
             val inner = dynamicAmount(node["args"]) ?: return null
-            used.add("DynamicAmount")
             val roundup = if (gn == "HalfRoundedUp") "true" else "false"
             return "DynamicAmount.Divide($inner, DynamicAmount.Fixed(2), roundUp = $roundup)"
         }
     }
     if (gn == "TheNumberOfCardsOfTypeRevealedFromHandThisWay") {
         val filter = revealedHandFilterDsl(node["args"]) ?: return null
-        used.addAll(listOf("DynamicAmount", "Player", "Zone"))
         return "DynamicAmount.Count(Player.TargetOpponent, Zone.HAND, $filter)"
     }
     if (gn == "Multiply" && node["args"].asArr?.size == 2) {
@@ -131,13 +125,11 @@ internal fun EmitCtx.dynamicAmount(node: JsonElement?): String? {
         val cnt = if (findInteger(a) == mult) b else a
         val inner = dynamicAmount(cnt)
         if (inner != null && mult is Int) {
-            used.add("DynamicAmount")
             return if (mult == 1) inner else "DynamicAmount.Multiply($inner, $mult)"
         }
         return null
     }
     if ((gn != null && "NumberOf" in gn) || gn == "TheNumberOfPermanentsOnTheBattlefield") {
-        used.addAll(listOf("DynamicAmount", "Player", "GameObjectFilter"))
         val oracle = oracleText?.lowercase() ?: ""
         if (" hand" in oracle || " in it" in oracle) return null
         val player = when {
@@ -166,7 +158,7 @@ internal fun EmitCtx.refTargetIn(args: JsonElement?, markerKey: String, tvar: St
 
 private fun EmitCtx.refTargetFromRef(ref: String?, tvar: String?): String? {
     if (ref in setOf("Ref_TargetPermanent", "Ref_TargetPlayer", "Ref_TargetGraveyardCard")) return tvar
-    if (ref in SELF_REFS) { used.add("EffectTarget"); return "EffectTarget.Self" }
+    if (ref in SELF_REFS) return "EffectTarget.Self"
     return tvar
 }
 
@@ -193,7 +185,6 @@ internal fun innerAction(node: JsonObject): JsonObject? {
 // ---------------------------------------------------------------------------
 internal fun EmitCtx.paycostDsl(costNode: JsonElement?): String? {
     val blob = compact(costNode)
-    used.add("PayCost")
     val kind = (costNode as? JsonObject)?.strField("_Cost")
     if (kind == "SacrificeAPermanent" || kind == "SacrificeNumberPermanents") {
         val filt = landSearchFilterDsl(costNode)  // IsLandType -> Land.withSubtype, etc.
@@ -206,12 +197,8 @@ internal fun EmitCtx.paycostDsl(costNode: JsonElement?): String? {
     if ("Discard" in blob) {
         val oracle = oracleText?.lowercase() ?: ""
         val filter = when {
-            "discard a creature card" in oracle || "\"Creature\"" in blob -> {
-                used.add("GameObjectFilter"); "GameObjectFilter.Creature"
-            }
-            "discard a land card" in oracle || "\"Land\"" in blob -> {
-                used.add("GameObjectFilter"); "GameObjectFilter.Land"
-            }
+            "discard a creature card" in oracle || "\"Creature\"" in blob -> "GameObjectFilter.Creature"
+            "discard a land card" in oracle || "\"Land\"" in blob -> "GameObjectFilter.Land"
             else -> null
         }
         return if (filter == null) "PayCost.Discard()" else "PayCost.Discard(filter = $filter)"
@@ -227,6 +214,5 @@ internal fun EmitCtx.echoEffect(actions: List<JsonObject>): String? {
     if (a0.strField("_Action") != "MayCost" || a1.strField("_Action") != "Unless") return null
     if (!jsonContains(a1, "_Condition", "CostWasPaid") || !jsonContains(a1, "_Action", "SacrificePermanent")) return null
     val cost = paycostDsl(a0["args"]) ?: return null
-    used.addAll(listOf("PayOrSufferEffect", "SacrificeSelfEffect"))
     return "PayOrSufferEffect(cost = $cost, suffer = SacrificeSelfEffect)"
 }

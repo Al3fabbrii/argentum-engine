@@ -12,40 +12,37 @@ import kotlinx.serialization.json.JsonObject
 
 /** Tap/untap, continuous P/T & keyword grants (CreatePermanentLayerEffectUntil), and turn-state
  *  effects (skip untap / skip combat / extra lands). */
-internal val tapLayerStateHandlers: Map<String, ActionHandler> = buildMap {
-    fun reg(vararg keys: String, h: ActionHandler) = keys.forEach { put(it, h) }
+internal val tapLayerStateHandlers: Map<String, ActionHandler> = actionHandlers {
 
-    reg("TapPermanent", "UntapPermanent") { node, args, tvar ->
-        val tgt = refTarget(args, tvar) ?: return@reg null
-        used.addAll(listOf("Effects", "EffectTarget"))
+    on("TapPermanent", "UntapPermanent") { node, args, tvar ->
+        val tgt = refTarget(args, tvar) ?: return@on null
         "Effects.${if (node.strField("_Action") == "TapPermanent") "Tap" else "Untap"}($tgt)"
     }
-    reg("TapEachPermanent", "UntapEachPermanent") { node, args, _ ->
+    on("TapEachPermanent", "UntapEachPermanent") { node, args, _ ->
         val verb = if (node.strField("_Action") == "TapEachPermanent") "Tap" else "Untap"
         if (jsonContains(node, "_Permanents", "Ref_TargetPermanents")) {  // Tidal Surge: each chosen target
-            used.add("Effects"); return@reg "Effects.${verb}EachTarget()"
+            return@on "Effects.${verb}EachTarget()"
         }
-        used.addAll(listOf("ForEachInGroupEffect", "Effects", "EffectTarget"))  // mass: tap/untap a group
-        val filter = groupFilterDsl(args) ?: return@reg null
+        val filter = groupFilterDsl(args) ?: return@on null  // mass: tap/untap a group
         "ForEachInGroupEffect($filter, Effects.$verb(EffectTarget.Self))"
     }
 
-    reg("CreatePermanentLayerEffectUntil", "CreateEachPermanentLayerEffectUntil") { node, _, tvar ->
+    on("CreatePermanentLayerEffectUntil", "CreateEachPermanentLayerEffectUntil") { node, _, tvar ->
         renderLayerEffect(node, node.strField("_Action")!!, tvar)
     }
 
-    reg("CreatePlayerEffectUntil") { node, _, _ ->  // Summer Bloom: may play N additional lands
+    on("CreatePlayerEffectUntil") { node, _, _ ->  // Summer Bloom: may play N additional lands
         val n = findInteger(node)
         if (jsonContains(node, "_PlayerEffect", "MayPlayAdditionalLands") && n is Int) {
-            used.add("PlayAdditionalLandsEffect"); "PlayAdditionalLandsEffect($n)"
+            "PlayAdditionalLandsEffect($n)"
         } else null
     }
 
-    reg("EachPermanentDoesntUntapDuringControllersNextUntap") { _, _, tvar ->
-        used.add("SkipUntapEffect"); if (tvar != null) "SkipUntapEffect($tvar)" else "SkipUntapEffect()"
+    on("EachPermanentDoesntUntapDuringControllersNextUntap") { _, _, tvar ->
+        if (tvar != null) "SkipUntapEffect($tvar)" else "SkipUntapEffect()"
     }
-    reg("SkipAllCombatPhasesTheirNextTurn") { _, _, tvar ->
-        used.add("SkipCombatPhasesEffect"); if (tvar != null) "SkipCombatPhasesEffect($tvar)" else "SkipCombatPhasesEffect()"
+    on("SkipAllCombatPhasesTheirNextTurn") { _, _, tvar ->
+        if (tvar != null) "SkipCombatPhasesEffect($tvar)" else "SkipCombatPhasesEffect()"
     }
 }
 
@@ -55,11 +52,9 @@ internal fun EmitCtx.renderLayerEffect(node: JsonObject, action: String, tvar: S
     val mass = action == "CreateEachPermanentLayerEffectUntil"
     val target = if (mass) "EffectTarget.Self" else refTarget(node["args"], tvar)
     if (target == null) return null
-    used.add("EffectTarget")
     val inner = mutableListOf<String>()
     val pt = findAdjustPt(node)
     if (pt is JsonArray && pt.size == 2) {
-        used.add("ModifyStatsEffect")
         inner.add("ModifyStatsEffect(powerModifier = ${pt[0].asInt()}, toughnessModifier = ${pt[1].asInt()}, target = $target)")
     }
     if (jsonContains(node, "_LayerEffect", "AddAbility")) {
@@ -70,18 +65,15 @@ internal fun EmitCtx.renderLayerEffect(node: JsonObject, action: String, tvar: S
         }
         kw = kw ?: keywordOf(node)
         if (kw != null) {
-            used.addAll(listOf("GrantKeywordEffect", "Keyword"))
             inner.add("GrantKeywordEffect(Keyword.$kw, $target)")
         } else return null
     }
     if (inner.isEmpty()) return null
     var effect: String? = if (inner.size == 1) inner[0] else null
     if (effect == null) {
-        used.add("CompositeEffect")
         effect = "CompositeEffect(listOf(" + inner.joinToString(", ") + "))"
     }
     if (mass) {
-        used.add("ForEachInGroupEffect")
         val gfArg = (node["args"].asArr)?.getOrNull(0) ?: JsonObject(emptyMap())
         val filter = groupFilterDsl(gfArg) ?: return null
         return "ForEachInGroupEffect($filter, $effect)"

@@ -9,15 +9,13 @@ import java.io.File
 import java.text.Normalizer
 
 /**
- * Shared infrastructure for the mtgish coverage tooling (the Kotlin port of
- * `spike/mtgish-coverage/{probe,emitter,fidelity,autogen}.py`).
+ * Shared infrastructure for the mtgish coverage tooling.
  *
  * The mtgish IR and the Scryfall payloads are deeply dynamic JSON (discriminator keys like
- * `_Action`/`_Rule` plus an `args` of any shape), so — exactly like the Python — we work on a
- * parsed [JsonElement] tree and a set of small "walk the tree" helpers that mirror Python's
- * `dict.get` / list iteration. Several Python helpers `json.dumps(node)` then regex the string;
- * [compact] reproduces that (kotlinx default encoding is compact and order-preserving, matching
- * Python's insertion-ordered `dict`).
+ * `_Action`/`_Rule` plus an `args` of any shape), so we work on a parsed [JsonElement] tree with a
+ * set of small "walk the tree" accessors and recursive finders. Some rules are easiest to detect by
+ * serialising a subtree and regexing the string; [compact] gives a compact, order-preserving
+ * encoding for exactly that (parsing keeps key order, so the output is deterministic).
  */
 
 /** Compact, order-preserving JSON. Parsing keeps key order (LinkedHashMap), re-encoding preserves it. */
@@ -33,7 +31,7 @@ val REPO_ROOT: File by lazy {
     error("could not locate repo root (settings.gradle.kts) from ${System.getProperty("user.dir")}")
 }
 
-// --- canonical paths, matching the Python spike's module constants -------------------------------
+// --- canonical paths into the rest of the repo ---------------------------------------------------
 val SDK_EFFECTS: File get() = File(REPO_ROOT, "mtg-sdk/src/main/kotlin/com/wingedsheep/sdk/scripting/effects")
 val SDK_ROOT: File get() = File(REPO_ROOT, "mtg-sdk/src/main/kotlin")
 val KEYWORD_KT: File get() = File(REPO_ROOT, "mtg-sdk/src/main/kotlin/com/wingedsheep/sdk/core/Keyword.kt")
@@ -41,13 +39,13 @@ val DEFINITIONS_ROOT: File get() = File(REPO_ROOT, "mtg-sets/src/main/kotlin/com
 val SNAP_DIR: File get() = File(REPO_ROOT, "mtg-sets/src/test/resources/snapshots/cards")
 val GEN_DIR: File get() = File(REPO_ROOT, "mtg-sets/build/generated-cards")
 
-// The bridge + the 29MB mtgish IR still live in the spike dir during the keep-both parity phase, so
-// the Kotlin tool reads the exact same inputs the Python does (identical input -> exact parity).
-val SPIKE_DIR: File get() = File(REPO_ROOT, "spike/mtgish-coverage")
-val MAPPING_JSON: File get() = File(SPIKE_DIR, "mapping.json")
-val MTGISH_LINES: File get() = File(SPIKE_DIR, "data/mtgish.lines.json")
+// --- this module's own working files (both gitignored; see mtgish-tooling/.gitignore) ------------
+// The 29MB mtgish IR corpus is auto-downloaded into data/ on first run; generated/ is the draft
+// staging dir for `autogen --write`.
+val TOOLING_DIR: File get() = File(REPO_ROOT, "mtgish-tooling")
+val MTGISH_LINES: File get() = File(TOOLING_DIR, "data/mtgish.lines.json")
 const val MTGISH_URL = "https://raw.githubusercontent.com/i5jb/mtgish/main/data/mtgish.lines.json"
-val DEFAULT_GENERATED_ROOT: File get() = File(SPIKE_DIR, "generated")
+val DEFAULT_GENERATED_ROOT: File get() = File(TOOLING_DIR, "generated")
 
 // ---------------------------------------------------------------------------
 // JsonElement accessors (the dict/list/scalar lens onto the dynamic IR).
@@ -55,7 +53,7 @@ val DEFAULT_GENERATED_ROOT: File get() = File(SPIKE_DIR, "generated")
 val JsonElement?.asObj: JsonObject? get() = this as? JsonObject
 val JsonElement?.asArr: JsonArray? get() = this as? JsonArray
 
-/** String content iff this is a JSON string primitive (mirrors Python truthiness on `str`). */
+/** String content iff this is a JSON string primitive, else null. */
 fun JsonElement?.asStr(): String? = (this as? JsonPrimitive)?.takeIf { it.isString }?.content
 
 /** Int iff this is a numeric primitive. */
@@ -85,7 +83,7 @@ fun asciiIdentifier(name: String): String = Normalizer.normalize(name, Normalize
     .joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 
 // ---------------------------------------------------------------------------
-// Tree walkers — faithful ports of the recursive helpers in probe.py / emitter.py.
+// Tree walkers — the recursive helpers that read the dynamic IR.
 // ---------------------------------------------------------------------------
 
 /** `_contains(node, key, val)` — does the subtree carry a `{key: val}` (string) pair anywhere? */

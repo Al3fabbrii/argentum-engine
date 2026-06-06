@@ -72,7 +72,7 @@ internal fun metadataLines(meta: JsonObject?, indent: String = "    "): List<Str
         indent + "metadata {",
         "$indent    rarity = Rarity.${RARITY_DSL[(meta.strField("rarity") ?: "").lowercase()] ?: "COMMON"}",
     )
-    // Python uses truthiness (`if meta.get(field):`), so empty strings are skipped, not emitted.
+    // Empty fields are skipped (no `collectorNumber = ""`), matching the committed golden metadata.
     meta.strField("collector_number")?.takeIf { it.isNotEmpty() }?.let { out.add("$indent    collectorNumber = \"${ktStr(it)}\"") }
     meta.strField("artist")?.takeIf { it.isNotEmpty() }?.let { out.add("$indent    artist = \"${ktStr(it)}\"") }
     meta.strField("flavor_text")?.takeIf { it.isNotEmpty() }?.let { out.add("$indent    flavorText = \"${ktStr(it.replace("*", ""))}\"") }
@@ -88,8 +88,8 @@ internal fun docCommentLines(card: JsonObject, scryfall: JsonObject?): List<Stri
     head.add(renderTypeline(card["Typeline"]))
     card["CardPT"].asObj?.let { pt -> head.add("${pt["Power"].asInt()}/${pt["Toughness"].asInt()}") }
     scryfall?.strField("oracle_text")?.takeIf { it.isNotEmpty() }?.let { oracle ->
-        // split multi-line / multi-face text; never let "*/" close the KDoc early. (Python uses
-        // truthiness, so an empty oracle string adds no lines.)
+        // split multi-line / multi-face text; never let "*/" close the KDoc early. An empty oracle
+        // string is filtered out above, so it adds no lines.
         head.addAll(oracle.replace("*/", "* /").split("\n"))
     }
     return listOf("/**") + head.map { if (it.isNotEmpty()) " * $it" else " *" } + listOf(" */")
@@ -127,8 +127,27 @@ internal fun keywordLines(card: JsonObject, keywords: Set<String>): Set<String> 
 internal fun isPermanent(card: JsonObject): Boolean =
     (card["Typeline"].field("Cardtypes").asArr?.mapNotNull { it.asStr() } ?: emptyList()).any { it in PERMANENT_TYPES }
 
-internal fun assemble(body: List<String>, used: Set<String>, pkg: String): String {
-    val imports = used.mapNotNull { Registry.importFor(it) }.toSortedSet()
-    val header = FILE_HEADER + listOf("", "package $pkg", "") + imports.map { "import $it" } + listOf("", "")
+internal fun assemble(body: List<String>, pkg: String): String {
+    val header = FILE_HEADER + listOf("", "package $pkg", "") + importsFor(body).map { "import $it" } + listOf("", "")
     return (header + body).joinToString("\n") + "\n"
+}
+
+private val STRING_LITERAL = Regex("\"(?:\\\\.|[^\"\\\\])*\"")
+private val IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
+
+/**
+ * Derive the import block by scanning the emitted code for SDK symbols (resolved via
+ * [Registry.importFor]). KDoc lines and string-literal *contents* are ignored, so prose — oracle
+ * text, card names, flavour — can never pull in a spurious import. This is why handlers don't track
+ * imports: every symbol they emit is found here automatically.
+ */
+internal fun importsFor(body: List<String>): Set<String> {
+    val imports = sortedSetOf<String>()
+    for (line in body) {
+        val trimmed = line.trimStart()
+        if (trimmed.startsWith("*") || trimmed.startsWith("/*") || trimmed.startsWith("//")) continue  // KDoc / comments
+        val code = line.replace(STRING_LITERAL, "\"\"")
+        IDENTIFIER.findAll(code).forEach { m -> Registry.importFor(m.value)?.let { imports.add(it) } }
+    }
+    return imports
 }

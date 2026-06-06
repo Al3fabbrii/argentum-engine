@@ -98,7 +98,7 @@ coverage-gaps *ARGS: _coverage-tool
 
 # Generate draft .kt files for a set's AUTOGEN-predicted missing cards into a STAGING dir.
 # DRAFTS ONLY — they must compile + pass a scenario test + be reviewed before use.
-#   just coverage-generate --set TMP             # -> spike/mtgish-coverage/generated/tmp/
+#   just coverage-generate --set TMP             # -> mtgish-tooling/generated/tmp/
 [group: 'build']
 coverage-generate *ARGS: _coverage-tool
     @mtgish-tooling/build/install/mtgish-tooling/bin/mtgish-tooling autogen --write {{ARGS}}

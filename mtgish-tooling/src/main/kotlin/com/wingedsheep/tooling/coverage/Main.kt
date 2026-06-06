@@ -4,7 +4,7 @@ import kotlin.system.exitProcess
 
 /**
  * Dispatch entrypoint for the mtgish coverage tooling. The first token selects one of the three
- * tools that were originally separate Python scripts; the rest are that tool's own flags.
+ * tools (probe / fidelity / autogen); the rest are that tool's own flags.
  *
  *   probe     --set CODE | --card "NAME" | --calibrate CODE   [--free|--blocked|--all] [--refresh]
  *   fidelity  --set CODE [--list TIER] | --all | --emit "NAME" | --gate CODE

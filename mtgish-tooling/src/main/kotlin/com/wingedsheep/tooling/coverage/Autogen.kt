@@ -7,7 +7,7 @@ import java.io.File
 import java.util.Locale
 
 /**
- * Auto-generation gap detector + draft generator (port of autogen.py), on top of the mtgish bridge.
+ * Auto-generation gap detector + draft generator, on top of the mtgish bridge.
  *
  *  --gaps SET     bucket a set's UNIMPLEMENTED cards into AUTOGEN / SCAFFOLD / BLOCKED + leaderboard
  *  --write SET    emit a draft `.kt` per AUTOGEN missing card into a STAGING dir for human review

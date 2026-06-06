@@ -26,7 +26,7 @@ internal fun EmitCtx.staticBlock(rule: JsonObject): List<String>? {
     for (r in rules) {
         val name = r.strField("_PermanentRule")!!
         if (name == "CantBeBlocked") {
-            used.add("AbilityFlag"); lines.add("    flags(AbilityFlag.CANT_BE_BLOCKED)"); continue
+            lines.add("    flags(AbilityFlag.CANT_BE_BLOCKED)"); continue
         }
         val dsl = staticAbilityDsl(name, r) ?: run { reasons.add(name); return null }
         lines.addAll(listOf("    staticAbility {", "        ability = $dsl", "    }"))
@@ -36,32 +36,27 @@ internal fun EmitCtx.staticBlock(rule: JsonObject): List<String>? {
 
 private fun EmitCtx.staticAbilityDsl(ruleName: String, ruleNode: JsonObject): String? {
     when (ruleName) {
-        "CantBlock" -> { used.add("CantBlock"); return "CantBlock()" }
-        "CantBeBlockedByMoreThanOne" -> { used.add("CantBeBlockedByMoreThan"); return "CantBeBlockedByMoreThan(maxBlockers = 1)" }
+        "CantBlock" -> return "CantBlock()"
+        "CantBeBlockedByMoreThanOne" -> return "CantBeBlockedByMoreThan(maxBlockers = 1)"
         "CanBlockOnly" -> {
-            used.addAll(listOf("CanOnlyBlockCreaturesWith", "GameObjectFilter"))
             val kw = keywordOf(ruleNode)
             val bf = if (kw != null) "GameObjectFilter.Creature.withKeyword(Keyword.$kw)" else "GameObjectFilter.Creature"
-            if (kw != null) used.add("Keyword")
             return "CanOnlyBlockCreaturesWith(blockerFilter = $bf)"
         }
         "CantBeBlockedExceptByDefenders", "CantBeBlockedByDefenders" -> {
             if (oracleText?.contains("defender", ignoreCase = true) == true) {
-                used.addAll(listOf("CantBeBlockedExceptBy", "GameObjectFilter", "Keyword"))
                 return "CantBeBlockedExceptBy(blockerFilter = GameObjectFilter.Creature.withKeyword(Keyword.DEFENDER))"
             }
             val blockerFilter = gameObjectFilterDsl(ruleNode["args"]) ?: return null
-            used.add("CantBeBlockedBy")
             return "CantBeBlockedBy(blockerFilter = $blockerFilter)"
         }
         "CantAttackUnlessDefendingPlayer" -> {  // Deep-Sea Serpent: defender must control an Island
             val subs = subtypes(ruleNode)
             if (subs.isEmpty()) return null
-            used.addAll(listOf("CantAttackUnless", "Conditions"))
             return "CantAttackUnless(Conditions.OpponentControlsLandType(\"${subs[0]}\"))"
         }
-        "MustBlockAttacker" -> { used.add("MustBlock"); return "MustBlock()" }
-        "MustAttackPlayer" -> { used.add("MustAttack"); return "MustAttack()" }
+        "MustBlockAttacker" -> return "MustBlock()"
+        "MustAttackPlayer" -> return "MustAttack()"
     }
     return null
 }

@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonObject
 import java.util.Locale
 
 /**
- * Coverage probe (port of probe.py Part 3 + the three lenses) — predicts which cards the engine
+ * Coverage probe — predicts which cards the engine
  * could support with no new engine work ("coverable-now") vs. blocked on a missing capability.
  * TOOLING ONLY — never loads a card; ground truth stays authored DSL + passing scenario test.
  */
@@ -168,7 +168,7 @@ object Probe {
     }
 
     // ---------------------------------------------------------------------------
-    // CLI (mirrors probe.py's argparse)
+    // CLI
     // ---------------------------------------------------------------------------
     fun run(args: List<String>): Int {
         var setCode: String? = null

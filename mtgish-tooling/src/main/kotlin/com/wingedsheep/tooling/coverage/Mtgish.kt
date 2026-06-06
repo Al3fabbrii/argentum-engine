@@ -5,8 +5,8 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 /**
- * A small order-preserving multiset, matching Python's `collections.Counter` (insertion order kept,
- * `most_common` stable on ties).
+ * A small order-preserving multiset: insertion order is kept and [mostCommon] is stable on ties, so
+ * leaderboards and reports are deterministic.
  */
 class Counter<K> {
     private val map = LinkedHashMap<K, Int>()

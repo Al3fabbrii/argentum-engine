@@ -14,7 +14,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 /**
- * mtgish -> Argentum cardDef EMITTER (port of emitter.py). The single source of truth for "what the
+ * mtgish -> Argentum cardDef EMITTER. The single source of truth for "what the
  * generator would emit": fidelity tiers cards on whether [renderCard] completes, autogen writes the
  * files, and the Kotlin gate compiles the output. A whole-card render is only a draft candidate;
  * calibrated sets must pass the gameplay-tree fidelity gate before the output is trusted.
@@ -34,7 +34,6 @@ object Emitter {
 
         val permanent = isPermanent(card)
         val kw = if (permanent) keywordLines(card, keywords) else emptySet()
-        if (kw.isNotEmpty()) ctx.used.add("Keyword")
 
         val body = mutableListOf<String>()
         body.addAll(docCommentLines(card, scryfall))
@@ -76,7 +75,7 @@ object Emitter {
 
         body.addAll(metadataLines(scryfall))
         body.add("}")
-        return RenderResult(assemble(body, ctx.used, pkg), true, ctx.reasons)
+        return RenderResult(assemble(body, pkg), true, ctx.reasons)
     }
 
     /** Landwalk-keyword recovery, exposed for the fidelity scorer's generated-capability set. */
@@ -88,6 +87,6 @@ object Emitter {
         b.add("    // STRUCTURE needs human wiring: ${ctx.reasons.sorted().joinToString(", ")}")
         b.addAll(metadataLines(scryfall))
         b.add("}")
-        return RenderResult(assemble(b, ctx.used, pkg), false, ctx.reasons)
+        return RenderResult(assemble(b, pkg), false, ctx.reasons)
     }
 }

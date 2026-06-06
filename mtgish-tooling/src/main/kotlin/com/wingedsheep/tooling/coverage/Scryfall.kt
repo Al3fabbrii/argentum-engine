@@ -17,10 +17,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 /**
- * Self-contained Scryfall layer — the Kotlin port of the bits of `scripts/card-status` that
- * `probe.py` imported (set discovery from source, implementation scanning, and the Scryfall fetch +
- * `~/.cache/scryfall/<code>.json` schema-v6 cache). It reads and writes the *same* cache files as
- * the Python `card-status`, so the two tools share state and never duplicate fetches.
+ * Self-contained Scryfall layer — set discovery from source, implementation scanning, and the
+ * Scryfall fetch + `~/.cache/scryfall/<code>.json` schema-v6 cache. It reads and writes the *same*
+ * cache files as the `scripts/card-status` tool, so the two share state and never duplicate fetches.
  */
 object Scryfall {
     private const val SCRYFALL_BASE = "https://api.scryfall.com"
