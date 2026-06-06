@@ -96,7 +96,8 @@ internal fun EmitCtx.auraTargetBlock(rule: JsonObject): List<String>? {
  * A static `PermanentLayerEffect` whose target is the aura's `HostPermanent` (the enchanted permanent)
  * -> one `staticAbility { ability = ... }` per layer effect, applied to the enchanted permanent (no
  * filter, the aura-static default): AdjustPT -> `ModifyStats(p, t)`, AddAbility{kw} ->
- * `GrantKeyword(Keyword.X)`. A layer effect we can't render exactly scaffolds.
+ * `GrantKeyword(Keyword.X)`, AddAbility{protection-from-color} -> `GrantProtection(Color.X)` (the Ward
+ * cycle). A layer effect we can't render exactly scaffolds.
  */
 internal fun EmitCtx.staticHostBlock(rule: JsonObject): List<String>? {
     val args = rule["args"] as? JsonArray
@@ -107,21 +108,45 @@ internal fun EmitCtx.staticHostBlock(rule: JsonObject): List<String>? {
     if (layerEffects.isNullOrEmpty()) { reasons.add("PermanentLayerEffect"); return null }
     val lines = mutableListOf<String>()
     for (le in layerEffects) {
-        val ability = when (le.strField("_StaticLayerEffect")) {
+        val abilities: List<String> = when (le.strField("_StaticLayerEffect")) {
             "AdjustPT" -> {
                 val pt = le["args"] as? JsonArray
                 if (pt?.size != 2) { reasons.add("PermanentLayerEffect"); return null }
-                "ModifyStats(${pt[0].asInt()}, ${pt[1].asInt()})"
+                listOf("ModifyStats(${pt[0].asInt()}, ${pt[1].asInt()})")
             }
             "AddAbility" -> {
-                val kw = keywordOf(le) ?: run { reasons.add("PermanentLayerEffect"); return null }
-                "GrantKeyword(Keyword.$kw)"
+                val granted = (le["args"] as? JsonArray)?.getOrNull(0) as? JsonObject
+                if (granted?.strField("_Rule") == "ProtectionAndDoesntRemovePermanents") {
+                    val colors = protectionGrantColors(granted) ?: run { reasons.add("PermanentLayerEffect"); return null }
+                    colors.map { "GrantProtection(Color.$it)" }
+                } else {
+                    val kw = keywordOf(le) ?: run { reasons.add("PermanentLayerEffect"); return null }
+                    listOf("GrantKeyword(Keyword.$kw)")
+                }
+            }
+            "SetController" -> {
+                // "you control enchanted permanent" (Control Magic, Steal Artifact). Only controller=You
+                // maps to the parameterless ControlEnchantedPermanent; any other player scaffolds.
+                if (!jsonContains(le["args"], "_Player", "You")) { reasons.add("PermanentLayerEffect"); return null }
+                listOf("ControlEnchantedPermanent")
             }
             else -> { reasons.add("PermanentLayerEffect"); return null }
         }
-        lines.addAll(listOf("    staticAbility {", "        ability = $ability", "    }"))
+        abilities.forEach { lines.addAll(listOf("    staticAbility {", "        ability = $it", "    }")) }
     }
     return lines
+}
+
+/** The colors of a `ProtectionAndDoesntRemovePermanents` host grant ("enchanted creature has protection
+ *  from <color>", the Ward cycle), uppercased for `Color.X`; null for non-color or empty protection
+ *  scopes (protection from a type/quality), which scaffold. */
+private fun protectionGrantColors(granted: JsonObject): List<String>? {
+    val protectable = (granted["args"] as? JsonArray)?.getOrNull(0) as? JsonObject ?: return null
+    if (protectable.strField("_Protectable") != "FromColor") return null
+    val colorsNode = protectable["args"] as? JsonObject ?: return null
+    if (colorsNode.strField("_ProtectableColor") != "Colors") return null
+    val colors = (colorsNode["args"] as? JsonArray ?: return null).mapNotNull { it.strField("_Color")?.uppercase() }
+    return colors.ifEmpty { null }
 }
 
 /** The affected-group GroupFilter for a lord: chosen-creature-type variable -> the named helper,

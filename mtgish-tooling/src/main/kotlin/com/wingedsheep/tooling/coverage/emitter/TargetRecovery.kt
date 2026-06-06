@@ -197,6 +197,7 @@ internal fun EmitCtx.gameObjectFilterDsl(filterNode: JsonElement?): String? {
         filtered += ".powerAtLeast(${it.groupValues[1]})"
     }
     if ("IsTapped" in blob) filtered += ".tapped()"
+    if ("IsUntapped" in blob) filtered += ".untapped()"
     if ("IsAttacking" in blob) filtered += ".attacking()"
     if ("\"You\"" in blob) filtered += ".youControl()"
     if ("\"Opponent\"" in blob) filtered += ".opponentControls()"

@@ -29,6 +29,14 @@ internal fun BridgeBuilder.structuralEnvelopes() {
     // the host's static continuous effect, whose real capability is the nested _StaticLayerEffect.
     supported("EnchantPermanent", "aura: enchant restriction (engine supports auras)")
     envelope("PermanentLayerEffect", "envelope: host continuous effect (capability is the _StaticLayerEffect)")
+    // A static "each/other matching permanent gets …" lord (Crusade, Goblin King) — the capability is
+    // the nested _StaticLayerEffect; the emitter's staticLordBlock renders it.
+    envelope("EachPermanentLayerEffect", "envelope: lord continuous effect (capability is the _StaticLayerEffect)")
+    // "Enchanted creature has protection from <color>" (the Alpha Ward cycle) — granted to the host as
+    // a `GrantProtection(color)` static ability; the trailing "doesn't remove this Aura" clause is moot.
+    composed("ProtectionAndDoesntRemovePermanents", "grant protection from color (aura)", composes = listOf("GrantProtection"))
+    // "You control enchanted permanent" (Control Magic, Steal Artifact) -> ControlEnchantedPermanent.
+    composed("SetController", "gain control of enchanted permanent (aura)", composes = listOf("ControlEnchantedPermanent"))
 
     // Continuous-effect envelopes (the capability is the nested _LayerEffect / _Rule).
     envelope("CreatePermanentLayerEffectUntil", "envelope: continuous effect (capability is the _LayerEffect)")

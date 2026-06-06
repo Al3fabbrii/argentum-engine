@@ -89,6 +89,35 @@
     ]
 }
 
+// Bad Moon
+{
+    "name": "Bad Moon",
+    "manaCost": "{1}{B}",
+    "typeLine": "Enchantment",
+    "oracleText": "Black creatures get +1/+1.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "ModifyStats",
+                "powerBonus": 1,
+                "toughnessBonus": 1,
+                "filter": {
+                    "baseFilter": "creature black"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "93",
+        "rarity": "RARE",
+        "artist": "Jesper Myrfors",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/3/43572906-ea74-4411-a549-5dc401591d2a.jpg"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Badlands
 {
     "name": "Badlands",
@@ -218,6 +247,37 @@
     ]
 }
 
+// Black Ward
+{
+    "name": "Black Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature has protection from black. This effect doesn't remove this Aura.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantProtection",
+                "color": "BLACK"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "5",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/5/15967a39-303f-457d-bcde-51837c8d63e1.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Blue Elemental Blast
 {
     "name": "Blue Elemental Blast",
@@ -244,6 +304,37 @@
     },
     "colorIdentityOverride": [
         "BLUE"
+    ]
+}
+
+// Blue Ward
+{
+    "name": "Blue Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature has protection from blue. This effect doesn't remove this Aura.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantProtection",
+                "color": "BLUE"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "8",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/3/93f9f0f2-e1cc-4740-888c-1336c6de0a27.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -301,6 +392,35 @@
     },
     "colorIdentityOverride": [
         "BLUE"
+    ]
+}
+
+// Castle
+{
+    "name": "Castle",
+    "manaCost": "{3}{W}",
+    "typeLine": "Enchantment",
+    "oracleText": "Untapped creatures you control get +0/+2.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "ModifyStats",
+                "powerBonus": 0,
+                "toughnessBonus": 2,
+                "filter": {
+                    "baseFilter": "creature untapped ctrl:you"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "9",
+        "rarity": "UNCOMMON",
+        "artist": "Dameon Willich",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/0/b0da8d56-3178-44c2-9344-95d2346d326f.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -365,6 +485,34 @@
     ]
 }
 
+// Control Magic
+{
+    "name": "Control Magic",
+    "manaCost": "{2}{U}{U}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nYou control enchanted creature.",
+    "script": {
+        "staticAbilities": [
+            "ControlEnchantedPermanent"
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "52",
+        "rarity": "UNCOMMON",
+        "artist": "Dameon Willich",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/b/7b52f459-c703-4a0b-9114-ff69eec61287.jpg"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Counterspell
 {
     "name": "Counterspell",
@@ -412,6 +560,35 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Crusade
+{
+    "name": "Crusade",
+    "manaCost": "{W}{W}",
+    "typeLine": "Enchantment",
+    "oracleText": "White creatures get +1/+1.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "ModifyStats",
+                "powerBonus": 1,
+                "toughnessBonus": 1,
+                "filter": {
+                    "baseFilter": "creature white"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "16",
+        "rarity": "RARE",
+        "artist": "Mark Poole",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/5/057986c7-20c0-4157-b4df-beae4ef5c66d.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -1044,6 +1221,37 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Green Ward
+{
+    "name": "Green Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature has protection from green. This effect doesn't remove this Aura.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantProtection",
+                "color": "GREEN"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "20",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/f/1f6118b2-fe01-425a-a2ed-6d7c42286c8e.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -1986,6 +2194,35 @@
     "colorIdentityOverride": []
 }
 
+// Orcish Oriflamme
+{
+    "name": "Orcish Oriflamme",
+    "manaCost": "{3}{R}",
+    "typeLine": "Enchantment",
+    "oracleText": "Attacking creatures you control get +1/+0.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "ModifyStats",
+                "powerBonus": 1,
+                "toughnessBonus": 0,
+                "filter": {
+                    "baseFilter": "creature attacking ctrl:you"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "166",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/1/911538ea-322c-4c40-a9c3-35e47fe60fce.jpg"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Pearled Unicorn
 {
     "name": "Pearled Unicorn",
@@ -2188,6 +2425,37 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Red Ward
+{
+    "name": "Red Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature has protection from red. This effect doesn't remove this Aura.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantProtection",
+                "color": "RED"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "33",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/0/e0c64c01-c2aa-470b-88c6-3d3e4a969649.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -2756,6 +3024,34 @@
         "collectorNumber": "79",
         "artist": "Brian Snõddy",
         "imageUri": "https://cards.scryfall.io/normal/front/8/4/845734da-ab03-4dbc-bb5f-96481d3b8e88.jpg"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
+// Steal Artifact
+{
+    "name": "Steal Artifact",
+    "manaCost": "{2}{U}{U}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant artifact\nYou control enchanted artifact.",
+    "script": {
+        "staticAbilities": [
+            "ControlEnchantedPermanent"
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "artifact"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "81",
+        "rarity": "UNCOMMON",
+        "artist": "Amy Weber",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/3/83316930-d6ad-46ce-9b40-48eea856d95b.jpg"
     },
     "colorIdentityOverride": [
         "BLUE"
@@ -3516,6 +3812,37 @@
         "artist": "Daniel Gelon",
         "flavorText": "Out of the blackness and stench of the engulfing swamp emerged a shimmering figure. Only the splattered armor and ichor-stained sword hinted at the unfathomable evil the knight had just laid waste.",
         "imageUri": "https://cards.scryfall.io/normal/front/5/0/50abfba8-c9f9-4ebf-965a-4b425fe83129.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
+// White Ward
+{
+    "name": "White Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature has protection from white. This effect doesn't remove this Aura.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantProtection",
+                "color": "WHITE"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "44",
+        "rarity": "UNCOMMON",
+        "artist": "Dan Frazier",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/9/49b22665-1501-420a-82ad-f71f6768bcf8.jpg"
     },
     "colorIdentityOverride": [
         "WHITE"
