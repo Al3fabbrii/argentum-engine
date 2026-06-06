@@ -3,8 +3,8 @@ package com.wingedsheep.mtg.sets.definitions.ecl.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Scarblade Scout
@@ -28,7 +28,7 @@ val ScarbladeScout = card("Scarblade Scout") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.mill(2)
+        effect = Patterns.Library.mill(2)
     }
 
     metadata {

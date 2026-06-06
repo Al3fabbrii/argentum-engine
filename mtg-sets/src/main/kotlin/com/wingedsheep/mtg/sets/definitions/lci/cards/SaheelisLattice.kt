@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.CharacteristicValue
 import com.wingedsheep.sdk.model.Rarity
@@ -12,7 +13,6 @@ import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.IfYouDoEffect
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Saheeli's Lattice // Mastercraft Raptor (CR 702.167, The Lost Caverns of Ixalan)
@@ -53,7 +53,7 @@ private val SaheelisLatticeFront = card("Saheeli's Lattice") {
         trigger = Triggers.EntersBattlefield
         effect = MayEffect(
             IfYouDoEffect(
-                action = HandPatterns.discardCards(1),
+                action = Patterns.Hand.discardCards(1),
                 ifYouDo = Effects.DrawCards(2)
             )
         )

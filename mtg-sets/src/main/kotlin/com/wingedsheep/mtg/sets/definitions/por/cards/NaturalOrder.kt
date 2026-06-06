@@ -5,8 +5,8 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Costs
+import com.wingedsheep.sdk.dsl.Patterns
 /**
  * Natural Order
  * {2}{G}{G}
@@ -24,7 +24,7 @@ val NaturalOrder = card("Natural Order") {
     ))
 
     spell {
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = GameObjectFilter.Creature.withColor(Color.GREEN),
             destination = SearchDestination.BATTLEFIELD
         )

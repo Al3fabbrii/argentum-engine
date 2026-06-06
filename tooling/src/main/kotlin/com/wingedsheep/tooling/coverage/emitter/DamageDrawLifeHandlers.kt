@@ -54,10 +54,10 @@ internal val damageDrawLifeHandlers: Map<String, ActionHandler> = buildMap {
     }
 
     reg("DiscardACard", "DiscardNumberCards", "DiscardAnyNumberOfCards") { _, args, _ ->
-        used.add("HandPatterns")
-        "HandPatterns.discardCards(${(findInteger(args) as? Int) ?: 1})"
+        used.add("Patterns")
+        "Patterns.Hand.discardCards(${(findInteger(args) as? Int) ?: 1})"
     }
-    reg("DiscardACardAtRandom") { _, _, _ -> used.add("HandPatterns"); "HandPatterns.discardRandom(1)" }
+    reg("DiscardACardAtRandom") { _, _, _ -> used.add("Patterns"); "Patterns.Hand.discardRandom(1)" }
 
     reg("LookAtPlayersHand") { _, args, tvar ->
         val tgt = refTarget(args, tvar)

@@ -5,8 +5,8 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.PayOrSufferEffect
-import com.wingedsheep.sdk.dsl.MiscPatterns
 import com.wingedsheep.sdk.dsl.Costs
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Chaos Spewer
@@ -30,7 +30,7 @@ val ChaosSpewer = card("Chaos Spewer") {
         trigger = Triggers.EntersBattlefield
         effect = PayOrSufferEffect(
             cost = Costs.pay.Mana(ManaCost.parse("{2}")),
-            suffer = MiscPatterns.blight(2)
+            suffer = Patterns.Mechanic.blight(2)
         )
     }
 

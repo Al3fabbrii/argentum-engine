@@ -7,7 +7,7 @@ import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
 import com.wingedsheep.sdk.dsl.Triggers
-import com.wingedsheep.sdk.dsl.LibraryPatterns
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Krosan Tusker
@@ -31,7 +31,7 @@ val KrosanTusker = card("Krosan Tusker") {
     triggeredAbility {
         trigger = Triggers.YouCycleThis
         effect = MayEffect(
-            LibraryPatterns.searchLibrary(
+            Patterns.Library.searchLibrary(
                 filter = GameObjectFilter.BasicLand,
                 count = 1,
                 destination = SearchDestination.HAND,

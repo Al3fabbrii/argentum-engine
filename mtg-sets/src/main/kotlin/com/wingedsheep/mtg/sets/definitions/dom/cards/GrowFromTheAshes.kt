@@ -1,13 +1,13 @@
 package com.wingedsheep.mtg.sets.definitions.dom.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.conditions.WasKicked
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Grow from the Ashes
@@ -29,13 +29,13 @@ val GrowFromTheAshes = card("Grow from the Ashes") {
     spell {
         effect = ConditionalEffect(
             condition = WasKicked,
-            effect = LibraryPatterns.searchLibrary(
+            effect = Patterns.Library.searchLibrary(
                 filter = GameObjectFilter.BasicLand,
                 count = 2,
                 destination = SearchDestination.BATTLEFIELD,
                 shuffleAfter = true
             ),
-            elseEffect = LibraryPatterns.searchLibrary(
+            elseEffect = Patterns.Library.searchLibrary(
                 filter = GameObjectFilter.BasicLand,
                 count = 1,
                 destination = SearchDestination.BATTLEFIELD,

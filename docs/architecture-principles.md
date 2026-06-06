@@ -65,7 +65,7 @@ val AncestralMemories = card("Ancestral Memories") {
     typeLine = "Sorcery"
 
     spell {
-        effect = LibraryPatterns.lookAtTopAndKeep(count = 7, keepCount = 2)
+        effect = Patterns.Library.lookAtTopAndKeep(count = 7, keepCount = 2)
     }
 }
 ```
@@ -255,15 +255,16 @@ CompositeEffect(listOf(
 ))
 ```
 
-Higher-level helpers in the domain pattern objects (`LibraryPatterns`, `HandPatterns`,
-`GroupPatterns`, `ExilePatterns`, `CreatureTypePatterns`, `MiscPatterns`) provide common recipes:
+Higher-level helpers, reached through the single `Patterns` index (`Patterns.Library`,
+`Patterns.Hand`, `Patterns.Group`, `Patterns.Exile`, `Patterns.CreatureType`, `Patterns.Mechanic`),
+provide common recipes:
 
 ```kotlin
-LibraryPatterns.scry(2)          // Scry 2
-LibraryPatterns.surveil(2)       // Surveil 2 (like scry but to graveyard)
-LibraryPatterns.mill(3)          // Mill 3
-LibraryPatterns.searchLibrary(filter)  // Tutor effect
-LibraryPatterns.lookAtTopAndKeep(count = 7, keepCount = 2)  // Ancestral Memories
+Patterns.Library.scry(2)          // Scry 2
+Patterns.Library.surveil(2)       // Surveil 2 (like scry but to graveyard)
+Patterns.Library.mill(3)          // Mill 3
+Patterns.Library.searchLibrary(filter)  // Tutor effect
+Patterns.Library.lookAtTopAndKeep(count = 7, keepCount = 2)  // Ancestral Memories
 ```
 
 **Why not one effect class per card?**
@@ -273,7 +274,7 @@ LibraryPatterns.lookAtTopAndKeep(count = 7, keepCount = 2)  // Ancestral Memorie
   different parameters.
 - **Zero new code for new cards.** Adding a card that says "Look at the top 5, put 2 on bottom, rest
   on top" requires zero new effect executors — just a new pipeline composition in the relevant
-  pattern object (e.g. `LibraryPatterns`).
+  pattern object (e.g. `LibraryPatterns`, reached via `Patterns.Library`).
 - **Consistent player UX.** All library manipulation flows through the same `SelectFromCollectionEffect`
   executor, which means the UI for choosing cards is consistent across all cards that use this pattern.
 - **Testability.** Each primitive is unit-testable in isolation. The pipeline as a whole is tested via

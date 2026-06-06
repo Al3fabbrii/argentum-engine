@@ -6,11 +6,11 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Temur Monument
@@ -23,7 +23,7 @@ import com.wingedsheep.sdk.dsl.LibraryPatterns
  * Activate only as a sorcery.
  *
  * The ETB search is a non-optional library search to hand (oracle text has no "you may"); modeled
- * via [LibraryPatterns.searchLibrary] with the basic-land subtype restriction. The token-making
+ * via [Patterns.Library.searchLibrary] with the basic-land subtype restriction. The token-making
  * ability combines a mana cost, tap, and self-sacrifice, and is sorcery-speed-only.
  */
 val TemurMonument = card("Temur Monument") {
@@ -37,7 +37,7 @@ val TemurMonument = card("Temur Monument") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = GameObjectFilter.BasicLand.withAnyOfSubtypes(
                 listOf(Subtype.FOREST, Subtype.ISLAND, Subtype.MOUNTAIN)
             ),

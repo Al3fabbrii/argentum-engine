@@ -1,9 +1,9 @@
 package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.targets.TargetOpponent
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Mind Knives
@@ -18,7 +18,7 @@ val MindKnives = card("Mind Knives") {
 
     spell {
         val t = target("target", TargetOpponent())
-        effect = HandPatterns.discardRandom(1, t)
+        effect = Patterns.Hand.discardRandom(1, t)
     }
 
     metadata {

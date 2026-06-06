@@ -5,10 +5,9 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Gandalf, White Rider
@@ -34,8 +33,8 @@ val GandalfWhiteRider = card("Gandalf, White Rider") {
 
     triggeredAbility {
         trigger = Triggers.YouCastSpell
-        effect = GroupPatterns.modifyStatsForAll(1, 0, Filters.Group.creaturesYouControl)
-            .then(LibraryPatterns.scry(1))
+        effect = Patterns.Group.modifyStatsForAll(1, 0, Filters.Group.creaturesYouControl)
+            .then(Patterns.Library.scry(1))
     }
 
     triggeredAbility {

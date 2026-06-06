@@ -3,10 +3,10 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Adeliz, the Cinder Wind
@@ -28,7 +28,7 @@ val AdelizTheCinderWind = card("Adeliz, the Cinder Wind") {
 
     triggeredAbility {
         trigger = Triggers.YouCastInstantOrSorcery
-        effect = GroupPatterns.modifyStatsForAll(
+        effect = Patterns.Group.modifyStatsForAll(
             power = 1,
             toughness = 1,
             filter = GroupFilter(GameObjectFilter.Creature.youControl().withSubtype("Wizard"))

@@ -173,7 +173,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetRequirement
  *
  * For composite effect patterns (search, scry, mill, discard, etc.), use the domain
  * pattern objects directly: [LibraryPatterns], [HandPatterns], [GroupPatterns],
- * [ExilePatterns], [CreatureTypePatterns], [MiscPatterns].
+ * [ExilePatterns], [CreatureTypePatterns], [MechanicPatterns].
  *
  * Usage:
  * ```kotlin
@@ -1397,14 +1397,14 @@ object Effects {
      * created token's entity ID into pipeline collection [CREATED_TOKENS], and a
      * subsequent [AddCountersEffect] places the +1/+1 counters via [EffectTarget.PipelineTarget].
      */
-    fun Incubate(n: Int): Effect = MiscPatterns.incubate(n)
+    fun Incubate(n: Int): Effect = MechanicPatterns.incubate(n)
 
     /**
      * Incubate X (CR 701.53), where the +1/+1 counter count is a [DynamicAmount]
      * resolved at resolution time (e.g., the triggering spell's mana value).
      */
     fun Incubate(amount: com.wingedsheep.sdk.scripting.values.DynamicAmount): Effect =
-        MiscPatterns.incubate(amount)
+        MechanicPatterns.incubate(amount)
 
     /**
      * Target creature explores.

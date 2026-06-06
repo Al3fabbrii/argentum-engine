@@ -10,6 +10,7 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.scripting.ActivationRestriction
@@ -18,7 +19,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Tests for Weathered Wayfarer.
@@ -39,7 +39,7 @@ class WeatheredWayfarerTest : FunSpec({
 
         activatedAbility {
             cost = Costs.Composite(Costs.Mana("{W}"), Costs.Tap)
-            effect = LibraryPatterns.searchLibrary(
+            effect = Patterns.Library.searchLibrary(
                 filter = Filters.Land,
                 count = 1,
                 destination = SearchDestination.HAND,

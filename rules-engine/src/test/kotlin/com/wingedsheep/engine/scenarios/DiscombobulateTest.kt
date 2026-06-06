@@ -13,6 +13,7 @@ import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.core.TypeLine
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Targets
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.CardScript
 import com.wingedsheep.sdk.model.Deck
@@ -22,7 +23,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Tests for Discombobulate.
@@ -41,7 +41,7 @@ class DiscombobulateTest : FunSpec({
         oracleText = "Counter target spell. Look at the top four cards of your library, then put them back in any order.",
         script = CardScript.spell(
             effect = CompositeEffect(
-                listOf(CounterEffect(), LibraryPatterns.lookAtTopAndReorder(4))
+                listOf(CounterEffect(), Patterns.Library.lookAtTopAndReorder(4))
             ),
             Targets.Spell
         )

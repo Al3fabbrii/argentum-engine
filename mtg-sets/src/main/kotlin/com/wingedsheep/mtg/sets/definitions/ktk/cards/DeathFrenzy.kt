@@ -3,12 +3,12 @@ package com.wingedsheep.mtg.sets.definitions.ktk.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.TriggeredAbility
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Death Frenzy
@@ -25,7 +25,7 @@ val DeathFrenzy = card("Death Frenzy") {
     spell {
         effect = Effects.Composite(
             listOf(
-                GroupPatterns.modifyStatsForAll(-2, -2, GroupFilter.AllCreatures),
+                Patterns.Group.modifyStatsForAll(-2, -2, GroupFilter.AllCreatures),
                 Effects.CreateGlobalTriggeredAbility(
                     duration = Duration.EndOfTurn,
                     ability = TriggeredAbility.create(

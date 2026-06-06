@@ -1,10 +1,10 @@
 package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 /**
  * Personal Tutor
  * {U}
@@ -17,7 +17,7 @@ val PersonalTutor = card("Personal Tutor") {
     typeLine = "Sorcery"
 
     spell {
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = GameObjectFilter.Sorcery,
             destination = SearchDestination.TOP_OF_LIBRARY,
             reveal = true

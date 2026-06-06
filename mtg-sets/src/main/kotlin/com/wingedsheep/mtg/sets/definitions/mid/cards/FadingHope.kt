@@ -4,10 +4,10 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Fading Hope
@@ -27,7 +27,7 @@ val FadingHope = card("Fading Hope") {
             .then(
                 ConditionalEffect(
                     condition = Conditions.TargetSpellManaValueAtMost(DynamicAmount.Fixed(3)),
-                    effect = LibraryPatterns.scry(1)
+                    effect = Patterns.Library.scry(1)
                 )
             )
     }

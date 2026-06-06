@@ -4,7 +4,7 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.dsl.MiscPatterns
+import com.wingedsheep.sdk.scripting.effects.SacrificeEffect
 
 /**
  * Dredge
@@ -20,9 +20,9 @@ val Dredge = card("Dredge") {
     oracleText = "Sacrifice a creature or land.\nDraw a card."
 
     spell {
-        effect = MiscPatterns.sacrifice(
-            filter = GameObjectFilter.CreatureOrLand,
-            then = Effects.DrawCards(1)
+        effect = Effects.Composite(
+            SacrificeEffect(GameObjectFilter.CreatureOrLand),
+            Effects.DrawCards(1)
         )
     }
 

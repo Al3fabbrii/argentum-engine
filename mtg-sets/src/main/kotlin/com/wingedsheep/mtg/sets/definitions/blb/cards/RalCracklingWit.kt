@@ -6,11 +6,11 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.CreateTokenEffect
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Ral, Crackling Wit {2}{U}{R}
@@ -49,7 +49,7 @@ val RalCracklingWit = card("Ral, Crackling Wit") {
 
     // −3: Draw three cards, then discard two cards.
     loyaltyAbility(-3) {
-        effect = Effects.DrawCards(3).then(HandPatterns.discardCards(2))
+        effect = Effects.DrawCards(3).then(Patterns.Hand.discardCards(2))
     }
 
     // −10: Draw three cards. You get an emblem with "Instant and sorcery spells you cast have storm."

@@ -7,6 +7,7 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -14,7 +15,6 @@ import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.effects.CREATED_TOKENS
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Mardu Monument — Tarkir: Dragonstorm #245
@@ -27,7 +27,7 @@ import com.wingedsheep.sdk.dsl.LibraryPatterns
  *
  * The ETB is a mandatory single-card library search restricted to basic lands carrying one of the
  * three Mardu basic subtypes, revealed and placed into hand then shuffled (atomic
- * [LibraryPatterns.searchLibrary]). The sacrifice ability creates three Warrior tokens, then grants
+ * [Patterns.Library.searchLibrary]). The sacrifice ability creates three Warrior tokens, then grants
  * each menace and haste until end of turn via the [CREATED_TOKENS] pipeline — the keywords are a
  * temporary grant (not intrinsic) so menace does not wrongly persist if a token survives the turn.
  */
@@ -42,7 +42,7 @@ val MarduMonument = card("Mardu Monument") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = GameObjectFilter.BasicLand.withAnyOfSubtypes(
                 listOf(Subtype.MOUNTAIN, Subtype.PLAINS, Subtype.SWAMP)
             ),

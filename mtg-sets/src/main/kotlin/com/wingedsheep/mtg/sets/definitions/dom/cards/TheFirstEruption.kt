@@ -5,13 +5,13 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
 import com.wingedsheep.sdk.scripting.effects.SacrificeEffect
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
-import com.wingedsheep.sdk.dsl.MiscPatterns
+import com.wingedsheep.sdk.scripting.effects.ReflexiveTriggerEffect
 
 /**
  * The First Eruption
@@ -33,7 +33,7 @@ val TheFirstEruption = card("The First Eruption") {
         "III — Sacrifice a Mountain. If you do, this Saga deals 3 damage to each creature."
 
     sagaChapter(1) {
-        effect = GroupPatterns.dealDamageToAll(1, GroupFilter.AllCreatures.withoutKeyword(Keyword.FLYING))
+        effect = Patterns.Group.dealDamageToAll(1, GroupFilter.AllCreatures.withoutKeyword(Keyword.FLYING))
     }
 
     sagaChapter(2) {
@@ -41,10 +41,10 @@ val TheFirstEruption = card("The First Eruption") {
     }
 
     sagaChapter(3) {
-        effect = MiscPatterns.reflexiveTrigger(
+        effect = ReflexiveTriggerEffect(
             action = SacrificeEffect(Filters.MountainCard),
             optional = false,
-            whenYouDo = GroupPatterns.dealDamageToAll(3, GroupFilter.AllCreatures)
+            reflexiveEffect = Patterns.Group.dealDamageToAll(3, GroupFilter.AllCreatures)
         )
     }
 

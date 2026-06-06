@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.AddCountersToCollectionEffect
@@ -20,7 +21,6 @@ import com.wingedsheep.sdk.scripting.effects.SelectionMode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Scavenger's Talent {B}
@@ -64,7 +64,7 @@ val ScavengersTalent = card("Scavenger's Talent") {
         triggeredAbility {
             trigger = Triggers.YouSacrificeOneOrMore()
             val player = target("target player", Targets.Player)
-            effect = LibraryPatterns.mill(2, player)
+            effect = Patterns.Library.mill(2, player)
         }
     }
 

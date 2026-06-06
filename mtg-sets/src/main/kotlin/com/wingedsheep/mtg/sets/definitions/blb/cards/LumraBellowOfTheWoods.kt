@@ -13,8 +13,8 @@ import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 // Lumra, Bellow of the Woods - {4}{G}{G}
 // Legendary Creature — Elemental Bear - star/star
@@ -34,7 +34,7 @@ val LumraBellowOfTheWoods = card("Lumra, Bellow of the Woods") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.mill(4)
+        effect = Patterns.Library.mill(4)
             .then(
                 Effects.Composite(
                     listOf(

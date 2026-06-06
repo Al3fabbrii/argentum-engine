@@ -19,11 +19,11 @@ import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.dsl.Triggers
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.scripting.targets.AnyTarget
 import com.wingedsheep.sdk.scripting.targets.TargetCreature
 import com.wingedsheep.sdk.scripting.targets.TargetSpell
 import java.util.UUID
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Test card definitions for unit tests.
@@ -309,7 +309,7 @@ object TestCards {
             effect = CompositeEffect(
                 listOf(
                     DrawCardsEffect(1, EffectTarget.Controller),
-                    HandPatterns.discardCards(1, EffectTarget.Controller)
+                    Patterns.Hand.discardCards(1, EffectTarget.Controller)
                 )
             )
         )

@@ -5,10 +5,10 @@ import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Claws of Wirewood
@@ -24,7 +24,7 @@ val ClawsOfWirewood = card("Claws of Wirewood") {
     oracleText = "Claws of Wirewood deals 3 damage to each creature with flying and each player.\nCycling {2}"
 
     spell {
-        effect = GroupPatterns.dealDamageToAll(3, Filters.Group.creatures { withKeyword(Keyword.FLYING) }) then
+        effect = Patterns.Group.dealDamageToAll(3, Filters.Group.creatures { withKeyword(Keyword.FLYING) }) then
             Effects.DealDamage(3, EffectTarget.PlayerRef(Player.Each))
     }
 

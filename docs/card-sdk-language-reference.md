@@ -700,7 +700,7 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 
 ---
 
-## 5. Effect patterns (`LibraryPatterns.*` / `HandPatterns.*` / `GroupPatterns.*` / `ExilePatterns.*` / `CreatureTypePatterns.*` / `MiscPatterns.*`)
+## 5. Effect patterns (`Patterns.Library.*` / `Patterns.Hand.*` / `Patterns.Group.*` / `Patterns.Exile.*` / `Patterns.CreatureType.*` / `Patterns.Mechanic.*`)
 
 Composed pipelines (`GatherCards → SelectFromCollection → MoveCollection` shapes and similar).
 
@@ -1371,7 +1371,7 @@ Triggers.youCastSpell(
 - `WheneverYouScry` — fires once per scry resolution (CR 701.18), after the cards have
   been placed on top/bottom. Pair with `DynamicAmount.ContextProperty(ContextPropertyKey.TRIGGER_SCRY_COUNT)`
   for "for each card looked at" payoffs (Celeborn the Wise, Elrond Master of Healing).
-  Automatically emitted by `LibraryPatterns.scry(N)`; no card has to opt in.
+  Automatically emitted by `Patterns.Library.scry(N)`; no card has to opt in.
 
 ### Sacrifice & counters
 
@@ -2826,10 +2826,10 @@ Card authors rarely reference these directly; they are created/updated by the ma
   is `DynamicAmount.Fixed` for "endure 2" or any dynamic value for "endure X" (e.g. Warden of the Grove reads
   `EntityProperty(Source, CounterCount(...))`); `target` defaults to `Self` ("it endures") but takes
   `EffectTarget.TriggeringEntity` when a card endures the creature that triggered it.
-- **Forage** — `MiscPatterns.forage`; cast-from-graveyard permissions need a branch in `CastSpellHandler.validate`.
+- **Forage** — `Patterns.Mechanic.forage`; cast-from-graveyard permissions need a branch in `CastSpellHandler.validate`.
 - **Blight X** — `Costs.additional.BlightVariable` + `DynamicAmount.AdditionalCostBlightAmount` +
   `Conditions.BlightWasPaid(n)`.
-- **Divvy (Fact-or-Fiction)** — `LibraryPatterns.factOrFiction(...)`; `SplitPilesDecision` stays dormant until N > 2.
+- **Divvy (Fact-or-Fiction)** — `Patterns.Library.factOrFiction(...)`; `SplitPilesDecision` stays dormant until N > 2.
 - **Astral Slide / delayed return** — `ExileUntilEndStepEffect` + `DelayedTriggeredAbility`.
 - **Lord effects** — multiple `staticAbility { }` blocks + `ModifyStatsForCreatureGroup` /
   `AffectsFilter.OtherCreaturesWithSubtype`.

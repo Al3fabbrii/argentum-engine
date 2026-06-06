@@ -4,11 +4,11 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Mouth of the Storm
@@ -32,7 +32,7 @@ val MouthOfTheStorm = card("Mouth of the Storm") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = GroupPatterns.modifyStatsForAll(
+        effect = Patterns.Group.modifyStatsForAll(
             power = -3,
             toughness = 0,
             filter = GroupFilter.AllCreaturesOpponentsControl,

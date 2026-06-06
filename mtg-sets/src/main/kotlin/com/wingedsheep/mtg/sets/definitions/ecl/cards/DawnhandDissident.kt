@@ -7,8 +7,8 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantMayCastFromLinkedExile
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Dawnhand Dissident
@@ -37,7 +37,7 @@ val DawnhandDissident = card("Dawnhand Dissident") {
     // {T}, Blight 1: Surveil 1.
     activatedAbility {
         cost = Costs.Composite(Costs.Tap, Costs.Blight(1))
-        effect = LibraryPatterns.surveil(1)
+        effect = Patterns.Library.surveil(1)
     }
 
     // {T}, Blight 2: Exile target card from a graveyard, linked to this creature.

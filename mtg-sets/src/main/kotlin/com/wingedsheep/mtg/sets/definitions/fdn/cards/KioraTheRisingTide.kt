@@ -5,8 +5,8 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Kiora, the Rising Tide
@@ -28,7 +28,7 @@ val KioraTheRisingTide = card("Kiora, the Rising Tide") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = HandPatterns.loot(draw = 2, discard = 2)
+        effect = Patterns.Hand.loot(draw = 2, discard = 2)
     }
 
     triggeredAbility {

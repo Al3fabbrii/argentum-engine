@@ -4,13 +4,13 @@ import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.ReflexiveTriggerEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetObject
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Curious Forager
@@ -37,7 +37,7 @@ val CuriousForager = card("Curious Forager") {
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
         effect = ReflexiveTriggerEffect(
-            action = MiscPatterns.forage(),
+            action = Patterns.Mechanic.forage(),
             optional = true,
             reflexiveEffect = Effects.ReturnToHand(EffectTarget.ContextTarget(0)),
             reflexiveTargetRequirements = listOf(

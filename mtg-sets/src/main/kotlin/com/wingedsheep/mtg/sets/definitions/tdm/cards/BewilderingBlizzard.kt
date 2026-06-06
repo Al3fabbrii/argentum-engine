@@ -2,9 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Bewildering Blizzard
@@ -21,7 +21,7 @@ val BewilderingBlizzard = card("Bewildering Blizzard") {
 
     spell {
         effect = Effects.DrawCards(3).then(
-            GroupPatterns.modifyStatsForAll(
+            Patterns.Group.modifyStatsForAll(
                 power = -3,
                 toughness = 0,
                 filter = GroupFilter.AllCreaturesOpponentsControl

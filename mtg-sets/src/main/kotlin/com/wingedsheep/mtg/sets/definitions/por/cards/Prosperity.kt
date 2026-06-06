@@ -1,8 +1,8 @@
 package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Prosperity
@@ -16,7 +16,7 @@ val Prosperity = card("Prosperity") {
     typeLine = "Sorcery"
 
     spell {
-        effect = HandPatterns.eachPlayerDrawsX(
+        effect = Patterns.Hand.eachPlayerDrawsX(
             includeController = true,
             includeOpponents = true
         )

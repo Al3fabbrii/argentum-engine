@@ -4,6 +4,7 @@ import com.wingedsheep.sdk.core.Counters
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.EntersWithCounters
 import com.wingedsheep.sdk.scripting.EventPattern.ZoneChangeEvent
@@ -12,7 +13,6 @@ import com.wingedsheep.sdk.scripting.TriggerBinding
 import com.wingedsheep.sdk.scripting.TriggerSpec
 import com.wingedsheep.sdk.scripting.events.CounterTypeFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Heirloom Auntie
@@ -49,7 +49,7 @@ val HeirloomAuntie = card("Heirloom Auntie") {
             ),
             binding = TriggerBinding.OTHER
         )
-        effect = LibraryPatterns.surveil(1) then
+        effect = Patterns.Library.surveil(1) then
             Effects.RemoveCounters(Counters.MINUS_ONE_MINUS_ONE, 1, EffectTarget.Self)
     }
 

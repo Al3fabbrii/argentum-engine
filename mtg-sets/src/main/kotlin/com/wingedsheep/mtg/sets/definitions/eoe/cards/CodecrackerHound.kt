@@ -2,8 +2,8 @@ package com.wingedsheep.mtg.sets.definitions.eoe.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Codecracker Hound
@@ -28,7 +28,7 @@ val CodecrackerHound = card("Codecracker Hound") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.lookAtTopAndKeep(count = 2, keepCount = 1)
+        effect = Patterns.Library.lookAtTopAndKeep(count = 2, keepCount = 1)
     }
 
     warp = "{2}{U}"

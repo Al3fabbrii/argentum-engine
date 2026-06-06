@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.scenarios
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.HandLookedAtEvent
 import com.wingedsheep.engine.core.LookedAtCardsEvent
@@ -35,7 +36,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Tests for Spy Network.
@@ -75,7 +75,7 @@ class SpyNetworkTest : FunSpec({
                         )
                     ),
                     LookAtFaceDownEffect(EffectTarget.ContextTarget(0), FaceDownLookScope.ALL_CONTROLLED_BY_TARGET_PLAYER),
-                    LibraryPatterns.lookAtTopAndReorder(4)
+                    Patterns.Library.lookAtTopAndReorder(4)
                 )
             ),
             TargetPlayer()

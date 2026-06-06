@@ -5,10 +5,10 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.effects.MayEffect
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Take Out the Trash
@@ -31,7 +31,7 @@ val TakeOutTheTrash = card("Take Out the Trash") {
                 condition = Conditions.ControlCreatureOfType(Subtype("Raccoon")),
                 effect = MayEffect(
                     Effects.Composite(listOf(
-                        HandPatterns.discardCards(1),
+                        Patterns.Hand.discardCards(1),
                         Effects.DrawCards(1)
                     ))
                 )

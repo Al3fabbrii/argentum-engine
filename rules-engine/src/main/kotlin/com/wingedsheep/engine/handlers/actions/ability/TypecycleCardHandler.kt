@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.handlers.actions.ability
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.CardCycledEvent
 import com.wingedsheep.engine.core.ExecutionResult
@@ -29,7 +30,6 @@ import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.PreventCycling
 import kotlin.reflect.KClass
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Handler for the TypecycleCard action.
@@ -242,7 +242,7 @@ class TypecycleCardHandler(
         }
 
         // Search library for a card matching the typecycling variant's filter
-        val searchEffect = LibraryPatterns.searchLibrary(
+        val searchEffect = Patterns.Library.searchLibrary(
             filter = variant.searchFilter,
             count = 1,
             reveal = true

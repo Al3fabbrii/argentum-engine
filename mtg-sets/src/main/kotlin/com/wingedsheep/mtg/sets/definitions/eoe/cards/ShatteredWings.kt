@@ -4,11 +4,11 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.TargetPermanent
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Shattered Wings
@@ -27,7 +27,7 @@ val ShatteredWings = card("Shattered Wings") {
         effect = Effects.Composite(
             listOf(
                 Effects.Destroy(target),
-                LibraryPatterns.surveil(1)
+                Patterns.Library.surveil(1)
             )
         )
     }

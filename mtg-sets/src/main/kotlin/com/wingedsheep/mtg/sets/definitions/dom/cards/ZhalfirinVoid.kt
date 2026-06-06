@@ -2,11 +2,11 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.effects.AddColorlessManaEffect
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Zhalfirin Void
@@ -21,7 +21,7 @@ val ZhalfirinVoid = card("Zhalfirin Void") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.scry(1)
+        effect = Patterns.Library.scry(1)
     }
 
     activatedAbility {

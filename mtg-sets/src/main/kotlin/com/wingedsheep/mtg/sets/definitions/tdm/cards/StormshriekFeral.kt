@@ -4,10 +4,10 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.IfYouDoEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Stormshriek Feral // Flush Out — Tarkir: Dragonstorm #124
@@ -50,7 +50,7 @@ val StormshriekFeral = card("Stormshriek Feral") {
             "(Then shuffle this card into its owner's library.)"
         spell {
             effect = IfYouDoEffect(
-                action = HandPatterns.discardCards(1),
+                action = Patterns.Hand.discardCards(1),
                 ifYouDo = Effects.DrawCards(2),
             )
         }

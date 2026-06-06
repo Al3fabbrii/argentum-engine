@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -25,7 +26,6 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.values.EntityNumericProperty
 import com.wingedsheep.sdk.scripting.values.EntityReference
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Entropic Battlecruiser
@@ -87,7 +87,7 @@ val EntropicBattlecruiser = card("Entropic Battlecruiser") {
             effects = listOf(
                 ConditionalEffect(
                     condition = Exists(Player.You, Zone.HAND),
-                    effect = HandPatterns.discardCards(1, EffectTarget.Controller),
+                    effect = Patterns.Hand.discardCards(1, EffectTarget.Controller),
                     elseEffect = LoseLifeEffect(3, EffectTarget.Controller)
                 )
             )

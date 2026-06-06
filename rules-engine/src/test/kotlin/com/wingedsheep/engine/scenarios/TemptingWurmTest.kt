@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.scenarios
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.engine.core.ChooseTargetsDecision
@@ -19,7 +20,6 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Tests for Tempting Wurm's ETB trigger.
@@ -40,7 +40,7 @@ class TemptingWurmTest : FunSpec({
             TriggeredAbility.create(
                 trigger = EventPattern.ZoneChangeEvent(to = Zone.BATTLEFIELD),
                 binding = TriggerBinding.SELF,
-                effect = HandPatterns.eachOpponentMayPutFromHand(
+                effect = Patterns.Hand.eachOpponentMayPutFromHand(
                     filter = GameObjectFilter.Artifact or GameObjectFilter.Creature or GameObjectFilter.Enchantment or GameObjectFilter.Land
                 )
             )

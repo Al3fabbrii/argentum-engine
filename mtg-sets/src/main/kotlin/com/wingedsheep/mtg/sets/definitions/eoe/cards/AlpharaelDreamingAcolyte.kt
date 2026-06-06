@@ -7,6 +7,7 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ConditionalStaticAbility
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -23,7 +24,6 @@ import com.wingedsheep.sdk.scripting.effects.SelectFromCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.SelectionMode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Alpharael, Dreaming Acolyte
@@ -82,7 +82,7 @@ val AlpharaelDreamingAcolyte = card("Alpharael, Dreaming Acolyte") {
                         ),
                         EffectChoice(
                             label = "Discard two cards",
-                            effect = HandPatterns.discardCards(2)
+                            effect = Patterns.Hand.discardCards(2)
                         )
                     )
                 )

@@ -8,6 +8,7 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -25,7 +26,6 @@ import com.wingedsheep.sdk.scripting.effects.TransformEffect
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Trystan, Callous Cultivator // Trystan, Penitent Culler
@@ -48,7 +48,7 @@ import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 private val millThenGainLifeIfElf = Effects.Composite(
     listOf(
-        LibraryPatterns.mill(3),
+        Patterns.Library.mill(3),
         ConditionalEffect(
             condition = Conditions.GraveyardContainsSubtype(Subtype.ELF),
             effect = Effects.GainLife(2)
@@ -58,7 +58,7 @@ private val millThenGainLifeIfElf = Effects.Composite(
 
 private val millThenExileElfThenDrain = Effects.Composite(
     listOf(
-        LibraryPatterns.mill(3),
+        Patterns.Library.mill(3),
         GatherCardsEffect(
             source = CardSource.FromZone(
                 zone = Zone.GRAVEYARD,

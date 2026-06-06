@@ -8,8 +8,8 @@ import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 import com.wingedsheep.sdk.scripting.targets.TargetCreature
 import com.wingedsheep.sdk.scripting.targets.TargetPermanent
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Sultai Charm
@@ -43,7 +43,7 @@ val SultaiCharm = card("Sultai Charm") {
                 effect = Effects.Move(t, Zone.GRAVEYARD, byDestruction = true)
             }
             mode("Draw two cards, then discard a card") {
-                effect = HandPatterns.loot(draw = 2, discard = 1)
+                effect = Patterns.Hand.loot(draw = 2, discard = 1)
             }
         }
     }

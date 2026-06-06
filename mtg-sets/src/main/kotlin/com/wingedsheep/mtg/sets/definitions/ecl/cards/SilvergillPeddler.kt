@@ -2,8 +2,8 @@ package com.wingedsheep.mtg.sets.definitions.ecl.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Silvergill Peddler
@@ -23,7 +23,7 @@ val SilvergillPeddler = card("Silvergill Peddler") {
 
     triggeredAbility {
         trigger = Triggers.BecomesTapped
-        effect = HandPatterns.loot(draw = 1, discard = 1)
+        effect = Patterns.Hand.loot(draw = 1, discard = 1)
     }
 
     metadata {

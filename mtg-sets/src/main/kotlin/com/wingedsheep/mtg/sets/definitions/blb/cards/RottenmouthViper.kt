@@ -19,8 +19,8 @@ import com.wingedsheep.sdk.scripting.effects.RepeatDynamicTimesEffect
 import com.wingedsheep.sdk.scripting.events.CounterTypeFilter
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Costs
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Rottenmouth Viper {5}{B}
@@ -114,7 +114,7 @@ private fun rottenmouthViperEffect(): Effect = Effects.Composite(
                             ),
                             EffectChoice(
                                 label = "Discard a card",
-                                effect = HandPatterns.discardCards(1, EffectTarget.Controller),
+                                effect = Patterns.Hand.discardCards(1, EffectTarget.Controller),
                                 feasibilityCheck = FeasibilityCheck.HasCardsInZone(Zone.HAND)
                             ),
                             EffectChoice(

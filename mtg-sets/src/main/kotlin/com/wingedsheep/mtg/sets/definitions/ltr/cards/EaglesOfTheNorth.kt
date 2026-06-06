@@ -4,10 +4,10 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Eagles of the North
@@ -32,8 +32,8 @@ val EaglesOfTheNorth = card("Eagles of the North") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = GroupPatterns.modifyStatsForAll(1, 0, GroupFilter.AllCreaturesYouControl) then
-            GroupPatterns.grantKeywordToAll(Keyword.FIRST_STRIKE, GroupFilter.AllCreaturesYouControl)
+        effect = Patterns.Group.modifyStatsForAll(1, 0, GroupFilter.AllCreaturesYouControl) then
+            Patterns.Group.grantKeywordToAll(Keyword.FIRST_STRIKE, GroupFilter.AllCreaturesYouControl)
     }
 
     keywordAbility(KeywordAbility.typecycling("Plains", ManaCost.parse("{1}")))

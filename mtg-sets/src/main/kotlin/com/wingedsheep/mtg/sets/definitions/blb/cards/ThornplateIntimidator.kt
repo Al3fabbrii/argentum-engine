@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.KeywordAbility
@@ -16,7 +17,6 @@ import com.wingedsheep.sdk.scripting.effects.FeasibilityCheck
 import com.wingedsheep.sdk.scripting.effects.ForceSacrificeEffect
 import com.wingedsheep.sdk.scripting.effects.LoseLifeEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Thornplate Intimidator {3}{B}
@@ -66,7 +66,7 @@ val ThornplateIntimidator = card("Thornplate Intimidator") {
                 ),
                 EffectChoice(
                     label = "Discard a card",
-                    effect = HandPatterns.discardCards(1, opponent),
+                    effect = Patterns.Hand.discardCards(1, opponent),
                     feasibilityCheck = FeasibilityCheck.HasCardsInZone(Zone.HAND)
                 ),
                 EffectChoice(

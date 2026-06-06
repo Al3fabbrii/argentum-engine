@@ -6,10 +6,10 @@ import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.references.Player
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Champion of the Weird
@@ -38,7 +38,7 @@ val ChampionOfTheWeird = card("Champion of the Weird") {
     activatedAbility {
         cost = Costs.Composite(Costs.PayLife(1), Costs.Blight(2))
         target = Targets.Opponent
-        effect = MiscPatterns.blight(2, Player.TargetOpponent)
+        effect = Patterns.Mechanic.blight(2, Player.TargetOpponent)
         timing = TimingRule.SorcerySpeed
     }
 

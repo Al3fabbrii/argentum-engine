@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.scenarios
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.*
 import com.wingedsheep.engine.state.ZoneKey
@@ -16,7 +17,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.util.UUID
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Tests for Rummaging Wizard:
@@ -43,7 +43,7 @@ class RummagingWizardTest : FunSpec({
             ActivatedAbility(
                 id = wizardAbilityId,
                 cost = AbilityCost.Mana(ManaCost.parse("{2}{U}")),
-                effect = LibraryPatterns.surveil(1)
+                effect = Patterns.Library.surveil(1)
             )
         )
     )

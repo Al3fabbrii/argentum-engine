@@ -3,9 +3,9 @@ package com.wingedsheep.mtg.sets.definitions.roe.cards
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 val EvolvingWilds = card("Evolving Wilds") {
     typeLine = "Land"
@@ -15,7 +15,7 @@ val EvolvingWilds = card("Evolving Wilds") {
 
     activatedAbility {
         cost = Costs.Composite(Costs.Tap, Costs.SacrificeSelf)
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = Filters.BasicLand,
             destination = SearchDestination.BATTLEFIELD,
             entersTapped = true,

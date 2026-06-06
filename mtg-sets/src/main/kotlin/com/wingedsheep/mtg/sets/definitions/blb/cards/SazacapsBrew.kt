@@ -13,8 +13,8 @@ import com.wingedsheep.sdk.scripting.effects.ModifyStatsEffect
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.MiscPatterns
 import com.wingedsheep.sdk.dsl.Costs
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Sazacap's Brew
@@ -40,7 +40,7 @@ val SazacapsBrew = card("Sazacap's Brew") {
     additionalCost(Costs.additional.DiscardCards())
 
     spell {
-        effect = MiscPatterns.giftSpell(
+        effect = Patterns.Mechanic.giftSpell(
             // Mode 1: No gift — target player draws 2
             Mode.withTarget(
                 DrawCardsEffect(2, EffectTarget.ContextTarget(0)),

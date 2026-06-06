@@ -63,7 +63,7 @@ class FacadeBoundaryTest : FunSpec({
  * Returns the file's lines with block comments, line comments, and `import` declarations blanked
  * out (line numbers preserved), so the scan only sees executable code.
  */
-private fun stripCommentsAndImports(source: String): List<String> {
+internal fun stripCommentsAndImports(source: String): List<String> {
     val out = ArrayList<String>()
     var inBlock = false
     for (raw in source.lines()) {

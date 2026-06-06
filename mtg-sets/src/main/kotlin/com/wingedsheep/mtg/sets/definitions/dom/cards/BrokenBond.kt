@@ -3,9 +3,9 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Broken Bond
@@ -23,7 +23,7 @@ val BrokenBond = card("Broken Bond") {
     spell {
         val t = target("target", Targets.ArtifactOrEnchantment)
         effect = Effects.Destroy(t)
-            .then(HandPatterns.putFromHand(filter = GameObjectFilter.Land))
+            .then(Patterns.Hand.putFromHand(filter = GameObjectFilter.Land))
     }
 
     metadata {

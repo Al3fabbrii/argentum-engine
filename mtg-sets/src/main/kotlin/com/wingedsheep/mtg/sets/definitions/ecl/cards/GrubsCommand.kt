@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.CardDestination
@@ -19,7 +20,6 @@ import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.TargetObject
 import com.wingedsheep.sdk.scripting.targets.TargetPlayer
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Grub's Command
@@ -53,11 +53,11 @@ val GrubsCommand = card("Grub's Command") {
             }
             mode("Creatures target player controls get +1/+1 and gain haste until end of turn") {
                 val player = target("target player", TargetPlayer())
-                effect = GroupPatterns.modifyStatsForAll(
+                effect = Patterns.Group.modifyStatsForAll(
                     power = 1,
                     toughness = 1,
                     filter = GroupFilter(GameObjectFilter.Creature.targetPlayerControls(player))
-                ) then GroupPatterns.grantKeywordToAll(
+                ) then Patterns.Group.grantKeywordToAll(
                     keyword = Keyword.HASTE,
                     filter = GroupFilter(GameObjectFilter.Creature.targetPlayerControls(player))
                 )

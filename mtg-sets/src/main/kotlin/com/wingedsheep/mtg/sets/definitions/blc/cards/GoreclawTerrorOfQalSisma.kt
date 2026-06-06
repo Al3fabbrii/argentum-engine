@@ -3,13 +3,13 @@ package com.wingedsheep.mtg.sets.definitions.blc.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.CostModification
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.ModifySpellCost
 import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Goreclaw, Terror of Qal Sisma {3}{G}
@@ -39,11 +39,11 @@ val GoreclawTerrorOfQalSisma = card("Goreclaw, Terror of Qal Sisma") {
 
     triggeredAbility {
         trigger = Triggers.Attacks
-        effect = GroupPatterns.modifyStatsForAll(
+        effect = Patterns.Group.modifyStatsForAll(
             power = 1,
             toughness = 1,
             filter = GroupFilter.AllCreaturesYouControl.powerAtLeast(4),
-        ) then GroupPatterns.grantKeywordToAll(
+        ) then Patterns.Group.grantKeywordToAll(
             keyword = Keyword.TRAMPLE,
             filter = GroupFilter.AllCreaturesYouControl.powerAtLeast(4),
         )

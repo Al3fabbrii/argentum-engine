@@ -3,9 +3,9 @@ package com.wingedsheep.mtg.sets.definitions.fin.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.DynamicAmounts
 import com.wingedsheep.sdk.dsl.Effects
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -46,7 +46,7 @@ private val CecilRedeemedPaladin = card("Cecil, Redeemed Paladin") {
     // Protect — Whenever Cecil attacks, other attacking creatures gain indestructible until end of turn.
     triggeredAbility {
         trigger = Triggers.Attacks
-        effect = GroupPatterns.grantKeywordToAll(
+        effect = Patterns.Group.grantKeywordToAll(
             keyword = Keyword.INDESTRUCTIBLE,
             filter = GroupFilter(GameObjectFilter.Creature.attacking(), excludeSelf = true)
         )

@@ -12,8 +12,8 @@ import com.wingedsheep.sdk.scripting.conditions.Exists
 import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Haunt of the Dead Marshes
@@ -35,7 +35,7 @@ val HauntOfTheDeadMarshes = card("Haunt of the Dead Marshes") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.scry(1)
+        effect = Patterns.Library.scry(1)
     }
 
     activatedAbility {

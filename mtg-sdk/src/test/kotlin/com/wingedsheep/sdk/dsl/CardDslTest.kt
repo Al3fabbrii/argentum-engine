@@ -44,6 +44,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Tests for the Card Definition DSL.
@@ -493,7 +494,7 @@ class CardDslTest : DescribeSpec({
                 startingLoyalty = 3
 
                 loyaltyAbility(+1) {
-                    effect = HandPatterns.discardCards(1)
+                    effect = Patterns.Hand.discardCards(1)
                     target = Targets.AllPlayers
                 }
 
@@ -525,7 +526,7 @@ class CardDslTest : DescribeSpec({
                 spell {
                     effect = Effects.Composite(
                         Effects.DrawCards(3),
-                        HandPatterns.discardCards(2)
+                        Patterns.Hand.discardCards(2)
                     )
                 }
             }
@@ -545,7 +546,7 @@ class CardDslTest : DescribeSpec({
 
                 spell {
                     condition = Conditions.OpponentControlsMoreLands
-                    effect = LibraryPatterns.searchLibrary(
+                    effect = Patterns.Library.searchLibrary(
                         filter = Filters.PlainsCard,
                         count = 3,
                         destination = SearchDestination.HAND
@@ -766,10 +767,12 @@ class CardDslTest : DescribeSpec({
 
                 spell {
                     // Sacrifice any number of lands, then search for that many
-                    effect = MiscPatterns.sacrificeFor(
-                        filter = GameObjectFilter.Land,
-                        countName = "sacrificedLands",
-                        thenEffect = LibraryPatterns.searchLibrary(
+                    effect = Effects.Composite(
+                        StoreCountEffect(
+                            SacrificeEffect(GameObjectFilter.Land, any = true),
+                            EffectVariable.Count("sacrificedLands")
+                        ),
+                        Patterns.Library.searchLibrary(
                             filter = GameObjectFilter.Land,
                             count = 0, // Engine will read from VariableReference
                             destination = SearchDestination.BATTLEFIELD,
@@ -890,53 +893,6 @@ class CardDslTest : DescribeSpec({
             )
 
             reflexive.description shouldBe "You may sacrifice a creature. When you do, deal 5 damage to target"
-        }
-    }
-
-    describe("Effect Patterns Helper") {
-
-        it("should create sacrifice-for pattern with variable binding") {
-            val effect = MiscPatterns.sacrificeFor(
-                filter = GameObjectFilter.Land,
-                countName = "landCount",
-                thenEffect = DrawCardsEffect(1)
-            )
-
-            val composite = effect.shouldBeInstanceOf<CompositeEffect>()
-            composite.effects shouldHaveSize 2
-            composite.effects[0].shouldBeInstanceOf<StoreCountEffect>()
-        }
-
-        it("should create may-pay shorthand") {
-            val effect = MiscPatterns.mayPay(
-                PayLifeEffect(3),
-                DrawCardsEffect(2)
-            )
-
-            val gated = effect.shouldBeInstanceOf<GatedEffect>()
-            val gate = gated.gate.shouldBeInstanceOf<Gate.MayPay>()
-            gate.cost shouldBe PayLifeEffect(3)
-            gated.then shouldBe DrawCardsEffect(2, EffectTarget.Controller)
-        }
-
-        it("should create reflexive trigger shorthand") {
-            val effect = MiscPatterns.reflexiveTrigger(
-                action = SacrificeEffect(GameObjectFilter.Creature),
-                whenYouDo = GainLifeEffect(5)
-            )
-
-            effect.shouldBeInstanceOf<ReflexiveTriggerEffect>()
-            effect.optional shouldBe true
-        }
-
-        it("should create store entity shorthand") {
-            val effect = MiscPatterns.storeEntity(
-                effect = MoveToZoneEffect(EffectTarget.ContextTarget(0), Zone.EXILE),
-                `as` = "exiledCreature"
-            )
-
-            effect.shouldBeInstanceOf<StoreResultEffect>()
-            effect.storeAs shouldBe EffectVariable.EntityRef("exiledCreature")
         }
     }
 

@@ -22,8 +22,8 @@ import com.wingedsheep.sdk.scripting.effects.SelectionMode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Thought-Stalker Warlock
@@ -74,7 +74,7 @@ val ThoughtStalkerWarlock = card("Thought-Stalker Warlock") {
                 )
             ),
             // Otherwise: they discard a card (their choice)
-            elseEffect = HandPatterns.discardCards(1, opponent)
+            elseEffect = Patterns.Hand.discardCards(1, opponent)
         )
     }
 

@@ -10,8 +10,8 @@ import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetObject
 import com.wingedsheep.sdk.scripting.targets.TargetOpponent
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Wail of War
@@ -24,7 +24,7 @@ import com.wingedsheep.sdk.dsl.Effects
  *
  * Mode 1 scopes the group debuff to the chosen opponent via
  * [GameObjectFilter.Creature.targetOpponentControls] + the standard
- * [GroupPatterns.modifyStatsForAll]; mode 2 reuses the up-to-two graveyard-return
+ * [Patterns.Group.modifyStatsForAll]; mode 2 reuses the up-to-two graveyard-return
  * shape (see Dutiful Return).
  */
 val WailOfWar = card("Wail of War") {
@@ -39,7 +39,7 @@ val WailOfWar = card("Wail of War") {
         modal(chooseCount = 1) {
             mode("Creatures target opponent controls get -1/-1 until end of turn") {
                 val opponent = target("target opponent", TargetOpponent())
-                effect = GroupPatterns.modifyStatsForAll(
+                effect = Patterns.Group.modifyStatsForAll(
                     power = -1,
                     toughness = -1,
                     filter = GroupFilter(GameObjectFilter.Creature.targetPlayerControls(opponent))

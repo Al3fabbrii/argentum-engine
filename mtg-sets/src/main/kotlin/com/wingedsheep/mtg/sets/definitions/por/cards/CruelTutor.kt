@@ -6,8 +6,8 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.LoseLifeEffect
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 /**
  * Cruel Tutor
  * {2}{B}
@@ -22,7 +22,7 @@ val CruelTutor = card("Cruel Tutor") {
     spell {
         effect = Effects.Composite(
             listOf(
-                LibraryPatterns.searchLibrary(
+                Patterns.Library.searchLibrary(
                     filter = GameObjectFilter.Any,
                     destination = SearchDestination.TOP_OF_LIBRARY
                 ),

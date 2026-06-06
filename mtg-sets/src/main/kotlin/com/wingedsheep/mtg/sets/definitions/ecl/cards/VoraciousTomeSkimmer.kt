@@ -6,8 +6,8 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.effects.OptionalCostEffect
 import com.wingedsheep.sdk.scripting.effects.PayLifeEffect
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Voracious Tome-Skimmer
@@ -32,7 +32,7 @@ val VoraciousTomeSkimmer = card("Voracious Tome-Skimmer") {
     triggeredAbility {
         trigger = Triggers.YouCastSpell
         triggerCondition = Conditions.IsNotYourTurn
-        effect = MiscPatterns.mayPay(PayLifeEffect(1), Effects.DrawCards(1))
+        effect = OptionalCostEffect(PayLifeEffect(1), Effects.DrawCards(1))
     }
 
     metadata {

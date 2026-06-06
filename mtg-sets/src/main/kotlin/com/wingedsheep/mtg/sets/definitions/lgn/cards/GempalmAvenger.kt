@@ -6,8 +6,8 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.KeywordAbility
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Gempalm Avenger
@@ -31,8 +31,8 @@ val GempalmAvenger = card("Gempalm Avenger") {
         trigger = Triggers.YouCycleThis
         effect = Effects.Composite(
             listOf(
-                GroupPatterns.modifyStatsForAll(1, 1, GroupFilter.allCreaturesWithSubtype("Soldier")),
-                GroupPatterns.grantKeywordToAll(Keyword.FIRST_STRIKE, GroupFilter.allCreaturesWithSubtype("Soldier"))
+                Patterns.Group.modifyStatsForAll(1, 1, GroupFilter.allCreaturesWithSubtype("Soldier")),
+                Patterns.Group.grantKeywordToAll(Keyword.FIRST_STRIKE, GroupFilter.allCreaturesWithSubtype("Soldier"))
             )
         )
     }

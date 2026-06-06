@@ -3,12 +3,12 @@ package com.wingedsheep.mtg.sets.definitions.fdn.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Springbloom Druid
@@ -29,7 +29,7 @@ val SpringbloomDruid = card("Springbloom Druid") {
         trigger = Triggers.EntersBattlefield
         effect = MayEffect(
             Effects.Sacrifice(GameObjectFilter.Land, count = 1, target = EffectTarget.Controller)
-                .then(LibraryPatterns.searchLibrary(
+                .then(Patterns.Library.searchLibrary(
                     filter = GameObjectFilter.BasicLand,
                     count = 2,
                     destination = SearchDestination.BATTLEFIELD,

@@ -6,8 +6,8 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Moonstone Harbinger
@@ -40,8 +40,8 @@ val MoonstoneHarbinger = card("Moonstone Harbinger") {
         val batsYouControl = GroupFilter.allCreaturesWithSubtype("Bat").youControl()
         effect = Effects.Composite(
             listOf(
-                GroupPatterns.modifyStatsForAll(1, 0, batsYouControl),
-                GroupPatterns.grantKeywordToAll(Keyword.DEATHTOUCH, batsYouControl)
+                Patterns.Group.modifyStatsForAll(1, 0, batsYouControl),
+                Patterns.Group.grantKeywordToAll(Keyword.DEATHTOUCH, batsYouControl)
             )
         )
     }

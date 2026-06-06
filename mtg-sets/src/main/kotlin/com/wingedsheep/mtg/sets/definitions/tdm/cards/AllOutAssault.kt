@@ -11,8 +11,8 @@ import com.wingedsheep.sdk.scripting.effects.AddCombatPhaseEffect
 import com.wingedsheep.sdk.scripting.effects.CreateDelayedTriggerEffect
 import com.wingedsheep.sdk.scripting.effects.DelayedTriggerExpiry
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * All-Out Assault — Tarkir: Dragonstorm #167
@@ -62,7 +62,7 @@ val AllOutAssault = card("All-Out Assault") {
                 CreateDelayedTriggerEffect(
                     trigger = Triggers.YouAttack,
                     fireOnce = true,
-                    effect = GroupPatterns.untapGroup(GroupFilter.AllCreaturesYouControl),
+                    effect = Patterns.Group.untapGroup(GroupFilter.AllCreaturesYouControl),
                     expiry = DelayedTriggerExpiry.EndOfTurn
                 )
             )

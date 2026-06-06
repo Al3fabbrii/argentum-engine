@@ -14,8 +14,8 @@ import com.wingedsheep.sdk.scripting.effects.MayPlayExpiry
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.values.ContextPropertyKey
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.MiscPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Shadow Urchin
@@ -40,7 +40,7 @@ val ShadowUrchin = card("Shadow Urchin") {
 
     triggeredAbility {
         trigger = Triggers.Attacks
-        effect = MiscPatterns.blight(1)
+        effect = Patterns.Mechanic.blight(1)
     }
 
     triggeredAbility {

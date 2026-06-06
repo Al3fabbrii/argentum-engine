@@ -13,8 +13,8 @@ import com.wingedsheep.sdk.scripting.effects.MayPayManaEffect
 import com.wingedsheep.sdk.scripting.effects.TransformEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.ManaColorSet
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Ashling, Rekindled // Ashling, Rimebound
@@ -35,7 +35,7 @@ import com.wingedsheep.sdk.dsl.Effects
  */
 
 private val rummageMay = MayEffect(
-    effect = HandPatterns.rummage(1),
+    effect = Patterns.Hand.rummage(1),
     descriptionOverride = "You may discard a card. If you do, draw a card."
 )
 

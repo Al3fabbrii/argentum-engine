@@ -11,8 +11,8 @@ import com.wingedsheep.sdk.scripting.effects.ShuffleLibraryEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetObject
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * The Bath Song
@@ -32,11 +32,11 @@ val TheBathSong = card("The Bath Song") {
         "III — Shuffle any number of target cards from your graveyard into your library. Add {U}{U}."
 
     sagaChapter(1) {
-        effect = HandPatterns.loot(draw = 2, discard = 1)
+        effect = Patterns.Hand.loot(draw = 2, discard = 1)
     }
 
     sagaChapter(2) {
-        effect = HandPatterns.loot(draw = 2, discard = 1)
+        effect = Patterns.Hand.loot(draw = 2, discard = 1)
     }
 
     sagaChapter(3) {

@@ -5,12 +5,12 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.TriggeredAbility
 import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
 import com.wingedsheep.sdk.scripting.effects.GrantTriggeredAbilityEffect
 import com.wingedsheep.sdk.scripting.targets.TargetCreature
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Fall of Gil-galad
@@ -33,7 +33,7 @@ val FallOfGilGalad = card("Fall of Gil-galad") {
         "III — Until end of turn, target creature you control gains \"When this creature dies, draw two cards.\" Then that creature fights up to one other target creature."
 
     sagaChapter(1) {
-        effect = LibraryPatterns.scry(2)
+        effect = Patterns.Library.scry(2)
     }
 
     sagaChapter(2) {

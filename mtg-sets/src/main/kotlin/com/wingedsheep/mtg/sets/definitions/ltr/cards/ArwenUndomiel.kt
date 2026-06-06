@@ -6,8 +6,8 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Arwen Undómiel
@@ -35,7 +35,7 @@ val ArwenUndomiel = card("Arwen Undómiel") {
 
     activatedAbility {
         cost = Costs.Mana("{4}{G}{U}")
-        effect = LibraryPatterns.scry(2)
+        effect = Patterns.Library.scry(2)
     }
 
     metadata {

@@ -3,8 +3,8 @@ package com.wingedsheep.mtg.sets.definitions.ecl.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 val ShoreLurker = card("Shore Lurker") {
     manaCost = "{3}{W}"
@@ -20,7 +20,7 @@ val ShoreLurker = card("Shore Lurker") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.surveil(1)
+        effect = Patterns.Library.surveil(1)
     }
 
     metadata {

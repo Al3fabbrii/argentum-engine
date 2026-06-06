@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -27,7 +28,6 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.values.EntityNumericProperty
 import com.wingedsheep.sdk.scripting.values.EntityReference
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Fell Gravship
@@ -52,7 +52,7 @@ val FellGravship = card("Fell Gravship") {
         effect = Effects.Composite(
             listOf(
                 // Mill 3 cards
-                LibraryPatterns.mill(3),
+                Patterns.Library.mill(3),
                 // Return a creature or Spacecraft card from graveyard to hand
                 Effects.Composite(
                     listOf(

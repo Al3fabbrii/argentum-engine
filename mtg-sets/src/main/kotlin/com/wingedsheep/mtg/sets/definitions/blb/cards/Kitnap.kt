@@ -4,13 +4,13 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ControlEnchantedPermanent
 import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
 import com.wingedsheep.sdk.scripting.effects.Mode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Kitnap
@@ -39,7 +39,7 @@ val Kitnap = card("Kitnap") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = MiscPatterns.giftSpell(
+        effect = Patterns.Mechanic.giftSpell(
             // Mode 1: No gift — tap enchanted creature + 3 stun counters
             Mode.noTarget(
                 Effects.Tap(EffectTarget.EnchantedCreature)

@@ -3,6 +3,7 @@ package com.wingedsheep.mtg.sets.definitions.eoe.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.conditions.Compare
@@ -12,7 +13,6 @@ import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Vaultguard Trooper
@@ -41,7 +41,7 @@ val VaultguardTrooper = card("Vaultguard Trooper") {
         )
         effect = MayEffect(
             IfYouDoEffect(
-                action = HandPatterns.discardHand(EffectTarget.Controller),
+                action = Patterns.Hand.discardHand(EffectTarget.Controller),
                 ifYouDo = Effects.DrawCards(2)
             )
         )

@@ -2,10 +2,10 @@ package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.effects.ShuffleLibraryEffect
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Omen
@@ -22,7 +22,7 @@ val Omen = card("Omen") {
     spell {
         effect = Effects.Composite(
             listOf(
-                LibraryPatterns.lookAtTopAndReorder(3),
+                Patterns.Library.lookAtTopAndReorder(3),
                 MayEffect(ShuffleLibraryEffect()),
                 Effects.DrawCards(1)
             )

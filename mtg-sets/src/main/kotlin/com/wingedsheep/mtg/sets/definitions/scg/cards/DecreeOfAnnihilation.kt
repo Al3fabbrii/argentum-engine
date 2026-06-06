@@ -15,8 +15,8 @@ import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Decree of Annihilation
@@ -60,7 +60,7 @@ val DecreeOfAnnihilation = card("Decree of Annihilation") {
 
     triggeredAbility {
         trigger = Triggers.YouCycleThis
-        effect = GroupPatterns.destroyAll(GroupFilter.AllLands)
+        effect = Patterns.Group.destroyAll(GroupFilter.AllLands)
     }
 
     metadata {

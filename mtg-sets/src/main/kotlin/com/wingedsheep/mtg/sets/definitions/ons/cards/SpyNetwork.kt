@@ -16,8 +16,8 @@ import com.wingedsheep.sdk.scripting.effects.ZonePlacement
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.targets.TargetPlayer
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Spy Network
@@ -56,7 +56,7 @@ val SpyNetwork = card("Spy Network") {
                 )
             )
             .then(LookAtFaceDownEffect(t, FaceDownLookScope.ALL_CONTROLLED_BY_TARGET_PLAYER))
-            .then(LibraryPatterns.lookAtTopAndReorder(4))
+            .then(Patterns.Library.lookAtTopAndReorder(4))
     }
 
     metadata {

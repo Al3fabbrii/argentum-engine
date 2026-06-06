@@ -3,12 +3,12 @@ package com.wingedsheep.mtg.sets.definitions.blc.cards
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.EntersTapped
 import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Temple of Malady
@@ -27,7 +27,7 @@ val TempleOfMalady = card("Temple of Malady") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.scry(1)
+        effect = Patterns.Library.scry(1)
     }
 
     activatedAbility {

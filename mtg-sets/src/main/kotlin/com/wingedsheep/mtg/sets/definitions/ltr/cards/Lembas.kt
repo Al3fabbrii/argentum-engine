@@ -4,9 +4,9 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Lembas
@@ -27,7 +27,7 @@ val Lembas = card("Lembas") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.scry(1) then Effects.DrawCards(1)
+        effect = Patterns.Library.scry(1) then Effects.DrawCards(1)
     }
 
     activatedAbility {

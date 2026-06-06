@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.scenarios
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.*
 import com.wingedsheep.engine.state.ZoneKey
@@ -22,7 +23,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
  * "Look at the top 7 cards of your library. Put 2 of them into your hand
  * and the rest into your graveyard."
  *
- * Uses the pipeline-based implementation (LibraryPatterns.lookAtTopAndKeep)
+ * Uses the pipeline-based implementation (Patterns.Library.lookAtTopAndKeep)
  * instead of the deprecated LookAtTopCardsEffect.
  */
 class AncestralMemoriesPipelineTest : FunSpec({

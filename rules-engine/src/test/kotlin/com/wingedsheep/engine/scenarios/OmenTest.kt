@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.scenarios
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.*
 import com.wingedsheep.engine.state.ZoneKey
@@ -21,7 +22,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Tests for the Omen card:
@@ -47,7 +47,7 @@ class OmenTest : FunSpec({
         script = CardScript.spell(
             CompositeEffect(
                 listOf(
-                    LibraryPatterns.lookAtTopAndReorder(3),
+                    Patterns.Library.lookAtTopAndReorder(3),
                     MayEffect(ShuffleLibraryEffect()),
                     DrawCardsEffect(1)
                 )

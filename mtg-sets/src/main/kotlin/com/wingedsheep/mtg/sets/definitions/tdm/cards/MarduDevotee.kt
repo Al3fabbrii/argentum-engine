@@ -5,10 +5,10 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ActivationRestriction
 import com.wingedsheep.sdk.scripting.values.ManaColorSet
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Mardu Devotee
@@ -31,7 +31,7 @@ val MarduDevotee = card("Mardu Devotee") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.scry(2)
+        effect = Patterns.Library.scry(2)
     }
 
     activatedAbility {

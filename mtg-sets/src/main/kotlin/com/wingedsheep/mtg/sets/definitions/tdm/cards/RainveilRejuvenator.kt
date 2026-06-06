@@ -6,9 +6,9 @@ import com.wingedsheep.sdk.dsl.DynamicAmounts
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.MayEffect
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Rainveil Rejuvenator — Tarkir: Dragonstorm #152
@@ -33,7 +33,7 @@ val RainveilRejuvenator = card("Rainveil Rejuvenator") {
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
         effect = MayEffect(
-            LibraryPatterns.mill(3),
+            Patterns.Library.mill(3),
             descriptionOverride = "You may mill three cards."
         )
         description = "When this creature enters, you may mill three cards."

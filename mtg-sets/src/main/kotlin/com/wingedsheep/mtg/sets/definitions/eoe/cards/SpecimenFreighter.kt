@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.core.Subtype
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -24,7 +25,6 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.values.EntityNumericProperty
 import com.wingedsheep.sdk.scripting.values.EntityReference
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Specimen Freighter
@@ -103,7 +103,7 @@ val SpecimenFreighter = card("Specimen Freighter") {
     // Whenever this Spacecraft attacks, defending player mills four cards
     triggeredAbility {
         trigger = Triggers.Attacks
-        effect = LibraryPatterns.mill(4, EffectTarget.PlayerRef(Player.Opponent))
+        effect = Patterns.Library.mill(4, EffectTarget.PlayerRef(Player.Opponent))
     }
 
     metadata {

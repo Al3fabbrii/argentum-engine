@@ -2,9 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.scg.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Root Elemental
@@ -27,7 +27,7 @@ val RootElemental = card("Root Elemental") {
 
     triggeredAbility {
         trigger = Triggers.TurnedFaceUp
-        effect = HandPatterns.putFromHand(
+        effect = Patterns.Hand.putFromHand(
             filter = GameObjectFilter.Creature
         )
     }

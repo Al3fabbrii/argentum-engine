@@ -5,7 +5,7 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.targets.TargetOpponent
 import com.wingedsheep.sdk.dsl.Triggers
-import com.wingedsheep.sdk.dsl.HandPatterns
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Ebon Dragon
@@ -27,7 +27,7 @@ val EbonDragon = card("Ebon Dragon") {
         trigger = Triggers.EntersBattlefield
         optional = true
         val t = target("target", TargetOpponent())
-        effect = HandPatterns.discardCards(1, t)
+        effect = Patterns.Hand.discardCards(1, t)
     }
 
     metadata {

@@ -1,9 +1,9 @@
 package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.targets.TargetOpponent
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Mind Rot
@@ -18,7 +18,7 @@ val MindRot = card("Mind Rot") {
 
     spell {
         val t = target("target", TargetOpponent())
-        effect = HandPatterns.discardCards(2, t)
+        effect = Patterns.Hand.discardCards(2, t)
     }
 
     metadata {

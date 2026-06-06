@@ -7,6 +7,7 @@ import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ModifyStats
 import com.wingedsheep.sdk.scripting.RemoveKeywordStatic
@@ -15,7 +16,6 @@ import com.wingedsheep.sdk.scripting.effects.Mode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Starforged Sword
@@ -41,7 +41,7 @@ val StarforgedSword = card("Starforged Sword") {
     // Gift modeled as a modal ETB triggered ability
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = MiscPatterns.giftSpell(
+        effect = Patterns.Mechanic.giftSpell(
             // Mode 1: No gift — do nothing
             Mode.noTarget(
                 Effects.Composite(emptyList()),

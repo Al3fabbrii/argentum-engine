@@ -3,9 +3,9 @@ package com.wingedsheep.mtg.sets.definitions.ktk.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Ankle Shanker
@@ -28,11 +28,11 @@ val AnkleShanker = card("Ankle Shanker") {
 
     triggeredAbility {
         trigger = Triggers.Attacks
-        effect = GroupPatterns.grantKeywordToAll(
+        effect = Patterns.Group.grantKeywordToAll(
             keyword = Keyword.FIRST_STRIKE,
             filter = GroupFilter.AllCreaturesYouControl
         ).then(
-            GroupPatterns.grantKeywordToAll(
+            Patterns.Group.grantKeywordToAll(
                 keyword = Keyword.DEATHTOUCH,
                 filter = GroupFilter.AllCreaturesYouControl
             )

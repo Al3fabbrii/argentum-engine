@@ -1,9 +1,9 @@
 package com.wingedsheep.mtg.sets.definitions.arn.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Piety
@@ -18,7 +18,7 @@ val Piety = card("Piety") {
     oracleText = "Blocking creatures get +0/+3 until end of turn."
 
     spell {
-        effect = GroupPatterns.modifyStatsForAll(
+        effect = Patterns.Group.modifyStatsForAll(
             power = 0,
             toughness = 3,
             filter = GroupFilter.BlockingCreatures,

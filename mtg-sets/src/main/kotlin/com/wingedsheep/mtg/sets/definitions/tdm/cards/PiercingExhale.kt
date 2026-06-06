@@ -6,6 +6,7 @@ import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.CardSource
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
@@ -17,7 +18,6 @@ import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.values.EntityNumericProperty
 import com.wingedsheep.sdk.scripting.values.EntityReference
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Piercing Exhale
@@ -72,7 +72,7 @@ val PiercingExhale = card("Piercing Exhale") {
                 ),
                 ConditionalEffect(
                     condition = Conditions.CollectionContainsMatch("beheld"),
-                    effect = LibraryPatterns.surveil(2)
+                    effect = Patterns.Library.surveil(2)
                 )
             )
         )

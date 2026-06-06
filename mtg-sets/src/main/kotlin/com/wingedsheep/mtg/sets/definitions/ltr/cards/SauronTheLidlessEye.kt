@@ -7,11 +7,11 @@ import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Sauron, the Lidless Eye
@@ -43,7 +43,7 @@ val SauronTheLidlessEye = card("Sauron, the Lidless Eye") {
 
     activatedAbility {
         cost = Costs.Mana("{1}{B}{R}")
-        effect = GroupPatterns.modifyStatsForAll(2, 0, Filters.Group.creaturesYouControl)
+        effect = Patterns.Group.modifyStatsForAll(2, 0, Filters.Group.creaturesYouControl)
             .then(Effects.LoseLife(2, EffectTarget.PlayerRef(Player.EachOpponent)))
     }
 

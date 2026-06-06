@@ -3,10 +3,10 @@ package com.wingedsheep.mtg.sets.definitions.lgn.cards
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureTypeEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.CreatureTypePatterns
 
 /**
  * Mistform Wakecaster
@@ -36,7 +36,7 @@ val MistformWakecaster = card("Mistform Wakecaster") {
 
     activatedAbility {
         cost = Costs.Composite(Costs.Mana("{2}{U}{U}"), Costs.Tap)
-        effect = CreatureTypePatterns.becomeChosenTypeAllCreatures(
+        effect = Patterns.CreatureType.becomeChosenTypeAllCreatures(
             controllerOnly = true
         )
     }

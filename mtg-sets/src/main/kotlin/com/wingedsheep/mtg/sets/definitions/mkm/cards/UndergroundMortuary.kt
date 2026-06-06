@@ -2,9 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.mkm.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.EntersTapped
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Underground Mortuary
@@ -25,7 +25,7 @@ val UndergroundMortuary = card("Underground Mortuary") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = LibraryPatterns.surveil(1)
+        effect = Patterns.Library.surveil(1)
     }
 
     metadata {

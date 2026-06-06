@@ -5,13 +5,13 @@ import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.ConditionalOnCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.CreateDelayedTriggerEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Meek Attack
@@ -32,7 +32,7 @@ val MeekAttack = card("Meek Attack") {
 
     activatedAbility {
         cost = Costs.Mana("{1}{R}")
-        effect = HandPatterns.putFromHand(
+        effect = Patterns.Hand.putFromHand(
             filter = GameObjectFilter.Creature.totalPowerAndToughnessAtMost(5)
         ).then(
             ConditionalOnCollectionEffect(

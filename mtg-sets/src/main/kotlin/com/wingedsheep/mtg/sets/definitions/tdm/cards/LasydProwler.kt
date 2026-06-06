@@ -7,11 +7,11 @@ import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.MayEffect
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Lasyd Prowler — Tarkir: Dragonstorm #149
@@ -37,7 +37,7 @@ val LasydProwler = card("Lasyd Prowler") {
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
         effect = MayEffect(
-            LibraryPatterns.mill(DynamicAmount.Count(Player.You, Zone.BATTLEFIELD, Filters.Land)),
+            Patterns.Library.mill(DynamicAmount.Count(Player.You, Zone.BATTLEFIELD, Filters.Land)),
             descriptionOverride = "You may mill cards equal to the number of lands you control."
         )
         description = "When this creature enters, you may mill cards equal to the number of lands you control."

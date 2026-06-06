@@ -1,10 +1,10 @@
 package com.wingedsheep.mtg.sets.definitions.tmt.cards
 
 import com.wingedsheep.sdk.core.Step
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.CreateDelayedTriggerEffect
 
@@ -33,7 +33,7 @@ val CaseyJonesVigilante = card("Casey Jones, Vigilante") {
                 CreateDelayedTriggerEffect(
                     step = Step.UPKEEP,
                     fireOnlyOnControllersTurn = true,
-                    effect = HandPatterns.discardRandom(3),
+                    effect = Patterns.Hand.discardRandom(3),
                 ),
             )
         )

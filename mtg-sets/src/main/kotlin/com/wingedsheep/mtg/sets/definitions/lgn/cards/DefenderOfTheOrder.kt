@@ -2,9 +2,9 @@ package com.wingedsheep.mtg.sets.definitions.lgn.cards
 
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Defender of the Order
@@ -24,7 +24,7 @@ val DefenderOfTheOrder = card("Defender of the Order") {
 
     triggeredAbility {
         trigger = Triggers.TurnedFaceUp
-        effect = GroupPatterns.modifyStatsForAll(0, 2, GroupFilter.AllCreaturesYouControl)
+        effect = Patterns.Group.modifyStatsForAll(0, 2, GroupFilter.AllCreaturesYouControl)
     }
 
     morph = "{W}{W}"

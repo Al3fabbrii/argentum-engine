@@ -1,8 +1,8 @@
 package com.wingedsheep.mtg.sets.definitions.por.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.HandPatterns
 
 /**
  * Temporary Truce
@@ -17,7 +17,7 @@ val TemporaryTruce = card("Temporary Truce") {
     typeLine = "Sorcery"
 
     spell {
-        effect = HandPatterns.eachPlayerMayDraw(maxCards = 2, lifePerCardNotDrawn = 2)
+        effect = Patterns.Hand.eachPlayerMayDraw(maxCards = 2, lifePerCardNotDrawn = 2)
     }
 
     metadata {

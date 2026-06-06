@@ -4,10 +4,10 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ActivationRestriction
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Weathered Wayfarer
@@ -27,7 +27,7 @@ val WeatheredWayfarer = card("Weathered Wayfarer") {
 
     activatedAbility {
         cost = Costs.Composite(Costs.Mana("{W}"), Costs.Tap)
-        effect = LibraryPatterns.searchLibrary(
+        effect = Patterns.Library.searchLibrary(
             filter = Filters.Land,
             count = 1,
             destination = SearchDestination.HAND,

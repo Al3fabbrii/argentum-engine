@@ -2,10 +2,10 @@ package com.wingedsheep.mtg.sets.definitions.tdm.cards
 
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Cruel Truths
@@ -23,7 +23,7 @@ val CruelTruths = card("Cruel Truths") {
         "them into your graveyard and the rest on top of your library in any order.)"
 
     spell {
-        effect = LibraryPatterns.surveil(2)
+        effect = Patterns.Library.surveil(2)
             .then(Effects.DrawCards(2))
             .then(Effects.LoseLife(2, EffectTarget.PlayerRef(Player.You)))
     }

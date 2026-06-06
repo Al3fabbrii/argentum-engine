@@ -1,12 +1,12 @@
 package com.wingedsheep.mtg.sets.definitions.ons.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.references.Player
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Information Dealer
@@ -26,7 +26,7 @@ val InformationDealer = card("Information Dealer") {
 
     activatedAbility {
         cost = AbilityCost.Tap
-        effect = LibraryPatterns.lookAtTopAndReorder(
+        effect = Patterns.Library.lookAtTopAndReorder(
             DynamicAmount.AggregateBattlefield(
                 Player.You,
                 GameObjectFilter.Creature.withSubtype("Wizard")

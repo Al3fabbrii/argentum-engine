@@ -1,4 +1,5 @@
 package com.wingedsheep.engine.handlers.effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 import com.wingedsheep.engine.core.*
 import com.wingedsheep.engine.state.ZoneKey
@@ -16,7 +17,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.util.UUID
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Surveil N: look at the top N cards; send any chosen subset to the graveyard,
@@ -40,7 +40,7 @@ class SurveilNTest : FunSpec({
             ActivatedAbility(
                 id = surveilAbilityId,
                 cost = AbilityCost.Mana(ManaCost.parse("{2}{U}")),
-                effect = LibraryPatterns.surveil(2)
+                effect = Patterns.Library.surveil(2)
             )
         )
     )

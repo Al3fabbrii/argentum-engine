@@ -3,6 +3,7 @@ package com.wingedsheep.mtg.sets.definitions.dom.cards
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.EventPattern
 import com.wingedsheep.sdk.scripting.TriggerBinding
@@ -12,7 +13,6 @@ import com.wingedsheep.sdk.scripting.effects.ShuffleLibraryEffect
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetObject
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Gaea's Blessing
@@ -51,7 +51,7 @@ val GaeasBlessing = card("Gaea's Blessing") {
             binding = TriggerBinding.SELF
         )
         triggerZone = Zone.GRAVEYARD
-        effect = LibraryPatterns.shuffleGraveyardIntoLibrary(EffectTarget.Controller)
+        effect = Patterns.Library.shuffleGraveyardIntoLibrary(EffectTarget.Controller)
     }
 
     metadata {

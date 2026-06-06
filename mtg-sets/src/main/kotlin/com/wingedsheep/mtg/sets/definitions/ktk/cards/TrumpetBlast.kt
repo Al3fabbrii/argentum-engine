@@ -1,9 +1,9 @@
 package com.wingedsheep.mtg.sets.definitions.ktk.cards
 
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Trumpet Blast
@@ -18,7 +18,7 @@ val TrumpetBlast = card("Trumpet Blast") {
     oracleText = "Attacking creatures get +2/+0 until end of turn."
 
     spell {
-        effect = GroupPatterns.modifyStatsForAll(
+        effect = Patterns.Group.modifyStatsForAll(
             power = 2,
             toughness = 0,
             filter = GroupFilter.AttackingCreatures

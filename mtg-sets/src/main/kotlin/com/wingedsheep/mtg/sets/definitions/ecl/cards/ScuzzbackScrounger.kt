@@ -3,9 +3,9 @@ package com.wingedsheep.mtg.sets.definitions.ecl.cards
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.OptionalCostEffect
-import com.wingedsheep.sdk.dsl.MiscPatterns
 
 /**
  * Scuzzback Scrounger
@@ -30,7 +30,7 @@ val ScuzzbackScrounger = card("Scuzzback Scrounger") {
     triggeredAbility {
         trigger = Triggers.FirstMainPhase
         effect = OptionalCostEffect(
-            cost = MiscPatterns.blight(1),
+            cost = Patterns.Mechanic.blight(1),
             ifPaid = Effects.CreateTreasure(),
             descriptionOverride = "You may blight 1. If you do, create a Treasure token"
         )

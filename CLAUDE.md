@@ -123,8 +123,8 @@ anti-corruption layer between engine and clients.
 - **Use the `Effects.*` facade** (e.g., `Effects.DrawCards(1)`, `Effects.Destroy()`), not raw constructors.
 - **Prefer atomic pipeline effects** (Gather → Select → Move via the domain pattern objects) over monolithic executors
   for library/zone mechanics. `Effects.kt` holds foundational atomic facades; the `*Patterns.kt` objects
-  (`LibraryPatterns`, `HandPatterns`, `GroupPatterns`, `ExilePatterns`, `CreatureTypePatterns`, `MiscPatterns`) hold
-  compositions like Scry, Mill, SearchLibrary.
+  hold compositions like Scry, Mill, SearchLibrary, reached through the single `Patterns` index
+  (`Patterns.Library`, `Patterns.Hand`, `Patterns.Group`, `Patterns.Exile`, `Patterns.CreatureType`, `Patterns.Mechanic`).
 - **Adding a card** → use the `add-card` skill (handles Scryfall lookup, oracle errata, set registration,
   scenario test).
 - **Adding a mechanic** → prefer composing in the relevant `*Patterns.kt` object first; only add a new `Effect` type + executor in

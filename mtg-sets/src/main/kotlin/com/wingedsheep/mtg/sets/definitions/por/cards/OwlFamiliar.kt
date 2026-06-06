@@ -4,7 +4,7 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.dsl.Triggers
-import com.wingedsheep.sdk.dsl.HandPatterns
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Owl Familiar
@@ -25,7 +25,7 @@ val OwlFamiliar = card("Owl Familiar") {
 
     triggeredAbility {
         trigger = Triggers.EntersBattlefield
-        effect = HandPatterns.loot()
+        effect = Patterns.Hand.loot()
     }
 
     metadata {

@@ -2,8 +2,8 @@ package com.wingedsheep.mtg.sets.definitions.ons.cards
 
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Reminisce
@@ -19,7 +19,7 @@ val Reminisce = card("Reminisce") {
 
     spell {
         val t = target("target", Targets.Player)
-        effect = LibraryPatterns.shuffleGraveyardIntoLibrary(t)
+        effect = Patterns.Library.shuffleGraveyardIntoLibrary(t)
     }
 
     metadata {

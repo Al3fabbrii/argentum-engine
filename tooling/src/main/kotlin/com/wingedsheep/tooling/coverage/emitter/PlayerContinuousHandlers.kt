@@ -68,9 +68,9 @@ internal fun EmitCtx.renderPlayerAction(node: JsonObject, tvar: String?): String
     val ptv = refTarget(args, tvar)  // the player the action applies to
     when (inner.strField("_Action")) {
         "DiscardACard", "DiscardNumberCards", "DiscardAnyNumberOfCards" -> {
-            used.add("HandPatterns")
+            used.add("Patterns")
             val n = (findInteger(inner["args"]) as? Int) ?: 1
-            return if (ptv != null) "HandPatterns.discardCards($n, $ptv)" else "HandPatterns.discardCards($n)"
+            return if (ptv != null) "Patterns.Hand.discardCards($n, $ptv)" else "Patterns.Hand.discardCards($n)"
         }
         "DrawNumberCards", "DrawACard" -> {
             used.add("DrawCardsEffect")
@@ -89,8 +89,8 @@ internal fun EmitCtx.renderPlayerAction(node: JsonObject, tvar: String?): String
             used.add("LoseLifeEffect"); return "LoseLifeEffect($amt, $ptv)"
         }
         "DiscardACardAtRandom" -> {
-            used.add("HandPatterns")
-            return if (ptv != null) "HandPatterns.discardRandom(1, $ptv)" else "HandPatterns.discardRandom(1)"
+            used.add("Patterns")
+            return if (ptv != null) "Patterns.Hand.discardRandom(1, $ptv)" else "Patterns.Hand.discardRandom(1)"
         }
         "SkipAllCombatPhasesTheirNextTurn" -> {
             used.add("SkipCombatPhasesEffect")
@@ -105,10 +105,10 @@ internal fun EmitCtx.renderPlayerAction(node: JsonObject, tvar: String?): String
 }
 
 internal fun EmitCtx.renderEachPlayer(node: JsonObject): String? {
-    used.add("HandPatterns")
+    used.add("Patterns")
     val blob = compact(node)
-    if (jsonContains(node, "_Players", "Opponent") && "Discard" in blob) return "HandPatterns.eachOpponentDiscards(1)"  // Noxious Toad
+    if (jsonContains(node, "_Players", "Opponent") && "Discard" in blob) return "Patterns.Hand.eachOpponentDiscards(1)"  // Noxious Toad
     if (jsonContains(node, "_Action", "DrawNumberCards") || jsonContains(node, "_GameNumber", "ValueX"))
-        return "HandPatterns.eachPlayerDrawsX(includeController = true, includeOpponents = true)"
+        return "Patterns.Hand.eachPlayerDrawsX(includeController = true, includeOpponents = true)"
     return null
 }

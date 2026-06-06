@@ -4,8 +4,8 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Ruin-Lurker Bat
@@ -41,7 +41,7 @@ val RuinLurkerBat = card("Ruin-Lurker Bat") {
     triggeredAbility {
         trigger = Triggers.YourEndStep
         triggerCondition = Conditions.YouDescendedThisTurn()
-        effect = LibraryPatterns.scry(1)
+        effect = Patterns.Library.scry(1)
     }
 
     metadata {

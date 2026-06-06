@@ -5,10 +5,10 @@ import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
 import com.wingedsheep.sdk.scripting.effects.SearchDestination
-import com.wingedsheep.sdk.dsl.LibraryPatterns
 
 /**
  * Embermouth Sentinel
@@ -21,7 +21,7 @@ import com.wingedsheep.sdk.dsl.LibraryPatterns
  * battlefield tapped instead.
  *
  * Modeled as a [ConditionalEffect] on "you control a Dragon", checked at resolution. The
- * search is a single optional library search (ChooseUpTo via [LibraryPatterns.searchLibrary]);
+ * search is a single optional library search (ChooseUpTo via [Patterns.Library.searchLibrary]);
  * only one destination branch runs:
  *  - Control a Dragon → put the basic land onto the battlefield tapped, then shuffle.
  *  - Otherwise → shuffle, then put the basic land on top of the library.
@@ -41,7 +41,7 @@ val EmbermouthSentinel = card("Embermouth Sentinel") {
         effect = ConditionalEffect(
             condition = Conditions.ControlCreatureOfType(Subtype.DRAGON),
             // Control a Dragon: put the basic land onto the battlefield tapped instead.
-            effect = LibraryPatterns.searchLibrary(
+            effect = Patterns.Library.searchLibrary(
                 filter = Filters.BasicLand,
                 count = 1,
                 destination = SearchDestination.BATTLEFIELD,
@@ -50,7 +50,7 @@ val EmbermouthSentinel = card("Embermouth Sentinel") {
                 reveal = true
             ),
             // Otherwise: shuffle and put the basic land on top of the library.
-            elseEffect = LibraryPatterns.searchLibrary(
+            elseEffect = Patterns.Library.searchLibrary(
                 filter = Filters.BasicLand,
                 count = 1,
                 destination = SearchDestination.TOP_OF_LIBRARY,

@@ -8,8 +8,8 @@ import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.effects.ConditionalOnCollectionEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Dermoplasm
@@ -35,7 +35,7 @@ val Dermoplasm = card("Dermoplasm") {
 
     triggeredAbility {
         trigger = Triggers.TurnedFaceUp
-        effect = HandPatterns.putFromHand(
+        effect = Patterns.Hand.putFromHand(
             filter = GameObjectFilter.Creature.withMorph()
         ) then ConditionalOnCollectionEffect(
             collection = "putting",

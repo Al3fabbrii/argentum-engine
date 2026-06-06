@@ -5,6 +5,7 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -13,7 +14,6 @@ import com.wingedsheep.sdk.scripting.effects.ForceSacrificeEffect
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * Sorin, Solemn Visitor - {2}{W}{B}
@@ -37,13 +37,13 @@ val SorinSolemnVisitor = card("Sorin, Solemn Visitor") {
     // +1: Until your next turn, creatures you control get +1/+0 and gain lifelink.
     loyaltyAbility(+1) {
         effect = Effects.Composite(
-            GroupPatterns.modifyStatsForAll(
+            Patterns.Group.modifyStatsForAll(
                 power = 1,
                 toughness = 0,
                 filter = GroupFilter.AllCreaturesYouControl,
                 duration = Duration.UntilYourNextTurn
             ),
-            GroupPatterns.grantKeywordToAll(
+            Patterns.Group.grantKeywordToAll(
                 keyword = Keyword.LIFELINK,
                 filter = GroupFilter.AllCreaturesYouControl,
                 duration = Duration.UntilYourNextTurn

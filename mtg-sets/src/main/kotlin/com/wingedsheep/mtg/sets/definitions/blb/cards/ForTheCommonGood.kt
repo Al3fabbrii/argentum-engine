@@ -4,6 +4,7 @@ import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.dsl.Patterns
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.Duration
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -14,7 +15,6 @@ import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetObject
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
-import com.wingedsheep.sdk.dsl.GroupPatterns
 
 /**
  * For the Common Good
@@ -38,7 +38,7 @@ val ForTheCommonGood = card("For the Common Good") {
             target = token,
             count = DynamicAmount.XValue
         ).then(
-            GroupPatterns.grantKeywordToAll(
+            Patterns.Group.grantKeywordToAll(
                 keyword = Keyword.INDESTRUCTIBLE,
                 filter = GroupFilter(baseFilter = GameObjectFilter.Token.youControl()),
                 duration = Duration.UntilYourNextTurn

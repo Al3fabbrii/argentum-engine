@@ -8,8 +8,8 @@ import com.wingedsheep.sdk.scripting.effects.ModifyStatsEffect
 import com.wingedsheep.sdk.scripting.effects.TapUntapEffect
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.dsl.HandPatterns
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Patterns
 
 /**
  * Jeskai Ascendancy
@@ -43,7 +43,7 @@ val JeskaiAscendancy = card("Jeskai Ascendancy") {
 
     triggeredAbility {
         trigger = Triggers.YouCastNoncreature
-        effect = MayEffect(HandPatterns.loot())
+        effect = MayEffect(Patterns.Hand.loot())
     }
 
     metadata {
