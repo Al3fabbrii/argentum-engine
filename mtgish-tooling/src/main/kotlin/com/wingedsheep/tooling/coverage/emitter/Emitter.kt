@@ -66,6 +66,7 @@ object Emitter {
                 rname == "PermanentRuleEffect" -> block = ctx.staticBlock(rule)
                 rname == "AsPermanentEnters" -> block = ctx.asEntersBlock(rule)
                 rname == "EachPermanentLayerEffect" -> block = ctx.staticLordBlock(rule)
+                rname == "FromAnyZone" -> block = ctx.fromAnyZoneBlock(rule)
                 rname == "CDA_Power" -> block = ctx.cdaStatsBlock(card, rule)
                 rname == "CDA_Toughness" ->
                     if (jsonContains(card["Rules"], "_Rule", "CDA_Power")) continue  // emitted with CDA_Power

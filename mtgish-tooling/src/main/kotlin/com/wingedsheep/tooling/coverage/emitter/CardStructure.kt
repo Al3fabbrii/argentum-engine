@@ -202,6 +202,30 @@ internal fun EmitCtx.asEntersBlock(rule: JsonObject): List<String>? {
     return lines
 }
 
+/**
+ * A `FromAnyZone { TriggerA { WhenAPlayerCyclesACard(You, this) ... } }` rule -> a triggered ability
+ * with `trigger = Triggers.YouCycleThis` ("When you cycle this card, [bonus]"). A lone `you may` bonus
+ * becomes `optional = true`, mirroring [triggerBlock].
+ */
+internal fun EmitCtx.fromAnyZoneBlock(rule: JsonObject): List<String>? {
+    val inner = rule["args"] as? JsonObject
+    if (inner?.strField("_Rule") != "TriggerA" ||
+        !jsonContains(inner, "_Trigger", "WhenAPlayerCyclesACard") ||
+        !jsonContains(inner, "_CardInHand", "ThisCardInHand")) { reasons.add("FromAnyZone"); return null }
+    val (targets, actions) = extractEnvelope(inner)
+    if (actions == null) { reasons.add("FromAnyZone"); return null }
+    val (tdsl, tvar) = spellTarget(targets, actions)
+    if (tdsl == null) return null
+    val mayWrapped = actions.singleOrNull()?.strField("_Action") == "MayAction"
+    val effectActions = if (mayWrapped) listOf(innerAction(actions.single()) ?: return null) else actions
+    val edsl = renderEffectList(effectActions, tvar) ?: return null
+    val lines = mutableListOf("    triggeredAbility {", "        trigger = Triggers.YouCycleThis")
+    if (mayWrapped) lines.add("        optional = true")
+    if (tvar != null) lines.add("        val t = target(\"target\", $tdsl)")
+    lines.addAll(listOf("        effect = $edsl", "    }"))
+    return lines
+}
+
 /** An Activated / ActivatedWithModifiers rule -> activatedAbility { cost; [target]; effect }. */
 internal fun EmitCtx.activatedBlock(rule: JsonObject): List<String>? {
     val args = rule["args"].asArr
