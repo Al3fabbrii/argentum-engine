@@ -2680,9 +2680,15 @@ function FilterSection({
   // catalogue. `/api/sets` may include sets the backend hasn't implemented yet, and the
   // catalogue may include codes `/api/sets` doesn't know about — keep the intersection plus
   // a defensive fallback so neither source can silently swallow the other.
+  // We count both a card's canonical `setCode` and every `printingSetCodes` reprint, so
+  // reprint-only sets (e.g. 8ED, whose cards are all reprints of earlier definitions) still
+  // appear — matching the `s:` matcher, which already filters on reprint set codes.
   const availableSets = useMemo(() => {
     const codes = new Set<string>()
-    for (const c of catalog) if (c.setCode) codes.add(c.setCode)
+    for (const c of catalog) {
+      if (c.setCode) codes.add(c.setCode)
+      if (c.printingSetCodes) for (const code of c.printingSetCodes) codes.add(code)
+    }
     const present = setInfos.filter((s) => codes.has(s.code))
     const known = new Set(present.map((s) => s.code))
     for (const code of codes) {
