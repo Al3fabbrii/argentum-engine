@@ -1,6 +1,6 @@
 package com.wingedsheep.engine.mechanics.layers
-import com.wingedsheep.engine.state.components.battlefield.chosenCreatureType
 
+import com.wingedsheep.engine.state.components.battlefield.chosenCreatureType
 import com.wingedsheep.engine.state.ComponentContainer
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.AttachmentsComponent

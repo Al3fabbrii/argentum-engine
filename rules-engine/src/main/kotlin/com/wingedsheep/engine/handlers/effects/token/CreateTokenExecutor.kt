@@ -88,13 +88,13 @@ class CreateTokenExecutor(
 
         // Resolve the token's color / creature type from the source's cast-choices bag when the
         // effect sources them from a ChoiceSlot (Riptide Replicator "of the chosen color and type");
-        // otherwise use the fixed sets baked into the effect.
-        val sourceBag = effect.colorsFromChoice?.let { context.sourceId }
+        // otherwise use the fixed sets baked into the effect. Both slots live on the one source bag.
+        val sourceBag = (effect.colorsFromChoice ?: effect.creatureTypesFromChoice)
+            ?.let { context.sourceId }
             ?.let { state.getEntity(it) }
             ?.get<CastChoicesComponent>()
-            ?: effect.creatureTypesFromChoice?.let { context.sourceId }
-                ?.let { state.getEntity(it) }
-                ?.get<CastChoicesComponent>()
+        // Defensive fallbacks for a malformed state (a *FromChoice slot declared but never written):
+        // colorless for color, generic "Creature" for type — a token is always created.
         val effectiveColors = effect.colorsFromChoice?.let { slot ->
             (sourceBag?.chosen?.get(slot) as? ChoiceValue.ColorChoice)?.color?.let { setOf(it) } ?: emptySet()
         } ?: effect.colors

@@ -1,7 +1,7 @@
 package com.wingedsheep.engine.mechanics.layers
+
 import com.wingedsheep.engine.state.components.battlefield.chosenLandType
 import com.wingedsheep.engine.state.components.battlefield.chosenColor
-
 import com.wingedsheep.engine.handlers.ConditionEvaluationContext
 import com.wingedsheep.engine.handlers.ConditionEvaluator
 import com.wingedsheep.engine.handlers.DynamicAmountEvaluator
