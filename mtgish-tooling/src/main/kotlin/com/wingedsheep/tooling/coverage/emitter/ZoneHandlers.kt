@@ -75,7 +75,15 @@ internal fun EmitCtx.renderSearch(args: JsonElement?): String? {
         "PutSetAsideCardsOnTopOfLibrary" in blob || "OnTopOfLibrary" in blob -> "TOP_OF_LIBRARY"
         else -> "HAND"
     }
-    val filt = landSearchFilterDsl(args)
+    // "search for a card named X" (Avarax, Daru Cavalier, …) -> a name filter, which the land/type
+    // search filter can't express.
+    val named = Regex(""""NamedCard",\s*"args":\s*"([^"]+)"""").find(blob)?.groupValues?.get(1)
+    val searchSubtype = Regex(""""IsCreatureType",\s*"args":\s*"(\w+)"""").find(blob)?.groupValues?.get(1)
+    val filt = when {
+        named != null -> "GameObjectFilter.Any.named(\"$named\")"
+        searchSubtype != null -> "GameObjectFilter.Any.withSubtype(\"$searchSubtype\")"  // "an Elf card"
+        else -> landSearchFilterDsl(args)
+    }
     val count = findInteger(args)
     val parts = mutableListOf("filter = $filt")
     if (count is Int && count != 1) parts.add("count = $count")
