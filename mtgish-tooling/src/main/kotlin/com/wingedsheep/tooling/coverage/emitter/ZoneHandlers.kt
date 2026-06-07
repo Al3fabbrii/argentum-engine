@@ -83,6 +83,10 @@ internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
         (findInteger(args) as? Int)?.let { call("Patterns.Library.surveil", arg("$it")) }
     }
 
+    on("Scry") { _, args, _ ->  // "Scry N" -> look-top, reorder/bottom pipeline
+        (findInteger(args) as? Int)?.let { call("Patterns.Library.scry", arg("$it")) }
+    }
+
     on("ReturnGraveyardCardToHand") { _, args, _ ->
         // "Return this card from your graveyard to your hand" (Gangrenous Goliath's graveyard ability). Only
         // the self (this graveyard card) form renders; a chosen graveyard-card target scaffolds.
