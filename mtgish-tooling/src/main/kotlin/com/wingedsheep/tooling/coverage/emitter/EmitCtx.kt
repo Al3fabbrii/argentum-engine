@@ -188,7 +188,12 @@ internal fun EmitCtx.dynamicAmountExpr(node: JsonElement?): Dsl? {
     if (gn != null && "ThisWay" in gn) return null
     if ((gn != null && "NumberOf" in gn) || gn == "TheNumberOfPermanentsOnTheBattlefield") {
         val oracle = oracleText?.lowercase() ?: ""
-        if (" hand" in oracle || " in it" in oracle) return null
+        // The hand/"in it" guard catches a generic "NumberOf" count that's really about hand cards. It must
+        // NOT fire for an explicit battlefield count (TheNumberOfPermanentsOnTheBattlefield) — a card may
+        // mention "hand" elsewhere in its text (e.g. Slate of Ancestry's "Discard your hand" cost) while the
+        // count itself is unambiguously a battlefield tally.
+        val battlefieldCount = gn == "TheNumberOfPermanentsOnTheBattlefield"
+        if (!battlefieldCount && (" hand" in oracle || " in it" in oracle)) return null
         val player = when {
             "attacking you" in oracle -> "Player.Opponent"
             "on the battlefield" in oracle -> "Player.Each"
