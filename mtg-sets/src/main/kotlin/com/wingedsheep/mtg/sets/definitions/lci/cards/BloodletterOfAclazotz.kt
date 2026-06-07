@@ -19,7 +19,7 @@ import com.wingedsheep.sdk.scripting.references.Player
  *
  * Implementation note: the doubling is applied at the life-total reduction step in
  * `DamageUtils` (both for direct life loss and for damage that causes life loss per
- * CR 119.3). Lifelink and other damage-based effects continue to see the original
+ * CR 120.3a). Lifelink and other damage-based effects continue to see the original
  * damage amount, matching the printed ruling.
  */
 val BloodletterOfAclazotz = card("Bloodletter of Aclazotz") {

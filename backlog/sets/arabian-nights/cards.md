@@ -2,7 +2,7 @@
 
 **Set Size:** 78 cards
 **Release Date:** December 17, 1993
-**Implemented:** 60 / 78
+**Implemented:** 61 / 78
 | Color | Count |
 |-------|-------|
 | White | 11 |
@@ -50,7 +50,7 @@
 - [x] Stone-Throwing Devils
 - [x] Aladdin
 - [x] Ali Baba
-- [ ] Ali from Cairo
+- [x] Ali from Cairo
 - [x] Bird Maiden
 - [x] Desert Nomads
 - [x] Hurr Jackal

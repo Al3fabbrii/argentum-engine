@@ -151,6 +151,46 @@
     ]
 }
 
+// Ali from Cairo
+{
+    "name": "Ali from Cairo",
+    "manaCost": "{2}{R}{R}",
+    "typeLine": "Creature — Human",
+    "oracleText": "Damage that would reduce your life total to less than 1 reduces it to 1 instead.",
+    "creatureStats": {
+        "power": 0,
+        "toughness": 1
+    },
+    "script": {
+        "replacementEffects": [
+            "LifeLossFloor"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "36",
+        "rarity": "RARE",
+        "artist": "Mark Poole",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/2/42027613-d261-4ce2-8ba1-7a2480c660f8.jpg?1562907105",
+        "rulings": [
+            {
+                "date": "2004-10-04",
+                "text": "This effect does not apply to effects which reduce your life without doing damage."
+            },
+            {
+                "date": "2004-10-04",
+                "text": "The ability works up until Ali enters the graveyard, so if he takes lethal damage or is destroyed at the same time you take damage, the ability helps you. If the damage occurs after it goes to the graveyard, however, it is not affected by the Ali which is no longer on the battlefield."
+            },
+            {
+                "date": "2004-10-04",
+                "text": "This effect does not prevent damage, it prevents the damage from turning into loss of life. So the full damage is dealt (and abilities that trigger on damage being dealt still trigger), but the full loss of life is not applied."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Army of Allah
 {
     "name": "Army of Allah",

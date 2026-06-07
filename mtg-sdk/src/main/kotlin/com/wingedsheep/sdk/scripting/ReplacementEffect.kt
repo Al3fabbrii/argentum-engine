@@ -799,6 +799,73 @@ data class ModifyLifeLoss(
     }
 }
 
+/**
+ * Floor the resulting life total when a player would lose life from damage.
+ *
+ * If a damage event would reduce the [appliesTo]-matching player's life total below
+ * [floor], the life-loss amount is capped so the resulting life total equals [floor].
+ * Damage that would not breach the floor is unchanged. The damage event itself still
+ * fires at the original amount — only the life-total reduction is capped — so
+ * lifelink, damage-dealt triggers, and abilities that key off the dealt damage still
+ * see the full amount, matching the printed ruling on Ali from Cairo: "the full
+ * damage is dealt (and abilities that trigger on damage being dealt still trigger),
+ * but the full loss of life is not applied."
+ *
+ * Scope: damage-as-life-loss (CR 120.3a) only. Direct life-loss effects (pay-life
+ * costs, Drain Life, Greed) are deliberately unaffected — the engine wires this
+ * replacement only at the damage-pipeline call sites; `LoseLifeExecutor` skips it,
+ * matching the ruling "This effect does not apply to effects which reduce your life
+ * without doing damage."
+ *
+ * Multiple instances pick the strictest floor (highest resulting life total).
+ *
+ * Examples:
+ * - Ali from Cairo ("Damage that would reduce your life total to less than 1
+ *   reduces it to 1 instead"):
+ *     `LifeLossFloor(floor = 1, appliesTo = LifeLossEvent(Player.You))`
+ * - Worship ("If you control a creature, damage that would reduce your life total
+ *   to less than 1 reduces it to 1 instead"):
+ *     `LifeLossFloor(floor = 1, restrictions = listOf(YouControlACreature),
+ *                    appliesTo = LifeLossEvent(Player.You))`
+ *
+ * @param floor Minimum resulting life total (default 1).
+ * @param restrictions Additional [Condition]s gating when this floor applies.
+ *        Evaluated against the source permanent's controller; ALL must hold.
+ * @param appliesTo Life-loss event filter (which player is protected).
+ */
+@SerialName("LifeLossFloor")
+@Serializable
+data class LifeLossFloor(
+    val floor: Int = 1,
+    val restrictions: List<Condition> = emptyList(),
+    override val appliesTo: EventPattern = EventPattern.LifeLossEvent()
+) : ReplacementEffect {
+    override val description: String = buildString {
+        val restrictionDesc = restrictions.joinToString(" and ") { it.description.removePrefix("if ") }
+        if (restrictionDesc.isNotEmpty()) {
+            append(restrictionDesc.replaceFirstChar { it.uppercase() })
+            append(", damage")
+        } else {
+            append("Damage")
+        }
+        append(" that would reduce ")
+        when ((appliesTo as? EventPattern.LifeLossEvent)?.player) {
+            Player.You -> append("your")
+            Player.Opponent, Player.EachOpponent -> append("an opponent's")
+            else -> append("a player's")
+        }
+        append(" life total to less than $floor reduces it to $floor instead")
+    }
+
+    override fun applyTextReplacement(replacer: TextReplacer): ReplacementEffect {
+        val newAppliesTo = appliesTo.applyTextReplacement(replacer)
+        val newRestrictions = restrictions.map { it.applyTextReplacement(replacer) }
+        val anyChanged = newAppliesTo !== appliesTo ||
+            newRestrictions.zip(restrictions).any { (n, o) -> n !== o }
+        return if (anyChanged) copy(appliesTo = newAppliesTo, restrictions = newRestrictions) else this
+    }
+}
+
 // =============================================================================
 // Copy Replacement Effects
 // =============================================================================

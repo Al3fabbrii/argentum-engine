@@ -2744,6 +2744,16 @@ replacementEffect {
   instances stack (×s multiply, +s sum) — two Leylines of Hope add 2 to every life-gain event.
 - `ModifyLifeLoss(multiplier, modifier, restrictions, appliesTo)` — same shape as `ModifyLifeGain` for life loss
   events (`LifeLossEvent`), plus a `restrictions: List<Condition>` list that further gates the replacement.
+- `LifeLossFloor(floor, restrictions, appliesTo)` — cap damage-induced life loss so the resulting life total
+  is ≥ `floor`. `appliesTo` is a `LifeLossEvent` whose `player` filter gates who is protected (default
+  `Player.Each`); `restrictions: List<Condition>` (evaluated against the source's controller) further
+  gates the floor — same shape as `ModifyLifeLoss.restrictions`. **Scope:** damage-as-life-loss only
+  (CR 120.3a); `LoseLifeExecutor` deliberately skips this step so pay-life costs and direct life-loss
+  effects bypass the floor (matching the Ali from Cairo ruling "does not apply to effects which reduce
+  your life without doing damage"). The damage event still fires at the original amount, so lifelink
+  and damage-dealt triggers see the full damage. Multiple instances pick the strictest floor. Used by
+  Ali from Cairo (`LifeLossFloor(floor = 1, appliesTo = LifeLossEvent(Player.You))`); Worship adds a
+  `restrictions = listOf(YouControlACreature)` gate.
 - `PreventLifeGain(appliesTo)` — life gain matching the event is fully prevented (Sulfuric Vortex, Erebos).
 - Custom — implement the `ReplacementEffect` interface directly.
 
