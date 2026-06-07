@@ -82,6 +82,10 @@ object CombatRemovalHelper {
                 val attackerEntity = newState.getEntity(attackerId) ?: continue
                 val blockedComponent = attackerEntity.get<BlockedComponent>() ?: continue
                 val updatedBlockerIds = blockedComponent.blockerIds - targetId
+                // "Sole blocker" is judged from the CURRENT blocker set (empty after removing this
+                // creature), not from who blocked it when combat began. Ydwen's oracle says "blocked by
+                // only this creature this combat"; we have no per-combat became-blocked-by history, so a
+                // contrived case (another blocker left earlier in the same combat) is treated as sole.
                 newState = if (unblockSoleBlockedAttackers && updatedBlockerIds.isEmpty()) {
                     newState.updateEntity(attackerId) { container ->
                         container
