@@ -853,11 +853,13 @@ internal class CombatDamageManager(
             return newState
         }
 
-        // Reduce life. Per CR 119.3, damage causes life loss, so life-loss
-        // replacements (Bloodletter of Aclazotz) modify the life total reduction here.
-        // Lifelink and tracking still see the unmodified `effectiveAmount`.
+        // Reduce life. Per CR 120.3a, damage to a player without infect causes that
+        // player to lose that much life, so life-loss replacements (Bloodletter of
+        // Aclazotz) modify the life total reduction here. Lifelink and tracking still
+        // see the unmodified `effectiveAmount`.
         val currentLife = newState.getEntity(targetId)?.get<LifeTotalComponent>()?.life ?: return newState
-        val lifeLossAmount = DamageUtils.applyStaticLifeLossModification(newState, targetId, effectiveAmount)
+        var lifeLossAmount = DamageUtils.applyStaticLifeLossModification(newState, targetId, effectiveAmount)
+        lifeLossAmount = DamageUtils.applyLifeLossFloors(newState, targetId, currentLife, lifeLossAmount)
         val newLife = currentLife - lifeLossAmount
         newState = newState.updateEntity(targetId) { container ->
             container.with(LifeTotalComponent(newLife))

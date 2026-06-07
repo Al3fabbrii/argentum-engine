@@ -41,12 +41,16 @@ import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.CapDamage
 import com.wingedsheep.sdk.scripting.DamageCantBePrevented
 import com.wingedsheep.sdk.scripting.DoubleDamage
+import com.wingedsheep.sdk.scripting.EventPattern
 import com.wingedsheep.sdk.scripting.ModifyDamageAmount
+import com.wingedsheep.sdk.scripting.LifeLossFloor
 import com.wingedsheep.sdk.scripting.ModifyLifeLoss
 import com.wingedsheep.sdk.scripting.PreventDamage
 import com.wingedsheep.sdk.scripting.PreventLifeGain
 import com.wingedsheep.sdk.scripting.RedirectDamage
 import com.wingedsheep.sdk.scripting.ReplaceDamageWithCounters
+import com.wingedsheep.sdk.scripting.ReplacementEffect
+import com.wingedsheep.sdk.scripting.conditions.Condition
 import com.wingedsheep.sdk.scripting.events.DamageType
 import com.wingedsheep.sdk.scripting.events.RecipientFilter
 import com.wingedsheep.sdk.scripting.events.SourceFilter
@@ -189,11 +193,12 @@ object DamageUtils {
         val lifeComponent = newState.getEntity(targetId)?.get<LifeTotalComponent>()
         val projected = newState.projectedState
         if (lifeComponent != null) {
-            // CR 119.3: damage to a player causes that player to lose life, so life-loss
-            // replacements (Bloodletter of Aclazotz) modify the life total reduction here.
-            // Lifelink and other damage-based effects below still see the unmodified
-            // `effectiveAmount`, matching the official ruling.
-            val lifeLossAmount = applyStaticLifeLossModification(newState, targetId, effectiveAmount)
+            // CR 120.3a: damage to a player by a source without infect causes that player
+            // to lose that much life, so life-loss replacements (Bloodletter of Aclazotz)
+            // modify the life total reduction here. Lifelink and other damage-based effects
+            // below still see the unmodified `effectiveAmount`, matching the official ruling.
+            var lifeLossAmount = applyStaticLifeLossModification(newState, targetId, effectiveAmount)
+            lifeLossAmount = applyLifeLossFloors(newState, targetId, lifeComponent.life, lifeLossAmount)
             val newLife = lifeComponent.life - lifeLossAmount
             newState = newState.updateEntity(targetId) { container ->
                 container.with(LifeTotalComponent(newLife))
@@ -274,8 +279,8 @@ object DamageUtils {
         val targetWasCreature = projected.isCreature(targetId)
         events.add(DamageDealtEvent(sourceId, targetId, effectiveAmount, false, sourceName = sourceName, targetName = targetName, targetIsPlayer = targetIsPlayer, targetWasFaceDown = targetIsFaceDown, targetControllerId = targetControllerId, targetWasCreature = targetWasCreature, excessAmount = creatureExcessDamage))
 
-        // Lifelink: if the source has lifelink, its controller gains life equal to the damage dealt (Rule 702.15).
-        // Per CR 119.3 / 702.15b the lifelink damage causes a life-gain event; ModifyLifeGain
+        // Lifelink: if the source has lifelink, its controller gains life equal to the damage dealt
+        // (CR 120.3f / 702.15b). The lifelink damage causes a life-gain event, so ModifyLifeGain
         // (Alhammarret's Archive, Leyline of Hope) replaces the actual amount gained.
         if (sourceId != null) {
             val projected = newState.projectedState
@@ -1267,7 +1272,7 @@ object DamageUtils {
      *
      * Multiple matching effects are applied in iteration order. Used both by direct
      * life-loss effects (LoseLifeExecutor) and by damage that reduces a player's life
-     * total (CR 119.3).
+     * total (CR 120.3a).
      */
     fun applyStaticLifeLossModification(
         state: GameState,
@@ -1277,19 +1282,67 @@ object DamageUtils {
         if (amount <= 0) return 0
 
         var modifiedAmount = amount
+        forEachLifeLossReplacement<ModifyLifeLoss>(state, losingPlayerId, { it.restrictions }) { effect ->
+            modifiedAmount = (modifiedAmount * effect.multiplier) + effect.modifier
+            if (modifiedAmount < 0) modifiedAmount = 0
+        }
+        return modifiedAmount
+    }
 
+    /**
+     * Apply life-loss floor replacement effects ([LifeLossFloor]) so the resulting
+     * life total does not fall below each effect's floor.
+     *
+     * Called only from the damage → life-loss pipeline (CR 120.3a); direct life-loss
+     * effects ([com.wingedsheep.engine.handlers.effects.life.LoseLifeExecutor]) skip
+     * this step, matching the printed ruling on Ali from Cairo: "This effect does
+     * not apply to effects which reduce your life without doing damage."
+     *
+     * Multiple matching floors pick the strictest (highest resulting life total).
+     */
+    fun applyLifeLossFloors(
+        state: GameState,
+        losingPlayerId: EntityId,
+        currentLife: Int,
+        amount: Int
+    ): Int {
+        if (amount <= 0) return amount
+
+        var modifiedAmount = amount
+        forEachLifeLossReplacement<LifeLossFloor>(state, losingPlayerId, { it.restrictions }) { effect ->
+            val maxLossAllowed = (currentLife - effect.floor).coerceAtLeast(0)
+            if (modifiedAmount > maxLossAllowed) modifiedAmount = maxLossAllowed
+        }
+        return modifiedAmount
+    }
+
+    /**
+     * Visit every battlefield replacement effect of type [T] whose `appliesTo`
+     * is a [EventPattern.LifeLossEvent] matching [losingPlayerId] and whose
+     * [restrictionsOf]-extracted conditions all hold against the source's controller.
+     *
+     * Shared scaffold for [applyStaticLifeLossModification] (`ModifyLifeLoss`)
+     * and [applyLifeLossFloors] (`LifeLossFloor`); each function keeps the actual
+     * arithmetic in its callback.
+     */
+    private inline fun <reified T : ReplacementEffect> forEachLifeLossReplacement(
+        state: GameState,
+        losingPlayerId: EntityId,
+        restrictionsOf: (T) -> List<Condition>,
+        action: (T) -> Unit
+    ) {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
             val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
-                if (effect !is ModifyLifeLoss) continue
+                if (effect !is T) continue
 
-                val lifeLossEvent = effect.appliesTo
-                if (lifeLossEvent !is com.wingedsheep.sdk.scripting.EventPattern.LifeLossEvent) continue
+                val pattern = effect.appliesTo
+                if (pattern !is EventPattern.LifeLossEvent) continue
 
-                val playerMatches = when (lifeLossEvent.player) {
+                val playerMatches = when (pattern.player) {
                     Player.Each, Player.Any -> true
                     Player.You -> losingPlayerId == sourceControllerId
                     Player.Opponent, Player.EachOpponent -> losingPlayerId != sourceControllerId
@@ -1297,22 +1350,20 @@ object DamageUtils {
                 }
                 if (!playerMatches) continue
 
-                if (effect.restrictions.isNotEmpty()) {
+                val restrictions = restrictionsOf(effect)
+                if (restrictions.isNotEmpty()) {
                     val opponentId = state.turnOrder.firstOrNull { it != sourceControllerId }
                     val context = EffectContext(
                         sourceId = entityId,
                         controllerId = sourceControllerId,
                         opponentId = opponentId,
                     )
-                    if (effect.restrictions.any { !conditionEvaluator.evaluate(state, it, context) }) continue
+                    if (restrictions.any { !conditionEvaluator.evaluate(state, it, context) }) continue
                 }
 
-                modifiedAmount = (modifiedAmount * effect.multiplier) + effect.modifier
-                if (modifiedAmount < 0) modifiedAmount = 0
+                action(effect)
             }
         }
-
-        return modifiedAmount
     }
 
     /**
