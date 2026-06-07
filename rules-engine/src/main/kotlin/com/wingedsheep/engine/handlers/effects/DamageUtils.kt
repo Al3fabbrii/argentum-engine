@@ -68,6 +68,18 @@ object DamageUtils {
     lateinit var cardRegistry: CardRegistry
 
     /**
+     * Controller of a battlefield permanent that hosts a replacement effect, honoring
+     * control-changing effects (CR 613.1b, Layer 2). The "you" / "an opponent" filters on
+     * damage and life-loss replacements are resolved relative to this controller, so they
+     * must follow the *current* controller, not the printed one — a stolen Bloodletter of
+     * Aclazotz or Ali from Cairo retargets to the thief. Falls back to the base
+     * [ControllerComponent] only for entities with no projected entry.
+     */
+    private fun replacementHostController(state: GameState, entityId: EntityId): EntityId? =
+        state.projectedState.getController(entityId)
+            ?: state.getEntity(entityId)?.get<ControllerComponent>()?.playerId
+
+    /**
      * Deal damage to a target (player or creature).
      *
      * @param state The current game state
@@ -544,16 +556,11 @@ object DamageUtils {
                 val lifeGainEvent = effect.appliesTo
                 if (lifeGainEvent !is com.wingedsheep.sdk.scripting.EventPattern.LifeGainEvent) continue
 
+                val sourceControllerId = replacementHostController(state, entityId)
                 when (lifeGainEvent.player) {
                     Player.Each -> return true
-                    Player.You -> {
-                        val sourceControllerId = container.get<ControllerComponent>()?.playerId
-                        if (playerId == sourceControllerId) return true
-                    }
-                    Player.Opponent -> {
-                        val sourceControllerId = container.get<ControllerComponent>()?.playerId
-                        if (playerId != sourceControllerId) return true
-                    }
+                    Player.You -> if (playerId == sourceControllerId) return true
+                    Player.Opponent -> if (playerId != sourceControllerId) return true
                     else -> {}
                 }
             }
@@ -745,7 +752,7 @@ object DamageUtils {
             if (entityId in appliedRedirects) continue
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is RedirectDamage) continue
@@ -943,7 +950,7 @@ object DamageUtils {
             if (remainingDamage <= 0) break
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (remainingDamage <= 0) break
@@ -1059,7 +1066,7 @@ object DamageUtils {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is DoubleDamage) continue
@@ -1105,7 +1112,7 @@ object DamageUtils {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is ModifyDamageAmount) continue
@@ -1210,7 +1217,7 @@ object DamageUtils {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is CapDamage) continue
@@ -1334,7 +1341,7 @@ object DamageUtils {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is T) continue
@@ -1406,7 +1413,7 @@ object DamageUtils {
         for (entityId in state.getBattlefield()) {
             val container = state.getEntity(entityId) ?: continue
             val replacementComponent = container.get<ReplacementEffectSourceComponent>() ?: continue
-            val sourceControllerId = container.get<ControllerComponent>()?.playerId ?: continue
+            val sourceControllerId = replacementHostController(state, entityId) ?: continue
 
             for (effect in replacementComponent.replacementEffects) {
                 if (effect !is ReplaceDamageWithCounters) continue
