@@ -703,6 +703,8 @@ function LobbyOverlay({
   const [setSearch, setSetSearch] = useState('')
   // Partially-implemented sets are hidden by default; the host opts into them with this toggle.
   const [showPartialSets, setShowPartialSets] = useState(false)
+  // Hide thin sets (lots of partial sets have only a handful of cards). Defaults to 50.
+  const [minCards, setMinCards] = useState(50)
 
   // Show tournament standings when tournament is active
   if (tournamentState) {
@@ -759,12 +761,18 @@ function LobbyOverlay({
     .map((code) => allSets.find((s) => s.code === code))
     .filter((s): s is AvailableSet => s != null)
 
-  // Partial (not-fully-implemented) sets are hidden unless the host flips the toggle. A partial set
-  // that's already selected stays visible regardless, so the host can still see/untick it here.
+  // Picker visibility rules (an already-selected set always stays visible so it can be un-ticked):
+  //  - partial sets are hidden unless the host flips the toggle, and
+  //  - sets with fewer than `minCards` implemented cards are pruned (kills the long tail of
+  //    near-empty sets you'd otherwise see once partial sets are shown).
   const partialSetCount = allSets.filter((s) => s.partial).length
-  const pickerSets = showPartialSets
-    ? allSets
-    : allSets.filter((s) => !s.partial || lobbyState.settings.setCodes.includes(s.code))
+  const isSetSelected = (s: AvailableSet) => lobbyState.settings.setCodes.includes(s.code)
+  const pickerSets = allSets.filter((s) => {
+    if (isSetSelected(s)) return true
+    if (s.partial && !showPartialSets) return false
+    if ((s.implementedCount ?? 0) < minCards) return false
+    return true
+  })
 
   // Searchable multi-select inside the modal — match on set name or code, like the deckbuilder picker.
   const setSearchNeedle = setSearch.trim().toLowerCase()
@@ -1512,29 +1520,54 @@ function LobbyOverlay({
                 autoFocus
                 onChange={(e) => setSetSearch(e.target.value)}
               />
-              <label className={styles.setPickerToggle}>
-                <input
-                  type="checkbox"
-                  checked={showPartialSets}
-                  onChange={(e) => setShowPartialSets(e.target.checked)}
-                />
-                <span className={styles.setPickerToggleLabel}>
-                  Show partially implemented sets
-                  {partialSetCount > 0 && (
-                    <span className={styles.setPickerToggleCount}> ({partialSetCount})</span>
-                  )}
-                </span>
-              </label>
+              <div className={styles.setPickerFilters}>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showPartialSets}
+                  className={`${styles.setPickerSwitch} ${showPartialSets ? styles.setPickerSwitchOn : ''}`}
+                  onClick={() => setShowPartialSets((v) => !v)}
+                >
+                  <span className={styles.setPickerSwitchTrack} aria-hidden>
+                    <span className={styles.setPickerSwitchThumb} />
+                  </span>
+                  <span className={styles.setPickerSwitchLabel}>
+                    Show partial sets
+                    {partialSetCount > 0 && (
+                      <span className={styles.setPickerSwitchCount}>{partialSetCount}</span>
+                    )}
+                  </span>
+                </button>
+                <label className={styles.setPickerMinCards}>
+                  <span className={styles.setPickerMinCardsLabel}>Min cards</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={10}
+                    inputMode="numeric"
+                    className={styles.setPickerMinCardsInput}
+                    value={minCards}
+                    onChange={(e) => setMinCards(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+                  />
+                </label>
+              </div>
               <p className={styles.setPickerNote}>
                 Sets tagged <span className={styles.setPartialBadge}>partial</span> aren't fully
-                implemented — their boosters draw from a reduced pool of the cards that exist. They're
-                hidden by default; tick the box above to pick from every set.
+                implemented — their boosters draw from a reduced pool of the cards that exist.
               </p>
               <div className={styles.setPickerList}>
                 {filteredPickerSets.length > 0 ? (
                   renderGroupedSetRows(filteredPickerSets)
                 ) : (
-                  <div className={styles.setPickerEmpty}>No sets match your search.</div>
+                  <div className={styles.setPickerEmpty}>
+                    No sets match.{' '}
+                    {!showPartialSets && partialSetCount > 0
+                      ? 'Try enabling partial sets'
+                      : minCards > 0
+                        ? 'Try lowering the minimum card count'
+                        : 'Try a different search'}
+                    .
+                  </div>
                 )}
               </div>
             </div>

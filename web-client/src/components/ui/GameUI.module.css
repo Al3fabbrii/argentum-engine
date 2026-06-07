@@ -1418,36 +1418,109 @@
   color: var(--text-disabled);
 }
 
-.setPickerToggle {
+/* Filter bar: partial-sets switch on the left, min-cards stepper on the right. */
+.setPickerFilters {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
-  padding: 8px 10px;
+  padding: 7px 10px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
+}
+
+/* iOS-style toggle switch (the native checkbox is replaced by track + thumb). */
+.setPickerSwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  background: none;
+  border: none;
   cursor: pointer;
   user-select: none;
-}
-
-.setPickerToggle:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.setPickerToggle input {
-  cursor: pointer;
-  accent-color: var(--color-accent-dark);
-}
-
-.setPickerToggleLabel {
   font-size: var(--font-sm);
   color: var(--text-secondary);
 }
 
-.setPickerToggleCount {
-  color: var(--text-disabled);
+.setPickerSwitchTrack {
+  position: relative;
+  flex-shrink: 0;
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-strong);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.setPickerSwitchThumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.setPickerSwitchOn .setPickerSwitchTrack {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+}
+
+.setPickerSwitchOn .setPickerSwitchThumb {
+  background: #fff;
+  transform: translateX(16px);
+}
+
+.setPickerSwitch:hover .setPickerSwitchLabel {
+  color: var(--text-primary);
+}
+
+.setPickerSwitchLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.setPickerSwitchCount {
+  padding: 0 6px;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+}
+
+.setPickerMinCards {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.setPickerMinCardsInput {
+  width: 64px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+}
+
+.setPickerMinCardsInput:focus {
+  border-color: var(--color-accent-dark);
 }
 
 .setPickerNote {
@@ -1465,23 +1538,36 @@
   overflow-y: auto;
 }
 
+/* A block (Onslaught, Invasion, …) is drawn as one outlined, inset card so its member sets
+ * read as a group, visually distinct from the standalone sets rendered as bare rows. */
 .setPickerGroup {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
 }
 
 .setPickerGroupLabel {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 4px 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 6px;
   font-size: var(--font-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--text-tertiary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: linear-gradient(180deg, rgba(20, 20, 30, 0.98), rgba(20, 20, 30, 0.92));
+}
+
+/* Trailing rule so the label reads as a header for the grouped rows below it. */
+.setPickerGroupLabel::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-medium);
 }
 
 .setPickerRow {
