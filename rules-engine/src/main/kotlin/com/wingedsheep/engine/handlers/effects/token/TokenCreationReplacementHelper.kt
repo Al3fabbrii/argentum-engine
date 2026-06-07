@@ -206,7 +206,7 @@ object TokenCreationReplacementHelper {
      * "enters with N counters" replacement effects (e.g., Burdened Stoneback's "this
      * creature enters with two -1/-1 counters"), applied via
      * [EntersWithCountersHelper.applyEntersWithCounters]. Summoning sickness is added
-     * only when the copy is itself a creature (CR 302.1).
+     * only when the copy is itself a creature (CR 302.6).
      */
     fun createAttachedPermanentCopies(
         state: GameState,
