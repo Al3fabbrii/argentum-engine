@@ -222,7 +222,17 @@ object Analyzer {
     }
 
     // --- cross-set capability index (aggregate every set's blocked-feature leaderboard) ----------
-    data class CrossRow(val disc: String, val value: String, val count: Int, val sets: Int, val verdict: String)
+    /** A missing-capability card the index ranks: which set it lives in and its name. */
+    data class CrossCard(val set: String, val name: String)
+    data class CrossRow(
+        val disc: String,
+        val value: String,
+        val count: Int,
+        val sets: Int,
+        val verdict: String,
+        /** The blocked, unimplemented cards this capability would unlock — set-qualified, drill-down fodder. */
+        val cards: List<CrossCard>,
+    )
 
     private var crossCache: List<CrossRow>? = null
 
@@ -232,18 +242,26 @@ object Analyzer {
         val agg = Counter<Pair<String, String>>()
         val setCount = HashMap<Pair<String, String>, Int>()
         val verdict = HashMap<Pair<String, String>, String>()
+        val cardsByKey = HashMap<Pair<String, String>, MutableList<CrossCard>>()
         val all = sets()
         for ((i, ref) in all.withIndex()) {
             progress(i + 1, all.size)
-            for (row in detail(ref.code).leaderboard) {
+            val d = detail(ref.code)
+            for (row in d.leaderboard) {
                 val key = row.disc to row.value
                 agg.add(key, row.count)
                 setCount[key] = (setCount[key] ?: 0) + 1
                 verdict[key] = row.verdict
             }
+            // The same blocked-unimplemented cards the leaderboard counts, kept per capability so the
+            // TUI can drill from a row into the actual cards adding that mapping would unlock.
+            for (cv in d.cards) {
+                if (cv.implemented || cv.gen != Gen.BLOCKED) continue
+                for (b in cv.blockers) cardsByKey.getOrPut(b.disc to b.value) { mutableListOf() }.add(CrossCard(ref.code, cv.name))
+            }
         }
         return agg.mostCommon()
-            .map { (key, c) -> CrossRow(key.first, key.second, c, setCount[key] ?: 0, verdict[key] ?: "") }
+            .map { (key, c) -> CrossRow(key.first, key.second, c, setCount[key] ?: 0, verdict[key] ?: "", cardsByKey[key] ?: emptyList()) }
             .also { crossCache = it }
     }
 

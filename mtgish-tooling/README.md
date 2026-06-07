@@ -76,11 +76,14 @@ rather than re-implementing coverage logic, and memoizes per-set results so a ke
   DSL, syntax-highlighted, above a `⚠ missing mappings` block listing the still-unmapped capabilities;
   **capabilities** lists every required capability with its verdict + which sets implement the card.
 - **`c`** — the cross-set capability index: every set's leaderboard rolled into one ranking of "what
-  engine work unlocks the most cards everywhere" (computed on demand, with a progress bar).
+  engine work unlocks the most cards everywhere" (computed on demand, with a progress bar). `→`/`enter`
+  on a row drills into the set-qualified list of blocked cards that mapping would unlock, and `→` again
+  opens any of those cards' detail (Kotlin / capabilities) in its own set's context.
 - **`f` / `--scan`** — full scan: analyze every set up front (fills all `gN` counts + the global
   total; also makes `c` instant).
-- Keys: `↑↓`/`jk` move · `→`/`enter` drill in · `←`/`esc` back · `tab` Kotlin/capabilities · `/`
-  search/filter · `s` sort · `f` scan-all · `r` fetch a set from Scryfall · `c` cross-set · `q` quit.
+- Keys: `↑↓`/`jk` move · `→`/`enter` drill in (set → cards → detail, or cross-set capability → cards
+  it unlocks → detail) · `←`/`esc` back · `tab` Kotlin/capabilities · `/` search/filter · `s` sort ·
+  `f` scan-all · `r` fetch a set from Scryfall · `c` cross-set · `q` quit.
   Needs an interactive terminal (drives `/dev/tty` via `stty`).
 
 The dashboard adds no runtime dependency — it uses raw ANSI escapes and `stty` raw mode

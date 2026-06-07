@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
  * Wired into `just coverage-dashboard` (see Main.kt `dashboard` subcommand).
  */
 object Dashboard {
-    private enum class Mode { SETS, CARDS, CARD, CROSS }
+    private enum class Mode { SETS, CARDS, CARD, CROSS, CROSS_CARDS }
     private enum class Sort { DATE, ALPHA }
 
     private val tty = RawTerminal()
@@ -31,10 +31,13 @@ object Dashboard {
     private var reqScroll = 0
     private var crossSel = 0
     private var crossScroll = 0
+    private var crossCardSel = 0
+    private var crossCardScroll = 0
     private var filter = "" // card-list filter (CARDS mode)
     private var setFilter = "" // set-list search (SETS mode)
     private var filtering = false
     private var cardName: String? = null
+    private var cardFrom = Mode.CARDS // which mode the CARD detail was opened from (back returns here)
     private var cardCodeView = true // card detail shows generated Kotlin (vs the capability list)
     private var highlightName: String? = null // which card `highlightLines` was tokenized for
     private var highlightLines: List<List<KotlinHighlight.Tok>> = emptyList()
@@ -96,7 +99,7 @@ object Dashboard {
 
     /** First visit to a set blocks on analysis (and, on the very first, the 29MB IR) — show a frame. */
     private fun ensureCurrentComputed(rows: Int, cols: Int) {
-        if (mode == Mode.CROSS) return
+        if (mode == Mode.CROSS || mode == Mode.CROSS_CARDS) return
         val code = currentCode().ifEmpty { return }
         if (!Analyzer.isComputed(code) && Analyzer.counts(code).total > 0) {
             val note = if (Analyzer.indexLoaded()) "" else "  (loading mtgish IR, first run only)"
@@ -111,6 +114,8 @@ object Dashboard {
         val bodyH = max(1, rows - 2)
         val body: List<String> = if (mode == Mode.CROSS) {
             buildCross(bodyH, cols)
+        } else if (mode == Mode.CROSS_CARDS) {
+            buildCrossCards(bodyH, cols)
         } else {
             val leftW = max(28, min(48, cols * 2 / 5))
             val rightW = max(1, cols - leftW - 1)
@@ -119,7 +124,7 @@ object Dashboard {
                 Mode.SETS -> buildSetDetail(bodyH, rightW)
                 Mode.CARDS -> buildCardList(bodyH, rightW)
                 Mode.CARD -> buildCardDetail(bodyH, rightW)
-                Mode.CROSS -> emptyList()
+                Mode.CROSS, Mode.CROSS_CARDS -> emptyList()
             }
             val sep = Ansi.style("│", Ansi.fg(Ansi.DARKGREY))
             (0 until bodyH).map { i ->
@@ -156,7 +161,8 @@ object Dashboard {
             Mode.SETS -> "↑↓ set · → cards · / search · s sort:${if (sortMode == Sort.DATE) "date" else "a-z"} · f scan-all · c cross · q quit"
             Mode.CARDS -> "↑↓ card · → detail · ← sets · / filter · c cross-set · q quit"
             Mode.CARD -> "↑↓ scroll · tab Kotlin/capabilities · ← cards · q quit"
-            Mode.CROSS -> "↑↓ scroll · ← back · q quit"
+            Mode.CROSS -> "↑↓ capability · → cards it unlocks · ← back · q quit"
+            Mode.CROSS_CARDS -> "↑↓ card · → detail · ← capabilities · q quit"
         }
         return Ansi.style(Ansi.fit(" $help", cols), Ansi.fg(Ansi.GREY))
     }
@@ -368,6 +374,33 @@ object Dashboard {
         return lines
     }
 
+    /** Drill-down of a single cross-set capability: the blocked cards adding that mapping would unlock. */
+    private fun buildCrossCards(h: Int, w: Int): List<String> {
+        val row = cross?.getOrNull(crossSel)
+        val lines = ArrayList<String>()
+        if (row == null) { lines.add(Ansi.fit(" no capability selected", w)); return padTo(lines, h, w) }
+        val cards = row.cards
+        if (crossCardSel >= cards.size) crossCardSel = max(0, cards.size - 1)
+        val gap = row.verdict == "MISSING"
+        val tag = if (gap) "GAP" else "?? "
+        val noun = if (cards.size == 1) "card" else "cards"
+        val head = " [$tag] ${row.disc} = ${row.value}  —  ${cards.size} $noun it would unlock across ${row.sets} set${if (row.sets == 1) "" else "s"}"
+        lines.add(Ansi.style(Ansi.fit(head, w), Ansi.BOLD, Ansi.fg(Ansi.WHITE), Ansi.bg(Ansi.DARKGREY)))
+        val listH = h - 1
+        crossCardScroll = clampScroll(crossCardSel, crossCardScroll, listH, cards.size)
+        for (rowIdx in 0 until listH) {
+            val idx = crossCardScroll + rowIdx
+            if (idx >= cards.size) { lines.add(" ".repeat(w)); continue }
+            val cc = cards[idx]
+            val plain = " ${cc.set.padEnd(4)} ${cc.name}"
+            lines.add(
+                if (idx == crossCardSel) Ansi.style(Ansi.fit(plain, w), Ansi.REVERSE)
+                else Ansi.style(Ansi.fit(plain, w), Ansi.fg(if (gap) Ansi.ORANGE else Ansi.GREY))
+            )
+        }
+        return lines
+    }
+
     // ============================================================ input
 
     private fun handle(key: Key, rows: Int, cols: Int): Boolean {
@@ -412,7 +445,7 @@ object Dashboard {
                     Key.End -> cardSel = max(0, cards.lastIndex)
                     Key.PageUp -> cardSel = max(0, cardSel - pageStep)
                     Key.PageDown -> cardSel = min(max(0, cards.lastIndex), cardSel + pageStep)
-                    Key.Enter, Key.Right, Key.Char('l') -> if (cards.isNotEmpty()) { cardName = cards[cardSel.coerceIn(0, cards.lastIndex)].name; mode = Mode.CARD; cardCodeView = true; reqScroll = 0 }
+                    Key.Enter, Key.Right, Key.Char('l') -> if (cards.isNotEmpty()) { cardName = cards[cardSel.coerceIn(0, cards.lastIndex)].name; cardFrom = Mode.CARDS; mode = Mode.CARD; cardCodeView = true; reqScroll = 0 }
                     Key.Esc, Key.Left, Key.Char('h') -> mode = Mode.SETS
                     Key.Char('/') -> filtering = true
                     else -> {}
@@ -425,7 +458,7 @@ object Dashboard {
                 Key.PageDown -> reqScroll += pageStep
                 Key.Home -> reqScroll = 0
                 Key.Tab, Key.Char('t') -> { cardCodeView = !cardCodeView; reqScroll = 0 }
-                Key.Esc, Key.Left, Key.Char('h') -> mode = Mode.CARDS
+                Key.Esc, Key.Left, Key.Char('h') -> mode = cardFrom
                 else -> {}
             }
             Mode.CROSS -> {
@@ -437,7 +470,26 @@ object Dashboard {
                     Key.End -> crossSel = max(0, n - 1)
                     Key.PageUp -> crossSel = max(0, crossSel - pageStep)
                     Key.PageDown -> crossSel = min(max(0, n - 1), crossSel + pageStep)
+                    Key.Enter, Key.Right, Key.Char('l') -> if ((cross?.getOrNull(crossSel)?.cards?.isNotEmpty()) == true) { mode = Mode.CROSS_CARDS; crossCardSel = 0; crossCardScroll = 0 }
                     Key.Esc, Key.Left, Key.Char('h') -> mode = Mode.SETS
+                    else -> {}
+                }
+            }
+            Mode.CROSS_CARDS -> {
+                val cards = cross?.getOrNull(crossSel)?.cards ?: emptyList()
+                when (key) {
+                    Key.Up, Key.Char('k') -> crossCardSel = max(0, crossCardSel - 1)
+                    Key.Down, Key.Char('j') -> crossCardSel = min(max(0, cards.lastIndex), crossCardSel + 1)
+                    Key.Home -> crossCardSel = 0
+                    Key.End -> crossCardSel = max(0, cards.lastIndex)
+                    Key.PageUp -> crossCardSel = max(0, crossCardSel - pageStep)
+                    Key.PageDown -> crossCardSel = min(max(0, cards.lastIndex), crossCardSel + pageStep)
+                    // Open the card's detail in the context of the set it lives in; back returns here.
+                    Key.Enter, Key.Right, Key.Char('l') -> cards.getOrNull(crossCardSel)?.let { cc ->
+                        setSel = shownSets().indexOfFirst { it.code == cc.set }.coerceAtLeast(0)
+                        cardName = cc.name; cardFrom = Mode.CROSS_CARDS; mode = Mode.CARD; cardCodeView = true; reqScroll = 0
+                    }
+                    Key.Esc, Key.Left, Key.Char('h') -> mode = Mode.CROSS
                     else -> {}
                 }
             }

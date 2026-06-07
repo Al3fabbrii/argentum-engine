@@ -4,6 +4,7 @@ import com.wingedsheep.tooling.coverage.MTGISH_LINES
 import com.wingedsheep.tooling.coverage.SDK_EFFECTS
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
@@ -42,6 +43,17 @@ class DashboardTest : StringSpec({
         // An implemented Portal card reports its home set in the per-card drill-down.
         val implementedCard = d.cards.first { it.implemented }
         Analyzer.cardReport(implementedCard.name).implementedIn shouldContain "POR"
+    }
+
+    "cross-set index carries the blocked cards behind each ranked capability".config(enabled = dataAvailable) {
+        Analyzer.init()
+        val rows = Analyzer.crossSet { _, _ -> }
+        rows.shouldNotBeEmpty()
+        rows.forEach { row ->
+            // The drill-down card list is exactly what the count ranks — set-qualified, no phantom rows.
+            row.cards.size shouldBe row.count
+            row.cards.map { it.set }.toSet().size shouldBeLessThanOrEqual row.sets
+        }
     }
 
     "Ansi.fit pads or ellipsis-truncates to an exact visible width" {
