@@ -85,6 +85,7 @@ internal fun EmitCtx.renderAction(node: JsonObject, tvar: String?): Dsl? =
 internal fun EmitCtx.renderEffectList(actions: List<JsonObject>, tvar: String?): Dsl? {
     echoEffect(actions)?.let { return it }
     becomeCreatureTypeEffect(actions, tvar)?.let { return it }
+    chooseTypeModifyStatsEffect(actions)?.let { return it }
     chooseCreatureTypeRevealTopEffect(actions)?.let { return it }
     val rendered = mutableListOf<Dsl>()
     for (act in actions) {
@@ -292,6 +293,31 @@ internal fun EmitCtx.becomeCreatureTypeEffect(actions: List<JsonObject>, tvar: S
     val parts = mutableListOf(arg("target", Lit(target)))
     if (excluded != null) parts.add(arg("excludedTypes", "listOf(\"${ktStr(excluded)}\")"))
     return Call("BecomeCreatureTypeEffect", parts)
+}
+
+/**
+ * [ChooseACreatureType, CreateEachPermanentLayerEffectUntil(creatures of the chosen type get ±X/±X)] ->
+ * a single `Effects.ChooseCreatureTypeModifyStats(...)` (Tribal Unity: "Creatures of the creature type
+ * of your choice get +X/+X until end of turn"). Only the bare ±X/±X over the chosen-type group at
+ * end-of-turn collapses; a riding keyword grant or any other shape declines (null -> SCAFFOLD).
+ */
+internal fun EmitCtx.chooseTypeModifyStatsEffect(actions: List<JsonObject>): Dsl? {
+    if (actions.size != 2) return null
+    if (actions.none { it.strField("_Action") == "ChooseACreatureType" }) return null
+    val layer = actions.firstOrNull { it.strField("_Action") == "CreateEachPermanentLayerEffectUntil" } ?: return null
+    val blob = compact(layer)
+    if ("IsCreatureTypeVariable" !in blob || "TheChosenCreatureType" !in blob) return null
+    if (!jsonContains(layer, "_Expiration", "UntilEndOfTurn")) return null
+    val layerEffects = (layer["args"].asArr)?.getOrNull(1) as? JsonArray ?: return null
+    if (layerEffects.size != 1) return null  // a lone ±X/±X; a riding grant would need grantKeyword
+    val le = layerEffects[0] as? JsonObject ?: return null
+    if (le.strField("_LayerEffect") != "AdjustPTX") return null
+    val a = le["args"].asArr ?: return null
+    if (a.size != 3) return null
+    val amt = dynamicAmountExpr(a[2]) ?: return null
+    val power = adjustModX(a.getOrNull(0), amt) ?: return null
+    val toughness = adjustModX(a.getOrNull(1), amt) ?: return null
+    return Call("Effects.ChooseCreatureTypeModifyStats", listOf(arg(power), arg(toughness)))
 }
 
 /**

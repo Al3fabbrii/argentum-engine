@@ -57,6 +57,13 @@ internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
     on("SacrificePermanent") { _, args, _ ->  // "sacrifice ~" (Blistering Firecat's end-step sacrifice)
         if (jsonContains(args, "_Permanent", "ThisPermanent")) Lit("SacrificeSelfEffect") else null
     }
+    on("SacrificeAPermanent") { _, args, _ ->
+        // "sacrifice a <filter>" by the resolving player (Accursed Centaur's ETB "sacrifice a creature").
+        // A player-directed sacrifice ("that player sacrifices …") arrives wrapped in a PlayerAction and is
+        // handled there; the bare effect sacrifices via the controller, so render SacrificeEffect(filter).
+        val filter = gameObjectFilterExpr(args) ?: return@on null
+        call("SacrificeEffect", arg(filter))
+    }
 
     on("ShuffleGraveyardCardIntoLibrary") { _, args, tvar ->  // e.g. Alabaster Dragon
         val tgt = refTarget(args, tvar) ?: "EffectTarget.Self"
