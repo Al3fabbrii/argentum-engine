@@ -446,6 +446,9 @@ internal fun EmitCtx.abilityCostDsl(node: JsonElement?): String? {
         // (ManaCostX -> "{X}") as the mana cost (Silklash Spider).
         "PayManaX" -> renderMana((obj["args"].asArr)?.getOrNull(0)).ifEmpty { null }?.let { "Costs.Mana(\"$it\")" }
         "DiscardHand" -> "Costs.DiscardHand"  // "Discard your hand" (Slate of Ancestry)
+        // "Discard a card at random" — a fixed, no-choice cost (the engine picks): Costs.DiscardAtRandom(1).
+        // It carries no value selection / X / inherited choice, so it is safe to render exactly (Canyon Drake).
+        "DiscardACardAtRandom" -> "Costs.DiscardAtRandom(1)"
         "TapPermanent" ->
             if (obj.field("args").strField("_Permanent") == "ThisPermanent") "Costs.Tap" else null
         "SacrificePermanent" ->
@@ -506,6 +509,18 @@ private fun EmitCtx.activationRestrictionLines(rule: JsonObject): List<String>? 
             "            ActivationRestriction.BeforeStep(Step.DECLARE_ATTACKERS)",
             "        )",
         )
+    }
+    // "Activate no more than N times each turn" (Pit Imp / Phyrexian Battleflies) -> MaxPerTurn(N).
+    // The modifier list is the rule's args after the cost + action list; render only when EVERY
+    // modifier present is this exact shape, so an unrecognised modifier still scaffolds.
+    val modifiers = (rule["args"].asArr ?: emptyList()).filterIsInstance<JsonObject>()
+        .filter { it.strField("_ActivateModifier") != null }
+    if (modifiers.isNotEmpty() && modifiers.all { it.strField("_ActivateModifier") == "ActivateNoMoreThanNumberTimesEachTurn" }) {
+        val lines = modifiers.map { mod ->
+            val n = findInteger(mod.field("args")) as? Int ?: return run { reasons.add("activated-modifiers"); null }
+            "ActivationRestriction.MaxPerTurn($n)"
+        }
+        return listOf("        restrictions = listOf(${lines.joinToString(", ")})")
     }
     reasons.add("activated-modifiers")
     return null
