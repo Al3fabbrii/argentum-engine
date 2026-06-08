@@ -434,7 +434,11 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 
 ### Mana
 
-- `AddMana(color, amount, restriction?)` — add N of one color.
+- `AddMana(color, amount, restriction?, expiry?)` — add N of one color. `expiry` is a `ManaExpiry`
+  (default `END_OF_TURN`); set `END_OF_COMBAT` for firebending-style combat-duration mana that the
+  pool keeps through combat and discards when combat ends. Combat-duration mana is stored as an
+  `AnySpend` restricted entry (so it spends like any other mana) and cleared by
+  `CombatManager.endCombat`. See [ManaExpiry](#manaexpiry).
 - `AddColorlessMana(amount, restriction?)` — add colorless.
 - `AddManaOfChoice(colorSet, amount?, restriction?, riders?)` — **unified primitive.** Add N mana of one color the controller picks from a resolved [ManaColorSet](#manacolorset). All "any-color from a constrained pool" cards (any color, commander identity, among permanents, lands could produce, source-chosen color) are expressed as this effect plus a different `ManaColorSet`. `riders` is a `Set<ManaSpellRider>` consumed when the mana pays for a spell (e.g. Path of Ancestry tags its mana with `ScryOnSharedTypeWithCommander`); when riders are set without a `restriction`, the engine stores the entries under `ManaRestriction.AnySpend` to preserve the rider through the pool.
 - `AddAnyColorMana(amount?, restriction?)` — sugar for `AddManaOfChoice(ManaColorSet.AnyColor, amount)`.
@@ -1948,6 +1952,14 @@ composite abilities).
   overload: it adds a `KeywordAbility.Variable(MOBILIZE, label)` display tag (prints "Mobilize X") plus the same
   attack-triggered `CreateTokenEffect`, but with `count = amount` (any `DynamicAmount`) resolved at attack time.
   Avenger of the Fallen passes `DynamicAmounts.creatureCardsInYourGraveyard()`.
+- `Firebending(n)` — "Whenever this creature attacks, add N {R}. Until end of combat, you don't lose this mana
+  as steps and phases end." (CR 702.189, Avatar: The Last Airbender). Display-only; wire the behavior with the
+  `card { firebending(n) }` builder helper, which adds this keyword ability plus a "whenever this attacks"
+  triggered `AddManaEffect(Color.RED, n, expiry = ManaExpiry.END_OF_COMBAT)` (mirrors `mobilize()` / `rampage()`).
+  The mana is ordinary red mana spendable anywhere — it is held as an `AnySpend` restricted-pool entry tagged
+  with [ManaExpiry](#manaexpiry).`END_OF_COMBAT` and discarded by `CombatManager.endCombat`. It is a normal
+  triggered ability (not a mana ability): it uses the stack and can be responded to. `n` may be any fixed value;
+  "firebending X (X = its power)" is not yet expressible by this helper (the keyword carries only a fixed Int).
 - `Decayed` — "This creature can't block, and when it attacks, sacrifice it at end of combat" (CR 702.147,
   Innistrad: Midnight Hunt). Display-only; wire the behavior with the `card { decayed() }` builder helper, which adds
   the keyword plus a `CantBlock(GroupFilter.source())` static ability and a "whenever this attacks" triggered
@@ -2570,6 +2582,18 @@ the spell when the rider needs the stack (typically because it requires a player
 - `ManaSpellRider.ScryOnSharedTypeWithCommander(amount)` — Path of Ancestry: if the spell is
   a creature spell that shares a creature type with any of the controller's commanders,
   queues a `scry amount` triggered ability above the spell.
+
+### `ManaExpiry`<a id="manaexpiry"></a>
+
+The *duration* axis of mana — when it leaves the pool — orthogonal to `ManaRestriction` (where it
+may be spent) and `ManaSpellRider` (what happens to the spell). Passed via the `expiry` parameter
+of `AddMana`. The engine empties pools at end of turn, so:
+
+- `ManaExpiry.END_OF_TURN` — the default; ordinary mana cleared by the end-of-turn pool emptying.
+- `ManaExpiry.END_OF_COMBAT` — firebending-style mana (CR 702.189): kept through combat, discarded
+  by `CombatManager.endCombat` when the combat phase ends ("Any of this mana you still have as combat
+  ends will be lost"). Stored as an `AnySpend` restricted-pool entry tagged with the expiry, so it
+  spends like any other mana and the tag survives partial spends.
 
 ### `TurnTracker` keys (used with `TurnTracking`)
 
