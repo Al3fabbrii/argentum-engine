@@ -44,7 +44,8 @@ val ThrummingHivepool = card("Thrumming Hivepool") {
             count = 2,
             power = 1,
             toughness = 1,
-            creatureTypes = setOf("Sliver")
+            creatureTypes = setOf("Sliver"),
+            imageUri = "https://cards.scryfall.io/normal/front/b/f/bf7501ee-783d-49c6-b381-1db056360b40.jpg?1752946465"
         )
     }
 
@@ -52,6 +53,7 @@ val ThrummingHivepool = card("Thrumming Hivepool") {
         rarity = Rarity.RARE
         collectorNumber = "247"
         artist = "Rob Rey"
+        flavorText = "\"I'll never escape this rock, but I fear they will.\"\n—Decrypted log 4.11"
         imageUri = "https://cards.scryfall.io/normal/front/8/5/85caf659-7b43-462e-a342-34703d46eb57.jpg?1752947564"
         ruling("2025-07-25", "The mana value of a spell isn't changed by alternative costs, cost increases, or cost reductions. For example, if you cast Thrumming Hivepool (an artifact with affinity for Slivers), its mana value is 6 no matter how many Slivers you controlled when you cast it.")
     }

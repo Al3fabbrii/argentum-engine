@@ -372,3 +372,70 @@ data class CommanderZoneChoiceContinuation(
     val ownerId: EntityId,
     val currentZone: com.wingedsheep.sdk.core.Zone
 ) : ContinuationFrame
+
+/**
+ * Resume after a player picks X for an activated ability with an X-variable cost
+ * (currently [com.wingedsheep.sdk.scripting.AbilityCost.TapXPermanents]).
+ *
+ * The legal-actions path surfaces such activations with `hasXCost=true` and no
+ * pre-filled `xValue`/`tappedPermanents`. When [com.wingedsheep.engine.handlers.actions.ability.ActivateAbilityHandler]
+ * sees that shape, it raises a [ChooseNumberDecision] and pushes this frame so the
+ * resumer can chain into a follow-up tap-target [SelectCardsDecision] sized to the
+ * chosen X (or skip straight to re-executing when X = 0).
+ *
+ * @property action The original [ActivateAbility] (xValue/costPayment still null), so the resumer
+ *   can re-enter the handler with the chosen X and selected tap targets filled in.
+ * @property tapTargets The untapped permanents matching the cost's filter at announcement time —
+ *   captured here so the follow-up [SelectCardsDecision] has a stable option list even if the
+ *   board changes between decisions.
+ */
+@Serializable
+data class ActivateAbilityChooseXContinuation(
+    override val decisionId: String,
+    val action: ActivateAbility,
+    val tapTargets: List<EntityId>
+) : ContinuationFrame
+
+/**
+ * Resume after a player picks which permanents to tap to satisfy a TapXPermanents cost,
+ * once X has already been chosen via [ActivateAbilityChooseXContinuation].
+ *
+ * @property action The original [ActivateAbility] (xValue/costPayment still null on the stored copy).
+ * @property chosenX The X value the player picked in the preceding [ChooseNumberDecision].
+ * @property tapTargets Permanents that were offered as options in the [SelectCardsDecision]; used
+ *   to validate the response is a subset of the originally legal targets.
+ */
+@Serializable
+data class ActivateAbilityTapXTargetsContinuation(
+    override val decisionId: String,
+    val action: ActivateAbility,
+    val chosenX: Int,
+    val tapTargets: List<EntityId>
+) : ContinuationFrame
+
+/**
+ * Resume after a player picks which graveyard cards to exile to satisfy an
+ * [com.wingedsheep.sdk.scripting.AbilityCost.ExileFromGraveyard] cost on an activated ability.
+ *
+ * Surfaces the cost-choice the original engine path silently auto-paid: when an activation's
+ * `ExileFromGraveyard(count, filter)` cost has more matching graveyard cards than `count`, the
+ * handler raises a [SelectCardsDecision] and pushes this frame so the resumer can re-enter the
+ * handler with the player's chosen cards filled into `costPayment.exiledCards`.
+ *
+ * Skipped (no pause) when `exiledCards` is already pre-filled (engine-direct path / resumed
+ * replay) or when candidate count ≤ required count (no real choice). Rust Harvester
+ * ({2}, {T}, Exile an artifact card from your graveyard: …) is the canonical trigger case.
+ *
+ * @property action The original [ActivateAbility] (`costPayment.exiledCards` still empty), so the
+ *   resumer can re-enter the handler with the chosen exile victims filled in.
+ * @property exileCandidates The matching graveyard cards offered to the player as options; used
+ *   to validate the response is a subset of the originally legal candidates.
+ * @property exileCount Exact number of cards the player must pick (`count` from the cost).
+ */
+@Serializable
+data class ActivateAbilityExileFromGraveyardContinuation(
+    override val decisionId: String,
+    val action: ActivateAbility,
+    val exileCandidates: List<EntityId>,
+    val exileCount: Int
+) : ContinuationFrame

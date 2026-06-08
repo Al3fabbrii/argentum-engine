@@ -2,7 +2,7 @@
 
 **Set Size:** 261 booster cards (excluding basic lands)
 **Release Date:** August 1, 2025
-**Implemented:** 258 / 261
+**Implemented:** 261 / 261
 ---
 
 - [x] Adagia, Windswept Bastion
@@ -148,7 +148,7 @@
 - [x] Molecular Modifier
 - [x] Monoist Circuit-Feeder
 - [x] Monoist Sentry
-- [ ] Moonlit Meditation
+- [x] Moonlit Meditation
 - [x] Mouth of the Storm
 - [x] Mutinous Massacre
 - [x] Nanoform Sentinel
@@ -229,11 +229,11 @@
 - [x] Tannuk, Steadfast Second
 - [x] Tapestry Warden
 - [x] Temporal Intervention
-- [ ] Terminal Velocity
+- [x] Terminal Velocity
 - [x] Terrapact Intimidator
 - [x] Terrasymbiosis
 - [x] Territorial Bruntar
-- [ ] Tezzeret, Cruel Captain
+- [x] Tezzeret, Cruel Captain
 - [x] Thaumaton Torpedo
 - [x] Thawbringer
 - [x] The Dominion Bracelet
