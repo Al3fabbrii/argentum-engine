@@ -1541,6 +1541,12 @@ class ActivatedAbilityBuilder {
     var promptOnDraw: Boolean = false
     var description: String? = null
     var hasConvoke: Boolean = false
+    /**
+     * When true, the ability's mana [cost] is a *waterbend* cost: while paying it the controller
+     * may tap untapped artifacts and/or creatures they control, each paying {1} generic
+     * (Avatar: The Last Airbender). See [ActivatedAbility.hasWaterbend].
+     */
+    var hasWaterbend: Boolean = false
     var holdPriority: Boolean = false
     var genericCostReduction: DynamicAmount? = null
     /** Colors that may be spent on the `{X}` portion of this ability's cost (empty = any). */
@@ -1583,6 +1589,7 @@ class ActivatedAbilityBuilder {
             promptOnDraw = promptOnDraw,
             descriptionOverride = description,
             hasConvoke = hasConvoke,
+            hasWaterbend = hasWaterbend,
             holdPriority = holdPriority,
             genericCostReduction = genericCostReduction,
             xManaRestriction = xManaRestriction
