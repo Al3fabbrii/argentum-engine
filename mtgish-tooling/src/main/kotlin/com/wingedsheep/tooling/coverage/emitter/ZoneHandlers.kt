@@ -177,6 +177,11 @@ internal fun EmitCtx.renderSearch(args: JsonElement?): Dsl? {
     // leaks into the search-filter regexes below. Decline rather than emit a wrong filter/count
     // (Kyoshi Island Plaza).
     if ("TheNumberOf" in blob) return null
+    // "exile them, then create that many tokens" / "any number of cards" (Myr Incubator) aren't modeled by
+    // the fixed SearchDestination + single-filter render: there is no EXILE destination, the any-number
+    // count isn't a fixed amount, and the CreateTokens payoff would be dropped. Decline -> SCAFFOLD rather
+    // than emit a wrong hand-search that silently loses the token clause.
+    if ("ExileFoundCards" in blob || "CreateTokens" in blob || "FindAnyNumberOfCardsOfType" in blob) return null
     val dest = when {
         "PutFoundCardsOntoBattlefield" in blob -> "BATTLEFIELD"
         "PutFoundCardsIntoHand" in blob -> "HAND"
