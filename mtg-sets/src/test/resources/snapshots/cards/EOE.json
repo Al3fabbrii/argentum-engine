@@ -1042,7 +1042,13 @@
                             "imageUri": "https://cards.scryfall.io/normal/front/c/4/c46f9a07-005c-44b7-8057-b2f00b274dd6.jpg?1756281130",
                             "artifactToken": true
                         },
-                        "AttachEquipment"
+                        {
+                            "type": "AttachEquipment",
+                            "target": {
+                                "type": "PipelineTarget",
+                                "collectionName": "createdTokens"
+                            }
+                        }
                     ]
                 }
             }
@@ -6382,26 +6388,17 @@
                                     "type": "Fixed",
                                     "amount": 1
                                 },
-                                "target": {
-                                    "type": "ContextTarget",
-                                    "index": 0
-                                }
+                                "target": "Self"
                             },
                             {
                                 "type": "GrantKeyword",
                                 "keyword": "VIGILANCE",
-                                "target": {
-                                    "type": "ContextTarget",
-                                    "index": 0
-                                }
+                                "target": "Self"
                             },
                             {
                                 "type": "GrantKeyword",
                                 "keyword": "HASTE",
-                                "target": {
-                                    "type": "ContextTarget",
-                                    "index": 0
-                                }
+                                "target": "Self"
                             }
                         ]
                     }
@@ -8133,7 +8130,7 @@
                         "tapped": true,
                         "attacking": true,
                         "artifactToken": true,
-                        "exileAtStep": "END_COMBAT"
+                        "sacrificeAtStep": "END_COMBAT"
                     }
                 }
             }

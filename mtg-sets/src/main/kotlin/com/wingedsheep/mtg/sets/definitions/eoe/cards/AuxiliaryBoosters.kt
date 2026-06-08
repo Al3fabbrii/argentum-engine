@@ -9,6 +9,7 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GrantKeyword
 import com.wingedsheep.sdk.scripting.ModifyStats
+import com.wingedsheep.sdk.scripting.effects.CREATED_TOKENS
 import com.wingedsheep.sdk.scripting.effects.CreateTokenEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 
@@ -36,7 +37,7 @@ val AuxiliaryBoosters = card("Auxiliary Boosters") {
             creatureTypes = setOf("Robot"),
             artifactToken = true,
             imageUri = "https://cards.scryfall.io/normal/front/c/4/c46f9a07-005c-44b7-8057-b2f00b274dd6.jpg?1756281130"
-        ).then(Effects.AttachEquipment(EffectTarget.ContextTarget(0)))
+        ).then(Effects.AttachEquipment(EffectTarget.PipelineTarget(CREATED_TOKENS, 0)))
     }
 
     // Static ability: Equipped creature gets +1/+2
