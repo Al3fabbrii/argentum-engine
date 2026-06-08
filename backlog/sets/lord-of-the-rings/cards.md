@@ -2,7 +2,7 @@
 
 **Set Size:** 291 cards (261 Draft / 30 Extra)
 **Release Date:** June 23, 2023
-**Implemented:** 198 / 291
+**Implemented:** 204 / 291
 Run `scripts/card-status --set LTR` (and `--list --set LTR`) to verify status at any time.
 The split below mirrors that script: **Draft** = Scryfall `booster: true`; **Extra** =
 starter-deck/special cards and basic lands.
@@ -52,7 +52,7 @@ starter-deck/special cards and basic lands.
 - [x] Protector of Gondor
 - [x] Reprieve
 - [x] Rosie Cotton of South Lane
-- [ ] Samwise the Stouthearted
+- [x] Samwise the Stouthearted
 - [x] Second Breakfast
 - [x] Shire Shirriff
 - [ ] Slip On the Ring
@@ -118,18 +118,18 @@ starter-deck/special cards and basic lands.
 - [ ] Gollum's Bite
 - [x] Gorbag of Minas Morgul
 - [x] Gothmog, Morgul Lieutenant
-- [ ] Gríma Wormtongue
+- [x] Gríma Wormtongue
 - [ ] Grond, the Gatebreaker
 - [x] Haunt of the Dead Marshes
 - [x] Isildur's Fateful Strike
 - [x] Lash of the Balrog
-- [ ] Lobelia Sackville-Baggins
+- [x] Lobelia Sackville-Baggins
 - [x] March from the Black Gate
 - [x] Mirkwood Bats
 - [x] Mordor Muster
 - [x] Mordor Trebuchet
 - [x] Morgul-Knife Wound
-- [ ] Nasty End
+- [x] Nasty End
 - [x] Nazgûl
 - [x] Oath of the Grey Host
 - [ ] One Ring to Rule Them All
@@ -223,7 +223,7 @@ starter-deck/special cards and basic lands.
 - [ ] Radagast the Brown
 - [x] Revive the Shire
 - [ ] The Ring Goes South
-- [ ] Shortcut to Mushrooms
+- [x] Shortcut to Mushrooms
 - [x] Shower of Arrows
 - [x] Stew the Coneys
 - [x] Wose Pathfinder
@@ -260,7 +260,7 @@ starter-deck/special cards and basic lands.
 - [ ] Pippin, Guard of the Citadel
 - [x] Prince Imrahil the Fair
 - [ ] Ringsight
-- [ ] Rise of the Witch-king
+- [x] Rise of the Witch-king
 - [x] Samwise Gamgee
 - [ ] Saruman of Many Colors
 - [ ] Sauron, the Dark Lord

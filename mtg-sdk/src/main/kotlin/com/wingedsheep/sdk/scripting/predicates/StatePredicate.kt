@@ -139,6 +139,31 @@ sealed interface StatePredicate {
         override val description: String = "attacked this turn"
     }
 
+    /**
+     * This card is currently in a graveyard *and* was put there from the battlefield
+     * during the current turn. Used as a target predicate on graveyard-zone filters:
+     *
+     *  - Samwise the Stouthearted (LTR): "target permanent card in your graveyard
+     *    that was put there from the battlefield this turn"
+     *  - Lobelia Sackville-Baggins (LTR): same predicate on an opponent's graveyard.
+     *
+     * Backed by the `PutIntoGraveyardFromBattlefieldThisTurnMarker` data-object
+     * component on the card entity. The marker is set by `ZoneTransitionService`
+     * whenever a card moves battlefield → graveyard, and stripped when it leaves the
+     * graveyard so a later arrival from a different zone (mill, exile → graveyard)
+     * does not falsely match. The marker carries no turn number — `BeginningPhaseManager`
+     * wipes it from every entity during the untap step of each turn, giving the predicate
+     * MTG-correct per-turn semantics independent of the engine's per-round `state.turnNumber`.
+     *
+     * Pair with `CardPredicate.IsPermanent` (or any other card-predicate constraint)
+     * to express the full Samwise / Lobelia filter.
+     */
+    @SerialName("PutIntoGraveyardFromBattlefieldThisTurn")
+    @Serializable
+    data object PutIntoGraveyardFromBattlefieldThisTurn : History {
+        override val description: String = "put into a graveyard from the battlefield this turn"
+    }
+
     // =============================================================================
     // Face-Down State (Entity)
     // =============================================================================

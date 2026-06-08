@@ -462,7 +462,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   token (creature or otherwise) with its own abilities — Treasure, Munitions, Cragflame — add a `CardDefinition`
   to `PredefinedTokens.kt` and expose an `Effects.Create<Name>Token()` facade that wraps
   `CreatePredefinedTokenEffect("<Name>", count)`. The predefined-token registry already supports noncreature type
-  lines (e.g. Munitions' `typeLine = "Artifact"`) and embedded triggered abilities.
+  lines (e.g. Munitions' `typeLine = "Artifact"`) and embedded triggered abilities. For a count computed at
+  resolution rather than a fixed integer, pass `dynamicCount = <DynamicAmount>` instead of `count` — the executor
+  evaluates it (coerced to ≥ 0) and creates that many tokens (Lobelia Sackville-Baggins, LTR: "create X Treasure
+  tokens, where X is the exiled card's power", via `DynamicAmount.EntityProperty(Target(0), Power)`).
 - `CreateDynamicToken(dynamicPower, dynamicToughness, colors?, creatureTypes, keywords?, count?, controller?, imageUri?)` —
   tokens whose P/T is computed at resolution (e.g. Pure Reflection's X/X Reflection where X = the cast spell's mana
   value, via `DynamicAmounts.triggeringManaValue()`). `controller` directs who gets the token (e.g.
@@ -1094,6 +1097,19 @@ work for abilities-on-stack (which carry no `CardComponent`).
   was cast for its warp cost (CR 702.185). Pair with
   `Conditions.TargetMatchesFilter(GameObjectFilter.Creature.castForWarp(), …)` to
   branch on whether a target was warp-cast (e.g., Full Bore).
+- `PutIntoGraveyardFromBattlefieldThisTurn` (filter builder
+  `putIntoGraveyardFromBattlefieldThisTurn()`) — card currently in a graveyard whose most
+  recent arrival there was from the battlefield during the current turn. Backed by the
+  per-entity `PutIntoGraveyardFromBattlefieldThisTurnMarker` data-object component, set by
+  `ZoneTransitionService` on every battlefield→graveyard move and stripped when the card
+  leaves the graveyard (so a later mill or exile→graveyard arrival doesn't falsely match).
+  The marker carries no turn number — `BeginningPhaseManager` wipes it from every entity
+  at each turn's untap step, which is what gives the predicate MTG-correct per-turn
+  semantics (the engine's `state.turnNumber` increments per round, not per active player,
+  so a turn-number comparison would be wrong in multiplayer). Used by Samwise the
+  Stouthearted and Lobelia Sackville-Baggins (LTR) — pair with `GameObjectFilter.Permanent`
+  or `Creature` on a graveyard-zone `TargetFilter`. False in battlefield-projection / untap /
+  trigger-gating contexts (the marker only lives on graveyard cards).
 
 ### `AffectsFilter` — static-ability target shapes
 
@@ -2297,6 +2313,24 @@ default to "you" so card authors don't need to pass it explicitly.
 - `ControlledCreatureDiedThisTurn` — intervening-if "if a creature died **under your control** this
   turn", scoped to the source's controller (reads only that player's `CreaturesDiedThisTurnComponent`).
   Used by Barrensteppe Siege (Mardu). Dual-mode.
+- `YouHadPermanentLeaveBattlefieldThisTurn` — intervening-if "if a permanent you controlled left
+  the battlefield this turn". Per-player, scoped to the source's controller. Counts every permanent
+  type (creatures, lands, artifacts, enchantments, planeswalkers) and includes tokens — broader
+  than `ControlledCreatureDiedThisTurn`. Backed by `PermanentLeftBattlefieldThisTurnComponent`,
+  incremented by `ZoneTransitionService` whenever a permanent leaves the battlefield, credited to
+  its last-known controller. Used by Shortcut to Mushrooms (LTR). Dual-mode.
+- `SacrificedHadSubtype(subtype)` — intervening-if "if an X was sacrificed this way". Reads
+  `EffectContext.sacrificedPermanents` snapshots captured at cost/effect-time (cost-payment or
+  edict-sacrifice both populate the same list). Used by Thallid Omnivore (DOM).
+- `SacrificedWasLegendary` — intervening-if "if the sacrificed creature was legendary". Same
+  snapshot path as `SacrificedHadSubtype`, but reads `supertypes` instead of subtypes. Used by
+  Nasty End and Gríma Wormtongue (LTR).
+- `YouSacrificedThisWay` — intervening-if "if you sacrificed a creature this way". Filters
+  `EffectContext.sacrificedPermanents` for snapshots whose last-known controller is the source's
+  controller — the gate on the personal half of a symmetric edict. Used by Rise of the Witch-king
+  (LTR). The companion `CardSource.FromZone(..., excludeSacrificedThisWay = true)` drops those same
+  snapshotted entities from a later gather, so "return **another** permanent card …" can't offer the
+  permanent you just sacrificed to the same spell.
 
 ### Composition
 

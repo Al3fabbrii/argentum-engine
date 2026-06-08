@@ -64,29 +64,33 @@ class EffectAndTriggerContinuationResumer(
             targetIds.map { entityId -> entityIdToChosenTarget(state, entityId) }
         }
 
-        if (selectedTargets.isEmpty()) {
-            if (continuation.elseEffect != null) {
-                val elseComponent = TriggeredAbilityOnStackComponent(
-                    sourceId = continuation.sourceId,
-                    sourceName = continuation.sourceName,
-                    controllerId = continuation.controllerId,
-                    effect = continuation.elseEffect,
-                    description = continuation.description,
-                    triggerDamageAmount = continuation.triggerDamageAmount,
-                    triggeringEntityId = continuation.triggeringEntityId,
-                    triggeringPlayerId = continuation.triggeringPlayerId,
-                    triggerCounterCount = continuation.triggerCounterCount,
-                    triggerTotalCounterCount = continuation.triggerTotalCounterCount,
-                    triggerLastKnownCounters = continuation.triggerLastKnownCounters,
-                    triggerLastKnownDamageDealtByPlayers = continuation.triggerLastKnownDamageDealtByPlayers,
-                    triggerScryCount = continuation.triggerScryCount,
-                    triggerExcessDamageAmount = continuation.triggerExcessDamageAmount
-                )
-                val stackResult = services.stackResolver.putTriggeredAbility(state, elseComponent, emptyList())
-                if (!stackResult.isSuccess) return stackResult
-                return checkForMore(stackResult.newState, stackResult.events.toList())
-            }
-            return checkForMore(state, emptyList())
+        // Zero-target resolution path. Two cases:
+        //  - `elseEffect != null`: the ability has explicit "...; otherwise, X" wording —
+        //    swap to that effect (Conditional/elseEffect pattern).
+        //  - `elseEffect == null`: the player declined an "up to N" optional target. The
+        //    ability still resolves with no targets; non-target portions of the effect
+        //    (e.g. Samwise's "Then the Ring tempts you" sibling) MUST still execute.
+        //    Fall through to the regular put-on-stack path with `selectedTargets = []`.
+        if (selectedTargets.isEmpty() && continuation.elseEffect != null) {
+            val elseComponent = TriggeredAbilityOnStackComponent(
+                sourceId = continuation.sourceId,
+                sourceName = continuation.sourceName,
+                controllerId = continuation.controllerId,
+                effect = continuation.elseEffect,
+                description = continuation.description,
+                triggerDamageAmount = continuation.triggerDamageAmount,
+                triggeringEntityId = continuation.triggeringEntityId,
+                triggeringPlayerId = continuation.triggeringPlayerId,
+                triggerCounterCount = continuation.triggerCounterCount,
+                triggerTotalCounterCount = continuation.triggerTotalCounterCount,
+                triggerLastKnownCounters = continuation.triggerLastKnownCounters,
+                triggerLastKnownDamageDealtByPlayers = continuation.triggerLastKnownDamageDealtByPlayers,
+                triggerScryCount = continuation.triggerScryCount,
+                triggerExcessDamageAmount = continuation.triggerExcessDamageAmount
+            )
+            val stackResult = services.stackResolver.putTriggeredAbility(state, elseComponent, emptyList())
+            if (!stackResult.isSuccess) return stackResult
+            return checkForMore(stackResult.newState, stackResult.events.toList())
         }
 
         // Check if this is a DividedDamageEffect with multiple targets — need distribution.

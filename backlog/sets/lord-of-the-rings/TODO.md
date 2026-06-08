@@ -10,7 +10,7 @@ Verify status anytime with: `scripts/card-status --set LTR` (and `--list --set L
 
 ## Status
 
-Draft cards at **175/261**. Every remaining unchecked card in `cards.md` (excluding the five
+Draft cards at **181/261**. Every remaining unchecked card in `cards.md` (excluding the five
 basic lands, which `basicLandsFallback` covers) needs at least one new engine primitive — see
 the "Engine gaps blocking the remaining cards" section below. Each card is listed under the
 primitive it is waiting on, with the exact blocking clause. Stop and open a dedicated PR per
@@ -224,13 +224,17 @@ deals damage equal to its power to another target creature."
 - **Voracious Fell Beast** — "Create a Food token for each creature sacrificed this way."
 
 ### Gap 17 — condition keyed to a creature sacrificed as a cost
-**Engine change:** a condition on the creature paid as an additional/activation sacrifice cost
-(e.g. "was legendary").
-- **Nasty End** — "…If the sacrificed creature was legendary, draw three cards instead."
-- **Gríma Wormtongue** — "If the sacrificed creature was legendary, amass Orcs 2." (also
-  "your opponents can't gain life" static).
-- **Rise of the Witch-king** — "If you sacrificed a creature this way, you may return another
-  permanent card from your graveyard to the battlefield." (each-player edict + reanimate).
+**Status:** LANDED. `PermanentSnapshot.supertypes` now captures the legendary/basic/snow/world
+flag at sacrifice time alongside the existing subtype capture; two new conditions consume it:
+`Conditions.SacrificedWasLegendary` (any sacrificed snapshot's supertypes contain `LEGENDARY`)
+and `Conditions.YouSacrificedThisWay` (any sacrificed snapshot's controller-at-sacrifice equals
+the source's controller). Also wired `ForceSacrificeExecutor` + the `SacrificeContinuation`
+resumer to capture snapshots on edict-driven sacrifices and inject them into the underlying
+`EffectContinuation`'s `EffectContext.sacrificedPermanents`, so a sibling rider after a paused
+"each player sacrifices" can read the per-player history.
+- **Nasty End** — ✅ implemented.
+- **Gríma Wormtongue** — ✅ implemented.
+- **Rise of the Witch-king** — ✅ implemented.
 
 ### Gap 18 — Ring-bearer player-state conditions and statics
 **Engine change:** a player-level "you control a Ring-bearer" condition and a "must be blocked
@@ -239,17 +243,27 @@ if able" static gated on a condition.
 - **Frodo Baggins** — "As long as Frodo Baggins is your Ring-bearer, it must be blocked if able."
 
 ### Gap 19 — "permanent you controlled left the battlefield this turn" condition
-**Engine change:** a this-turn condition broader than `CreatureDiedThisTurn`.
-- **Shortcut to Mushrooms** — "…if a permanent you controlled left the battlefield this turn…"
-  (ETB Ring tempts half composable).
+**Status:** LANDED as `Conditions.YouHadPermanentLeaveBattlefieldThisTurn` (per-player
+analogue of the global `VoidCondition`). Backed by a new `PermanentLeftBattlefieldThisTurnComponent`
+on the player entity, incremented by `ZoneTransitionService` on every battlefield→anywhere move
+keyed to the last-known controller (so a Threaten-style steal-and-sacrifice counts for the
+thief), and cleared at end of turn by `CleanupPhaseManager`. Broader than the existing
+`ControlledCreatureDiedThisTurn` — counts every permanent type (lands included) and every
+destination zone.
+- **Shortcut to Mushrooms** — ✅ implemented.
 
 ### Gap 20 — "a card put into a graveyard from the battlefield this turn" filter
-**Engine change:** a zone filter that matches cards that entered a graveyard from the
-battlefield during the current turn.
-- **Samwise the Stouthearted** — "…target permanent card in your graveyard that was put there
-  from the battlefield this turn."
-- **Lobelia Sackville-Baggins** — "…creature card from an opponent's graveyard that was put
-  there from the battlefield this turn…" (then Treasures = exiled card's power).
+**Status:** LANDED as `StatePredicate.PutIntoGraveyardFromBattlefieldThisTurn` (with the
+fluent `GameObjectFilter.putIntoGraveyardFromBattlefieldThisTurn()` helper). Backed by a
+per-entity `PutIntoGraveyardFromBattlefieldThisTurnMarker` set by `ZoneTransitionService`
+on battlefield→graveyard moves, stripped when the card leaves the graveyard (so a later
+mill→graveyard or exile→graveyard arrival doesn't falsely match), and wiped from every entity
+in `BeginningPhaseManager` on every turn boundary (matching MTG's per-turn "this turn"
+semantics rather than the engine's per-round `state.turnNumber` counter). Same PR also extended
+`CreatePredefinedTokenEffect` with an optional `dynamicCount: DynamicAmount?` so Lobelia's
+"X Treasures where X = the exiled card's power" composes from existing primitives.
+- **Samwise the Stouthearted** — ✅ implemented.
+- **Lobelia Sackville-Baggins** — ✅ implemented.
 
 ### Gap 21 — graveyard-functional triggered ability
 **Engine change:** a triggered ability that works while the card is in the graveyard.
