@@ -589,6 +589,62 @@
     ]
 }
 
+// Fabricate
+{
+    "name": "Fabricate",
+    "manaCost": "{2}{U}",
+    "typeLine": "Sorcery",
+    "oracleText": "Search your library for an artifact card, reveal it, put it into your hand, then shuffle.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "FromZone",
+                        "zone": "Library",
+                        "filter": "artifact"
+                    },
+                    "storeAs": "searchable"
+                },
+                {
+                    "type": "SelectFromCollection",
+                    "from": "searchable",
+                    "selection": {
+                        "type": "ChooseUpTo",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    },
+                    "storeSelected": "found"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "found",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Hand"
+                    },
+                    "revealed": true
+                },
+                "ShuffleLibrary"
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "35",
+        "rarity": "UNCOMMON",
+        "artist": "Glen Angus",
+        "flavorText": "\"The secret to invention is to see something in your mind, then find where it hides in the world.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/7/a742e23c-1991-4dce-b670-dea92a1cf4ec.jpg"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Fangren Hunter
 {
     "name": "Fangren Hunter",
@@ -2523,6 +2579,53 @@
     ]
 }
 
+// Rustspore Ram
+{
+    "name": "Rustspore Ram",
+    "manaCost": "{4}",
+    "typeLine": "Artifact Creature — Sheep",
+    "oracleText": "When this creature enters, destroy target Equipment.",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    },
+                    "destination": "Graveyard",
+                    "byDestruction": true
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "artifact Equipment"
+                    },
+                    "id": "target"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "235",
+        "rarity": "UNCOMMON",
+        "artist": "Arnie Swekel",
+        "flavorText": "Where herds have passed, the dented ground is lined with piles of rust.",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/d/5d23449c-4439-4425-ad53-84168a94b1ce.jpg"
+    },
+    "colorIdentityOverride": []
+}
+
 // Seat of the Synod
 {
     "name": "Seat of the Synod",
@@ -3908,6 +4011,52 @@
         "artist": "Puddnhead",
         "flavorText": "It's no coincidence that the oldest trolls are also the angriest.",
         "imageUri": "https://cards.scryfall.io/normal/front/f/0/f01233c2-6df0-4f0e-8668-3855868731ea.jpg"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
+// Turn to Dust
+{
+    "name": "Turn to Dust",
+    "manaCost": "{G}",
+    "typeLine": "Instant",
+    "oracleText": "Destroy target Equipment. Add {G}.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    },
+                    "destination": "Graveyard",
+                    "byDestruction": true
+                },
+                {
+                    "type": "AddMana",
+                    "color": "GREEN"
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "artifact Equipment"
+                },
+                "id": "target"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "137",
+        "artist": "Wayne England",
+        "flavorText": "Mirrodin's inhabitants must be prepared for anything—including suddenly being unprepared.",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/c/fcfcb643-bbd1-419a-b1a8-daae1062c8bc.jpg"
     },
     "colorIdentityOverride": [
         "GREEN"
