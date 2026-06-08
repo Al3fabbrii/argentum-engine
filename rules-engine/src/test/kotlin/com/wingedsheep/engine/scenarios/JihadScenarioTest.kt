@@ -1,8 +1,14 @@
 package com.wingedsheep.engine.scenarios
 
+import com.wingedsheep.engine.core.ChooseColorDecision
+import com.wingedsheep.engine.core.ChooseOptionDecision
+import com.wingedsheep.engine.core.ColorChosenResponse
+import com.wingedsheep.engine.core.OptionChosenResponse
 import com.wingedsheep.engine.mechanics.layers.StateProjector
 import com.wingedsheep.engine.state.components.battlefield.CastChoicesComponent
 import com.wingedsheep.engine.state.components.battlefield.ChoiceValue
+import com.wingedsheep.engine.state.components.battlefield.chosenColor
+import com.wingedsheep.engine.state.components.battlefield.chosenOpponent
 import com.wingedsheep.engine.state.components.identity.TokenComponent
 import com.wingedsheep.engine.support.ScenarioTestBase
 import com.wingedsheep.sdk.core.Color
@@ -136,6 +142,69 @@ class JihadScenarioTest : ScenarioTestBase() {
 
                 withClue("Only the chosen opponent's permanents satisfy the condition") {
                     game.isOnBattlefield("Jihad") shouldBe false
+                }
+            }
+
+            test("casting Jihad walks the color → opponent choice chain and records both on the cast-choices bag") {
+                // Unlike the cases above (which seed the bag directly to isolate the reading
+                // paths), this one casts Jihad from hand and answers the prompts, exercising the
+                // OPPONENT pause/resume plumbing: StackResolver.pauseForEntersWithChoice +
+                // ModalAndCloneContinuationResumer writing ChoiceSlot.OPPONENT from opponentIds.
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardInHand(1, "Jihad")
+                    .withLandsOnBattlefield(1, "Plains", 3)             // pay {W}{W}{W}
+                    .withCardOnBattlefield(1, "Glory Seeker")           // white creature to observe the anthem
+                    .withCardOnBattlefield(2, "Mons's Goblin Raiders")  // chosen opponent's red nontoken permanent
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val whiteCreature = game.findPermanent("Glory Seeker")!!
+
+                val cast = game.castSpell(1, "Jihad")
+                withClue("Casting Jihad ({W}{W}{W}) should succeed: ${cast.error}") {
+                    cast.error shouldBe null
+                }
+
+                // CR 614.12a — the as-it-enters choices are made before Jihad enters. The engine
+                // surfaces them in ChoiceType ordinal order: COLOR first, then OPPONENT.
+                game.resolveStack()
+                val colorDecision = game.state.pendingDecision
+                withClue("Jihad should pause for the color choice first") {
+                    (colorDecision is ChooseColorDecision) shouldBe true
+                }
+                game.submitDecision(ColorChosenResponse(colorDecision!!.id, Color.RED))
+
+                // Resolving the color choice chains straight into the opponent choice.
+                val opponentDecision = game.state.pendingDecision
+                withClue("Jihad should then pause for the opponent choice") {
+                    (opponentDecision is ChooseOptionDecision) shouldBe true
+                }
+                val options = (opponentDecision as ChooseOptionDecision).options
+                val player2Index = options.indexOf("Player2")
+                withClue("The lone opponent should be offered as a choice, options were $options") {
+                    (player2Index >= 0) shouldBe true
+                }
+                game.submitDecision(OptionChosenResponse(opponentDecision.id, player2Index))
+
+                game.resolveStack()
+
+                val jihadEntity = game.state.getEntity(game.findPermanent("Jihad")!!)!!
+                withClue("Jihad should have resolved onto the battlefield") {
+                    game.isOnBattlefield("Jihad") shouldBe true
+                }
+                withClue("The chosen-color slot should hold the picked color (RED)") {
+                    jihadEntity.chosenColor() shouldBe Color.RED
+                }
+                withClue("The chosen-opponent slot should hold the picked player's entity id") {
+                    jihadEntity.chosenOpponent() shouldBe game.player2Id
+                }
+
+                // End-to-end: the recorded color + opponent actually drive the anthem.
+                withClue("Glory Seeker (2/2) should be +2/+1 from Jihad's anthem") {
+                    projector.getProjectedPower(game.state, whiteCreature) shouldBe (2 + 2)
+                    projector.getProjectedToughness(game.state, whiteCreature) shouldBe (2 + 1)
                 }
             }
         }
