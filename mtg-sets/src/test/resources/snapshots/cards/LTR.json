@@ -10157,28 +10157,43 @@
                         "condition": "YouSacrificedPermanentThisWay"
                     },
                     "then": {
-                        "type": "MoveToZone",
-                        "target": {
-                            "type": "BoundVariable",
-                            "name": "another permanent card from your graveyard"
-                        },
-                        "destination": "Battlefield",
-                        "fromZone": "Graveyard"
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Graveyard",
+                                    "filter": "permanent"
+                                },
+                                "storeAs": "eligible"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "eligible",
+                                "selection": {
+                                    "type": "ChooseUpTo",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "chosen",
+                                "prompt": "Choose a permanent card to return to the battlefield"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "chosen",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Battlefield"
+                                }
+                            }
+                        ]
                     }
                 }
             ]
-        },
-        "targetRequirements": [
-            {
-                "type": "TargetObject",
-                "optional": true,
-                "filter": {
-                    "baseFilter": "permanent own:you",
-                    "zone": "Graveyard"
-                },
-                "id": "another permanent card from your graveyard"
-            }
-        ]
+        }
     },
     "metadata": {
         "collectorNumber": "221",

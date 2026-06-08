@@ -3,15 +3,19 @@ package com.wingedsheep.mtg.sets.definitions.ltr.cards
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
-import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.effects.CardDestination
+import com.wingedsheep.sdk.scripting.effects.CardSource
 import com.wingedsheep.sdk.scripting.effects.ConditionalEffect
-import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
+import com.wingedsheep.sdk.scripting.effects.GatherCardsEffect
+import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
+import com.wingedsheep.sdk.scripting.effects.SelectFromCollectionEffect
+import com.wingedsheep.sdk.scripting.effects.SelectionMode
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
-import com.wingedsheep.sdk.scripting.targets.TargetObject
+import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
 /**
  * Rise of the Witch-king
@@ -21,20 +25,18 @@ import com.wingedsheep.sdk.scripting.targets.TargetObject
  * Each player sacrifices a creature of their choice. If you sacrificed a creature this
  * way, you may return another permanent card from your graveyard to the battlefield.
  *
+ * The oracle text does not say "target" — the reanimation is a *resolution-time* choice,
+ * not a cast-time target. The card has no targets, so it can resolve even if all eligible
+ * graveyard cards become invalid between cast and resolution.
+ *
  * Composition:
- *  - `Effects.Sacrifice(Creature, count=1, target=Player.Each)` — `ForceSacrificeEffect`
- *    walks `state.turnOrder`, auto-sacrifices when a player has 0 or 1 creature, pauses
- *    for a choice when there are 2+. Each leg captures a `PermanentSnapshot` and threads
- *    it back into the underlying `EffectContinuation` so the sibling rider can read it.
- *  - The rider is a `ConditionalEffect` gated on `YouSacrificedThisWay` (LTR Gap 17),
- *    which checks `EffectContext.sacrificedPermanents` for any snapshot whose
- *    last-known controller was the source's controller.
- *  - The reanimation half is a target `Move` from graveyard → battlefield restricted to
- *    permanent cards owned by you. "Another" is handled implicitly: the Sacrifice
- *    effect has resolved by the time the target predicate evaluates, so the just-
- *    sacrificed permanent is in your graveyard but the predicate is on `Permanent`
- *    cards — any permanent-typed graveyard card matches, *including* the one just
- *    sacrificed (which is correct per CR; "another permanent card" lets you grab it back).
+ *  - `Effects.Sacrifice(Creature, count=1, target=Player.Each)` — each player auto-sacrifices
+ *    a sole creature or chooses among multiples. Snapshots flow into
+ *    `EffectContext.sacrificedPermanents` so the rider can read them.
+ *  - The rider is a `ConditionalEffect` gated on `YouSacrificedThisWay` (LTR Gap 17).
+ *  - The reanimation half is the standard Gather → Select(`ChooseUpTo(1)`) → Move
+ *    pipeline against the graveyard: the player is offered the eligible permanent cards
+ *    in their graveyard and may pick zero or one of them.
  */
 val RiseOfTheWitchKing = card("Rise of the Witch-king") {
     manaCost = "{2}{B}{G}"
@@ -45,13 +47,6 @@ val RiseOfTheWitchKing = card("Rise of the Witch-king") {
         "from your graveyard to the battlefield."
 
     spell {
-        val returnTarget = target(
-            "another permanent card from your graveyard",
-            TargetObject(
-                filter = TargetFilter(GameObjectFilter.Permanent.ownedByYou(), zone = Zone.GRAVEYARD),
-                optional = true
-            )
-        )
         effect = Effects.Sacrifice(
             GameObjectFilter.Creature,
             count = 1,
@@ -59,7 +54,28 @@ val RiseOfTheWitchKing = card("Rise of the Witch-king") {
         ).then(
             ConditionalEffect(
                 condition = Conditions.YouSacrificedThisWay,
-                effect = Effects.Move(returnTarget, Zone.BATTLEFIELD, fromZone = Zone.GRAVEYARD)
+                effect = Effects.Composite(
+                    listOf(
+                        GatherCardsEffect(
+                            source = CardSource.FromZone(
+                                Zone.GRAVEYARD,
+                                Player.You,
+                                GameObjectFilter.Permanent
+                            ),
+                            storeAs = "eligible"
+                        ),
+                        SelectFromCollectionEffect(
+                            from = "eligible",
+                            selection = SelectionMode.ChooseUpTo(DynamicAmount.Fixed(1)),
+                            storeSelected = "chosen",
+                            prompt = "Choose a permanent card to return to the battlefield"
+                        ),
+                        MoveCollectionEffect(
+                            from = "chosen",
+                            destination = CardDestination.ToZone(Zone.BATTLEFIELD)
+                        )
+                    )
+                )
             )
         )
     }

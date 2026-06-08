@@ -1,7 +1,8 @@
 {
-  "_comment": "Rise of the Witch-king (LTR, {2}{B}{G} sorcery). Each player sacrifices a creature of their choice; if you sacrificed, you may return another permanent card from your graveyard to the battlefield. Both sides have exactly one creature so the sacrifices auto-resolve (no decision pause). The player's graveyard pre-seeds a Mirkwood Spider for the reanimation rider to bring back.",
+  "_comment": "Rise of the Witch-king (LTR, {2}{B}{G} sorcery). Each player sacrifices a creature of their choice; if you sacrificed, you may return another permanent card from your graveyard to the battlefield. The reanimation is NOT a target — the player chooses at resolution from a graveyard SelectFromCollection prompt and may decline (pick zero). Both sides have exactly one creature so the sacrifices auto-resolve (no decision pause). The player's graveyard pre-seeds a Mirkwood Spider for the rider to bring back.",
   "player1Name": "You",
   "player2Name": "Opponent",
+  "aiPlayer": 2,
   "player1": {
     "lifeTotal": 20,
     "hand": ["Rise of the Witch-king"],
