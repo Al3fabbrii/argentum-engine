@@ -257,8 +257,8 @@ export function ReplayPage() {
           >
             {downloaded ? 'Saved!' : 'Save snapshot'}
           </button>
-          <button onClick={handleShare} style={styles.shareButton} title="Copy link to clipboard">
-            {copied ? 'Copied!' : 'Share'}
+          <button onClick={handleShare} style={styles.shareButton} title="Copy a link to this replay">
+            {copied ? 'Copied!' : 'Share replay'}
           </button>
         </div>
         <div style={styles.gameBoardContainer}>
@@ -315,7 +315,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#0d0d15',
     flexShrink: 0,
     zIndex: 1600,
-    gap: 16,
+    gap: 10,
   },
   backButton: {
     padding: '8px 16px',
@@ -368,7 +368,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   replayInfo: {
     textAlign: 'right',
-    flexShrink: 0,
+    flexShrink: 1,
+    minWidth: 0,
+    overflow: 'hidden',
   },
   replayLabel: {
     display: 'block',
@@ -378,8 +380,12 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: '0.1em',
   },
   matchupText: {
+    display: 'block',
     color: '#aaa',
     fontSize: 13,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   winnerText: {
     display: 'block',
@@ -387,24 +393,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
   },
   shareButton: {
-    padding: '8px 16px',
-    fontSize: 13,
+    padding: '7px 10px',
+    fontSize: 12,
     backgroundColor: '#1e40af',
     color: '#fff',
     border: 'none',
     borderRadius: 6,
     cursor: 'pointer',
     flexShrink: 0,
+    whiteSpace: 'nowrap',
   },
   scenarioButton: {
-    padding: '8px 16px',
-    fontSize: 13,
+    padding: '7px 10px',
+    fontSize: 12,
     backgroundColor: '#6d28d9',
     color: '#fff',
     border: 'none',
     borderRadius: 6,
     cursor: 'pointer',
     flexShrink: 0,
+    whiteSpace: 'nowrap',
   },
   gameBoardContainer: {
     flex: 1,
