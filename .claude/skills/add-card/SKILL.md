@@ -29,9 +29,58 @@ When the faithful implementation is more work than a shortcut, do the work — o
 the user what's missing. A card that looks right but resolves wrong is worse than an
 unimplemented one.
 
+## Step 0: mtgish draftability probe (do this first — fail fast)
+
+**Before any manual work**, ask the [`:mtgish-tooling`](../../../mtgish-tooling/README.md) generator to
+draft the card. This is the cheapest possible signal: it tells you in one command whether you're about to
+hand-model something the tooling can already draft, and — for a complete render — hands you a starting
+`cardDef` *with metadata already filled in*. The generator is **predictive and non-authoritative**: a
+draft to refine, never a finished card.
+
+1. **Emit the draft:**
+
+   ```bash
+   just coverage-fidelity --emit "<Card Name>"     # prints the generated cardDef DSL + a tier banner
+   ```
+
+   It draws the card's structure from the mtgish IR by name, and pulls metadata (mana cost, type line,
+   collector, artist, flavor) from the **same Scryfall cache Step 1 uses** (`~/.cache/scryfall`). Read the
+   trailing tier line:
+
+   - **Complete render** (`fidelity tier: AUTO`) — the emitter rendered the whole card. This is your
+     starting draft for Step 3: in Step 1 you'll pick the canonical file and re-point the
+     package/imports, then treat every line as a claim to verify.
+   - **Scaffold** (`fidelity tier: SCAFFOLD`, leads with `// TODO:` / `// STRUCTURE needs human wiring:`)
+     — part of the card couldn't be recovered. Keep the structure as a skeleton and **hand-fill every
+     TODO / STRUCTURE marker** in Step 3. Don't ship the stubs.
+   - **Blocked / nothing emitted** — the card isn't draftable yet. Implement from scratch (Steps 2–4).
+
+2. **The emit does NOT replace Step 1.** Two reasons it can't be the authoritative fetch:
+   - **Printing-keyed metadata is a guess.** `emit` keys its Scryfall lookup to *where the card is already
+     implemented, else POR* — not the asked-for set and not necessarily the canonical earliest printing.
+     Collector number, artist, flavor, and image differ per printing, so its metadata may be for the wrong
+     one. Step 1 re-fetches with the correct `&set=` to get authoritative per-printing metadata.
+   - **It can't make the placement decision.** Choosing the canonical set (Step 1.4) needs Scryfall's
+     printings list, which the emit doesn't produce.
+
+   So: use Step 0 to decide *whether and how* to hand-model, then **always** run Step 1 for printings,
+   canonical placement, and authoritative metadata.
+
+3. **Don't trust the draft on the engine's known-sloppy shapes.** Per the tooling README, the generator
+   deliberately scaffolds (or may mis-render) **additional costs**, **cast/activation-time value choices**
+   (X, chosen creature type, chosen color), and **inheriting a cast-time choice into later effects**. If
+   the card touches any of these, model that part by hand and prove it with a scenario test even on a
+   complete render.
+
+4. **The draft is a draft.** It must compile, get a scenario test, and pass the Step 10 Scryfall re-check
+   before it's done. A confidently-wrong generated card is worse than none — when in doubt, discard the
+   emit and model the card by hand.
+
 ## Step 1: Look Up Card Data on Scryfall
 
-**REQUIRED**: Always fetch exact card data before implementing. Never guess card text or stats.
+**REQUIRED**: Always fetch exact card data before implementing — even when Step 0 produced a draft with
+metadata. Step 0's metadata is keyed to a guessed printing; this step gets the authoritative per-printing
+data and (in Step 1.4) makes the canonical-placement decision the emit can't. Never guess card text or stats.
 
 1. WebFetch: `https://api.scryfall.com/cards/named?exact=<card-name-url-encoded>&set=<set-code>`
    - **ALWAYS include `&set=<code>`** — each printing has different rarity, collector_number, artist, flavor_text, image_uris
@@ -95,47 +144,6 @@ unimplemented one.
       real set isn't scaffolded, or a scaffolded printing is missing a `Printing(...)`
       row. Fix any drift it reports before committing.
 
-## Step 1.5: Try the mtgish auto-draft first (head start)
-
-Before hand-modeling the card, ask the [`:mtgish-tooling`](../../../mtgish-tooling/README.md)
-generator to draft it. The generator is **predictive and non-authoritative** — it gives you a
-starting `cardDef` to refine, never a finished card. It replaces the blank page in Step 3; it does
-**not** replace Scryfall verification (Step 10), the scenario test (Step 5), or human review.
-
-1. **Emit the draft for this card:**
-
-   ```bash
-   just coverage-fidelity --emit "<Card Name>"     # prints the generated cardDef DSL to stdout
-   ```
-
-   (It draws from the mtgish IR by name, independent of set.) Read the header banner — it tells you
-   which tier the draft is:
-
-   - **Complete render** (*"… Complete render — no manual wiring needed"*) — the emitter rendered the
-     whole card. Use it as the starting draft for Step 3: paste it into the canonical card file (the
-     set chosen in Step 1.4), fix the package/imports for that set, and treat every line as a claim to
-     verify, not a fact. Still predictive — Step 10's line-by-line Scryfall check and a scenario test
-     are mandatory.
-   - **Scaffold** (leads with `// TODO:` and carries `// STRUCTURE needs human wiring: …`) — part of
-     the card couldn't be recovered. Use the rendered structure as a skeleton and **hand-fill every
-     TODO / STRUCTURE marker** in Step 3. Don't ship the stubs.
-   - **Blocked / nothing emitted** — the card isn't draftable yet. Implement from scratch (Steps 2–4)
-     as normal.
-
-2. **Don't trust the draft on the engine's known-sloppy shapes.** Per the creator's note in the
-   tooling README, the generator deliberately scaffolds (or may mis-render) **additional costs**,
-   **cast/activation-time value choices** (X, chosen creature type, chosen color), and **inheriting a
-   cast-time choice into later effects**. If the card touches any of these, model that part by hand and
-   prove it with a scenario test even on a "complete render".
-
-3. **Placement still follows Step 1.4.** The emit is just DSL text — you decide the canonical file vs.
-   a `Printing` row (Step 10b). If the card is already implemented elsewhere, skip the draft and add a
-   reprint instead.
-
-4. **The draft is a draft.** It must compile, get a scenario test, and pass your Scryfall re-check
-   before it's done. A confidently-wrong generated card is worse than none — when in doubt, discard the
-   emit and model the card by hand.
-
 ## Step 2: Check Existing Effects
 
 **Always prefer atomic effects over monolithic effects** for reusability.
@@ -148,7 +156,7 @@ starting `cardDef` to refine, never a finished card. It replaces the blank page 
 
 **File**: `mtg-sets/src/main/kotlin/com/wingedsheep/mtg/sets/definitions/{set}/cards/{CardName}.kt`
 
-1. Write the card definition using DSL facades (`Effects.*`, `Targets.*`, `Triggers.*`, `Filters.*`, etc.) over raw constructors. **If Step 1.5 produced a complete-render or scaffold draft, start from it** — paste it here and refine, rather than writing from a blank page. See [examples.md](examples.md) for all patterns.
+1. Write the card definition using DSL facades (`Effects.*`, `Targets.*`, `Triggers.*`, `Filters.*`, etc.) over raw constructors. **If Step 0 produced a complete-render or scaffold draft, start from it** — paste it here and refine, rather than writing from a blank page. See [examples.md](examples.md) for all patterns.
 
 2. **Image URI — CRITICAL**:
    - **ALWAYS use the exact `image_uris.normal` URL from the Scryfall API response**
@@ -578,5 +586,5 @@ If `backlog/sets/{set-name}/cards.md` exists:
 12. **Walkthrough new mechanics** — If new effects/engine changes, trace through all layers (Step 9)
 13. **Build/test before committing** — `just build` (simple) or `just test` (new effects)
 14. **Be rules-faithful, no shortcuts** — Model the card exactly as the Comprehensive Rules dictate; cover edge cases and timing rather than the happy path. If a faithful implementation isn't feasible, stop and tell the user what's missing (see "Guiding principle" above)
-15. **Try the mtgish auto-draft first** — Before hand-modeling, run `just coverage-fidelity --emit "<Card Name>"` (Step 1.5) for a head-start draft; it's predictive, so still verify against Scryfall and add a scenario test. Discard it for the engine's known-sloppy shapes (extra costs, cast-time X / chosen values)
+15. **Probe the mtgish auto-draft FIRST (Step 0)** — Before any manual work, run `just coverage-fidelity --emit "<Card Name>"` to fail fast on cards the tooling can already draft and grab a head-start `cardDef`. It's predictive and its metadata is keyed to a guessed printing, so Step 1 still runs for authoritative per-printing data + canonical placement; verify against Scryfall (Step 10) and add a scenario test. Discard the draft for the engine's known-sloppy shapes (extra costs, cast-time X / chosen values)
 16. **Teach the mtgish generator new building blocks** — When a card adds a new effect/trigger/condition/keyword, also add a bridge capability + emitter handler (Step 4.11) so the tooling can predict and draft the mechanic across every set, not just this card

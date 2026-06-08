@@ -2,6 +2,7 @@ package com.wingedsheep.tooling.coverage
 
 import com.wingedsheep.tooling.coverage.bridge.Bridge
 import com.wingedsheep.tooling.coverage.emitter.Emitter
+import com.wingedsheep.tooling.coverage.emitter.reprintRowSource
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -205,12 +206,23 @@ object Fidelity {
         return 0
     }
 
-    private fun emit(name: String, effects: Set<String>, keywords: Set<String>): Int {
+    private fun emit(name: String, effects: Set<String>, keywords: Set<String>, requestedSet: String? = null): Int {
         val idx = Mtgish.loadMtgishIndex(setOf(name))
         val card = idx[Cards.front(name)] ?: idx.entries.firstOrNull { it.key.lowercase() == Cards.front(name).lowercase() }?.value
         if (card == null) { println("'$name': not found in mtgish IR"); return 1 }
-        val setCode = Cards.implementedNamesForCard(card["Name"].asStr() ?: "").firstOrNull() ?: "POR"
-        val scryfall = Cards.scryfallCard(setCode, card["Name"].asStr() ?: "")
+        val cardName = card["Name"].asStr() ?: ""
+        // The canonical `card(...)` definition belongs in the card's earliest real-expansion printing, so
+        // render its metadata (mana cost, type, collector, artist, image) + package from THAT set — never
+        // the asked-for set. Fall back to an implemented set / POR when there's no printing data (offline,
+        // no cache) so the emit never regresses to a metadata-less draft.
+        val canonical = Printings.earliestRealSet(cardName)?.uppercase()
+            ?: Cards.implementedNamesForCard(cardName).firstOrNull()
+            ?: "POR"
+        val (setCode, scryfall) = Cards.scryfallCard(canonical, cardName)?.let { canonical to it }
+            ?: run {
+                val fallback = Cards.implementedNamesForCard(cardName).firstOrNull() ?: "POR"
+                fallback to Cards.scryfallCard(fallback, cardName)
+            }
         val res = Emitter.renderCard(card, scryfall, effects, keywords,
             pkg = "com.wingedsheep.mtg.sets.generated.${setCode.lowercase()}.cards")
         println(res.text)
@@ -218,6 +230,23 @@ object Fidelity {
         val reasonsRepr = res.reasons.sorted().joinToString(", ", "[", "]") { "'$it'" }
         println("// fidelity tier: ${if (res.complete) "AUTO" else "SCAFFOLD"}" +
             (if (res.reasons.isNotEmpty()) " — unrecovered: $reasonsRepr" else ""))
+
+        // When the caller asked for a specific set that ISN'T the canonical home, that set must contribute
+        // only a Printing(...) row (the canonical card(...) above stays in the earliest set's package).
+        // Emit it too, so the draft is complete for the requested set — mirroring add-card Step 10b.
+        if (requestedSet != null && !requestedSet.equals(setCode, ignoreCase = true)) {
+            val target = requestedSet.uppercase()
+            val printing = Printings.printingFor(cardName, target)
+            val oracleId = printing?.oracleId ?: Printings.printingsOf(cardName).firstNotNullOfOrNull { it.oracleId }
+            if (oracleId == null) {
+                println("\n// NOTE: no Scryfall printing data for \"$cardName\" in $target — add the Printing(...) row by hand (add-card Step 10b).")
+            } else {
+                val reprintPkg = "com.wingedsheep.mtg.sets.generated.${target.lowercase()}.cards"
+                val meta = Cards.scryfallCard(target, cardName)
+                println("\n// ---- reprint row for $target (place in $target's cards/ package; canonical card(...) stays in $setCode) ----")
+                print(reprintRowSource(cardName, reprintPkg, setCode, target, oracleId, printing?.releasedAt, meta))
+            }
+        }
         return 0
     }
 
@@ -520,7 +549,7 @@ object Fidelity {
         val effects = Registry.loadEffectSerialNames()
         val keywords = Registry.loadKeywords()
         return when {
-            emitTokens.isNotEmpty() -> emit(emitTokens.joinToString(" "), effects, keywords)
+            emitTokens.isNotEmpty() -> emit(emitTokens.joinToString(" "), effects, keywords, setCode)
             all -> modeAll(effects, keywords)
             gate != null -> modeGate(gate, effects)
             setCode != null -> modeSet(setCode, effects, keywords, listTier)
