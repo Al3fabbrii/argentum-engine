@@ -3,9 +3,8 @@
   "player2Name": "Opponent",
   "player1": {
     "lifeTotal": 20,
-    "hand": [],
+    "hand": ["There and Back Again"],
     "battlefield": [
-      {"name": "There and Back Again", "counters": {"LORE": 0}},
       {"name": "Grizzly Bears"},
       {"name": "Mountain"},
       {"name": "Mountain"},
@@ -19,9 +18,12 @@
   },
   "player2": {
     "lifeTotal": 20,
-    "hand": [],
+    "hand": ["Intrepid Hero"],
     "battlefield": [
+      {"name": "Royal Assassin"},
       {"name": "Grizzly Bears"},
+      {"name": "Plains"},
+      {"name": "Plains"},
       {"name": "Plains"},
       {"name": "Plains"}
     ],
@@ -32,6 +34,6 @@
   "step": "UPKEEP",
   "activePlayer": 1,
   "priorityPlayer": 1,
-  "player1StopAtSteps": ["UPKEEP", "DRAW", "PRECOMBAT_MAIN"],
+  "player1StopAtSteps": [],
   "player2StopAtSteps": []
 }

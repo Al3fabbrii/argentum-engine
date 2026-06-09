@@ -84,7 +84,8 @@ val ThereAndBackAgain = card("There and Back Again") {
                     binding = Triggers.Dies.binding,
                     effect = Effects.CreateTreasure(14)
                 )
-            )
+            ),
+            imageUri = "https://cards.scryfall.io/normal/front/b/b/bb4ac08f-f6a5-49d6-91e9-38c4f217932b.jpg?1699974515"
         )
     }
 

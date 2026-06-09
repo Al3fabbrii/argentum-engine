@@ -3,9 +3,8 @@
   "player2Name": "Opponent",
   "player1": {
     "lifeTotal": 20,
-    "hand": ["Llanowar Elves", "Elvish Warrior", "Grizzly Bears"],
+    "hand": ["Llanowar Elves", "Elvish Warrior", "Grizzly Bears", "Long List of the Ents", "Long List of the Ents"],
     "battlefield": [
-      {"name": "Long List of the Ents", "counters": {"LORE": 0}},
       {"name": "Forest"},
       {"name": "Forest"},
       {"name": "Forest"},
@@ -29,6 +28,7 @@
   "step": "UPKEEP",
   "activePlayer": 1,
   "priorityPlayer": 1,
-  "player1StopAtSteps": ["UPKEEP", "DRAW", "PRECOMBAT_MAIN"],
-  "player2StopAtSteps": []
+  "player1StopAtSteps": [],
+  "player2StopAtSteps": [],
+  "mode": "SELF"
 }
