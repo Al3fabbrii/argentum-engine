@@ -65,7 +65,7 @@ data class DeckbuildConfig(
     /** Set to open boosters from (e.g. "BLB"). Must be sealed-supported in the booster generator. */
     val setCode: String,
 
-    /** Number of 15-card boosters to open. Tournament sealed = 6. */
+    /** Number of boosters to open (pack size follows the set's booster strategy). Tournament sealed = 6. */
     val boosterCount: Int = 6,
 
     /** Minimum legal deck size; `FINALIZE` unlocks once the build reaches it. */

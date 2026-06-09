@@ -123,6 +123,12 @@ data class LobbyPlayerState(
     var currentPack: List<CardDefinition>? = null,
     /** Draft only: queued packs waiting to be picked from (async pack passing). */
     val packQueue: MutableList<List<CardDefinition>> = mutableListOf(),
+    /**
+     * Draft only: [cardPool] size when the current pack round started. Pick numbers are derived
+     * from pool growth ((pool - this) / picksPerRound + 1), which stays correct for any booster
+     * size (15-card classic, 13-card Play Booster, 20-card commander draft).
+     */
+    var poolSizeAtRoundStart: Int = 0,
     var submittedDeck: Map<String, Int>? = null,
     /**
      * Commander card name when the lobby's [TournamentLobby.deckFormat] is commander-shape
@@ -331,7 +337,7 @@ class TournamentLobby(
     var currentPackNumber: Int = 0
         private set
 
-    /** Current pick number within the pack (1-15). In async mode, this is the minimum across all players. */
+    /** Current pick number within the pack (1-based). In async mode, this is the minimum across all players. */
     @Volatile
     var currentPickNumber: Int = 0
         private set
@@ -630,6 +636,7 @@ class TournamentLobby(
             }
             playerState.currentPack = newPack
             playerState.packQueue.clear()
+            playerState.poolSizeAtRoundStart = playerState.cardPool.size
         }
     }
 

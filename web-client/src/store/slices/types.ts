@@ -456,6 +456,12 @@ export interface DraftState {
   picksPerRound: number
   queuedPacks: number
   playerPackCounts: Readonly<Record<string, number>>
+  /**
+   * Total picks a pack of this round's size yields, derived from the latest received
+   * pack (booster sizes vary: 15-card classic, 13-card Play Booster, 20-card commander).
+   * Null until a non-empty pack has been seen.
+   */
+  picksPerPack: number | null
 }
 
 /**

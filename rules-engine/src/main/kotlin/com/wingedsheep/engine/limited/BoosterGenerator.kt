@@ -9,10 +9,10 @@ import kotlin.random.Random
 /**
  * Generates booster packs and sealed pools from card sets.
  *
- * Standard booster composition:
- * - 11 Commons
- * - 3 Uncommons
- * - 1 Rare (with ~12.5% chance of Mythic if the set has mythics)
+ * Pack composition is delegated to each set's [BoosterStrategy]: classic sets use
+ * the 15-card [StandardBooster] (11C / 3U / 1R-or-mythic), Play-Booster-era sets
+ * (Murders at Karlov Manor, 2024, onward) use [com.wingedsheep.sdk.limited.PlayBooster],
+ * and sets can override with custom strategies (guaranteed legendary, commander draft).
  *
  * ## Scope
  *
@@ -234,7 +234,7 @@ class BoosterGenerator(
         // Combined-pool path: forced by Chaos mode, or by any incomplete set in the selection.
         if (chaos || setConfigs.any { it.incomplete }) {
             val combinedCards = setConfigs.flatMap { it.cards }
-            val effectiveStrategy = strategy ?: StandardBooster()
+            val effectiveStrategy = strategy ?: combinedPoolStrategy(setConfigs)
             return effectiveStrategy.generate(boosterPool(combinedCards, bannedCardNames), Random.Default)
         }
 
@@ -303,7 +303,7 @@ class BoosterGenerator(
         // Combined-pool path: forced by Chaos mode, or by any incomplete set.
         if (chaos || setConfigs.any { it.incomplete }) {
             val combinedCards = setConfigs.flatMap { it.cards }
-            val combinedStrategy = strategy ?: StandardBooster()
+            val combinedStrategy = strategy ?: combinedPoolStrategy(setConfigs)
             val combinedPool = boosterPool(combinedCards, bannedCardNames)
             return (1..boosterCount).flatMap { combinedStrategy.generate(combinedPool, Random.Default) }
         }
@@ -363,7 +363,7 @@ class BoosterGenerator(
         if (chaos || setConfigs.any { it.incomplete }) {
             val combinedCards = setConfigs.flatMap { it.cards }
             val totalBoosters = boosterDistribution.values.sum()
-            val combinedStrategy = strategy ?: StandardBooster()
+            val combinedStrategy = strategy ?: combinedPoolStrategy(setConfigs)
             val combinedPool = boosterPool(combinedCards, bannedCardNames)
             return (1..totalBoosters).flatMap { combinedStrategy.generate(combinedPool, Random.Default) }
         }
@@ -434,6 +434,14 @@ class BoosterGenerator(
         }
         return getAllBasicLandVariants(setCodes.first())
     }
+
+    /**
+     * Strategy for the combined-pool (chaos / incomplete-set) path: a single set keeps its own
+     * configured pack shape; a genuine multi-set mix falls back to the classic 15-card booster,
+     * since the merged pool has no one era to honor.
+     */
+    private fun combinedPoolStrategy(setConfigs: List<SetConfig>): BoosterStrategy =
+        setConfigs.singleOrNull()?.boosterStrategy ?: StandardBooster()
 
     /**
      * Strip basic lands and non-booster cards (Special Guests / The List / promos), plus any

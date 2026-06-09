@@ -151,9 +151,9 @@ class BoosterDraftHandler(
         val ws = playerState.identity.webSocketSession ?: return
         if (!ws.isOpen) return
 
-        // Derive pick number from pack size: 15-card = pick 1, 14-card = pick 2, etc.
-        val boosterSize = 15
-        val pickNumber = (boosterSize - pack.size) / lobby.picksPerRound + 1
+        // Derive pick number from this player's pool growth since the round started —
+        // booster sizes vary by strategy (15-card classic, 13-card Play Booster, 20-card commander).
+        val pickNumber = (playerState.cardPool.size - playerState.poolSizeAtRoundStart) / lobby.picksPerRound + 1
         val timeRemaining = lobby.playerTimeRemaining[playerId] ?: lobby.pickTimeSeconds
 
         ctx.sender.send(ws, ServerMessage.DraftPackReceived(
@@ -263,12 +263,11 @@ class BoosterDraftHandler(
     fun sendDraftReconnectionState(session: WebSocketSession, lobby: TournamentLobby, identity: PlayerIdentity) {
         val playerState = lobby.players[identity.playerId] ?: return
         val pack = playerState.currentPack
-        val boosterSize = 15
 
         // Always send DraftPackReceived so the client creates draftState.
         // If the player has no current pack (waiting), send an empty pack.
         val pickNumber = if (pack != null) {
-            (boosterSize - pack.size) / lobby.picksPerRound + 1
+            (playerState.cardPool.size - playerState.poolSizeAtRoundStart) / lobby.picksPerRound + 1
         } else {
             1
         }

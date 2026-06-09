@@ -28,7 +28,7 @@ class GameEnvironmentTest : FunSpec({
 
     fun simpleDeck() = Deck.of("Mountain" to 17, "Raging Goblin" to 3)
 
-    /** Build a sealed deck from a random Bloomburrow pool (6 "boosters" of 15 cards). */
+    /** Build a sealed deck from a random 90-card Bloomburrow pool. */
     fun sealedDeck(): Deck {
         val pool = BloomburrowSet.cards.shuffled().take(90)
         val deckMap = buildHeuristicSealedDeck(pool)

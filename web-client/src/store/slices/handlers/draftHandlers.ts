@@ -114,6 +114,11 @@ export function createDraftHandlers(set: SetState, _get: GetState): Pick<Message
                 picksPerRound: msg.picksPerRound,
                 queuedPacks: msg.queuedPacks ?? 0,
                 playerPackCounts: state.lobbyState.draftState?.playerPackCounts ?? {},
+                // Reconstruct this round's picks-per-pack from the pack in hand; an empty
+                // pack (waiting / reconnect) keeps the last known value.
+                picksPerPack: msg.cards.length > 0
+                  ? msg.pickNumber - 1 + Math.ceil(msg.cards.length / Math.max(1, msg.picksPerRound))
+                  : state.lobbyState.draftState?.picksPerPack ?? null,
               },
             }
           : null,

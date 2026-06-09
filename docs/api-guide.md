@@ -141,7 +141,11 @@ object MyNewSet : MtgSet {
 Optional overrides commonly used by real sets:
 
 - `basicLandsFallback = OnslaughtSet` — point at another set's basics when yours has none.
-- `boosterStrategy = …` — override the default 11C / 3U / 1R(or mythic) pack for custom slots.
+- `boosterStrategy = …` — override the era default for custom slots. The default follows
+  `releaseDate`: sets before Murders at Karlov Manor (2024-02-09) get the classic 15-card
+  `StandardBooster` (11C / 3U / 1R-or-mythic); later sets get the modern `PlayBooster`
+  division (7C / 3U / 1R-or-mythic at 12.5% / 2 any-rarity wildcards — 13 cards, since the
+  engine has no foils and supplies basics at deck building).
 - `printings: List<Printing>` — register reprints whose canonical `CardDefinition` lives in an
   earlier set.
 

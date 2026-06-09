@@ -1,6 +1,7 @@
 package com.wingedsheep.sdk.model
 
 import com.wingedsheep.sdk.limited.BoosterStrategy
+import com.wingedsheep.sdk.limited.PlayBooster
 import com.wingedsheep.sdk.limited.StandardBooster
 
 /**
@@ -39,11 +40,15 @@ interface MtgSet {
 
     /**
      * Strategy that turns the set's card pool into a single booster pack.
-     * Defaults to a standard 11C / 3U / 1R(or mythic) pack; sets override
-     * this to express custom slot rules (guaranteed legendary, extra slots,
-     * etc.).
+     *
+     * The default follows the set's era, derived from [releaseDate]: sets from
+     * Murders at Karlov Manor (2024-02-09) onward get the 14-card [PlayBooster]
+     * division; earlier sets (and sets without a release date) get the classic
+     * 15-card [StandardBooster] (11C / 3U / 1R-or-mythic). Sets override this to
+     * express custom slot rules (guaranteed legendary, commander draft, etc.).
      */
-    val boosterStrategy: BoosterStrategy get() = StandardBooster()
+    val boosterStrategy: BoosterStrategy
+        get() = if ((releaseDate ?: "") >= PLAY_BOOSTER_ERA_START) PlayBooster() else StandardBooster()
 
     /**
      * If this set has no basic lands of its own, the set whose lands should be
@@ -75,4 +80,12 @@ interface MtgSet {
      * Each entry's `name` must match an existing [CardDefinition.name] in some registered set.
      */
     val printings: List<Printing> get() = emptyList()
+
+    companion object {
+        /**
+         * Release date of Murders at Karlov Manor, the first set printed as
+         * 14-card Play Boosters. ISO dates compare correctly as strings.
+         */
+        const val PLAY_BOOSTER_ERA_START = "2024-02-09"
+    }
 }

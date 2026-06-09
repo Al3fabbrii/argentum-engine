@@ -204,7 +204,8 @@ function DraftPicker({ draftState, settings }: { draftState: DraftState; setting
 
   const totalPicked = draftState.pickedCards.length
   const totalPacks = settings.boosterCount
-  const totalPicks = totalPacks * 15 // packs * cards per pack
+  // Booster sizes vary by set era/strategy; picksPerPack is derived from the received packs.
+  const totalPicks = draftState.picksPerPack != null ? totalPacks * draftState.picksPerPack : null
 
   return (
     <div
@@ -242,6 +243,7 @@ function DraftPicker({ draftState, settings }: { draftState: DraftState; setting
             packNumber={draftState.packNumber}
             pickNumber={draftState.pickNumber}
             totalPacks={totalPacks}
+            picksPerPack={draftState.picksPerPack}
           />
           <SetSynergiesButton setCodes={settings.setCodes} cardPool={draftState.pickedCards} />
           {settings.aiAssistEnabled && draftState.currentPack.length > 0 && (
@@ -282,7 +284,7 @@ function DraftPicker({ draftState, settings }: { draftState: DraftState; setting
               fontSize: responsive.fontSize.normal,
             }}
           >
-            {totalPicked} / {totalPicks}
+            {totalPicks != null ? `${totalPicked} / ${totalPicks}` : totalPicked}
           </div>
 
           {/* Toggle picked cards sidebar - mobile only */}
@@ -501,7 +503,7 @@ function DraftPicker({ draftState, settings }: { draftState: DraftState; setting
   )
 }
 
-function PackPickIndicator({ packNumber, pickNumber, totalPacks }: { packNumber: number; pickNumber: number; totalPacks: number }) {
+function PackPickIndicator({ packNumber, pickNumber, totalPacks, picksPerPack }: { packNumber: number; pickNumber: number; totalPacks: number; picksPerPack: number | null }) {
   return (
     <div
       style={{
@@ -519,7 +521,7 @@ function PackPickIndicator({ packNumber, pickNumber, totalPacks }: { packNumber:
       <span style={{ color: '#555' }}>|</span>
       <span style={{ color: '#888', fontSize: 13 }}>Pick</span>
       <span style={{ color: '#4fc3f7', fontWeight: 700, fontSize: 16 }}>{pickNumber}</span>
-      <span style={{ color: '#666', fontSize: 12 }}>/ 15</span>
+      {picksPerPack != null && <span style={{ color: '#666', fontSize: 12 }}>/ {picksPerPack}</span>}
     </div>
   )
 }

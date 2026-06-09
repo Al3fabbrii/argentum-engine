@@ -29,7 +29,7 @@ sealed interface DeckSpec {
      *
      * @property setCode Which set to open boosters from. When null, a random
      *                   set is chosen from the booster generator's catalogue.
-     * @property boosterCount Number of 15-card boosters to open (default 8,
+     * @property boosterCount Number of boosters to open (default 8,
      *                        matching tournament sealed).
      */
     @Serializable
