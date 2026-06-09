@@ -1189,6 +1189,16 @@ for any other (filter, binding, to/excludeTo) combination.
   any-controller deaths); `excludeTo = GRAVEYARD` gives "leaves without dying"
   (Three Tree Scribe shape); leaving both null gives "leaves to any zone."
 
+**Token creation**
+
+- `EventPattern.TokenCreationEvent(controller = ControllerFilter.You, tokenFilter? = null)` — used as
+  a trigger, "Whenever you create a token" (Mirkwood Bats). **Per-token**: fires once for *each* token
+  created, so an effect that creates three tokens at once fires it three times. Matched against each
+  token-creation `ZoneChangeEvent` (`fromZone == null`); a token that's a copy of a permanent spell
+  enters from the stack and is **not** "created" (CR 608.3f / 111.13), so it doesn't fire this. The
+  same `EventPattern` also serves as a replacement-effect filter (token doublers); the two uses don't
+  conflict.
+
 ### Combat
 
 Named sugar for the common cases; reach for `attacks(...)` / `blocks(...)` /
