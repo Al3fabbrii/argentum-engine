@@ -6,6 +6,7 @@ import com.wingedsheep.engine.mechanics.layers.Layer
 import com.wingedsheep.engine.mechanics.layers.SerializableModification
 import com.wingedsheep.engine.mechanics.layers.addFloatingEffect
 import com.wingedsheep.engine.state.GameState
+import com.wingedsheep.engine.state.components.battlefield.NotedCreatureTypesComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.handlers.effects.library.ChooseCreatureTypePipelineExecutor
 
@@ -15,6 +16,7 @@ class CreatureTypeChoiceContinuationResumer(
 
     override fun resumers(): List<ContinuationResumer<*>> = listOf(
         resumer(ChooseOptionPipelineContinuation::class, ::resumeChooseOptionPipeline),
+        resumer(NoteCreatureTypePipelineContinuation::class, ::resumeNoteCreatureType),
         resumer(BecomeCreatureTypeContinuation::class, ::resumeBecomeCreatureType),
         resumer(EachPlayerChoosesCreatureTypeContinuation::class, ::resumeEachPlayerChoosesCreatureType)
     )
@@ -46,34 +48,60 @@ class CreatureTypeChoiceContinuationResumer(
         val chosenValue = continuation.options.getOrNull(response.optionIndex)
             ?: return ExecutionResult.error(state, "Invalid option index: ${response.optionIndex}")
 
-        val isChosenCreatureType = continuation.storeAs ==
+        val mirrorChosenCreatureType = continuation.storeAs ==
             ChooseCreatureTypePipelineExecutor.CHOSEN_CREATURE_TYPE_KEY
 
-        val updatedStack = state.continuationStack.map { frame ->
-            if (frame is EffectContinuation) {
-                val newContext = if (isChosenCreatureType) {
-                    frame.effectContext.copy(
-                        chosenCreatureType = chosenValue,
-                        pipeline = frame.effectContext.pipeline.copy(
-                            chosenValues = frame.effectContext.pipeline.chosenValues +
-                                (continuation.storeAs to chosenValue)
-                        )
-                    )
-                } else {
-                    frame.effectContext.copy(
-                        pipeline = frame.effectContext.pipeline.copy(
-                            chosenValues = frame.effectContext.pipeline.chosenValues +
-                                (continuation.storeAs to chosenValue)
-                        )
-                    )
-                }
-                frame.copy(effectContext = newContext)
-            } else {
-                frame
-            }
+        val newState = state.copy(
+            continuationStack = injectChosenValueIntoStack(
+                state.continuationStack,
+                continuation.storeAs,
+                chosenValue,
+                mirrorChosenCreatureType = mirrorChosenCreatureType
+            )
+        )
+
+        return checkForMore(newState, emptyList())
+    }
+
+    /**
+     * Resume after the player picked a creature type for a [com.wingedsheep.sdk.scripting.effects.NoteCreatureTypeEffect].
+     * Appends the chosen type to the source's [NotedCreatureTypesComponent] (creating the
+     * component on demand) AND injects the chosen value into every `EffectContinuation` on the
+     * stack via `chosenValues[storeAs]` — same pattern as [resumeChooseOptionPipeline] so a
+     * downstream pipeline step (e.g., the delayed-trigger spawn that fires "when you next cast
+     * a creature spell of that type this turn") reads it the same way it would read any
+     * `ChooseOption` result.
+     */
+    fun resumeNoteCreatureType(
+        state: GameState,
+        continuation: NoteCreatureTypePipelineContinuation,
+        response: DecisionResponse,
+        checkForMore: CheckForMore
+    ): ExecutionResult {
+        if (response !is OptionChosenResponse) {
+            return ExecutionResult.error(state, "Expected option choice response for note-creature-type selection")
         }
 
-        val newState = state.copy(continuationStack = updatedStack)
+        val chosenValue = continuation.options.getOrNull(response.optionIndex)
+            ?: return ExecutionResult.error(state, "Invalid option index: ${response.optionIndex}")
+
+        // Source may have left play between pause and resume — guard before updating.
+        val stateWithComponent = if (state.getEntity(continuation.sourceId) != null) {
+            state.updateEntity(continuation.sourceId) { container ->
+                val existing = container.get<NotedCreatureTypesComponent>() ?: NotedCreatureTypesComponent()
+                container.with(existing.withAdded(chosenValue))
+            }
+        } else {
+            state
+        }
+
+        val newState = stateWithComponent.copy(
+            continuationStack = injectChosenValueIntoStack(
+                stateWithComponent.continuationStack,
+                continuation.storeAs,
+                chosenValue
+            )
+        )
 
         return checkForMore(newState, emptyList())
     }
@@ -214,4 +242,31 @@ class CreatureTypeChoiceContinuationResumer(
         return checkForMore(newState, emptyList())
     }
 
+    /**
+     * Copy [chosenValue] into `chosenValues[storeAs]` on every [EffectContinuation] frame, so a
+     * downstream pipeline step inside the same composite — or in an outer composite that wraps
+     * the choice (a `ChooseOption` nested inside a `MayEffect` inside a `CompositeEffect`) —
+     * reads the same value the original chooser saw. Non-effect frames pass through unchanged.
+     *
+     * Pass [mirrorChosenCreatureType] = true to also write the value into the legacy
+     * `chosenCreatureType` field, kept for compatibility with `SelectFromCollectionExecutor` and
+     * `HasSubtypeFromVariable` consumers that predate the generic `chosenValues` map.
+     */
+    private fun injectChosenValueIntoStack(
+        stack: List<ContinuationFrame>,
+        storeAs: String,
+        chosenValue: String,
+        mirrorChosenCreatureType: Boolean = false
+    ): List<ContinuationFrame> = stack.map { frame ->
+        if (frame !is EffectContinuation) return@map frame
+        val newPipeline = frame.effectContext.pipeline.copy(
+            chosenValues = frame.effectContext.pipeline.chosenValues + (storeAs to chosenValue)
+        )
+        val newContext = if (mirrorChosenCreatureType) {
+            frame.effectContext.copy(chosenCreatureType = chosenValue, pipeline = newPipeline)
+        } else {
+            frame.effectContext.copy(pipeline = newPipeline)
+        }
+        frame.copy(effectContext = newContext)
+    }
 }

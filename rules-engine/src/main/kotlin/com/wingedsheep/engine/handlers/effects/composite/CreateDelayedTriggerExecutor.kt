@@ -21,6 +21,10 @@ import com.wingedsheep.sdk.scripting.effects.WarpExileEffect
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.core.Subtype
+import com.wingedsheep.sdk.scripting.EventPattern
+import com.wingedsheep.sdk.scripting.TriggerSpec
+import com.wingedsheep.sdk.scripting.predicates.CardPredicate
 import java.util.UUID
 import kotlin.reflect.KClass
 
@@ -51,6 +55,14 @@ class CreateDelayedTriggerExecutor : EffectExecutor<CreateDelayedTriggerEffect> 
         // Bake in any context-dependent target references so the delayed trigger
         // has concrete entity IDs when it fires later.
         val resolvedEffect = resolveContextTargets(effect.effect, context)
+
+        // Bake any chosen-value references in the trigger's filter into concrete predicates.
+        // Long List of the Ents (LTR) needs "when you cast a creature spell of the type just
+        // noted, that creature enters with +1/+1" — the noted type lives in `chosenValues` of
+        // the pipeline running this chapter, and that EffectContext is gone by the time the
+        // trigger fires. Substitute the chosen value at creation time so the trigger spec is
+        // self-contained.
+        val resolvedTrigger = effect.trigger?.let { bakeChosenValuesIntoTrigger(it, context) }
 
         // For event-based delayed triggers, bake the watched target into a concrete
         // entity id so matching later is cheap and doesn't need the original context.
@@ -103,7 +115,7 @@ class CreateDelayedTriggerExecutor : EffectExecutor<CreateDelayedTriggerEffect> 
             sourceId = sourceId,
             sourceName = sourceName,
             controllerId = context.controllerId,
-            trigger = effect.trigger,
+            trigger = resolvedTrigger,
             watchedEntityId = watchedEntityId,
             expiry = if (effect.trigger != null) effect.expiry else null,
             fireOnce = effect.trigger != null && effect.fireOnce,
@@ -113,6 +125,37 @@ class CreateDelayedTriggerExecutor : EffectExecutor<CreateDelayedTriggerEffect> 
         )
 
         return EffectResult.success(state.addDelayedTrigger(delayedTrigger))
+    }
+
+    /**
+     * Substitute any chosen-value references in the trigger spec's filter with the concrete
+     * values from the current [EffectContext.pipeline.chosenValues]. After the delayed trigger
+     * is created, the originating EffectContext is gone — the trigger spec needs to be
+     * self-contained so the matcher can evaluate it on its own.
+     *
+     * Currently handles [CardPredicate.HasSubtypeFromVariable] inside a
+     * [EventPattern.SpellCastEvent]'s `spellFilter` — that's the predicate Long List of the
+     * Ents's chapter trigger needs. Extend this helper as further variable-based predicates
+     * appear in trigger filters (e.g., `HasSubtypeInStoredList`, `NameEqualsChosen` inside a
+     * cast trigger).
+     */
+    private fun bakeChosenValuesIntoTrigger(trigger: TriggerSpec, context: EffectContext): TriggerSpec {
+        val chosen = context.pipeline.chosenValues
+        if (chosen.isEmpty()) return trigger
+        val event = trigger.event
+        if (event !is EventPattern.SpellCastEvent) return trigger
+        val filter = event.spellFilter
+        val newPredicates = filter.cardPredicates.map { predicate ->
+            if (predicate is CardPredicate.HasSubtypeFromVariable) {
+                val value = chosen[predicate.variableName] ?: return@map predicate
+                CardPredicate.HasSubtype(Subtype(value))
+            } else {
+                predicate
+            }
+        }
+        if (newPredicates == filter.cardPredicates) return trigger
+        val newFilter = filter.copy(cardPredicates = newPredicates)
+        return trigger.copy(event = event.copy(spellFilter = newFilter))
     }
 
     /**

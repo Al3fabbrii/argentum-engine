@@ -7443,6 +7443,225 @@
     ]
 }
 
+// Long List of the Ents
+{
+    "name": "Long List of the Ents",
+    "manaCost": "{G}",
+    "typeLine": "Enchantment — Saga",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after VI.)\nI, II, III, IV, V, VI — Note a creature type that hasn't been noted for this Saga. When you next cast a creature spell of that type this turn, that creature enters with an additional +1/+1 counter on it.",
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 4,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 5,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 6,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "NoteCreatureType",
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "effect": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "TriggeringEntity"
+                            },
+                            "trigger": {
+                                "event": {
+                                    "type": "SpellCastEvent",
+                                    "spellFilter": {
+                                        "cardPredicates": [
+                                            "IsCreature",
+                                            {
+                                                "type": "HasSubtypeFromVariable",
+                                                "variableName": "notedType"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "fireOnce": true
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "174",
+        "rarity": "UNCOMMON",
+        "artist": "Logan Feliciano",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/7/27347256-2ac4-4b12-b288-0a8d578a1ff2.jpg?1715045040"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Lost to Legend
 {
     "name": "Lost to Legend",
@@ -11026,6 +11245,104 @@
     ]
 }
 
+// Scroll of Isildur
+{
+    "name": "Scroll of Isildur",
+    "manaCost": "{2}{U}",
+    "typeLine": "Enchantment — Saga",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Gain control of up to one target artifact for as long as you control this Saga. The Ring tempts you.\nII — Tap up to two target creatures. Put a stun counter on each of them.\nIII — Draw a card for each tapped creature target opponent controls.",
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GainControl",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "up to one target artifact"
+                            },
+                            "duration": {
+                                "type": "WhileYouControlSource",
+                                "sourceDescription": "Scroll of Isildur"
+                            }
+                        },
+                        "TheRingTemptsYou"
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "artifact"
+                    },
+                    "id": "up to one target artifact"
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "ForEachTarget",
+                    "effects": [
+                        {
+                            "type": "TapUntap",
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            }
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "stun",
+                            "count": 1,
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            }
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "count": 2,
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature"
+                    },
+                    "id": "up to two target creatures"
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Count",
+                        "player": "TargetOpponent",
+                        "zone": "Battlefield",
+                        "filter": "creature tapped"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetOpponent",
+                    "id": "target opponent"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "69",
+        "rarity": "RARE",
+        "artist": "Audrey Benjaminsen",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/9/195821f4-ba3d-4412-930f-f3656b319dfd.jpg?1688569264"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Second Breakfast
 {
     "name": "Second Breakfast",
@@ -13108,6 +13425,129 @@
     },
     "colorIdentityOverride": [
         "BLUE"
+    ]
+}
+
+// There and Back Again
+{
+    "name": "There and Back Again",
+    "manaCost": "{3}{R}{R}",
+    "typeLine": "Enchantment — Saga",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Up to one target creature can't block for as long as you control this Saga. The Ring tempts you.\nII — Search your library for a Mountain card, put it onto the battlefield, then shuffle.\nIII — Create Smaug, a legendary 6/6 red Dragon creature token with flying, haste, and \"When Smaug dies, create fourteen Treasure tokens.\"",
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "CantBlockTargetCreatures",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "up to one target creature"
+                            },
+                            "duration": {
+                                "type": "WhileYouControlSource",
+                                "sourceDescription": "There and Back Again"
+                            }
+                        },
+                        "TheRingTemptsYou"
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature"
+                    },
+                    "id": "up to one target creature"
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "FromZone",
+                                "zone": "Library",
+                                "filter": "Mountain"
+                            },
+                            "storeAs": "searchable"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "searchable",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "storeSelected": "found"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "found",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Battlefield"
+                            }
+                        },
+                        "ShuffleLibrary"
+                    ]
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 6,
+                    "toughness": 6,
+                    "colors": [
+                        "RED"
+                    ],
+                    "creatureTypes": [
+                        "Dragon"
+                    ],
+                    "keywords": [
+                        "FLYING",
+                        "HASTE"
+                    ],
+                    "name": "Smaug",
+                    "imageUri": "https://cards.scryfall.io/normal/front/b/b/bb4ac08f-f6a5-49d6-91e9-38c4f217932b.jpg?1699974515",
+                    "legendary": true,
+                    "triggeredAbilities": [
+                        {
+                            "id": "ability_1",
+                            "trigger": {
+                                "type": "ZoneChangeEvent",
+                                "from": "Battlefield",
+                                "to": "Graveyard"
+                            },
+                            "effect": {
+                                "type": "CreatePredefinedToken",
+                                "tokenType": "Treasure",
+                                "count": 14
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "151",
+        "rarity": "RARE",
+        "artist": "Jarel Threat",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/3/939b0bd0-24ea-45de-a2d3-37bbf6a3e6f9.jpg?1689938360"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 

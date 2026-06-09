@@ -513,10 +513,13 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   `Duration.WhileSourceTapped` (Callous Oppressor) or
   `Duration.WhileSourceTappedAndAffectedPowerAtMostSource` (Old Man of the Sea) for the classic
   "for as long as this creature remains tapped [and the stolen creature's power stays ≤ source's
-  power]" steal pattern. `StateProjector` gates these per-frame for the instantaneous view; the
+  power]" steal pattern, or `Duration.WhileYouControlSource("<source name>")` for the
+  "for as long as you control this [permanent]" pattern (Aladdin, Scroll of Isildur Chapter I,
+  Rangers of Ithilien). `StateProjector` gates these per-frame for the instantaneous view; the
   one-way half of CR 611.2b ("for as long as" durations don't restart) is enforced by the
   `EndedDurationExpiryCheck` state-based action, which physically removes the effect the moment
-  the condition fails — so a pump that wears off (or a re-tap) never re-grabs the creature.
+  the condition fails — so a pump that wears off, a re-tap, or a re-acquired source never
+  re-grabs the creature.
 - `ExchangeControlEffect(target1, target2)` — swap control of two permanents.
 - `GainControlByMostEffect(metric, target?)` — the player with strictly the most of a `PlayerRankMetric` takes it (tie = no change). Metrics: `PlayerRankMetric.LifeTotal` (Ghazbán Ogre), `PlayerRankMetric.CreaturesOfSubtype(subtype)` (Thoughtbound Primoc). Facades: `Effects.GainControlByMostLife()`, `Effects.GainControlByMostOfSubtype(subtype)`.
 - `GiftGivenEffect(target)` — "gift" temporary control.
@@ -2769,6 +2772,7 @@ staticAbility { ability = GrantLandwalkOfChosenType() }
   — and, when `source` is the about-to-leave permanent, place it before the exile/destroy step
   (`Composite(ForEachColorOf(…), Exile(…))`) so its colors are still readable (Éowyn, Fearless Knight).
 - `ChooseCreatureTypeEffect(...)` — pause for creature-type selection.
+- `Effects.NoteCreatureType(storeAs = "notedType", prompt?)` — "note a creature type that hasn't been noted for this <source>" (LTR — Long List of the Ents). Same decision shape as `ChooseOption(OptionType.CREATURE_TYPE)`, but the source's *current* `NotedCreatureTypesComponent.types` are excluded from the option list (so the player can't pick a duplicate), and on resolution the chosen type is appended to that component on the source AND stored in `chosenValues[storeAs]` for any downstream pipeline step. The component lives on the source permanent's container, so it disappears when the source leaves play (CR 400.7 — a permanent that changes zones becomes a new object with no memory of its previous existence). Use this whenever a card's text says "note … for this permanent"; use plain `ChooseOption(OptionType.CREATURE_TYPE)` when the choice is one-shot and doesn't need to accumulate.
 - `Effects.ChooseCardName(storeAs, prompt?, excludeBasicLandNames?)` — name a card (`ChooseOptionEffect(OptionType.CARD_NAME)`); the chosen name is stored in `chosenValues[storeAs]`. Options are every registry card name (searchable list, not free text); `excludeBasicLandNames` drops the five basics. Match cards by it with `GameObjectFilter.namedFromVariable(storeAs)`. (Desperate Research)
 - `Effects.StoreCardName(from, storeAs)` — capture the name of the first card in collection `from` into `chosenValues[storeAs]`. The "choose a card, then act on cards of that name" counterpart to `ChooseCardName`. (Lobotomy)
 - `SelectTargetEffect(...)` — pick from a valid target set.
