@@ -1,7 +1,7 @@
 /**
  * Draft slice - handles sealed deck building and drafting logic.
  */
-import type { SliceCreator, DeckBuildingState } from './types'
+import type { SliceCreator, DeckBuildingState, PickScore } from './types'
 import {
   createCreateSealedGameMessage,
   createJoinSealedGameMessage,
@@ -13,10 +13,27 @@ import {
   createGridDraftPickMessage,
 } from '@/types'
 import { trackEvent } from '@/utils/analytics.ts'
+import {
+  suggestPick as apiSuggestPick,
+  autoBuildDeck as apiAutoBuildDeck,
+} from '@/api/aiAssist'
 import { getWebSocket, saveDeckState } from './shared'
+
+export type { PickScore }
 
 export interface DraftSliceState {
   deckBuildingState: DeckBuildingState | null
+  /**
+   * AI "Suggest Pick" results for the current pack: card name → score/reason. Null until the player
+   * asks for a suggestion; cleared by the draft handlers when the pack changes.
+   */
+  pickScores: Readonly<Record<string, PickScore>> | null
+  /** Card names the AI recommends taking this pick (highlighted in the pack grid). */
+  recommendedPick: readonly string[]
+  /** True while a suggest-pick / auto-build request is in flight. */
+  aiAssistBusy: boolean
+  /** Last AI-assist error message (e.g. assistance disabled), or null. */
+  aiAssistError: string | null
 }
 
 export interface DraftSliceActions {
@@ -36,6 +53,12 @@ export interface DraftSliceActions {
   winstonTakePile: () => void
   winstonSkipPile: () => void
   gridDraftPick: (selection: string) => void
+  /** Ask the chosen AI engine to score the current pack and recommend the best pick(s). */
+  suggestPick: (advisorId?: string) => Promise<void>
+  /** Clear the current pick suggestion overlay. */
+  clearPickSuggestion: () => void
+  /** Build (empty deck) or complete (partial deck) the deck from the pool with the chosen engine. */
+  autoBuildDeck: (advisorId?: string) => Promise<void>
 }
 
 export type DraftSlice = DraftSliceState & DraftSliceActions
@@ -43,6 +66,10 @@ export type DraftSlice = DraftSliceState & DraftSliceActions
 export const createDraftSlice: SliceCreator<DraftSlice> = (set, get) => ({
   // Initial state
   deckBuildingState: null,
+  pickScores: null,
+  recommendedPick: [],
+  aiAssistBusy: false,
+  aiAssistError: null,
 
   // Actions
   createSealedGame: (setCode) => {
@@ -266,5 +293,87 @@ export const createDraftSlice: SliceCreator<DraftSlice> = (set, get) => ({
   gridDraftPick: (selection) => {
     trackEvent('grid_draft_pick', { selection })
     getWebSocket()?.send(createGridDraftPickMessage(selection))
+  },
+
+  suggestPick: async (advisorId) => {
+    const { lobbyState } = get()
+    const draft = lobbyState?.draftState
+    if (!draft || draft.currentPack.length === 0) return
+
+    trackEvent('draft_suggest_pick', { advisor: advisorId ?? 'default' })
+    set({ aiAssistBusy: true, aiAssistError: null })
+    try {
+      const advice = await apiSuggestPick({
+        lobbyId: lobbyState?.lobbyId ?? null,
+        advisorId: advisorId ?? null,
+        pack: draft.currentPack.map((c) => c.name),
+        pickedSoFar: draft.pickedCards.map((c) => c.name),
+        packNumber: draft.packNumber,
+        pickNumber: draft.pickNumber,
+        picksRequired: draft.picksPerRound,
+      })
+      const scores: Record<string, PickScore> = {}
+      for (const s of advice.scores) scores[s.cardName] = { score: s.score, reason: s.reason }
+      set({ pickScores: scores, recommendedPick: advice.recommended, aiAssistBusy: false })
+    } catch (e) {
+      set({
+        aiAssistBusy: false,
+        aiAssistError: e instanceof Error ? e.message : 'Suggestion failed',
+        pickScores: null,
+        recommendedPick: [],
+      })
+    }
+  },
+
+  clearPickSuggestion: () => set({ pickScores: null, recommendedPick: [], aiAssistError: null }),
+
+  autoBuildDeck: async (advisorId) => {
+    const { deckBuildingState, lobbyState } = get()
+    if (!deckBuildingState) return
+
+    trackEvent('deckbuild_auto_build', { advisor: advisorId ?? 'default' })
+    set({ aiAssistBusy: true, aiAssistError: null })
+    try {
+      // Treat the player's current deck (non-land picks + basic lands) as locked, so an empty deck
+      // builds fresh and a partial deck is completed without dropping their existing cards.
+      const lockedDeck: Record<string, number> = {}
+      for (const name of deckBuildingState.deck) lockedDeck[name] = (lockedDeck[name] ?? 0) + 1
+      for (const [land, count] of Object.entries(deckBuildingState.landCounts)) {
+        if (count > 0) lockedDeck[land] = (lockedDeck[land] ?? 0) + count
+      }
+
+      const format = lobbyState?.settings.format
+      const isCommander = format === 'COMMANDER_DRAFT' || format === 'COMMANDER_SEALED'
+      const targetSize = isCommander ? lobbyState?.settings.deckSizeMin ?? 60 : 40
+
+      const result = await apiAutoBuildDeck({
+        lobbyId: lobbyState?.lobbyId ?? null,
+        advisorId: advisorId ?? null,
+        pool: deckBuildingState.cardPool.map((c) => c.name),
+        basics: deckBuildingState.basicLands.map((c) => c.name),
+        lockedDeck,
+        targetSize,
+      })
+
+      // Split the built decklist into non-land cards (deck) and basic-land counts (landCounts),
+      // then apply via setDeck (which re-caps to pool availability and the 4-of rule).
+      const basicNames = new Set(deckBuildingState.basicLands.map((c) => c.name))
+      const newDeck: string[] = []
+      const newLandCounts: Record<string, number> = {}
+      for (const [name, count] of Object.entries(result.deckList)) {
+        if (basicNames.has(name)) {
+          newLandCounts[name] = count
+        } else {
+          for (let i = 0; i < count; i++) newDeck.push(name)
+        }
+      }
+      get().setDeck(newDeck, newLandCounts)
+      set({ aiAssistBusy: false })
+    } catch (e) {
+      set({
+        aiAssistBusy: false,
+        aiAssistError: e instanceof Error ? e.message : 'Auto-build failed',
+      })
+    }
   },
 })

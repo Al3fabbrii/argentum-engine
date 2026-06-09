@@ -97,6 +97,9 @@ export function createDraftHandlers(set: SetState, _get: GetState): Pick<Message
 
     onDraftPackReceived: (msg) => {
       set((state) => ({
+        // A new pack invalidates any "Suggest Pick" scores from the previous pack.
+        pickScores: null,
+        recommendedPick: [],
         lobbyState: state.lobbyState
           ? {
               ...state.lobbyState,
@@ -138,6 +141,8 @@ export function createDraftHandlers(set: SetState, _get: GetState): Pick<Message
         )
 
         return {
+          pickScores: null,
+          recommendedPick: [],
           lobbyState: {
             ...state.lobbyState,
             draftState: {

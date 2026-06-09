@@ -403,6 +403,12 @@ export interface DelveSelectionState {
 /**
  * Deck building state during sealed draft.
  */
+/** A single card's AI pick evaluation (keyed by card name in the store's `pickScores`). */
+export interface PickScore {
+  readonly score: number
+  readonly reason: string
+}
+
 export interface DeckBuildingState {
   phase: 'waiting' | 'building' | 'submitted'
   setCodes: readonly string[]
@@ -772,7 +778,7 @@ export type GameStore = {
   addAiToLobby: () => void
   removeAiFromLobby: (playerId: string) => void
   stopLobby: () => void
-  updateLobbySettings: (settings: { setCodes?: string[]; format?: TournamentFormat; boosterCount?: number; boosterDistribution?: Record<string, number>; maxPlayers?: number; gamesPerMatch?: number; pickTimeSeconds?: number; picksPerRound?: number; isPublic?: boolean; deckFormat?: DeckFormat | '' | null; deckSizeMin?: number; allowDuplicates?: boolean; commanderPreset?: CommanderPreset; chaosBoosters?: boolean; bannedCardNames?: string[] }) => void
+  updateLobbySettings: (settings: { setCodes?: string[]; format?: TournamentFormat; boosterCount?: number; boosterDistribution?: Record<string, number>; maxPlayers?: number; gamesPerMatch?: number; pickTimeSeconds?: number; picksPerRound?: number; isPublic?: boolean; deckFormat?: DeckFormat | '' | null; deckSizeMin?: number; allowDuplicates?: boolean; commanderPreset?: CommanderPreset; chaosBoosters?: boolean; bannedCardNames?: string[]; aiAssistEnabled?: boolean }) => void
   /** Disconnected tournament players: playerId -> info */
   disconnectedPlayers: Record<string, { playerName: string; secondsRemaining: number; disconnectedAt: number }>
   readyForNextRound: () => void
@@ -818,6 +824,14 @@ export type GameStore = {
   winstonTakePile: () => void
   winstonSkipPile: () => void
   gridDraftPick: (selection: string) => void
+  // AI assistance (Suggest Pick / Auto-build)
+  pickScores: Readonly<Record<string, PickScore>> | null
+  recommendedPick: readonly string[]
+  aiAssistBusy: boolean
+  aiAssistError: string | null
+  suggestPick: (advisorId?: string) => Promise<void>
+  clearPickSuggestion: () => void
+  autoBuildDeck: (advisorId?: string) => Promise<void>
 
   // Pipeline slice
   pipelineState: ActionPipelineState | null

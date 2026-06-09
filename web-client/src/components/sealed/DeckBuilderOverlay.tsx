@@ -9,6 +9,7 @@ import { HoverCardPreview } from '../ui/HoverCardPreview'
 import { useDfcHoverFlip } from '../ui/useDfcHoverFlip'
 import { SetSynergiesButton, type Archetype } from '../draft/SetSynergiesOverlay'
 import { DeckbuilderChatPanel } from './DeckbuilderChatPanel'
+import { fetchAdvisors, type AdvisorInfo } from '@/api/aiAssist'
 import {
   detectProducedColors,
   suggestBasicLands,
@@ -591,6 +592,10 @@ function DeckBuilder({ state }: { state: DeckBuildingState }) {
             >
               ♛ {state.commander}
             </div>
+          )}
+
+          {!isSubmitted && (lobbyState ? lobbyState.settings.aiAssistEnabled : true) && (
+            <AutoBuildControl hasCards={totalCount > 0} responsive={responsive} />
           )}
 
           {isSubmitted ? (
@@ -1371,6 +1376,92 @@ function DeckBuilder({ state }: { state: DeckBuildingState }) {
 /**
  * Animated ellipsis dots for loading/waiting indicators.
  */
+/**
+ * "Auto-build" control for the deckbuild header: an optional engine dropdown (shown when more than
+ * one engine is registered) plus a button that builds the deck from the pool. An empty deck builds
+ * fresh; a partial deck is completed (existing picks kept). Rendered only when AI assistance is
+ * enabled for the tournament.
+ */
+function AutoBuildControl({
+  hasCards,
+  responsive,
+}: {
+  hasCards: boolean
+  responsive: ReturnType<typeof useResponsive>
+}) {
+  const autoBuildDeck = useGameStore((s) => s.autoBuildDeck)
+  const aiAssistBusy = useGameStore((s) => s.aiAssistBusy)
+  const aiAssistError = useGameStore((s) => s.aiAssistError)
+
+  const [advisors, setAdvisors] = useState<readonly AdvisorInfo[]>([])
+  const [advisorId, setAdvisorId] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchAdvisors()
+      .then((r) => {
+        if (cancelled) return
+        setAdvisors(r.deckbuild)
+        setAdvisorId(r.deckbuild[0]?.id)
+      })
+      .catch(() => {
+        // Dropdown stays empty; the button still works using the server's default engine.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {advisors.length > 1 && (
+        <select
+          value={advisorId}
+          onChange={(e) => setAdvisorId(e.target.value)}
+          title="AI engine"
+          style={{
+            padding: '6px 8px',
+            fontSize: 13,
+            backgroundColor: '#333',
+            color: '#ddd',
+            border: '1px solid #555',
+            borderRadius: 6,
+          }}
+        >
+          {advisors.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      )}
+      <button
+        onClick={() => void autoBuildDeck(advisorId)}
+        disabled={aiAssistBusy}
+        title={
+          hasCards
+            ? 'Keep your current picks and fill the rest of the deck from the pool'
+            : 'Build the best deck from your pool'
+        }
+        style={{
+          padding: responsive.isMobile ? '6px 14px' : '8px 20px',
+          fontSize: responsive.fontSize.normal,
+          backgroundColor: '#7e57c2',
+          color: 'white',
+          border: 'none',
+          borderRadius: 6,
+          cursor: aiAssistBusy ? 'wait' : 'pointer',
+          fontWeight: 600,
+          opacity: aiAssistBusy ? 0.7 : 1,
+        }}
+      >
+        {aiAssistBusy ? 'Building…' : hasCards ? '🪄 Complete Deck' : '🪄 Auto-build'}
+      </button>
+      {aiAssistError && <span style={{ color: '#ff6b6b', fontSize: 12 }}>{aiAssistError}</span>}
+    </div>
+  )
+}
+
 function AnimatedDots() {
   const [dotCount, setDotCount] = useState(0)
 

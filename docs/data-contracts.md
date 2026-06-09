@@ -161,6 +161,42 @@ Drafting is lower frequency, so standard HTTP JSON is used.
   }
 }
 
+## 3b. AI Assistance Payload (REST / HTTP)
+
+In-app AI help for the player at the wheel: **Suggest Pick** (draft) and **Auto-build** (deckbuild).
+Stateless w.r.t. the draft/deckbuild flow — the client sends card **names** (it already holds the
+pack/pool) and the server re-resolves them against the card registry. The actual engines live behind
+a pluggable SPI in the `ai` module (`AdvisorCatalog`); only the heuristic engine ships today.
+
+**Gating.** When a `lobbyId` is supplied and that tournament has `aiAssistEnabled = false` (a
+`LobbySettings` field, host-toggled), every endpoint below returns **403**. The client also hides the
+controls. Requests with no `lobbyId` (practice) are allowed. This gate is **advisory, not
+anti-cheat**: it trusts the client-supplied `lobbyId` (as do the other REST endpoints), so a modified
+client could still reach the engines. The toggle signals that assistance is unwelcome for an event;
+it does not hard-enforce it.
+
+**List engines** — `GET /api/ai-advisors` → `{ "draft": [{ "id", "name" }], "deckbuild": [...] }`.
+Populates the per-player engine dropdowns.
+
+**Suggest a pick** — `POST /api/draft/suggest-pick`
+
+```json
+{ "lobbyId": "lob_1", "advisorId": "heuristic", "pack": ["Shivan Dragon", "..."],
+  "pickedSoFar": ["..."], "packNumber": 1, "pickNumber": 3, "picksRequired": 1 }
+```
+Response: `{ "advisorId", "scores": [{ "cardName", "score": 0-100, "reason" }], "recommended": ["..."] }`.
+
+**Auto-build / complete a deck** — `POST /api/deckbuild/auto-build`
+
+```json
+{ "lobbyId": "lob_1", "advisorId": "heuristic", "pool": ["Bear", "Bear", "..."],
+  "basics": ["Plains", "Island", "Swamp", "Mountain", "Forest"],
+  "lockedDeck": { "Bear": 2 }, "targetSize": 40 }
+```
+Response: `{ "advisorId", "deckList": { "<name>": <count> }, "score": <number|null>, "archetype": <string|null> }`.
+`lockedDeck` empty = build fresh; non-empty = keep those cards and only fill the rest. The client
+splits `deckList` into non-land cards + basic-land counts and applies it via the deckbuilder's `setDeck`.
+
 ## 4. Scenario Builder Payload (REST / HTTP)
 
 The Scenario Builder lets any player construct an arbitrary board state and play it. It is a
