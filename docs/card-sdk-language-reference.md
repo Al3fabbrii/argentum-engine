@@ -450,6 +450,16 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `AddDynamicMana(amount, allowedColors, restriction?)` — split X across a fixed color set, distinct from `AddManaOfChoice` because it distributes the full X total across multiple colors rather than producing X copies of one chosen color.
 - `AddManaInAnyCombination(colors, amount)` — split N across colors (alias for `AddDynamicMana`).
 - `AddOneManaOfEachColorAmong(filter)` — one mana of *each* color found among matching permanents (Bloom Tender shape).
+- `PayDynamicMana(amount, payer?)` — pay a dynamically-computed amount of **generic** mana at resolution; the
+  dynamic, payer-parametric twin of the flat `PayManaCostEffect`. `amount` is a [DynamicAmount](#dynamicamount)
+  evaluated at resolution (0 pays nothing and succeeds); `payer` is a `Player` reference defaulting to the
+  controller (`Player.You`). This is the building block for **"pay {N} for each X"** templating — pair it with a
+  pipeline selection and read the selection size via `DynamicAmount.Multiply(DynamicAmount.VariableReference("<collection>_count"), N)`
+  — and for **"that player pays"** on each-player triggers (`payer = Player.TriggeringPlayer`, the only effect that
+  charges a player other than the ability's controller). Affordability is recognized by `Gate.MayPay`, so wrapping
+  it in a may-pay gate skips the prompt when the payer can't afford the computed cost. Magnetic Mountain ("pay {4}
+  for each tapped blue creature chosen, untap them") composes it as the cost of a `Gate.MayPay` whose `decisionMaker`
+  is the same `Player.TriggeringPlayer`.
 
 ### Tokens & emblems
 
@@ -642,10 +652,14 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
     skips the gate silently when the source has left that zone by resolution; `inlineOnTrigger`
     renders the yes/no on the triggering permanent rather than as a modal.
   - `Gate.MayPay(cost)` — "You may [cost]. If you do, [then]." `cost` is a cost **effect**
-    (`PayManaCostEffect`, `PayLifeEffect`, `SacrificeEffect`, or a `CompositeEffect` of them). An
-    unaffordable cost (mana/life recognized; other shapes assumed payable) skips the prompt straight
-    to `otherwise`. On "yes", the cost is paid then `then` runs (`stopOnError`: an unpayable cost
-    aborts the payoff).
+    (`PayManaCostEffect`, `PayDynamicManaCostEffect`, `PayLifeEffect`, `SacrificeEffect`, or a
+    `CompositeEffect` of them). An unaffordable cost (fixed mana, dynamic mana, and life are
+    recognized — the dynamic-mana amount is checked against its own `payer`; other shapes are
+    assumed payable) skips the prompt straight to `otherwise`. On "yes", the cost is paid then `then`
+    runs (`stopOnError`: an unpayable cost aborts the payoff). When the cost is a
+    `PayDynamicManaCostEffect` with a non-default `payer` (e.g. the "each player's upkeep, that player
+    may pay …" shape — Magnetic Mountain), set `decisionMaker` to that same player so the one who is
+    charged is the one prompted; affordability is already gauged against the `payer` regardless.
   - `Gate.WhenCondition(condition)` — **not a decision, a state test.** Succeeds iff `condition`
     holds at resolution; no prompt, no pause — `then`/`otherwise` run synchronously in the executor.
     The condition evaluates through the shared `ConditionEvaluationContext` (identical at resolution

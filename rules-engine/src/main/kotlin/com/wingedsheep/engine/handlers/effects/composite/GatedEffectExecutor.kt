@@ -2,6 +2,7 @@ package com.wingedsheep.engine.handlers.effects.composite
 
 import com.wingedsheep.engine.core.*
 import com.wingedsheep.engine.handlers.ConditionEvaluator
+import com.wingedsheep.engine.handlers.DynamicAmountEvaluator
 import com.wingedsheep.engine.handlers.EffectContext
 import com.wingedsheep.engine.handlers.effects.EffectExecutor
 import com.wingedsheep.engine.handlers.effects.TargetResolutionUtils
@@ -23,6 +24,7 @@ import com.wingedsheep.sdk.scripting.effects.Gate
 import com.wingedsheep.sdk.scripting.effects.GatedEffect
 import com.wingedsheep.sdk.scripting.effects.MoveCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.MoveToZoneEffect
+import com.wingedsheep.sdk.scripting.effects.PayDynamicManaCostEffect
 import com.wingedsheep.sdk.scripting.effects.PayLifeEffect
 import com.wingedsheep.sdk.scripting.effects.PayManaCostEffect
 import com.wingedsheep.sdk.scripting.effects.SuccessCriterion
@@ -57,6 +59,7 @@ class GatedEffectExecutor(
 
     private val manaSolver = ManaSolver(cardRegistry)
     private val conditionEvaluator = ConditionEvaluator()
+    private val dynamicAmountEvaluator = DynamicAmountEvaluator()
 
     override fun execute(
         state: GameState,
@@ -116,7 +119,7 @@ class GatedEffectExecutor(
             ?: context.controllerId
 
         // Gate.MayPay: don't offer an impossible "yes" — fall straight through to `otherwise`.
-        if (gate is Gate.MayPay && !canAfford(state, playerId, gate.cost)) {
+        if (gate is Gate.MayPay && !canAfford(state, playerId, gate.cost, context)) {
             return effect.otherwise
                 ?.let { effectExecutor(state, it, context) }
                 ?: EffectResult.success(state)
@@ -310,18 +313,30 @@ class GatedEffectExecutor(
     /**
      * Whether [playerId] can pay [cost] right now. Mirrors the former
      * `OptionalCostEffectExecutor`: recognizes the payment primitives that appear in a
-     * [Gate.MayPay] cost slot ([PayManaCostEffect], [PayLifeEffect], and a [CompositeEffect]
-     * composing them). Unknown shapes fail open (assumed payable) so exotic cost pipelines
-     * still prompt and abort later via the resumer's `stopOnError` composite.
+     * [Gate.MayPay] cost slot ([PayManaCostEffect], [PayDynamicManaCostEffect], [PayLifeEffect], and
+     * a [CompositeEffect] composing them). The dynamic-mana branch charges the cost's own `payer`, so
+     * affordability stays correct even when it differs from the gate's decisionMaker. Unknown shapes
+     * fail open (assumed payable) so exotic cost pipelines still prompt and abort later via the
+     * resumer's `stopOnError` composite.
      */
-    private fun canAfford(state: GameState, playerId: EntityId, cost: Effect): Boolean =
+    private fun canAfford(state: GameState, playerId: EntityId, cost: Effect, context: EffectContext): Boolean =
         when (cost) {
             is PayManaCostEffect -> manaSolver.canPay(state, playerId, cost.cost)
+            is PayDynamicManaCostEffect -> {
+                // Affordability must target whoever actually foots the bill — resolve the cost's own
+                // `payer` rather than trusting the gate's decisionMaker to match it. A computed
+                // amount of <= 0 is free.
+                val amount = dynamicAmountEvaluator.evaluate(state, cost.amount, context)
+                val payerId = TargetResolutionUtils
+                    .resolvePlayerTarget(EffectTarget.PlayerRef(cost.payer), context, state)
+                    ?: playerId
+                amount <= 0 || manaSolver.canPay(state, payerId, ManaCost.parse("{$amount}"))
+            }
             is PayLifeEffect -> {
                 val life = state.getEntity(playerId)?.get<LifeTotalComponent>()?.life ?: 0
                 life >= cost.amount
             }
-            is CompositeEffect -> cost.effects.all { canAfford(state, playerId, it) }
+            is CompositeEffect -> cost.effects.all { canAfford(state, playerId, it, context) }
             else -> true
         }
 
