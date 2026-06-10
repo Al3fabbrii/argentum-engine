@@ -35,7 +35,7 @@
 - [ ] Don & Leo, Problem Solvers
 - [ ] Don & Raph, Hard Science
 - [x] Donatello's Technique
-- [ ] Donatello, Gadget Master
+- [x] Donatello, Gadget Master
 - [ ] Donatello, Mutant Mechanic
 - [x] Donatello, Turtle Techie
 - [x] Donatello, Way with Machines
