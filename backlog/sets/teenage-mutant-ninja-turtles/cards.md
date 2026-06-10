@@ -180,7 +180,7 @@
 - [x] Transdimensional Bovine
 - [x] Triceraton Commander
 - [x] Tunnel Rats
-- [ ] Turncoat Kunoichi
+- [x] Turncoat Kunoichi
 - [x] Turtle Blimp
 - [ ] Turtle Lair
 - [x] Turtle Power!
