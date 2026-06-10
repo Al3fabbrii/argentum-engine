@@ -80,7 +80,7 @@
 - [ ] Leonardo's Technique
 - [x] Leonardo, Big Brother
 - [x] Leonardo, Cutting Edge
-- [ ] Leonardo, Leader in Blue
+- [x] Leonardo, Leader in Blue
 - [ ] Leonardo, Sewer Samurai
 - [x] Lessons from Life
 - [ ] Lita, Little Orphan Amphibian
