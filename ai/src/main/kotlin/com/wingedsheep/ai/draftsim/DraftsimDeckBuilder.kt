@@ -99,8 +99,11 @@ class DraftsimDeckBuilder(private val tables: DraftsimSetTables) {
     }
 
     /**
-     * The ≤2 build colors for a completion: the heaviest colors by mana-pip weight among the locked
-     * cards, topped up from the pool's overall pip weight when the locked cards don't pin two colors.
+     * The build colors for a completion: **every** color the locked cards need, heaviest-first by
+     * mana-pip weight, so [buildManabase] fixes all of them and no locked card is left uncastable
+     * (locking a three-color pile yields a three-color manabase). When the locked cards don't pin two
+     * colors (mono-color or colorless picks) it's topped up from the pool's overall pip weight so the
+     * fill still has a real two-color base to build around.
      */
     private fun completionColors(forcedNonland: List<ScorerCard>, pool: List<DraftsimPoolCard>): List<String> {
         fun weigh(cards: List<ScorerCard>): Map<String, Double> {
@@ -120,7 +123,7 @@ class DraftsimDeckBuilder(private val tables: DraftsimSetTables) {
                 if (color !in ordered) ordered += color
             }
         }
-        return ordered.take(2)
+        return ordered
     }
 
     // =========================================================================
@@ -188,10 +191,12 @@ class DraftsimDeckBuilder(private val tables: DraftsimSetTables) {
         // Completion: seed the locked cards first so the phases fill around them (and never drop them).
         if (forced.isNotEmpty()) for (item in scored) if (item.pc.instanceId in forced) st.seed(item)
 
-        // Phase 1 — removal first (cap 6).
-        var removalTaken = 0
+        // Phase 1 — removal first (cap 6). Seeded (locked) removal is already in the deck: skip it so
+        // it isn't double-added, but count it against the cap so completion doesn't over-stack removal.
+        var removalTaken = st.deck.count { isRemoval(it.pc.card) }
         for (item in removalCards) {
-            if (removalTaken >= 6) break
+            if (removalTaken >= 6 || st.deck.size >= DECK_NONLAND) break
+            if (item.pc.instanceId in st.chosen) continue
             if (st.canAdd(item)) { st.add(item); removalTaken++ }
         }
         // Phase 2 — interleave removal vs. best other until 9 removal or 23 cards.
