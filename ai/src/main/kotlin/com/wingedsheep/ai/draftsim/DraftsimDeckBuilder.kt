@@ -99,19 +99,22 @@ class DraftsimDeckBuilder(private val tables: DraftsimSetTables) {
     }
 
     /**
-     * The build colors for a completion: **every** color the locked cards need, heaviest-first by
-     * mana-pip weight, so [buildManabase] fixes all of them and no locked card is left uncastable
-     * (locking a three-color pile yields a three-color manabase). When the locked cards don't pin two
-     * colors (mono-color or colorless picks) it's topped up from the pool's overall pip weight so the
-     * fill still has a real two-color base to build around.
+     * The build colors for a completion: **every** color the locked cards strictly require, heaviest-
+     * first by colored-pip weight, so [buildManabase] fixes all of them and no locked card is left
+     * uncastable (locking a three-color pile yields a three-color manabase). When the locked cards
+     * don't pin two colors (mono-color or colorless picks) it's topped up from the pool's overall pip
+     * weight so the fill still has a real two-color base to build around.
+     *
+     * Only **plain** colored pips select colors. Hybrid / Phyrexian pips are flexible — payable from
+     * another color or generic mana — so they must not pull their color into the manabase, which would
+     * add basics the deck can't use (e.g. a `{2/B}` card in a GU deck must not summon Swamps).
      */
     private fun completionColors(forcedNonland: List<ScorerCard>, pool: List<DraftsimPoolCard>): List<String> {
         fun weigh(cards: List<ScorerCard>): Map<String, Double> {
             val pips = HashMap<String, Double>()
             for (card in cards) {
-                val counts = DraftsimMana.pipCounts(card.manaCost)
-                if (counts.isEmpty()) ops.colorsOf(card).forEach { pips[it] = (pips[it] ?: 0.0) + 1.0 }
-                else counts.forEach { (c, v) -> pips[c] = (pips[c] ?: 0.0) + v }
+                DraftsimMana.castRequirement(card.manaCost).plainPips
+                    .forEach { (c, v) -> pips[c] = (pips[c] ?: 0.0) + v }
             }
             return pips
         }

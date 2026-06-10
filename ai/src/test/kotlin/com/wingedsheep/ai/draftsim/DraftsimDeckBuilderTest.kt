@@ -108,6 +108,30 @@ class DraftsimDeckBuilderTest : FunSpec({
         listOf("Zap1", "Zap2", "Zap3").forEach { name -> nonland.count { it.name == name } shouldBe 1 }
     }
 
+    test("completion does not add off-color basics for a flexible hybrid card") {
+        val ratings = HashMap<String, Double>()
+        val cards = mutableListOf<DraftsimPoolCard>()
+        var n = 0
+        fun add(card: ScorerCard, rating: Double) {
+            ratings[DraftsimData.nameKey(card.name)] = rating
+            cards += DraftsimPoolCard(card, "id-${n++}")
+        }
+        // A pure GU pool — plus a {2/B} monocolor-hybrid card that is castable with generic mana
+        // (no black ever needed). Locking it must NOT pull black into the build / manabase.
+        for (i in 1..14) add(BCard("GreenCreature$i", "{1}{G}", "Creature — Beast", listOf("G")), 2.6)
+        for (i in 1..14) add(BCard("BlueCreature$i", "{1}{U}", "Creature — Wizard", listOf("U")), 2.6)
+        add(BCard("Flexible", "{2/B}", "Creature — Horror", listOf("B")), 3.0)
+        val tables = DraftsimSetTables(ratings, emptySet(), emptyMap())
+        val builder = DraftsimDeckBuilder(tables)
+
+        val forced = cards.filter { it.card.name in setOf("GreenCreature1", "BlueCreature1", "Flexible") }
+            .map { it.instanceId }.toSet()
+        val build = builder.buildDecks(cards, mode = "sealed", forced = forced).single()
+
+        build.colors.toSet() shouldBe setOf("G", "U")
+        (build.basicsNeeded["B"] ?: 0) shouldBe 0
+    }
+
     test("completion fixes mana for every locked color, even a third") {
         val ratings = HashMap<String, Double>()
         val cards = mutableListOf<DraftsimPoolCard>()
