@@ -136,7 +136,7 @@
 - [ ] Raphael's Technique
 - [ ] Raphael, Most Attitude
 - [ ] Raphael, Ninja Destroyer
-- [ ] Raphael, the Nightwatcher
+- [x] Raphael, the Nightwatcher
 - [x] Raphael, Tough Turtle
 - [ ] Rat King, Verminister
 - [x] Ravenous Robots

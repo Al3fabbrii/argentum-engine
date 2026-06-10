@@ -4311,6 +4311,47 @@
         "RED"
     ]
 }
+// Raphael, the Nightwatcher
+{
+    "name": "Raphael, the Nightwatcher",
+    "manaCost": "{2}{R}{R}",
+    "typeLine": "Legendary Creature — Mutant Ninja Turtle",
+    "oracleText": "Sneak {1}{R}{R} (You may cast this spell for {1}{R}{R} if you also return an unblocked attacker you control to hand during the declare blockers step. He enters tapped and attacking.)\nAttacking creatures you control have double strike.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 3
+    },
+    "keywords": [
+        "SNEAK"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Sneak",
+            "cost": "{1}{R}{R}"
+        }
+    ],
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantKeyword",
+                "keyword": "DOUBLE_STRIKE",
+                "filter": {
+                    "baseFilter": "creature attacking ctrl:you"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "103",
+        "rarity": "RARE",
+        "artist": "Greg Staples",
+        "flavorText": "\"Time to punch in.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/a/6af50b50-3776-4383-b493-7c5dd732c965.jpg?1769006162"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
 // Ravenous Robots
 {
     "name": "Ravenous Robots",
