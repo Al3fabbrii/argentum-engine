@@ -119,7 +119,7 @@
 - [x] Old Hob, Alleycat Blues
 - [x] Omni-Cheese Pizza
 - [ ] Ooze Spill
-- [ ] Oroku Saki, Shredder Rising
+- [x] Oroku Saki, Shredder Rising
 - [x] Pain 101
 - [ ] Paramecia Coloniex
 - [ ] Party Dude
