@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 96 / 190
+**Implemented:** 97 / 190
 ---
 
 - [x] Action News Crew
@@ -48,7 +48,7 @@
 - [x] Foot Elite
 - [x] Foot Headquarters
 - [ ] Foot Mystic
-- [ ] Foot Ninjas
+- [x] Foot Ninjas
 - [x] Frog Butler
 - [ ] Fugitive Droid
 - [ ] General Traag, Heart of Stone
