@@ -288,6 +288,7 @@ val engineSerializersModule = SerializersModule {
         subclass(ActivateAbilityChooseXContinuation::class)
         subclass(ActivateAbilityTapXTargetsContinuation::class)
         subclass(ActivateAbilityExileFromGraveyardContinuation::class)
+        subclass(ActivateAbilityOpponentTargetContinuation::class)
     }
 
     // Component hierarchy (for GameState persistence)

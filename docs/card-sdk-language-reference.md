@@ -927,6 +927,15 @@ Composed pipelines (`GatherCards → SelectFromCollection → MoveCollection` sh
 ### Cast-time (`Targets.*` / `TargetRequirement`)
 
 - `Targets.Any` — any creature, player, or planeswalker.
+- `Targets.AnyChosenByOpponent` — "any target **of an opponent's choice**" (Cuombajj Witches). A real
+  target of *your* spell/ability that an **opponent** selects: announced at the same time as your own
+  targets, equally respondable, and with legality (hexproof/protection/shroud) measured relative to
+  **you, the controller** — so an opponent can't pick a hexproof creature they control. Desugars to
+  `AnyTarget(chooser = TargetChooser.Opponent)`; any `TargetRequirement` can carry `chooser` (see
+  below). List the opponent-chosen requirement *after* the controller-chosen ones in a script. The
+  engine routes the opponent's selection at announcement for **activated abilities** (the only printed
+  use today); the controller picks which opponent in multiplayer (currently defaults to the sole
+  opponent — see `TargetChooser`).
 - `Targets.AnyOtherThanEnchantedCreature` — any target except the creature the source Aura/Equipment
   is attached to. Desugars to `TargetOther(AnyTarget(), excludeAttachedCreature = true)`; for Aura/Equipment
   abilities worded "enchanted/equipped creature deals damage … to **any other target**" (e.g. Pain for All),
@@ -994,6 +1003,16 @@ Every `TargetRequirement` carries count semantics (defaults shown):
   requirements and for non-card targets. E.g.
   `TargetObject(count = 2, optional = true, filter = TargetFilter.CardInGraveyard, sameOwner = true)`
   (Arashin Sunshield).
+- `chooser = TargetChooser.Controller` — **who selects this requirement's target(s)**. Set to
+  `TargetChooser.Opponent` for "**… of an opponent's choice**" wording (Cuombajj Witches). The chosen
+  target is still a real target of *your* spell/ability — announced together with your own targets,
+  equally respondable, legality measured relative to **you** — but an opponent picks which legal
+  object/player it is (the controller chooses *which* opponent in multiplayer; CR 601.6b/602.3b run the
+  controller's own choices first, then the opponent's). Orthogonal to legality: target-finding and
+  validation ignore `chooser` (always relative to the controller); only the announcement layer reads it
+  to route the selection decision. Honored for **activated abilities** today; list the opponent-chosen
+  requirement after the controller-chosen ones. `Targets.AnyChosenByOpponent` is the ready-made
+  "any target of an opponent's choice".
 
 ### Player-target restrictions (`TargetPlayer.restriction` / `TargetOpponent.restriction`)
 
