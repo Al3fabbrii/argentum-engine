@@ -2710,8 +2710,11 @@
         ],
         "additionalCosts": [
             {
-                "type": "SacrificePermanent",
-                "filter": "artifact"
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomSacrifice",
+                    "filter": "artifact"
+                }
             }
         ]
     },
@@ -3929,8 +3932,11 @@
         ],
         "additionalCosts": [
             {
-                "type": "SacrificePermanent",
-                "filter": "artifact"
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomSacrifice",
+                    "filter": "artifact"
+                }
             }
         ]
     },

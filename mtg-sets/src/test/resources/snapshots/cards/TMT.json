@@ -5378,8 +5378,11 @@
         {
             "type": "Kicker",
             "additionalCost": {
-                "type": "SacrificePermanent",
-                "filter": "artifact|creature"
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomSacrifice",
+                    "filter": "artifact|creature"
+                }
             }
         }
     ],

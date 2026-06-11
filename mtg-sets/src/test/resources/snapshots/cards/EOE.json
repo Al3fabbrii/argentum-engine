@@ -2270,7 +2270,10 @@
                 },
                 "effect": {
                     "type": "PayOrSuffer",
-                    "cost": "Tap",
+                    "cost": {
+                        "type": "PayAtom",
+                        "atom": "AtomTapPermanents"
+                    },
                     "suffer": "SacrificeSelf"
                 },
                 "descriptionOverride": "When this land enters, sacrifice it unless you tap an untapped permanent you control."
@@ -4329,8 +4332,11 @@
         ],
         "additionalCosts": [
             {
-                "type": "SacrificePermanent",
-                "filter": "artifact|creature"
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomSacrifice",
+                    "filter": "artifact|creature"
+                }
             }
         ]
     },
@@ -13206,8 +13212,11 @@
         ],
         "additionalCosts": [
             {
-                "type": "SacrificePermanent",
-                "filter": "artifact|creature"
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomSacrifice",
+                    "filter": "artifact|creature"
+                }
             }
         ]
     },
@@ -18166,8 +18175,11 @@
             "type": "Warp",
             "cost": "{B}",
             "additionalCost": {
-                "type": "PayLife",
-                "amount": 2
+                "type": "AdditionalAtom",
+                "atom": {
+                    "type": "AtomPayLife",
+                    "amount": 2
+                }
             },
             "fromGraveyard": true
         }

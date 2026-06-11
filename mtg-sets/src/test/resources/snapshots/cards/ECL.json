@@ -3887,8 +3887,11 @@
                 "effect": {
                     "type": "PayOrSuffer",
                     "cost": {
-                        "type": "PayMana",
-                        "cost": "{2}"
+                        "type": "PayAtom",
+                        "atom": {
+                            "type": "AtomMana",
+                            "cost": "{2}"
+                        }
                     },
                     "suffer": {
                         "type": "Composite",
