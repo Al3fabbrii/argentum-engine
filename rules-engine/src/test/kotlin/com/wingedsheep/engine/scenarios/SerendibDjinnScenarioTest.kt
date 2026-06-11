@@ -45,6 +45,10 @@ class SerendibDjinnScenarioTest : ScenarioTestBase() {
                 game.passUntilPhase(Phase.BEGINNING, Step.UPKEEP)
                 game.resolveStack()
 
+                withClue("Sacrifice prompt should name the actual filter (land), not 'creature'") {
+                    game.getPendingDecision()?.prompt shouldBe "Choose a land to sacrifice"
+                }
+
                 // Two lands, sacrifice one — choose the Island.
                 val island = game.findPermanent("Island")!!
                 game.selectCards(listOf(island))
