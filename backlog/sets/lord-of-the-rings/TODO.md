@@ -312,12 +312,15 @@ toughness rather than its power.
   toughness rather than its power." (Food half composable).
 
 ### Gap 28 — equip-ability timing / cost modification
-**Engine change:** "activate equip abilities at instant speed," equip-cost reduction, and a
-"first equip each turn costs {0}" replacement.
-- **Forge Anew** — instant-speed equip + free first equip (return-Equipment-from-GY half
-  composable).
-- **Éowyn, Lady of Rohan** — "Equip abilities you activate cost {1} less to activate." (plus a
-  begin-combat modal first strike/vigilance with an equipped-creature branch).
+**Status:** PARTIALLY LANDED. The `EquipAbilitiesAtInstantSpeed` and `FreeFirstEquipEachTurn`
+static abilities (keyed off `ActivatedAbility.isEquipAbility`, consulted by the enumerator +
+`ActivateAbilityHandler`) cover instant-speed equip and "first equip each turn costs {0}". Generic
+equip-cost reduction (Éowyn's "{1} less") is still a gap.
+- **Forge Anew** — ✅ implemented (instant-speed equip + free first equip + the
+  return-Equipment-from-GY ETB).
+- **Éowyn, Lady of Rohan** — "Equip abilities you activate cost {1} less to activate" still needs
+  generic equip-cost reduction (plus a begin-combat modal first strike/vigilance with an
+  equipped-creature branch).
 
 ### Gap 29 — conditional keyword from combat opponent's subtype
 **Engine change:** a static granting a keyword conditioned on what is blocking/blocked-by.
