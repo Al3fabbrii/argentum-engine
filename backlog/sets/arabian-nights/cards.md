@@ -2,7 +2,7 @@
 
 **Set Size:** 78 cards
 **Release Date:** December 17, 1993
-**Implemented:** 64 / 78
+**Implemented:** 65 / 78
 | Color | Count |
 |-------|-------|
 | White | 11 |
@@ -70,7 +70,7 @@
 - [x] Sandstorm
 - [x] Singing Tree
 - [x] Wyluli Wolf
-- [ ] Aladdin's Lamp
+- [x] Aladdin's Lamp
 - [x] Aladdin's Ring
 - [x] Bottle of Suleiman
 - [x] Brass Man

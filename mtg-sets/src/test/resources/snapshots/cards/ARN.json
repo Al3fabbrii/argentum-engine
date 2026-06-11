@@ -59,6 +59,100 @@
     ]
 }
 
+// Aladdin's Lamp
+{
+    "name": "Aladdin's Lamp",
+    "manaCost": "{10}",
+    "typeLine": "Artifact",
+    "oracleText": "{X}, {T}: The next time you would draw a card this turn, instead look at the top X cards of your library, put all but one of them on the bottom of your library in a random order, then draw a card. X can't be 0.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostMana",
+                            "cost": "{X}"
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "ReplaceNextDrawWith",
+                    "replacementEffect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "TopOfLibrary",
+                                            "count": "XValue"
+                                        },
+                                        "storeAs": "looked"
+                                    },
+                                    {
+                                        "type": "SelectFromCollection",
+                                        "from": "looked",
+                                        "selection": {
+                                            "type": "ChooseExactly",
+                                            "count": {
+                                                "type": "Fixed",
+                                                "amount": 1
+                                            }
+                                        },
+                                        "storeSelected": "kept",
+                                        "storeRemainder": "rest",
+                                        "selectedLabel": "Keep on top",
+                                        "remainderLabel": "Put on bottom at random"
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "kept",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Library",
+                                            "placement": "Top"
+                                        }
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "rest",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Library",
+                                            "placement": "Bottom"
+                                        },
+                                        "order": "Random"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "DrawCards",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            }
+                        ]
+                    }
+                },
+                "descriptionOverride": "{X}, {T}: The next time you would draw a card this turn, instead look at the top X cards of your library, put all but one of them on the bottom of your library in a random order, then draw a card. X can't be 0."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "56",
+        "rarity": "RARE",
+        "artist": "Mark Tedin",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/f/8fecc5d2-5298-4d47-b085-f160603f220e.jpg?1562921727"
+    }
+}
+
 // Aladdin's Ring
 {
     "name": "Aladdin's Ring",
