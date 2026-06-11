@@ -490,6 +490,19 @@ class CardBuilder(private val name: String) {
      * combat ends. It is an ordinary triggered ability (not a mana ability): it uses the
      * stack and can be responded to.
      */
+    fun firebending(n: Int) {
+        keywordAbilityList.add(KeywordAbility.firebending(n))
+        triggeredAbilities.add(
+            TriggeredAbility.create(
+                trigger = Triggers.Attacks.event,
+                binding = Triggers.Attacks.binding,
+                effect = AddManaEffect(Color.RED, n, expiry = ManaExpiry.END_OF_COMBAT),
+                descriptionOverride = "Whenever this creature attacks, add ${"{R}".repeat(n)}. " +
+                    "Until end of combat, you don't lose this mana as steps and phases end."
+            )
+        )
+    }
+
     /**
      * Add Sneak [cost] (Teenage Mutant Ninja Turtles, CR 702.190).
      *
@@ -508,19 +521,6 @@ class CardBuilder(private val name: String) {
      */
     fun sneak(cost: String) {
         keywordAbilityList.add(KeywordAbility.sneak(cost))
-    }
-
-    fun firebending(n: Int) {
-        keywordAbilityList.add(KeywordAbility.firebending(n))
-        triggeredAbilities.add(
-            TriggeredAbility.create(
-                trigger = Triggers.Attacks.event,
-                binding = Triggers.Attacks.binding,
-                effect = AddManaEffect(Color.RED, n, expiry = ManaExpiry.END_OF_COMBAT),
-                descriptionOverride = "Whenever this creature attacks, add ${"{R}".repeat(n)}. " +
-                    "Until end of combat, you don't lose this mana as steps and phases end."
-            )
-        )
     }
 
     /**

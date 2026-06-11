@@ -17,7 +17,13 @@ import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.AdditionalCostPayment
 import com.wingedsheep.engine.core.PaymentStrategy
+import com.wingedsheep.engine.state.ZoneKey
+import com.wingedsheep.engine.state.components.battlefield.CountersComponent
+import com.wingedsheep.sdk.core.CounterType
+import com.wingedsheep.sdk.core.Zone
+import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.scripting.ChoiceSlot
+import io.kotest.matchers.nulls.shouldBeNull
 import com.wingedsheep.sdk.scripting.conditions.SneakCostWasPaid
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -57,9 +63,20 @@ class SneakTest : FunSpec({
         toughness = 2
     }
 
+    // A minimal opponent planeswalker the Brawler can attack, so a sneak cast carries it as the
+    // defender; used by the CR 506.3c "defender left the battlefield" case.
+    val testWalker = card("Test Walker") {
+        manaCost = "{2}"
+        typeLine = "Legendary Planeswalker — Tester"
+        startingLoyalty = 3
+        loyaltyAbility(1) {
+            effect = Effects.GainLife(1)
+        }
+    }
+
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
-        driver.registerCards(TestCards.all + listOf(sneakNinja, vanillaAttacker))
+        driver.registerCards(TestCards.all + listOf(sneakNinja, vanillaAttacker, testWalker))
         return driver
     }
 
@@ -236,5 +253,62 @@ class SneakTest : FunSpec({
             SneakCostWasPaid,
             EffectContext(sourceId = ninjaPerm, controllerId = attacker, opponentId = driver.getOpponent(attacker))
         ).shouldBeFalse()
+    }
+
+    test("sneaked creature enters not attacking when its carried defender has left (CR 506.3c)") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Forest" to 40), startingLife = 20)
+        val attacker = driver.activePlayer!!
+        val defender = driver.getOpponent(attacker)
+
+        // The Brawler attacks the opponent's planeswalker, so the sneak carries the walker as the
+        // defender the returned creature was attacking.
+        val walker = driver.putPermanentOnBattlefield(defender, "Test Walker")
+        // putPermanentOnBattlefield doesn't seed loyalty, so give it counters or SBA destroys it.
+        driver.replaceState(
+            driver.state.updateEntity(walker) { c ->
+                c.with((c.get<CountersComponent>() ?: CountersComponent()).withAdded(CounterType.LOYALTY, 3))
+            }
+        )
+        val brawler = driver.putCreatureOnBattlefield(attacker, "Plain Brawler")
+        driver.removeSummoningSickness(brawler)
+        val ninja = driver.putCardInHand(attacker, "Sneaky Ninja")
+
+        driver.passPriorityUntil(Step.DECLARE_ATTACKERS)
+        driver.declareAttackers(attacker, mapOf(brawler to walker)).isSuccess shouldBe true
+        driver.passPriorityUntil(Step.DECLARE_BLOCKERS)
+        driver.declareBlockers(defender, emptyMap()).isSuccess shouldBe true
+        var guard = 0
+        while (driver.state.priorityPlayerId != null && driver.state.priorityPlayerId != attacker &&
+            driver.state.step == Step.DECLARE_BLOCKERS && guard++ < 4
+        ) {
+            driver.passPriority(driver.state.priorityPlayerId!!)
+        }
+
+        driver.giveMana(attacker, Color.GREEN, 2)
+        driver.submit(
+            CastSpell(
+                playerId = attacker,
+                cardId = ninja,
+                useAlternativeCost = true,
+                alternativeCostType = AlternativeCostType.SNEAK,
+                additionalCostPayment = AdditionalCostPayment(bouncedPermanents = listOf(brawler)),
+                paymentStrategy = PaymentStrategy.FromPool
+            )
+        ).isSuccess shouldBe true
+
+        // The planeswalker leaves the battlefield while the sneak spell is still on the stack, so
+        // the carried defender is no longer a legal attack target by the time the spell resolves.
+        driver.replaceState(
+            driver.state.removeFromZone(ZoneKey(defender, Zone.BATTLEFIELD), walker)
+        )
+        while (driver.state.stack.isNotEmpty()) driver.bothPass()
+
+        // CR 506.3c: the Ninja still enters (tapped per 702.190b) but is never attacking — the
+        // engine does not redirect it to the controller's opponent.
+        val ninjaPerm = driver.findPermanent(attacker, "Sneaky Ninja")
+        ninjaPerm.shouldNotBeNull()
+        driver.state.getEntity(ninjaPerm)?.has<TappedComponent>() shouldBe true
+        driver.state.getEntity(ninjaPerm)?.get<AttackingComponent>().shouldBeNull()
     }
 })

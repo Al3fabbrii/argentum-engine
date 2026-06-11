@@ -1269,19 +1269,24 @@ class StackResolver(
             .place(newState, controllerId, spellId)
 
         // Sneak (CR 702.190b / 506.3a): a permanent spell whose sneak cost was paid enters
-        // tapped and attacking the same defender the returned unblocked creature was attacking.
-        // A non-creature permanent can't attack, so it just enters tapped.
+        // tapped and attacking the same player or planeswalker the returned unblocked creature
+        // was attacking. A non-creature permanent can't attack, so it just enters tapped (506.3a).
         if (spellComponent.wasSneaked) {
-            val opponent = newState.getOpponent(controllerId)
-            // Prefer the carried defender (player/planeswalker/battle the bounced attacker was
-            // hitting); fall back to the caster's opponent if it's no longer a valid attack target.
-            val defenderId = spellComponent.sneakAttackDefenderId
-                ?.takeIf { newState.getEntity(it) != null }
-                ?: opponent
             newState = newState.updateEntity(spellId) { c -> c.with(TappedComponent) }
-            if (defenderId != null && newState.projectedState.isCreature(spellId)) {
+            val projected = newState.projectedState
+            // CR 506.3c: the creature only enters attacking if the carried defender is still a
+            // legal attack target — an opponent still in the game, or an opponent's planeswalker
+            // still on the battlefield (mirrors the defender check in AttackPhaseManager). If it's
+            // no longer valid, the creature enters but is never attacking — no redirect.
+            val legalDefender = spellComponent.sneakAttackDefenderId?.takeIf { d ->
+                (d in newState.turnOrder && d != controllerId) ||
+                    (projected.isPlaneswalker(d) &&
+                        d in newState.getBattlefield() &&
+                        projected.getController(d) != controllerId)
+            }
+            if (legalDefender != null && projected.isCreature(spellId)) {
                 newState = newState.updateEntity(spellId) { c ->
-                    c.with(AttackingComponent(defenderId))
+                    c.with(AttackingComponent(legalDefender))
                 }
             }
         }
