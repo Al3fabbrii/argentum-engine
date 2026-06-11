@@ -13,9 +13,13 @@ import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
 import com.wingedsheep.engine.state.components.player.CantCastSpellsComponent
+import com.wingedsheep.engine.state.components.player.EquipActivationsThisTurnComponent
 import com.wingedsheep.engine.state.components.player.FlashGrantsThisTurnComponent
+import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.model.EntityId
+import com.wingedsheep.sdk.scripting.AbilityCost
 import com.wingedsheep.sdk.scripting.AbilityId
+import com.wingedsheep.sdk.scripting.ActivatedAbility
 import com.wingedsheep.sdk.scripting.ActivationRestriction
 import com.wingedsheep.sdk.scripting.CantCastSpellsSharingColorWithLastCast
 import com.wingedsheep.sdk.scripting.CastRestriction
@@ -431,6 +435,32 @@ class CastPermissionUtils(
      */
     fun hasFreeFirstEquip(state: GameState, playerId: EntityId): Boolean =
         hasActiveEquipPermission(state, playerId) { it is FreeFirstEquipEachTurn }
+
+    /**
+     * Zero the mana cost of [cost] when [ability] is an equip ability, [playerId] has an active
+     * [FreeFirstEquipEachTurn] grant (Forge Anew), and this is their first equip this turn
+     * (`EquipActivationsThisTurnComponent.count == 0`). Shared by the enumerator (offered/displayed
+     * cost) and [ActivateAbilityHandler] (paid cost) so the two always agree. "Pay {0} rather than
+     * pay the equip cost" zeroes the whole cost, including any colored pips.
+     */
+    fun applyFreeFirstEquipDiscount(
+        cost: AbilityCost,
+        ability: ActivatedAbility,
+        state: GameState,
+        playerId: EntityId
+    ): AbilityCost {
+        if (!ability.isEquipAbility) return cost
+        val activations = state.getEntity(playerId)?.get<EquipActivationsThisTurnComponent>()?.count ?: 0
+        if (activations > 0) return cost
+        if (!hasFreeFirstEquip(state, playerId)) return cost
+        return when (cost) {
+            is AbilityCost.Mana -> AbilityCost.Mana(ManaCost.ZERO)
+            is AbilityCost.Composite -> AbilityCost.Composite(cost.costs.map {
+                if (it is AbilityCost.Mana) AbilityCost.Mana(ManaCost.ZERO) else it
+            })
+            else -> cost
+        }
+    }
 
     /**
      * Scan [playerId]'s battlefield for a static ability matching [predicate], unwrapping a
