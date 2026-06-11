@@ -4677,6 +4677,86 @@
     ]
 }
 
+// Frodo, Determined Hero
+{
+    "name": "Frodo, Determined Hero",
+    "manaCost": "{1}{W}",
+    "typeLine": "Legendary Creature — Halfling Warrior",
+    "oracleText": "Whenever Frodo enters or attacks, you may attach target Equipment you control with mana value 2 or 3 to Frodo.\nDuring your turn, prevent all damage that would be dealt to Frodo.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "AttachTargetEquipmentToCreature",
+                    "equipmentTarget": {
+                        "type": "BoundVariable",
+                        "name": "Equipment you control with mana value 2 or 3"
+                    },
+                    "creatureTarget": "Self"
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "artifact Equipment mv>=2 mv<=3 ctrl:you"
+                    },
+                    "id": "Equipment you control with mana value 2 or 3"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "AttachTargetEquipmentToCreature",
+                    "equipmentTarget": {
+                        "type": "BoundVariable",
+                        "name": "Equipment you control with mana value 2 or 3"
+                    },
+                    "creatureTarget": "Self"
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "artifact Equipment mv>=2 mv<=3 ctrl:you"
+                    },
+                    "id": "Equipment you control with mana value 2 or 3"
+                }
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "PreventDamage",
+                "restrictions": [
+                    "IsYourTurn"
+                ],
+                "appliesTo": {
+                    "type": "DamageEvent",
+                    "recipient": "RecipientSelf"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "289",
+        "rarity": "RARE",
+        "artist": "Magali Villeneuve",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/3/83d1b37c-a8c6-4690-8701-3395397711e7.jpg?1687424782"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Galadhrim Bow
 {
     "name": "Galadhrim Bow",

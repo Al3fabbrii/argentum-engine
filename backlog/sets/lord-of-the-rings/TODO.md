@@ -436,6 +436,7 @@ that try to grant the restriction silently no-op.
 - **Riders of the Mark** (Extra) — Affinity for Humans (composable) + end-step "if it attacked,
   return it to hand and create tokens equal to its toughness."
 - **Fires of Mount Doom** (Extra) — impulse-exile-and-play + destroy attached Equipment + damage.
-- **Frodo, Determined Hero** (Extra) — attach Equipment of MV 2–3 on enter/attack + "prevent all
-  damage to Frodo during your turn."
+- **Frodo, Determined Hero** (Extra) — ✅ implemented (no engine change). Composes
+  `AttachTargetEquipmentToCreature` with an MV-2-or-3 optional target on enters/attacks + a
+  `PreventDamage` replacement scoped to self (`RecipientFilter.Self`) gated to your turn (`IsYourTurn`).
 - **Gollum, Scheming Guide** (Extra) — opponent guesses whether your top card is land/nonland.
