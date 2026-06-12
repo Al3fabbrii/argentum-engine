@@ -116,6 +116,8 @@ export interface MessageHandlers {
   onQuickGameLobbyClosed: (message: QuickGameLobbyClosedMessage) => void
   // Presence handlers
   onOnlinePlayersCount: (message: OnlinePlayersCountMessage) => void
+  // Liveness handlers
+  onPong: () => void
 }
 
 /**
@@ -280,6 +282,9 @@ export function handleServerMessage(message: ServerMessage, handlers: MessageHan
       break
     case 'onlinePlayersCount':
       handlers.onOnlinePlayersCount(message)
+      break
+    case 'pong':
+      handlers.onPong()
       break
     default: {
       // TypeScript exhaustiveness check

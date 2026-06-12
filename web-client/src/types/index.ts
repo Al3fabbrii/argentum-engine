@@ -308,6 +308,8 @@ export type {
   SetQuickGameLobbyPublicMessage,
   SetQuickGameLobbyFormatMessage,
   OnlinePlayersCountMessage,
+  PingMessage,
+  PongMessage,
   DeckFormat,
 } from './messages'
 export {

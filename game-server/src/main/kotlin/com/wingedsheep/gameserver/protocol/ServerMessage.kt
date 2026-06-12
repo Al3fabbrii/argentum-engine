@@ -993,6 +993,11 @@ sealed interface ServerMessage {
     @Serializable
     @SerialName("onlinePlayersCount")
     data class OnlinePlayersCount(val count: Int) : ServerMessage
+
+    /** Reply to [ClientMessage.Ping] — always sent, regardless of auth or game state. */
+    @Serializable
+    @SerialName("pong")
+    data object Pong : ServerMessage
 }
 
 @Serializable

@@ -74,6 +74,8 @@ export type ServerMessage =
   | QuickGameLobbyClosedMessage
   // Presence
   | OnlinePlayersCountMessage
+  // Liveness
+  | PongMessage
 
 /**
  * Connection confirmed with assigned player ID.
@@ -1587,6 +1589,8 @@ export type ClientMessage =
   | RequestUndoMessage
   // Resync
   | RequestResyncMessage
+  // Liveness
+  | PingMessage
   // Quick Game Lobby Messages
   | CreateQuickGameLobbyMessage
   | JoinQuickGameLobbyMessage
@@ -2076,6 +2080,15 @@ export interface RequestResyncMessage {
   readonly type: 'requestResync'
 }
 
+/**
+ * Connection liveness probe. The server always answers with a pong, regardless of
+ * authentication or game state. Sent when a backgrounded tab becomes visible again,
+ * to detect half-open sockets (e.g. after OS sleep).
+ */
+export interface PingMessage {
+  readonly type: 'ping'
+}
+
 // Lobby Message Factories
 export function createCreateTournamentLobbyMessage(
   setCodes: readonly string[],
@@ -2367,6 +2380,13 @@ export interface QuickGameLobbyClosedMessage {
 export interface OnlinePlayersCountMessage {
   readonly type: 'onlinePlayersCount'
   readonly count: number
+}
+
+/**
+ * Reply to a ping liveness probe — always sent, regardless of auth or game state.
+ */
+export interface PongMessage {
+  readonly type: 'pong'
 }
 
 export interface CreateQuickGameLobbyMessage {

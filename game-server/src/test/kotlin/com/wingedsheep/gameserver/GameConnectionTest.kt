@@ -21,6 +21,26 @@ class GameConnectionTest : GameServerTestBase() {
                 connected.playerId shouldBe playerId
             }
 
+            test("ping is answered with pong before authentication") {
+                val client = createClient()
+                client.connect()
+                client.send(ClientMessage.Ping)
+
+                eventually(5.seconds) {
+                    client.messages.any { it is ServerMessage.Pong } shouldBe true
+                }
+            }
+
+            test("ping is answered with pong after authentication") {
+                val client = createClient()
+                client.connectAs("TestPlayer")
+                client.send(ClientMessage.Ping)
+
+                eventually(5.seconds) {
+                    client.messages.any { it is ServerMessage.Pong } shouldBe true
+                }
+            }
+
             test("two players can create and join a game") {
                 val ctx = setupGame(skipMulligan = false)
                 ctx.sessionId shouldNotBe null

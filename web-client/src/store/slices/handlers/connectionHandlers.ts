@@ -6,17 +6,34 @@ import { entityId, createJoinLobbyMessage, createSpectateGameMessage } from '@/t
 import { getWebSocket, clearLobbyId, loadLobbyId } from '../shared'
 import type { SetState, GetState } from './types'
 
-type ConnectionHandlerKeys = 'onConnected' | 'onReconnected' | 'onOnlinePlayersCount'
+type ConnectionHandlerKeys = 'onConnected' | 'onReconnected' | 'onOnlinePlayersCount' | 'onPong'
 
 export function createConnectionHandlers(set: SetState, get: GetState): Pick<MessageHandlers, ConnectionHandlerKeys> {
   return {
     onConnected: (msg) => {
       localStorage.setItem('argentum-token', msg.token)
+      // A plain Connected (not Reconnected) after an auto-reconnect means the server has
+      // no memory of this identity (e.g. it restarted while the tab was backgrounded) —
+      // any session state from before is stale. Drop it so the user lands in the lobby
+      // instead of a dead game board.
+      const stale = get().sessionId !== null || get().gameState !== null
       set({
         connectionStatus: 'connected',
         playerId: entityId(msg.playerId),
         aiEnabled: msg.aiEnabled ?? false,
         availableSets: msg.availableSets ?? [],
+        ...(stale && {
+          sessionId: null,
+          opponentName: null,
+          gameState: null,
+          legalActions: [],
+          pendingDecision: null,
+          mulliganState: null,
+          waitingForOpponentMulligan: false,
+          deckBuildingState: null,
+          lobbyState: null,
+          tournamentState: null,
+        }),
       })
 
       // Auto-join tournament if we have a pending tournament ID (from /tournament/:lobbyId route)
@@ -57,5 +74,9 @@ export function createConnectionHandlers(set: SetState, get: GetState): Pick<Mes
     onOnlinePlayersCount: (msg) => {
       set({ onlinePlayers: msg.count })
     },
+
+    // Liveness replies are consumed by GameWebSocket's last-message tracking; nothing
+    // store-side to update.
+    onPong: () => {},
   }
 }
