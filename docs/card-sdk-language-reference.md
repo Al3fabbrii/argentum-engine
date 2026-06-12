@@ -305,7 +305,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `EachPlayerReturnPermanentToHand()` — each player bounces a permanent.
 - `EachPlayerDrawsForDamageDealtToSource()` — each player draws equal to damage source took this turn.
 - `ReadTheRunes()` — draw N, then discard N (or sacrifice permanents).
-- `ReplaceNextDraw(effect)` — replaces controller's next draw with the given effect.
+- `ReplaceNextDraw(effect)` — replaces controller's next draw this turn with the given effect (a one-shot
+  floating shield, consumed before the replacement runs so an inner `DrawCards` doesn't re-trigger it). The
+  activation-time `{X}` is captured onto the shield, so the replacement effect can read `DynamicAmount.XValue`
+  when it fires at draw time (Aladdin's Lamp: "look at the top X cards … then draw a card").
 
 ### Destruction & exile
 

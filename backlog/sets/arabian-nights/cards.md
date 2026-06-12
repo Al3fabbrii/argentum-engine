@@ -70,7 +70,7 @@
 - [x] Sandstorm
 - [x] Singing Tree
 - [x] Wyluli Wolf
-- [ ] Aladdin's Lamp
+- [x] Aladdin's Lamp
 - [x] Aladdin's Ring
 - [x] Bottle of Suleiman
 - [x] Brass Man
