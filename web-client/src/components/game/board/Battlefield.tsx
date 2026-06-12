@@ -190,6 +190,8 @@ function BattlefieldContent({
           return ids.has(a.sourceId)
         case 'CrewVehicle':
           return ids.has(a.vehicleId)
+        case 'SaddleMount':
+          return ids.has(a.mountId)
         case 'CastSpell':
           return ids.has(a.cardId)
         default:
@@ -618,6 +620,8 @@ function AttachmentsBrowser({
           return a.sourceId === cardId
         case 'CrewVehicle':
           return a.vehicleId === cardId
+        case 'SaddleMount':
+          return a.mountId === cardId
         case 'CastSpell':
           return a.cardId === cardId
         default:
