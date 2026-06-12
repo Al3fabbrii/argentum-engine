@@ -45,7 +45,13 @@ class GameSession(
     val sessionId: String = UUID.randomUUID().toString(),
     private val services: EngineServices,
     private val stateTransformer: ClientStateTransformer = ClientStateTransformer(services.cardRegistry),
-    private val useHandSmoother: Boolean = false
+    private val useHandSmoother: Boolean = false,
+    /**
+     * Number of seats this session fills before it is [isReady] to start. Defaults to 2 (the
+     * quick-game / sealed / tournament-match case, unchanged). Free-for-All lobbies (Phase 4)
+     * pass 3–4. The engine, sessions, and DTOs are seat-count agnostic; this is the only knob.
+     */
+    val maxPlayers: Int = 2,
 ) {
     /** Backward-compatible constructor: wraps a CardRegistry in EngineServices. */
     constructor(
@@ -55,7 +61,8 @@ class GameSession(
         useHandSmoother: Boolean = false,
         debugMode: Boolean = false,
         printingRegistry: com.wingedsheep.engine.registry.PrintingRegistry? = null,
-    ) : this(sessionId, EngineServices(cardRegistry, printingRegistry), if (debugMode) ClientStateTransformer(cardRegistry, debugMode = true) else stateTransformer, useHandSmoother)
+        maxPlayers: Int = 2,
+    ) : this(sessionId, EngineServices(cardRegistry, printingRegistry), if (debugMode) ClientStateTransformer(cardRegistry, debugMode = true) else stateTransformer, useHandSmoother, maxPlayers)
 
     private val cardRegistry: CardRegistry get() = services.cardRegistry
     // Lock for synchronizing state modifications to prevent lost updates
@@ -162,11 +169,15 @@ class GameSession(
         FULL_CONTROL
     }
 
-    val player1: PlayerSession? get() = players.values.firstOrNull()
-    val player2: PlayerSession? get() = players.values.drop(1).firstOrNull()
+    /**
+     * All seated players in join order (which is also turn order once the game starts). This is
+     * the single N-player accessor; broadcasts iterate it. Note the underlying map is a
+     * [LinkedHashMap], so iteration order is stable.
+     */
+    fun getPlayers(): List<PlayerSession> = players.values.toList()
 
-    val isFull: Boolean get() = players.size >= 2
-    val isReady: Boolean get() = players.size == 2 && deckLists.size == 2
+    val isFull: Boolean get() = players.size >= maxPlayers
+    val isReady: Boolean get() = players.size == maxPlayers && deckLists.size == maxPlayers
     val isStarted: Boolean get() = gameState != null
 
     /**
@@ -232,10 +243,11 @@ class GameSession(
     }
 
     /**
-     * Get the opponent's player ID.
+     * Get every other seated player's ID (all opponents of [playerId]). In a 2-player game this
+     * is a single-element list. Order follows seating/turn order.
      */
-    fun getOpponentId(playerId: EntityId): EntityId? {
-        return players.keys.firstOrNull { it != playerId }
+    fun getOpponentIds(playerId: EntityId): List<EntityId> {
+        return players.keys.filter { it != playerId }
     }
 
     /**
@@ -276,31 +288,45 @@ class GameSession(
     fun getSpectators(): Set<PlayerSession> = spectators.toSet()
 
     /**
-     * Get player names for spectator display.
+     * Player names in seat order, for spectator display.
      */
-    fun getPlayerNames(): Pair<String, String>? {
-        val p1 = player1 ?: return null
-        val p2 = player2 ?: return null
-        return Pair(p1.playerName, p2.playerName)
+    fun getPlayerNames(): List<String> = getPlayers().map { it.playerName }
+
+    /**
+     * Current life totals in seat order, for spectator display.
+     */
+    fun getLifeTotals(): List<Int> {
+        val state = gameState ?: return emptyList()
+        return getPlayers().map { player ->
+            state.getEntity(player.playerId)?.get<LifeTotalComponent>()?.life ?: 20
+        }
     }
 
     /**
-     * Get current life totals for spectator display.
+     * The N-player seat roster (turn order). [seatIndex] is the player's index in the engine's
+     * turn order once the game has started, falling back to join order before then. [viewerId],
+     * when given, flags that recipient's own seat ([PlayerSeatInfo.isYou]); spectators pass null.
      */
-    fun getLifeTotals(): Pair<Int, Int>? {
-        val state = gameState ?: return null
-        val p1Id = player1?.playerId ?: return null
-        val p2Id = player2?.playerId ?: return null
-        val p1Life = state.getEntity(p1Id)?.get<LifeTotalComponent>()?.life ?: 20
-        val p2Life = state.getEntity(p2Id)?.get<LifeTotalComponent>()?.life ?: 20
-        return Pair(p1Life, p2Life)
+    fun seatInfos(viewerId: EntityId? = null): List<ServerMessage.PlayerSeatInfo> {
+        val turnOrder = gameState?.turnOrder
+        val seated = getPlayers()
+        return seated.mapIndexed { joinIndex, player ->
+            val seatIndex = turnOrder?.indexOf(player.playerId)?.takeIf { it >= 0 } ?: joinIndex
+            ServerMessage.PlayerSeatInfo(
+                playerId = player.playerId.value,
+                name = player.playerName,
+                seatIndex = seatIndex,
+                isYou = viewerId != null && player.playerId == viewerId,
+                isAi = playerPersistenceInfo[player.playerId]?.isAi == true,
+            )
+        }.sortedBy { it.seatIndex }
     }
 
     fun buildSpectatorState(): ServerMessage.SpectatorStateUpdate? {
         val state = gameState ?: return null
-        val p1 = player1 ?: return null
-        val p2 = player2 ?: return null
-        return spectatorStateBuilder.buildState(state, p1, p2, sessionId)
+        val seated = getPlayers()
+        if (seated.size < 2) return null
+        return spectatorStateBuilder.buildState(state, seated, seatInfos(), sessionId)
     }
 
     /**
@@ -308,7 +334,7 @@ class GameSession(
      * Initializes the game with the new engine - mulligan phase is handled by the engine.
      */
     fun startGame(): GameState {
-        require(isReady) { "Game session not ready - need 2 players with deck lists" }
+        require(isReady) { "Game session not ready - need $maxPlayers players with deck lists" }
 
         val playerConfigs = players.map { (playerId, session) ->
             PlayerConfig(

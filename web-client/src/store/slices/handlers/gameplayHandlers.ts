@@ -419,7 +419,10 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
     },
 
     onGameStarted: (msg) => {
-      trackEvent('game_started', { opponent_name: msg.opponentName })
+      // Derive "the opponent" from the seat roster — the first non-you seat. For 2-player this is
+      // the sole opponent; the N-player opponent rail is Phase 3 client work.
+      const opponentName = msg.players.find((p) => !p.isYou)?.name ?? 'Opponent'
+      trackEvent('game_started', { opponent_name: opponentName })
       setInGame(true)
 
       // Clear spectating state — active game takes priority
@@ -452,7 +455,7 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
       if (tournamentState && playerId) {
         round = tournamentState.currentRound
         const playerStanding = tournamentState.standings.find((s) => s.playerId === playerId)
-        const opponentStanding = tournamentState.standings.find((s) => s.playerName === msg.opponentName)
+        const opponentStanding = tournamentState.standings.find((s) => s.playerName === opponentName)
         if (playerStanding) {
           playerRecord = `${playerStanding.wins}-${playerStanding.losses}${playerStanding.draws > 0 ? `-${playerStanding.draws}` : ''}`
         }
@@ -463,7 +466,7 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
       set({
         matchIntro: {
           playerName,
-          opponentName: msg.opponentName,
+          opponentName,
           ...(round != null ? { round } : {}),
           ...(playerRecord != null ? { playerRecord } : {}),
           ...(opponentRecord != null ? { opponentRecord } : {}),
@@ -471,7 +474,7 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
       })
 
       set((state) => ({
-        opponentName: msg.opponentName,
+        opponentName,
         mulliganState: null,
         // Preserve the drafted deck in tournament mode so the player can still
         // view or save it from the standings screen between rounds and after

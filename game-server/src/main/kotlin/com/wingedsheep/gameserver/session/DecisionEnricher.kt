@@ -92,6 +92,7 @@ class DecisionEnricher(private val cardRegistry: CardRegistry) {
             is SelectManaSourcesDecision -> "Selecting mana sources"
         }
         return ServerMessage.OpponentDecisionStatus(
+            playerId = decision.playerId.value,
             decisionType = decision::class.simpleName ?: "Unknown",
             displayText = displayText,
             sourceName = decision.context.sourceName
