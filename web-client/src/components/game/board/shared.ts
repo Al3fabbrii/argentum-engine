@@ -54,12 +54,14 @@ export interface SlotSizedLayout {
  * all lines still fits the slot. Single lines win ties, so roomy boards keep
  * today's flat layout.
  *
- * The tapped counts matter because tapped cards are rotated 90°: their
- * horizontal footprint is the portrait card *height* (≈1.4× card width)
- * rather than the width. The width constraint assumes the worst-case line
- * (as many tapped cards as can share a line) so an unplanned extra wrap line
- * — which would overflow the slot vertically into the center HUD — stays
- * geometrically impossible.
+ * Counts are *rendered stacks* (after groupCards), not raw cards. The tapped
+ * counts matter because tapped cards are rotated 90°: their horizontal
+ * footprint is the portrait card *height* (≈1.4× card width) rather than the
+ * width. The stackedExtra counts (cards hidden behind a stack's first card)
+ * each add a fixed peek offset to their stack's footprint. The width
+ * constraint assumes the worst-case line (as many tapped cards as can share a
+ * line) so an unplanned extra wrap line — which would overflow the slot
+ * vertically into the center HUD — stays geometrically impossible.
  *
  * Phase 2 of the no-overlap layout: makes overflow into the center HUD
  * geometrically impossible by sizing cards from the actual slot rather
@@ -69,8 +71,10 @@ export function useSlotSizedResponsive(
   slotRef: RefObject<HTMLElement | null>,
   frontRowCount: number = 0,
   frontRowTappedCount: number = 0,
+  frontRowStackedExtra: number = 0,
   backRowCount: number = 0,
   backRowTappedCount: number = 0,
+  backRowStackedExtra: number = 0,
 ): SlotSizedLayout {
   const base = useResponsiveContext()
   const [slotSize, setSlotSize] = useState<{ width: number; height: number } | null>(null)
@@ -113,21 +117,26 @@ export function useSlotSizedResponsive(
     // slot's width (accounting for inter-card gaps). With 0–1 cards per line,
     // no horizontal constraint applies.
     //
-    // Each tapped card's rotated container is cardHeight + 8 (= 1.4 ×
+    // Each tapped stack's rotated container is cardHeight + 8 (= 1.4 ×
     // cardWidth + 8, see GameCard's needsLandscapeContainer) wide rather than
-    // cardWidth. Flex-wrap breaks lines greedily, so we can't control which
-    // cards share a line — assume the worst case where a line holds as many
-    // tapped cards as possible. Solving for cardWidth with t tapped out of n
-    // on a line:
-    //   slotWidth ≥ cw × (n + 0.4·t) + 8·t + (n − 1) × gap
-    //   cw ≤ (slotWidth − 8·t − (n − 1) × gap) / (n + 0.4·t)
-    const widthCapForRow = (count: number, tappedCount: number, lines: number): number => {
+    // cardWidth, and every card stacked behind a group's first peeks out by a
+    // fixed offset (see CardStack). Flex-wrap breaks lines greedily, so we
+    // can't control which items share a line — assume the worst case where a
+    // line holds as many tapped stacks (and all the stacked-extra cards) as
+    // possible. Solving for cardWidth with t tapped and e stacked-extra out
+    // of n items on a line:
+    //   slotWidth ≥ cw × (n + 0.4·t) + 8·t + stackOffset·e + (n − 1) × gap
+    //   cw ≤ (slotWidth − 8·t − stackOffset·e − (n − 1) × gap) / (n + 0.4·t)
+    const stackOffset = base.isMobile ? 12 : 18
+    const widthCapForRow = (count: number, tappedCount: number, stackedExtra: number, lines: number): number => {
       const cardsPerLine = Math.ceil(count / lines)
-      if (cardsPerLine <= 1) return SLOT_MAX_CARD_WIDTH
+      if (cardsPerLine <= 1 && stackedExtra <= 0) return SLOT_MAX_CARD_WIDTH
       const tappedOnLine = Math.max(0, Math.min(tappedCount, cardsPerLine))
       const widthDivisor = cardsPerLine + 0.4 * tappedOnLine
       const totalGap = (cardsPerLine - 1) * base.cardGap
-      return Math.floor((slotSize.width - totalGap - 8 * tappedOnLine) / widthDivisor)
+      return Math.floor(
+        (slotSize.width - totalGap - 8 * tappedOnLine - stackOffset * stackedExtra) / widthDivisor,
+      )
     }
 
     // Search every (frontLines, backLines) combination and keep whichever
@@ -152,8 +161,8 @@ export function useSlotSizedResponsive(
         const candidate = Math.min(
           SLOT_MAX_CARD_WIDTH,
           widthFromHeight,
-          widthCapForRow(frontRowCount, frontRowTappedCount, front),
-          widthCapForRow(backRowCount, backRowTappedCount, back),
+          widthCapForRow(frontRowCount, frontRowTappedCount, frontRowStackedExtra, front),
+          widthCapForRow(backRowCount, backRowTappedCount, backRowStackedExtra, back),
         )
         if (candidate > bestWidth) {
           bestWidth = candidate
@@ -171,18 +180,20 @@ export function useSlotSizedResponsive(
       // line count from what greedy flex-wrap actually produces at the floor
       // width, so the minHeight reservations in Battlefield.tsx track reality
       // instead of the impossible plan.
-      const linesAtFloor = (count: number, tappedCount: number): number => {
+      const linesAtFloor = (count: number, tappedCount: number, stackedExtra: number): number => {
         if (count <= 0) return 1
         const contentWidth =
-          count * (slotCardWidth + base.cardGap) + tappedCount * (0.4 * slotCardWidth + 8)
+          count * (slotCardWidth + base.cardGap) +
+          tappedCount * (0.4 * slotCardWidth + 8) +
+          stackedExtra * stackOffset
         const lineCapacity = slotSize.width + base.cardGap
         return Math.min(
           MAX_LINES_PER_ROW,
           Math.max(1, Math.ceil(contentWidth / lineCapacity)),
         )
       }
-      frontRowLines = linesAtFloor(frontRowCount, frontRowTappedCount)
-      backRowLines = linesAtFloor(backRowCount, backRowTappedCount)
+      frontRowLines = linesAtFloor(frontRowCount, frontRowTappedCount, frontRowStackedExtra)
+      backRowLines = linesAtFloor(backRowCount, backRowTappedCount, backRowStackedExtra)
     }
     const slotCardHeight = Math.round(slotCardWidth * 1.4)
 
@@ -238,7 +249,16 @@ export function useSlotSizedResponsive(
       frontRowLines,
       backRowLines,
     }
-  }, [base, slotSize, frontRowCount, frontRowTappedCount, backRowCount, backRowTappedCount])
+  }, [
+    base,
+    slotSize,
+    frontRowCount,
+    frontRowTappedCount,
+    frontRowStackedExtra,
+    backRowCount,
+    backRowTappedCount,
+    backRowStackedExtra,
+  ])
 }
 
 /**
