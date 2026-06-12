@@ -299,8 +299,13 @@ internal fun EmitCtx.dynamicAmountExpr(node: JsonElement?): Dsl? {
         // it would silently widen the count's filter to GameObjectFilter.Any and over-count every permanent.
         // Decline (-> SCAFFOLD) rather than misrender (The Spirit Oasis's "draw a card for each Shrine").
         if (subtype == null && node.firstArgWordTagged("IsEnchantmentType") != null) return null
-        val filter = if (subtype != null) Lit("GameObjectFilter.Creature").dot("withSubtype", arg("\"$subtype\""))
+        var filter = if (subtype != null) Lit("GameObjectFilter.Creature").dot("withSubtype", arg("\"$subtype\""))
                      else landSearchFilterExpr(node)
+        // "untapped Mountains you control" (Ben-Ben, Akki Hermit): an IsUntapped predicate on the counted
+        // group. Compose .untapped() so the tally isn't silently widened to include tapped permanents (the
+        // land/type filter above has no untapped path). The tapped case is already handled inside
+        // landSearchFilterExpr via the oracle "tapped creature" cue (Theft of Dreams), so don't re-apply it.
+        if ("IsUntapped" in compact(node)) filter = filter.dot("untapped")
         return call("DynamicAmount.AggregateBattlefield", arg(player), arg(filter))
     }
     return null
@@ -419,7 +424,15 @@ internal fun EmitCtx.paycostDsl(costNode: JsonElement?): String? {
         }
         return if (filter == null) "Costs.pay.Discard()" else "Costs.pay.Discard(filter = $filter)"
     }
-    if ("Mana" in blob) return "Costs.pay.OwnManaCost"
+    if (kind == "PayMana") {
+        // "unless you pay {cost}" carries an EXPLICIT mana cost in the IR ({B}{B}{B}{B} for Kuro,
+        // Pitlord). That is rarely the card's own printed cost, so render the literal symbols rather
+        // than collapsing to OwnManaCost (which resolves against the source's printed cost). Decline
+        // if any symbol is unrecognised so we scaffold instead of emitting a wrong cost.
+        val mana = renderMana((costNode as? JsonObject)?.get("args"))
+        if (mana.isBlank() || "{?}" in mana) return null
+        return "Costs.pay.Mana(\"$mana\")"
+    }
     return null
 }
 
