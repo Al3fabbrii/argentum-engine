@@ -3711,6 +3711,102 @@
     ]
 }
 
+// Marauding Sphinx
+{
+    "name": "Marauding Sphinx",
+    "manaCost": "{3}{U}{U}",
+    "typeLine": "Creature — Sphinx Rogue",
+    "oracleText": "Flying, vigilance, ward {2}\nWhenever you commit a crime, surveil 2. This ability triggers only once each turn. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 5
+    },
+    "keywords": [
+        "FLYING",
+        "VIGILANCE",
+        "WARD"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Ward",
+            "cost": {
+                "type": "WardCost.Mana",
+                "manaCost": "{2}"
+            }
+        }
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "CommitCrimeEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                }
+                            },
+                            "storeAs": "surveiled"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "surveiled",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                }
+                            },
+                            "storeSelected": "toGraveyard",
+                            "storeRemainder": "toTop",
+                            "selectedLabel": "Put in graveyard",
+                            "remainderLabel": "Put on top"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "toGraveyard",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard"
+                            }
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "toTop",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Library",
+                                "placement": "Top"
+                            },
+                            "order": "ControllerChooses"
+                        }
+                    ]
+                },
+                "oncePerTurn": true,
+                "descriptionOverride": "Whenever you commit a crime, surveil 2. This ability triggers only once each turn."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "56",
+        "rarity": "UNCOMMON",
+        "artist": "Mila Pesic",
+        "flavorText": "She poses a riddle to each mark, allowing them a chance to keep their goods. Thus far, none have succeeded.",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/4/34071884-c5b6-42c0-9eb3-9f32910c29d8.jpg?1712355453"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Mine Raider
 {
     "name": "Mine Raider",
@@ -3862,6 +3958,82 @@
         "artist": "Zuzanna Wużyk",
         "flavorText": "\"Y'all should've known better than to buy me a coffin!\"",
         "imageUri": "https://cards.scryfall.io/normal/front/9/8/980b0b68-7218-49c6-b6bf-022218f3abf4.jpg?1712355617"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
+// Nezumi Linkbreaker
+{
+    "name": "Nezumi Linkbreaker",
+    "manaCost": "{B}",
+    "typeLine": "Creature — Rat Warlock",
+    "oracleText": "When this creature dies, create a 1/1 red Mercenary creature token with \"{T}: Target creature you control gets +1/+0 until end of turn. Activate only as a sorcery.\"",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "RED"
+                    ],
+                    "creatureTypes": [
+                        "Mercenary"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/5/f/5f04607f-eed2-462e-897f-82e41e5f7049.jpg?1712316319",
+                    "activatedAbilities": [
+                        {
+                            "id": "ability_2",
+                            "cost": "CostTap",
+                            "effect": {
+                                "type": "ModifyStats",
+                                "powerModifier": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                },
+                                "toughnessModifier": {
+                                    "type": "Fixed",
+                                    "amount": 0
+                                },
+                                "target": {
+                                    "type": "ContextTarget",
+                                    "index": 0
+                                }
+                            },
+                            "targetRequirements": [
+                                {
+                                    "type": "TargetObject",
+                                    "filter": {
+                                        "baseFilter": "creature ctrl:you"
+                                    }
+                                }
+                            ],
+                            "timing": "SorcerySpeed"
+                        }
+                    ]
+                },
+                "descriptionOverride": "When this creature dies, create a 1/1 red Mercenary creature token with \"{T}: Target creature you control gets +1/+0 until end of turn. Activate only as a sorcery.\""
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "96",
+        "artist": "Miro Petrov",
+        "flavorText": "\"If they want to get to Prosperity so badly, they can walk there.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/d/6dd0095b-6136-4368-94cb-4c82621aaf37.jpg?1712355626"
     },
     "colorIdentityOverride": [
         "BLACK"
@@ -4381,6 +4553,116 @@
     ]
 }
 
+// Quick Draw
+{
+    "name": "Quick Draw",
+    "manaCost": "{R}",
+    "typeLine": "Instant",
+    "oracleText": "Target creature you control gets +1/+1 and gains first strike until end of turn. Creatures target opponent controls lose first strike and double strike until end of turn.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "ModifyStats",
+                    "powerModifier": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "toughnessModifier": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature you control"
+                    }
+                },
+                {
+                    "type": "GrantKeyword",
+                    "keyword": "FIRST_STRIKE",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature you control"
+                    }
+                },
+                {
+                    "type": "ForEach",
+                    "space": {
+                        "type": "IterationSpace.Group",
+                        "filter": {
+                            "baseFilter": {
+                                "cardPredicates": [
+                                    "IsCreature"
+                                ],
+                                "controllerPredicate": {
+                                    "type": "ControlledByReferencedPlayer",
+                                    "target": {
+                                        "type": "BoundVariable",
+                                        "name": "target opponent"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "body": {
+                        "type": "RemoveKeyword",
+                        "keyword": "FIRST_STRIKE",
+                        "target": "Self"
+                    }
+                },
+                {
+                    "type": "ForEach",
+                    "space": {
+                        "type": "IterationSpace.Group",
+                        "filter": {
+                            "baseFilter": {
+                                "cardPredicates": [
+                                    "IsCreature"
+                                ],
+                                "controllerPredicate": {
+                                    "type": "ControlledByReferencedPlayer",
+                                    "target": {
+                                        "type": "BoundVariable",
+                                        "name": "target opponent"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "body": {
+                        "type": "RemoveKeyword",
+                        "keyword": "DOUBLE_STRIKE",
+                        "target": "Self"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature ctrl:you"
+                },
+                "id": "target creature you control"
+            },
+            {
+                "type": "TargetOpponent",
+                "id": "target opponent"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "138",
+        "artist": "Lie Setiawan",
+        "flavorText": "The opening of the Omenpaths awoke the wild magic of Thunder Junction. Settlers dubbed it \"thunder\" and put it to use in everything from farming tools to deadly weapons.",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/6/56399cd0-1214-42b6-be38-f2cbd770915f.jpg?1712355816"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Quilled Charger
 {
     "name": "Quilled Charger",
@@ -4835,6 +5117,48 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Rodeo Pyromancers
+{
+    "name": "Rodeo Pyromancers",
+    "manaCost": "{3}{R}",
+    "typeLine": "Creature — Human Mercenary",
+    "oracleText": "Whenever you cast your first spell each turn, add {R}{R}.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 4
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "NthSpellCastEvent",
+                    "nthSpell": 1,
+                    "player": "You"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "RED",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 2
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "143",
+        "artist": "Kim Sokol",
+        "flavorText": "\"My citizens throw good money at them, and for what? Cheap tricks and collateral damage. Damnable Slickshot charlatans.\"\n—Baron Bertram Graywater",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/f/df877a29-06e1-474d-8600-410bbec674ae.jpg?1712355836"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 
@@ -6156,6 +6480,58 @@
     ]
 }
 
+// Sterling Supplier
+{
+    "name": "Sterling Supplier",
+    "manaCost": "{4}{W}",
+    "typeLine": "Creature — Bird Soldier",
+    "oracleText": "Flying\nWhen this creature enters, put a +1/+1 counter on another target creature you control.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 4
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "+1/+1",
+                    "count": 1,
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature ctrl:you",
+                        "excludeSelf": true
+                    },
+                    "id": "target"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "33",
+        "artist": "Camille Alquier",
+        "flavorText": "The Sterling Company can always rely on him to bring the thunder.",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/6/b6000be7-67db-440e-87ba-276df20b803e.jpg?1712355360"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Stoic Sphinx
 {
     "name": "Stoic Sphinx",
@@ -6514,6 +6890,60 @@
     "colorIdentityOverride": [
         "GREEN"
     ]
+}
+
+// Tomb Trawler
+{
+    "name": "Tomb Trawler",
+    "manaCost": "{2}",
+    "typeLine": "Artifact Creature — Golem",
+    "oracleText": "{2}: Put target card from your graveyard on the bottom of your library.",
+    "creatureStats": {
+        "power": 0,
+        "toughness": 4
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{2}"
+                    }
+                },
+                "effect": {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    },
+                    "destination": "Library",
+                    "placement": "Bottom"
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "own:you",
+                            "zone": "Graveyard"
+                        },
+                        "id": "target"
+                    }
+                ],
+                "descriptionOverride": "{2}: Put target card from your graveyard on the bottom of your library."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "250",
+        "rarity": "UNCOMMON",
+        "artist": "Anton Solovianchyk",
+        "flavorText": "\"Dying is common on Thunder Junction. Resting in peace is a much rarer commodity.\"\n—Baron Bertram Graywater",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/6/36e61cb8-219a-4fe6-a2e6-307665ffa38f.jpg?1712356295"
+    },
+    "colorIdentityOverride": []
 }
 
 // Trained Arynx
