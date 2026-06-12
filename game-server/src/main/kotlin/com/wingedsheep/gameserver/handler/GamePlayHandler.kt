@@ -286,15 +286,11 @@ class GamePlayHandler(
         // Save game state after starting (so gameState is persisted)
         gameRepository.save(gameSession)
 
-        val player1 = gameSession.player1
-        val player2 = gameSession.player2
-
-        if (player1 != null && player2 != null) {
-            sender.send(player1.webSocketSession, ServerMessage.GameStarted(player2.playerName))
-            sender.send(player2.webSocketSession, ServerMessage.GameStarted(player1.playerName))
-
-            sendMulliganDecision(gameSession, player1)
-            sendMulliganDecision(gameSession, player2)
+        // Send each seat the full roster from its own perspective, then its mulligan decision.
+        // 2-player is the degenerate case (one opponent in the roster).
+        for (player in gameSession.getPlayers()) {
+            sender.send(player.webSocketSession, ServerMessage.GameStarted(gameSession.seatInfos(player.playerId)))
+            sendMulliganDecision(gameSession, player)
         }
     }
 
@@ -479,7 +475,7 @@ class GamePlayHandler(
             }
         } else {
             // Notify players who have completed their mulligan that they're waiting
-            listOfNotNull(gameSession.player1, gameSession.player2).forEach { player ->
+            gameSession.getPlayers().forEach { player ->
                 if (gameSession.hasMulliganComplete(player.playerId)) {
                     sender.send(player.webSocketSession, ServerMessage.WaitingForOpponentMulligan)
                 }
@@ -548,8 +544,7 @@ class GamePlayHandler(
         val customMessage = events.filterIsInstance<PlayerLostEvent>().firstOrNull()?.message
         val message = ServerMessage.GameOver(winnerId, gameOverReason, customMessage, gameSession.sessionId)
 
-        gameSession.player1?.let { sender.send(it.webSocketSession, message) }
-        gameSession.player2?.let { sender.send(it.webSocketSession, message) }
+        gameSession.getPlayers().forEach { sender.send(it.webSocketSession, message) }
 
         // Notify spectators that the game has ended and return them to tournament overview
         for (spectator in gameSession.getSpectators()) {
@@ -577,9 +572,9 @@ class GamePlayHandler(
                 }
                 gameRepository.removeLobbyLink(gameSessionId)
 
-                // Clear currentGameSessionId for both players so they are
+                // Clear currentGameSessionId for all players so they are
                 // considered "waiting" and receive the active matches broadcast
-                listOfNotNull(gameSession.player1, gameSession.player2).forEach { player ->
+                gameSession.getPlayers().forEach { player ->
                     player.currentGameSessionId = null
                     sessionRegistry.getIdentityByWsId(player.webSocketSession.id)
                         ?.currentGameSessionId = null
@@ -598,8 +593,7 @@ class GamePlayHandler(
         val frameCount = gameSession.getReplayFrameCount()
         if (initialSnapshot != null && frameCount >= 5) {
             val winnerName = winnerId?.let { wId ->
-                listOfNotNull(gameSession.player1, gameSession.player2)
-                    .find { it.playerId == wId }?.playerName
+                gameSession.getPlayers().find { it.playerId == wId }?.playerName
             }
 
             // Look up tournament context for grouping replays
@@ -614,10 +608,9 @@ class GamePlayHandler(
 
             val record = GameReplayRecord(
                 gameId = gameSessionId,
-                player1Id = gameSession.player1?.playerId?.value ?: "",
-                player2Id = gameSession.player2?.playerId?.value ?: "",
-                player1Name = gameSession.player1?.playerName ?: "Player 1",
-                player2Name = gameSession.player2?.playerName ?: "Player 2",
+                players = gameSession.getPlayers().map {
+                    com.wingedsheep.gameserver.replay.ReplayPlayerInfo(it.playerId.value, it.playerName)
+                },
                 startedAt = gameSession.replayStartedAt ?: Instant.now(),
                 endedAt = Instant.now(),
                 winnerName = winnerName,
@@ -649,13 +642,12 @@ class GamePlayHandler(
     fun broadcastStateUpdate(gameSession: GameSession, events: List<GameEvent>) {
         val allEvents = processAutoPassLoop(gameSession, events)
 
-        val player1 = gameSession.player1
-        val player2 = gameSession.player2
+        val sessionPlayers = gameSession.getPlayers()
 
         // AI players must always receive full StateUpdate (never deltas) because
         // they don't reconstruct state from diffs — they need the complete picture.
         if (aiGameManager.hasAiPlayer(gameSession.sessionId)) {
-            listOfNotNull(player1, player2).forEach { session ->
+            sessionPlayers.forEach { session ->
                 if (session.webSocketSession is AiWebSocketSession) {
                     gameSession.clearLastSentState(session.playerId)
                 }
@@ -666,7 +658,7 @@ class GamePlayHandler(
         if (aiGameManager.hasAiPlayer(gameSession.sessionId)) {
             val state = gameSession.getStateForTesting()
             if (state != null && (state.step == com.wingedsheep.sdk.core.Step.DECLARE_ATTACKERS || state.step == com.wingedsheep.sdk.core.Step.DECLARE_BLOCKERS)) {
-                val aiPlayer = listOfNotNull(player1, player2).find { it.webSocketSession is AiWebSocketSession }
+                val aiPlayer = sessionPlayers.find { it.webSocketSession is AiWebSocketSession }
                 if (aiPlayer != null) {
                     val aiLegalActions = gameSession.getLegalActions(aiPlayer.playerId)
                     logger.info("AI combat state: step={}, priorityPlayer={}, aiPlayer={}, legalActions={}",
@@ -677,15 +669,10 @@ class GamePlayHandler(
         }
 
         try {
-            player1?.let { session ->
+            sessionPlayers.forEach { session ->
                 val update = gameSession.createStateUpdate(session.playerId, allEvents)
                 if (update != null) sender.send(session.webSocketSession, update)
-                else logger.warn("createStateUpdate returned null for player1")
-            }
-            player2?.let { session ->
-                val update = gameSession.createStateUpdate(session.playerId, allEvents)
-                if (update != null) sender.send(session.webSocketSession, update)
-                else logger.warn("createStateUpdate returned null for player2")
+                else logger.warn("createStateUpdate returned null for player ${session.playerId.value}")
             }
 
             // Update spectators
@@ -783,17 +770,11 @@ class GamePlayHandler(
 
         val gameSession = getGameSession(session, playerSession) ?: return
 
-        // Forward the attacker targets to the opponent
-        val opponent = if (gameSession.player1?.playerId == playerSession.playerId) {
-            gameSession.player2
-        } else {
-            gameSession.player1
-        }
-
+        // Forward the attacker targets to every opponent (2-player = the one opponent)
         val serverMessage = ServerMessage.OpponentAttackerTargets(message.selectedAttackers, message.attackerTargets)
 
-        if (opponent != null) {
-            sender.send(opponent.webSocketSession, serverMessage)
+        gameSession.getOpponentIds(playerSession.playerId).forEach { opponentId ->
+            gameSession.getPlayerSession(opponentId)?.let { sender.send(it.webSocketSession, serverMessage) }
         }
 
         // Also forward to all spectators so they can see attacker arrows in real-time
@@ -811,15 +792,11 @@ class GamePlayHandler(
 
         val gameSession = getGameSession(session, playerSession) ?: return
 
-        // Forward the blocker assignments to the opponent
-        val opponent = if (gameSession.player1?.playerId == playerSession.playerId) {
-            gameSession.player2
-        } else {
-            gameSession.player1
-        }
-
-        if (opponent != null) {
-            sender.send(opponent.webSocketSession, ServerMessage.OpponentBlockerAssignments(message.assignments))
+        // Forward the blocker assignments to every opponent (2-player = the one opponent)
+        gameSession.getOpponentIds(playerSession.playerId).forEach { opponentId ->
+            gameSession.getPlayerSession(opponentId)?.let {
+                sender.send(it.webSocketSession, ServerMessage.OpponentBlockerAssignments(message.assignments))
+            }
         }
 
         // Also forward to all spectators so they can see blocker arrows in real-time

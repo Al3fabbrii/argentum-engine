@@ -311,6 +311,25 @@ their commander-damage rows (keep for history, irrelevant once they've left). 40
 
 ## Phase 2 — Server: sessions, DTOs, spectators
 
+**Status: landed.** The session/DTO/spectator layer is now seat-count agnostic. `GameSession` lost
+its `player1`/`player2` getters for `getPlayers()` + `getOpponentIds()`, gained a `maxPlayers` seat
+count (default 2) and a `seatInfos()` roster builder; every broadcast/cleanup loop iterates seats.
+The live player protocol was reshaped cleanly: `GameStarted(opponentName)` → `GameStarted(players:
+List<PlayerSeatInfo>)` (per-recipient roster; the client derives the opponent from the non-`isYou`
+seat), and `OpponentDecisionStatus` gained the deciding `playerId`. The spectator/replay surface is
+*additive* — `SpectatorStateUpdate` gained a `players` roster while keeping the legacy
+`player1`/`player2` 2-player projection, because the external `tournament-newspaper` tooling and the
+not-yet-migrated replay viewer still consume it (per "flag, don't fix"); `GameReplayRecord` now
+stores a `players` list. Disconnect/forfeit notifies *every* opponent and, in a >2 game, concedes
+the leaver and continues (CR 800.4a) instead of ending the match (relies on Phase 1.2 leave-game).
+The client wire layer (TS message types + `onGameStarted`) was updated in the same PR; the 2-player
+UI is untouched and comes out identical. Verified by `MultiplayerSessionTest` (4-player seating,
+per-recipient hand masking, spectator roster, 2-player degenerate parity) + the existing server
+suite. `StopOverrideInfo` kept its singular `opponentTurnStops` semantics (per-opponent stops
+deferred). **Deferred to a follow-up:** the scenario-builder N-seat widening (Phase 1.4) —
+`ScenarioBuilderService` / `POST /api/scenarios` and the engine `ScenarioTestBase` are still
+hardwired to two seats; N-player games are exercised at the `GameSession` level instead.
+
 ### 2.1 GameSession generalization
 
 - Delete the `player1`/`player2` getters (`GameSession.kt:165-166`); migrate every call site to iterate

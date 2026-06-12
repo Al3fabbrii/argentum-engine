@@ -72,8 +72,12 @@ class GameConnectionTest : GameServerTestBase() {
                 val started1 = ctx.player1.client.messages.filterIsInstance<ServerMessage.GameStarted>().first()
                 val started2 = ctx.player2.client.messages.filterIsInstance<ServerMessage.GameStarted>().first()
 
-                started1.opponentName shouldBe ctx.player2.name
-                started2.opponentName shouldBe ctx.player1.name
+                // Each player gets the full seat roster from their own perspective; the opponent
+                // is the non-`isYou` seat (single opponent in a 2-player game).
+                started1.players.single { it.isYou }.name shouldBe ctx.player1.name
+                started1.players.single { !it.isYou }.name shouldBe ctx.player2.name
+                started2.players.single { it.isYou }.name shouldBe ctx.player2.name
+                started2.players.single { !it.isYou }.name shouldBe ctx.player1.name
             }
 
             test("joining non-existent game returns GAME_NOT_FOUND error") {

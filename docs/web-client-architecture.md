@@ -59,7 +59,9 @@ For responsiveness, we may later add:
 1. **Connect** → `{ type: "connect", playerName: "Alice" }`
 2. **Connected** ← `{ type: "connected", playerId: "p1" }`
 3. **Create/Join** → `{ type: "createGame", deckList: {...} }`
-4. **Game Started** ← `{ type: "gameStarted", opponentName: "Bob" }`
+4. **Game Started** ← `{ type: "gameStarted", players: [{ playerId, name, seatIndex, isYou, isAi }, …] }`
+   (N-player seat roster from this recipient's perspective; "the opponent" is the non-`isYou` seat
+   in a 2-player game)
 5. **Mulligan Phase** ↔ `mulliganDecision` / `keepHand` / `mulligan`
 6. **Game Loop** ← `stateUpdate` with state, events, legalActions
 

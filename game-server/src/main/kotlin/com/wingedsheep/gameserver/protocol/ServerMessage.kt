@@ -55,11 +55,28 @@ sealed interface ServerMessage {
     data class GameCreated(val sessionId: String) : ServerMessage
 
     /**
-     * Game is starting with both players connected.
+     * One seat in a game, from the perspective of a specific recipient. The seat list is the
+     * single N-player source of truth for "who is at this table" — a 2-player game is the
+     * degenerate case (one [isYou] seat + one opponent). [seatIndex] drives stable UI ordering
+     * and seat colors; it is the player's index in the engine's turn order.
+     */
+    @Serializable
+    data class PlayerSeatInfo(
+        val playerId: String,
+        val name: String,
+        val seatIndex: Int,
+        /** True for the recipient's own seat. Always false in spectator/replay rosters. */
+        val isYou: Boolean = false,
+        val isAi: Boolean = false,
+    )
+
+    /**
+     * Game is starting. Carries the full seat roster (turn order) from this recipient's
+     * perspective; the client derives "the opponent(s)" from the non-[PlayerSeatInfo.isYou] seats.
      */
     @Serializable
     @SerialName("gameStarted")
-    data class GameStarted(val opponentName: String) : ServerMessage
+    data class GameStarted(val players: List<PlayerSeatInfo>) : ServerMessage
 
     /**
      * Game was cancelled before it started (by the creator).
@@ -74,6 +91,9 @@ sealed interface ServerMessage {
      */
     @Serializable
     data class OpponentDecisionStatus(
+        /** The seat that is actually deciding. Lets the client attribute the decision in an
+         *  N-player pod (whose spinner to show); for 2-player it's simply "the opponent". */
+        val playerId: String,
         val decisionType: String,
         val displayText: String,
         val sourceName: String? = null
@@ -789,6 +809,14 @@ sealed interface ServerMessage {
         val gameSessionId: String,
         /** Full ClientGameState for reusing GameBoard component (both hands masked) */
         val gameState: ClientGameState? = null,
+        /**
+         * N-player seat roster (turn order). The authoritative "who is at this table" list for
+         * spectators/replay; the per-player board state lives in [gameState] (already N-player).
+         * The [player1Id]/[player2Id]/[player1]/[player2] fields below are the legacy 2-player
+         * projection (first two seats), retained for the current spectator board, replay viewer,
+         * and the external `tournament-newspaper` tooling until the Phase 3 client migration.
+         */
+        val players: List<PlayerSeatInfo> = emptyList(),
         /** Player 1's entity ID */
         val player1Id: String? = null,
         /** Player 2's entity ID */

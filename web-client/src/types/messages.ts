@@ -112,11 +112,24 @@ export interface GameCreatedMessage {
 }
 
 /**
- * Game is starting with both players connected.
+ * One seat in a game, from the recipient's perspective. The seat list is the N-player source of
+ * truth; a 2-player game is the degenerate case (one `isYou` seat + one opponent).
+ */
+export interface PlayerSeatInfo {
+  readonly playerId: string
+  readonly name: string
+  readonly seatIndex: number
+  readonly isYou: boolean
+  readonly isAi: boolean
+}
+
+/**
+ * Game is starting. Carries the full seat roster (turn order) from this recipient's perspective;
+ * derive "the opponent(s)" from the non-`isYou` seats.
  */
 export interface GameStartedMessage {
   readonly type: 'gameStarted'
-  readonly opponentName: string
+  readonly players: readonly PlayerSeatInfo[]
 }
 
 /**
@@ -131,6 +144,8 @@ export interface GameCancelledMessage {
  * Sent to the non-deciding player so they know the opponent is making a choice.
  */
 export interface OpponentDecisionStatus {
+  /** The seat actually deciding (lets an N-player pod show whose spinner). */
+  readonly playerId: string
   readonly decisionType: string
   readonly displayText: string
   readonly sourceName?: string | null
@@ -1434,7 +1449,9 @@ export interface SpectatorStateUpdateMessage {
   readonly gameSessionId: string
   /** Full ClientGameState for reusing GameBoard component (both hands masked) */
   readonly gameState?: ClientGameState | null
-  /** Player 1's entity ID */
+  /** N-player seat roster (turn order). The per-player board state lives in `gameState`. */
+  readonly players?: readonly PlayerSeatInfo[]
+  /** Player 1's entity ID (legacy 2-player projection = first seat) */
   readonly player1Id?: string | null
   /** Player 2's entity ID */
   readonly player2Id?: string | null

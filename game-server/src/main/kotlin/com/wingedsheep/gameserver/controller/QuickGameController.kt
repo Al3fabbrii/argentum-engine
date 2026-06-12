@@ -67,14 +67,16 @@ class QuickGameController(
         val live = gameRepository.findAll()
             .filter { it.publicSpectate && !it.isGameOver() }
             .mapNotNull { session ->
-                val names = session.getPlayerNames() ?: return@mapNotNull null
-                val life = session.getLifeTotals() ?: return@mapNotNull null
+                // Quick games are 2-player; the Live Games tile shows the two seats.
+                val names = session.getPlayerNames()
+                val life = session.getLifeTotals()
+                if (names.size < 2 || life.size < 2) return@mapNotNull null
                 LiveQuickGameDTO(
                     gameSessionId = session.sessionId,
-                    player1Name = names.first,
-                    player2Name = names.second,
-                    player1Life = life.first,
-                    player2Life = life.second,
+                    player1Name = names[0],
+                    player2Name = names[1],
+                    player1Life = life[0],
+                    player2Life = life[1],
                 )
             }
             .sortedBy { it.gameSessionId }
