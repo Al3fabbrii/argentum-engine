@@ -41,8 +41,11 @@ export function CardRow({
     return <div style={{ ...styles.emptyZone, fontSize: responsive.fontSize.small }}>No cards</div>
   }
 
-  // Calculate available width for the hand (viewport - padding - zone piles on sides)
-  const sideZoneWidth = responsive.pileWidth + 20 // pile + margin
+  // Calculate available width for the hand (viewport - padding - zone piles on sides).
+  // On phones the side reservations go: the game log is hidden there (see
+  // GameBoard) and the zone piles sit above the hand row, so the hand can use
+  // nearly the full viewport width.
+  const sideZoneWidth = responsive.isMobile ? 8 : responsive.pileWidth + 20 // pile + margin
   const availableWidth = responsive.viewportWidth - (responsive.containerPadding * 2) - (sideZoneWidth * 2)
 
   // Calculate card width that fits all cards (revealed + unrevealed + ghost)

@@ -21,24 +21,26 @@ export function useResponsiveContext(): ResponsiveSizes {
 // budget anticipated, so we let cards grow up to ~1.6× before clamping.
 const SLOT_MAX_CARD_WIDTH = 200
 
-// Upper bound on the wrap-line search per battlefield row. Three lines of
-// cards per row (so up to six across front + back) already exhausts any
-// realistic slot height; a larger bound only adds search work.
-const MAX_LINES_PER_ROW = 3
+// Upper bound on the wrap-line search per battlefield row. Four lines of
+// tiny cards per row is the most a phone slot can ever usefully hold; a
+// larger bound only adds search work.
+const MAX_LINES_PER_ROW = 4
 
 // Preferred readability floor for battlefield cards. When a board is so
 // crowded that respecting it would make the layout taller than the slot
 // (overlapping the center HUD), cards shrink further — fitting beats size.
 const PREFERRED_MIN_CARD_WIDTH = 60
 
-// Below this, cards are unrecognizable; clamp here and accept overflow for
-// pathological boards (20+ permanents on a phone).
-const ABSOLUTE_MIN_CARD_WIDTH = 40
+// Below this, cards are unrecognizable; clamp here for pathological boards
+// (25+ permanents on a phone). The slot clips its content (Battlefield.tsx),
+// so even then nothing can bleed over the center HUD.
+const ABSOLUTE_MIN_CARD_WIDTH = 32
 
 // Minimum gap kept toward the center HUD when the comfortable `breathing`
-// margin has been sacrificed for card size. Just clears the StepStrip's
-// active-player chevron (~9px).
-const TIGHT_HUD_GAP = 10
+// margin has been sacrificed for card size. Clears the StepStrip's
+// active-player chevron (~9px) and its glow, which paints over anything
+// closer and reads as cards tucked under the HUD.
+const TIGHT_HUD_GAP = 16
 
 /**
  * Slot-derived battlefield layout: the card sizes to render with, plus the

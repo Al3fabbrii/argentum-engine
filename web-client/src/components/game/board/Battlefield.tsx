@@ -109,6 +109,11 @@ export function Battlefield({ isOpponent, spectatorMode = false }: { isOpponent:
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
+        // Hard guarantee: even when a pathological board exceeds what the
+        // sizing math can fit (cards already at ABSOLUTE_MIN_CARD_WIDTH),
+        // battlefield content must never paint over the center HUD or the
+        // hand — clip it at the slot boundary instead.
+        overflow: 'clip',
       }}
     >
       <ResponsiveContext.Provider value={sizes}>
