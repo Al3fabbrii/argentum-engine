@@ -67,14 +67,19 @@ export default function App() {
   )
 
   useEffect(() => {
-    // Only auto-connect if we already have a stored player name (returning user)
-    // Otherwise, GameUI will show the name entry screen first. A spectate deep-link
-    // connects under a throwaway name so a fresh dev browser can watch immediately.
-    const storedName = localStorage.getItem('argentum-player-name')
-    const name = storedName ?? (spectateParam ? `Spectator-${Math.floor(Math.random() * 9000 + 1000)}` : null)
-    if (name && connectionStatus === 'disconnected' && !hasConnectedRef.current) {
+    if (connectionStatus !== 'disconnected' || hasConnectedRef.current) return
+    if (spectateParam) {
+      // Spectate deep-link: connect as an isolated, ephemeral spectator (no shared token/name) so
+      // it doesn't collide with the user's identity and each watch gets a fresh session.
       hasConnectedRef.current = true
-      connect(name)
+      connect(`Spectator-${Math.floor(Math.random() * 9000 + 1000)}`, { spectator: true })
+      return
+    }
+    // Otherwise only auto-connect for a returning user with a stored name; new users see name entry.
+    const storedName = localStorage.getItem('argentum-player-name')
+    if (storedName) {
+      hasConnectedRef.current = true
+      connect(storedName)
     }
   }, [connectionStatus, connect, spectateParam])
 

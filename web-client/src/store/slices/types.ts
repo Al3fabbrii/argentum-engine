@@ -732,7 +732,7 @@ export type GameStore = {
   aiEnabled: boolean
   availableSets: readonly AvailableSet[]
   onlinePlayers: number | null
-  connect: (playerName: string) => void
+  connect: (playerName: string, options?: { spectator?: boolean }) => void
   disconnect: () => void
   setPendingTournamentId: (lobbyId: string | null) => void
   setPendingSpectateGameId: (gameSessionId: string | null) => void

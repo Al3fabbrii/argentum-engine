@@ -32,6 +32,7 @@ createRoot(rootElement).render(
         <Route path="/deckbuilder/:deckId" element={<DeckbuilderPage />} />
         <Route path="/scenario" element={<ScenarioBuilderPage />} />
         <Route path="/llm-tournament" element={<LlmTournamentPage />} />
+        <Route path="/llm-tournament/:id" element={<LlmTournamentPage />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
