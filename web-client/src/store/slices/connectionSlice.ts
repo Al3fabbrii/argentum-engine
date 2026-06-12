@@ -27,7 +27,13 @@ export interface ConnectionSliceState {
 }
 
 export interface ConnectionSliceActions {
-  connect: (playerName: string) => void
+  /**
+   * Connect to the server. `spectator: true` opens an isolated, ephemeral session — it does NOT
+   * reuse or overwrite the stored token/name — so a spectate deep-link in a second tab can't
+   * collide with (or clobber) the user's real identity, and each spectate gets a fresh session
+   * instead of the server restoring a previous (now-finished) spectating game.
+   */
+  connect: (playerName: string, options?: { spectator?: boolean }) => void
   disconnect: () => void
   setPendingTournamentId: (lobbyId: string | null) => void
   setPendingSpectateGameId: (gameSessionId: string | null) => void
@@ -47,7 +53,8 @@ export const createConnectionSlice: SliceCreator<ConnectionSlice> = (set, get) =
   onlinePlayers: null,
 
   // Actions
-  connect: (playerName) => {
+  connect: (playerName, options) => {
+    const spectator = options?.spectator === true
     const { connectionStatus } = get()
     if (connectionStatus === 'connecting' || connectionStatus === 'connected') {
       return
@@ -58,8 +65,11 @@ export const createConnectionSlice: SliceCreator<ConnectionSlice> = (set, get) =
       existingWs.disconnect()
     }
 
-    // Store player name for reconnection
-    localStorage.setItem('argentum-player-name', playerName)
+    // Store player name for reconnection — but never for an ephemeral spectator session, which
+    // must not clobber the user's real identity.
+    if (!spectator) {
+      localStorage.setItem('argentum-player-name', playerName)
+    }
 
     // Build message handlers from the full store
     const handlers = createMessageHandlers(set, get)
@@ -78,9 +88,11 @@ export const createConnectionSlice: SliceCreator<ConnectionSlice> = (set, get) =
           if (urlToken) {
             localStorage.setItem('argentum-token', urlToken)
           }
-          const token = urlToken ?? localStorage.getItem('argentum-token') ?? undefined
-          const storedName = localStorage.getItem('argentum-player-name') ?? playerName
-          getWebSocket()?.send(createConnectMessage(storedName, token))
+          // Spectator sessions connect tokenless (fresh identity every time) so a new spectate tab
+          // never reconnects as an existing identity and gets its old spectating game restored.
+          const token = spectator ? undefined : (urlToken ?? localStorage.getItem('argentum-token') ?? undefined)
+          const connectName = spectator ? playerName : (localStorage.getItem('argentum-player-name') ?? playerName)
+          getWebSocket()?.send(createConnectMessage(connectName, token))
         }
       },
       onError: () => {
