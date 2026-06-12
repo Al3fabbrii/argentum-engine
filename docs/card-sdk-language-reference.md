@@ -1057,6 +1057,15 @@ can't statically prevent (cross-trigger flows, `Self`-vs-`ContextTarget` inside 
 ### Cast-time (`Targets.*` / `TargetRequirement`)
 
 - `Targets.Any` — any creature, player, or planeswalker.
+- `Targets.AnyChosenByOpponent` — "any target **of an opponent's choice**" (Cuombajj Witches). A real
+  target of *your* spell/ability that an **opponent** selects: announced at the same time as your own
+  targets, equally respondable, and with legality (hexproof/protection/shroud) measured relative to
+  **you, the controller** — so an opponent can't pick a hexproof creature they control. Desugars to
+  `AnyTarget(chooser = TargetChooser.Opponent)`; any `TargetRequirement` can carry `chooser` (see
+  below). List the opponent-chosen requirement *after* the controller-chosen ones in a script. The
+  engine routes the opponent's selection at announcement for **activated abilities** (the only printed
+  use today); the controller picks which opponent in multiplayer (currently defaults to the sole
+  opponent — see `TargetChooser`).
 - `Targets.AnyOtherThanEnchantedCreature` — any target except the creature the source Aura/Equipment
   is attached to. Desugars to `TargetOther(AnyTarget(), excludeAttachedCreature = true)`; for Aura/Equipment
   abilities worded "enchanted/equipped creature deals damage … to **any other target**" (e.g. Pain for All),
@@ -1124,6 +1133,18 @@ Every `TargetRequirement` carries count semantics (defaults shown):
   requirements and for non-card targets. E.g.
   `TargetObject(count = 2, optional = true, filter = TargetFilter.CardInGraveyard, sameOwner = true)`
   (Arashin Sunshield).
+- `chooser = TargetChooser.Controller` — **who selects this requirement's target(s)**. Set to
+  `TargetChooser.Opponent` for "**… of an opponent's choice**" wording (Cuombajj Witches). The chosen
+  target is still a real target of *your* spell/ability — announced together with your own targets,
+  equally respondable, legality measured relative to **you** — but an opponent picks which legal
+  object/player it is (the controller chooses *which* opponent in multiplayer per CR 601.6a/602.3a, and
+  that pick follows the controller's own choices per CR 601.6b/602.3b). Orthogonal to legality: target-finding and
+  validation ignore `chooser` (always relative to the controller); only the announcement layer reads it
+  to route the selection decision. Honored for **activated abilities** today; list the opponent-chosen
+  requirement after the controller-chosen ones. `Targets.AnyChosenByOpponent` is the ready-made
+  "any target of an opponent's choice". `CardLinter` (§21) fails any card that puts a
+  `TargetChooser.Opponent` target outside an activated ability — a spell or triggered ability would
+  silently let the *controller* choose it instead.
 
 ### Player-target restrictions (`TargetPlayer.restriction` / `TargetOpponent.restriction`)
 
@@ -2195,6 +2216,16 @@ activatedAbility {
 ---
 
 ## 11. Keywords
+
+> **Where set-mechanic helpers live.** The `card { … }` keyword helpers below for *set-specific*
+> mechanics — `leyline()`, `flurry { }`, `mobilize(…)`, `firebending(n)`, `sneak(cost)`, `decayed()`,
+> `vividEtb { }` / `vividCostReduction()`, `impending(time, cost)`, `renew(cost) { }`,
+> `craft(filter, cost)`, `station()` — are `CardBuilder` **extension functions** in
+> `mtg-sdk/.../dsl/mechanics/` (one file per mechanic), not methods on the core `CardBuilder`. They
+> stay in package `com.wingedsheep.sdk.dsl`, so the call syntax is unchanged, but a card file that
+> uses one needs the matching import (e.g. `import com.wingedsheep.sdk.dsl.station`). Evergreen /
+> multi-set parameterized keywords (`prowess()`, `rampage(n)`, `keywordAbility(…)`) remain on the core
+> builder. New set mechanics get an extension file in `dsl/mechanics/`.
 
 **`Keyword` enum (display-level)**
 
