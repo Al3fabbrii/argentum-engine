@@ -82,4 +82,16 @@ class SetCoverageServiceTest : FunSpec({
     test("detail returns null for an unknown set") {
         service.detail("ZZZ") shouldBe null
     }
+
+    test("progress is a non-empty, monotonically non-decreasing cumulative series") {
+        val series = service.progress()
+        series.shouldNotBeEmpty()
+        series.last().total shouldBeGreaterThanOrEqualTo 1
+        series.zipWithNext().forEach { (a, b) ->
+            withClue("${a.date} -> ${b.date}") {
+                b.total shouldBeGreaterThanOrEqualTo a.total // cumulative never drops
+                b.total shouldBe a.total + b.added // each day's total = prior total + that day's adds
+            }
+        }
+    }
 })

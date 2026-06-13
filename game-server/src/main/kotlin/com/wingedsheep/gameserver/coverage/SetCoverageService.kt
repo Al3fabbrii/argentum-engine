@@ -101,11 +101,20 @@ class SetCoverageService {
         val extra: List<CardCoverageDTO>,
     )
 
+    /** One day on the implementation-progress curve, as baked by `scripts/card-progress-graph`. */
+    @Serializable
+    data class ProgressPointDTO(val date: String, val added: Int, val total: Int)
+
     private val canonical: List<CanonicalSet> =
         ClassPathResource(RESOURCE_PATH).inputStream.bufferedReader().use {
             JSON.decodeFromString<List<CanonicalSet>>(it.readText())
         }
     private val byCode: Map<String, CanonicalSet> = canonical.associateBy { it.code }
+
+    private val progress: List<ProgressPointDTO> =
+        ClassPathResource(PROGRESS_PATH).inputStream.bufferedReader().use {
+            JSON.decodeFromString<List<ProgressPointDTO>>(it.readText())
+        }
 
     /**
      * Coverage for every catalogued set, newest release first (then by code) —
@@ -158,6 +167,13 @@ class SetCoverageService {
     }
 
     /**
+     * Distinct-implemented-cards-over-time series (one cumulative point per calendar day since
+     * the project began), baked from git history by `scripts/card-progress-graph`. Drives the
+     * progress chart behind the Set Completion overall-progress element.
+     */
+    fun progress(): List<ProgressPointDTO> = progress
+
+    /**
      * Names we've authored for a set, matching `scripts/card-status`: every `card(...)`,
      * `basicLand(...)`, and reprint `Printing` row, reduced to front-face names.
      */
@@ -174,6 +190,7 @@ class SetCoverageService {
 
     private companion object {
         const val RESOURCE_PATH = "coverage/set-totals.json"
+        const val PROGRESS_PATH = "coverage/implementation-history.json"
         val JSON = Json { ignoreUnknownKeys = true }
 
         fun percent(implemented: Int, total: Int): Double =

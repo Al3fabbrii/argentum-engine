@@ -65,3 +65,17 @@ export async function fetchSetDetail(code: string): Promise<SetDetail> {
   if (!res.ok) throw new Error(`Failed to load ${code} coverage (${res.status})`)
   return res.json() as Promise<SetDetail>
 }
+
+/** One day on the implementation-progress curve. */
+export interface ProgressPoint {
+  readonly date: string
+  readonly added: number
+  readonly total: number
+}
+
+/** Distinct-implemented-cards-over-time series, one cumulative point per day since the start. */
+export async function fetchProgressHistory(): Promise<readonly ProgressPoint[]> {
+  const res = await fetch('/api/sets/progress')
+  if (!res.ok) throw new Error(`Failed to load progress history (${res.status})`)
+  return res.json() as Promise<readonly ProgressPoint[]>
+}

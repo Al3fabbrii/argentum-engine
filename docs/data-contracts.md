@@ -216,6 +216,13 @@ the click-through detail view.
   "extra": [{ "name": "...", "implemented": false, "imageUri": "…" }, ...] }
 ```
 
+**Implementation progress** — `GET /api/sets/progress` → the distinct-implemented-cards-over-time
+series (one cumulative point per calendar day since the project began), `[{ date, added, total }]`.
+Drives the chart behind the Set Completion overall-progress element. Git history isn't reachable at
+runtime, so `scripts/card-progress-graph` bakes the series (alongside the root
+`card-implementation-progress.html` + README SVG) into
+`game-server/.../resources/coverage/implementation-history.json`.
+
 The denominator (canonical booster + extra front-face card names) isn't knowable at runtime — it
 lives only in the local Scryfall cache. `scripts/gen-set-totals` bakes those canonical cards, split
 into `draft` (Scryfall `booster: true`) and `extra`, each `{ name, img }` (direct CDN art URL), into

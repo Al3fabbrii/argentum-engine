@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SetIcon } from '../ui/SetIcon'
 import { HoverCardPreview } from '../ui/HoverCardPreview'
+import { ProgressChartOverlay } from './ProgressChartOverlay'
 import { getScryfallFallbackUrl } from '@/utils/cardImages'
 import {
   fetchSetCoverage,
@@ -65,6 +66,7 @@ export function SetCompletionPage() {
   const [sort, setSort] = useState<SortKey>('newest')
   const [filter, setFilter] = useState<Filter>('all')
   const [openCode, setOpenCode] = useState<string | null>(null)
+  const [showProgress, setShowProgress] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -130,7 +132,11 @@ export function SetCompletionPage() {
       </header>
 
       {totals && (
-        <section className={styles.summary}>
+        <button
+          className={`${styles.summary} ${styles.summaryButton}`}
+          onClick={() => setShowProgress(true)}
+          title="View implementation progress over time"
+        >
           <div className={styles.summaryStat}>
             <span className={styles.summaryValue}>{fmtPct(totals.percent)}%</span>
             <span className={styles.summaryLabel}>overall</span>
@@ -149,7 +155,8 @@ export function SetCompletionPage() {
               </span>
             </div>
           </div>
-        </section>
+          <span className={styles.summaryHint}>📈 View progress →</span>
+        </button>
       )}
 
       <div className={styles.controls}>
@@ -203,6 +210,7 @@ export function SetCompletionPage() {
       )}
 
       {openCode && <SetDetailOverlay code={openCode} onClose={() => setOpenCode(null)} />}
+      {showProgress && <ProgressChartOverlay onClose={() => setShowProgress(false)} />}
     </div>
   )
 }
@@ -278,8 +286,37 @@ function SetDetailOverlay({ code, onClose }: { code: string; onClose: () => void
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const keep = (c: CardCoverage) =>
-    cardFilter === 'all' || (cardFilter === 'implemented' ? c.implemented : !c.implemented)
+  // Stable handler + memoized filtered lists so that a hover (high-frequency mousemove) only
+  // re-renders the floating preview — not the whole ~280-tile grid. The position update is
+  // coalesced to one per animation frame so a fast mousemove can't outrun the paint loop.
+  const rafRef = useRef<number | null>(null)
+  const pendingHover = useRef<HoverState | null>(null)
+  const onHover = useCallback((h: HoverState | null) => {
+    if (h === null) {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+      pendingHover.current = null
+      setHover(null)
+      return
+    }
+    pendingHover.current = h
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null
+        if (pendingHover.current) setHover(pendingHover.current)
+      })
+    }
+  }, [])
+  useEffect(() => () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+  }, [])
+  const matches = useCallback(
+    (c: CardCoverage) =>
+      cardFilter === 'all' || (cardFilter === 'implemented' ? c.implemented : !c.implemented),
+    [cardFilter],
+  )
+  const draftCards = useMemo(() => detail?.draft.filter(matches) ?? [], [detail, matches])
+  const extraCards = useMemo(() => detail?.extra.filter(matches) ?? [], [detail, matches])
 
   const t = detail ? tier(detail.percent) : 'empty'
 
@@ -340,17 +377,12 @@ function SetDetailOverlay({ code, onClose }: { code: string; onClose: () => void
             <>
               <CardSection
                 title={detail.extra.length > 0 ? 'Booster' : 'Cards'}
-                cards={detail.draft.filter(keep)}
+                cards={draftCards}
                 total={detail.draft.length}
-                onHover={setHover}
+                onHover={onHover}
               />
               {detail.extra.length > 0 && (
-                <CardSection
-                  title="Extras"
-                  cards={detail.extra.filter(keep)}
-                  total={detail.extra.length}
-                  onHover={setHover}
-                />
+                <CardSection title="Extras" cards={extraCards} total={detail.extra.length} onHover={onHover} />
               )}
             </>
           )}
@@ -361,7 +393,7 @@ function SetDetailOverlay({ code, onClose }: { code: string; onClose: () => void
   )
 }
 
-function CardSection({
+const CardSection = memo(function CardSection({
   title,
   cards,
   total,
@@ -389,9 +421,15 @@ function CardSection({
       )}
     </section>
   )
-}
+})
 
-function CardTile({ card, onHover }: { card: CardCoverage; onHover: (h: HoverState | null) => void }) {
+const CardTile = memo(function CardTile({
+  card,
+  onHover,
+}: {
+  card: CardCoverage
+  onHover: (h: HoverState | null) => void
+}) {
   return (
     <div
       className={card.implemented ? styles.tile : styles.tileMissing}
@@ -400,9 +438,15 @@ function CardTile({ card, onHover }: { card: CardCoverage; onHover: (h: HoverSta
       onMouseMove={(e) => onHover({ name: card.name, imageUri: card.imageUri, pos: { x: e.clientX, y: e.clientY } })}
       onMouseLeave={() => onHover(null)}
     >
-      <img className={styles.tileImage} src={smallArt(card.name, card.imageUri)} alt={card.name} loading="lazy" />
+      <img
+        className={styles.tileImage}
+        src={smallArt(card.name, card.imageUri)}
+        alt={card.name}
+        loading="lazy"
+        decoding="async"
+      />
       <span className={styles.tileBadge}>{card.implemented ? '✓' : 'Missing'}</span>
       <span className={styles.tileName}>{card.name}</span>
     </div>
   )
-}
+})

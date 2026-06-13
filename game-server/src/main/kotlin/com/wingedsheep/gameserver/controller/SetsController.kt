@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException
  * - `GET /api/sets`                       — every catalogued set (deckbuilder, search filters).
  * - `GET /api/sets/booster-ready`         — subset draftable for sealed/draft (booster generation).
  * - `GET /api/sets/coverage`              — per-set card-implementation coverage (Set Completion view).
+ * - `GET /api/sets/progress`              — distinct-cards-over-time series (Set Completion chart).
  * - `GET /api/sets/{setCode}/archetypes`  — limited archetype synergies for a single set.
  *
  * The bare `/api/sets` used to mean "draftable" — that intent now lives at the
@@ -91,6 +92,13 @@ class SetsController(
     fun getSetCoverageDetail(@PathVariable setCode: String): SetCoverageService.SetDetailDTO =
         setCoverageService.detail(setCode)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No coverage data for set $setCode")
+
+    /**
+     * Distinct-implemented-cards-over-time series (one cumulative point per day since the project
+     * began). Drives the progress chart behind the Set Completion overall-progress element.
+     */
+    @GetMapping("/progress")
+    fun getProgress(): List<SetCoverageService.ProgressPointDTO> = setCoverageService.progress()
 
     @GetMapping("/{setCode}/archetypes")
     fun getArchetypes(@PathVariable setCode: String): SetSynergiesDTO? {

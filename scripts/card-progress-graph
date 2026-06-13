@@ -42,6 +42,10 @@ REPO = Path(__file__).resolve().parent.parent
 DEFS = "mtg-sets/src/main/kotlin/com/wingedsheep/mtg/sets/definitions"
 HTML = REPO / "card-implementation-progress.html"
 SVG = REPO / "assets" / "card-implementation-progress.svg"
+# Server-readable copy of the same per-day series, so the Set Completion view can render
+# the progress chart live (GET /api/sets/progress). Git history isn't reachable at runtime,
+# so this baked resource is the data source — regenerate it alongside the HTML/SVG.
+JSON_RESOURCE = REPO / "game-server" / "src" / "main" / "resources" / "coverage" / "implementation-history.json"
 
 # `val Foo = card("Some Name") {` — the canonical definition opener.
 ADDED_RE = re.compile(r'^\+.*=\s*card\("((?:[^"\\]|\\.)*)"')
@@ -220,6 +224,9 @@ def main() -> None:
     print(f"wrote          : {HTML.relative_to(REPO)}")
     SVG.write_text(render_svg(series), encoding="utf-8")
     print(f"wrote          : {SVG.relative_to(REPO)}")
+    JSON_RESOURCE.parent.mkdir(parents=True, exist_ok=True)
+    JSON_RESOURCE.write_text(json.dumps(series, separators=(",", ":")) + "\n", encoding="utf-8")
+    print(f"wrote          : {JSON_RESOURCE.relative_to(REPO)}")
 
 
 if __name__ == "__main__":
