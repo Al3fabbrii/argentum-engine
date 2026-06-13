@@ -265,6 +265,12 @@ export type {
   TournamentResumedMessage,
   ReadyForNextRoundMessage,
   AddExtraRoundMessage,
+  // Free-for-All types
+  LobbyGameMode,
+  FfaStandingInfo,
+  FreeForAllGameStartingMessage,
+  FreeForAllGameCompleteMessage,
+  PlayerEliminatedMessage,
   // Spectating types
   ActiveMatchInfo,
   ActiveMatchesMessage,

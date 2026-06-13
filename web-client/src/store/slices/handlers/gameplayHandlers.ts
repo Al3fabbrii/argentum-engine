@@ -409,7 +409,7 @@ type GameplayHandlerKeys =
   | 'onGameCreated' | 'onGameStarted' | 'onGameCancelled'
   | 'onStateUpdate' | 'onStateDeltaUpdate'
   | 'onMulliganDecision' | 'onChooseBottomCards' | 'onMulliganComplete' | 'onWaitingForOpponentMulligan'
-  | 'onGameOver' | 'onError'
+  | 'onGameOver' | 'onPlayerEliminated' | 'onError'
 
 export function createGameplayHandlers(set: SetState, get: GetState): Pick<MessageHandlers, GameplayHandlerKeys> {
   return {
@@ -477,10 +477,10 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
       set((state) => ({
         opponentName,
         mulliganState: null,
-        // Preserve the drafted deck in tournament mode so the player can still
+        // Preserve the drafted deck in tournament/FFA mode so the player can still
         // view or save it from the standings screen between rounds and after
         // the tournament completes.
-        deckBuildingState: state.tournamentState ? state.deckBuildingState : null,
+        deckBuildingState: state.tournamentState || state.ffaState ? state.deckBuildingState : null,
       }))
     },
 
@@ -554,7 +554,10 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
     },
 
     onGameOver: (msg) => {
-      const { playerId } = get()
+      const { playerId, sessionId } = get()
+      // Ignore a game-over for a game we already left — e.g. an eliminated FFA player who
+      // returned to the lobby still holds a seat server-side and receives the final GameOver.
+      if (msg.gameId && sessionId !== msg.gameId) return
       const result: 'win' | 'lose' | 'draw' =
         msg.winnerId === null ? 'draw' : msg.winnerId === playerId ? 'win' : 'lose'
       trackEvent('game_over', { result, reason: msg.reason })
@@ -565,6 +568,23 @@ export function createGameplayHandlers(set: SetState, get: GetState): Pick<Messa
           reason: msg.reason,
           result,
           message: msg.message,
+          gameId: msg.gameId,
+        },
+      })
+    },
+
+    onPlayerEliminated: (msg) => {
+      // Personal elimination from a multiplayer game that continues without us (e.g. we
+      // conceded a 4-player pod). Show the defeat overlay; the table plays on.
+      if (msg.gameId !== get().sessionId) return
+      trackEvent('game_over', { result: 'lose', reason: msg.reason, eliminated: true })
+      setInGame(false)
+      set({
+        gameOverState: {
+          winnerId: null,
+          reason: msg.reason,
+          result: 'lose',
+          message: 'You are out of the game — the table plays on without you.',
           gameId: msg.gameId,
         },
       })

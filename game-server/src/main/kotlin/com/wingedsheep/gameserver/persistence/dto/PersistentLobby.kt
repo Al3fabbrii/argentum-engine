@@ -33,7 +33,13 @@ data class PersistentTournamentLobby(
     val completedAt: Long? = null,
     val isPublic: Boolean = false,
     /** Master switch for in-app AI assistance (Suggest Pick / Auto-build). */
-    val aiAssistEnabled: Boolean = true
+    val aiAssistEnabled: Boolean = true,
+    /** Lobby mode axis: LobbyGameMode enum name ("TOURNAMENT" / "FREE_FOR_ALL"). */
+    val gameMode: String = "TOURNAMENT",
+    /** FFA mode: session id of the game currently in progress, or null between games. */
+    val ffaGameSessionId: String? = null,
+    /** FFA mode: completed games in this lobby's play-again loop. */
+    val ffaGamesPlayed: Int = 0
 )
 
 /**

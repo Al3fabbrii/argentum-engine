@@ -191,8 +191,7 @@ class GamePlayHandler(
         // If the game has already started, treat cancel as a concede
         if (gameSession.isStarted) {
             logger.info("Player ${playerSession.playerName} cancelled started game ${gameSession.sessionId} - treating as concede")
-            gameSession.playerConcedes(playerSession.playerId)
-            handleGameOver(gameSession, GameOverReason.CONCESSION)
+            concedeSeat(gameSession, playerSession.playerId)
             return
         }
 
@@ -533,8 +532,38 @@ class GamePlayHandler(
         val gameSession = getGameSession(session, playerSession) ?: return
 
         logger.info("Player ${playerSession.playerName} conceded game ${gameSession.sessionId}")
-        gameSession.playerConcedes(playerSession.playerId)
-        handleGameOver(gameSession, GameOverReason.CONCESSION)
+        concedeSeat(gameSession, playerSession.playerId)
+    }
+
+    /**
+     * Concede [playerId]'s seat. If that ends the game (≤1 player remains, CR 104.2a) the match
+     * is finalized; otherwise the game continues for the remaining seats (CR 800.4a) — the
+     * conceder gets a personal [ServerMessage.PlayerEliminated] so their client can leave the
+     * table, and everyone else sees the seat drop out via the state rebroadcast. In a 2-player
+     * game conceding always ends it — the degenerate case.
+     */
+    private fun concedeSeat(gameSession: GameSession, playerId: EntityId) {
+        gameSession.playerConcedes(playerId)
+        if (gameSession.isGameOver()) {
+            handleGameOver(gameSession, GameOverReason.CONCESSION)
+            return
+        }
+
+        // In a hotseat pod the conceding identity may still control other live seats
+        // (scenario builder self-play) — keep them at the table instead of showing the
+        // personal elimination overlay.
+        val state = gameSession.getStateSnapshot()
+        val stillControlsLiveSeat = state != null && state.turnOrder.any { seat ->
+            seat != playerId && seat in state.activePlayers && state.actorFor(seat) == playerId
+        }
+        val conceder = gameSession.getPlayerSession(playerId)
+        if (!stillControlsLiveSeat && conceder != null && conceder.webSocketSession.isOpen) {
+            sender.send(conceder.webSocketSession, ServerMessage.PlayerEliminated(
+                gameId = gameSession.sessionId,
+                reason = GameOverReason.CONCESSION,
+            ))
+        }
+        broadcastStateUpdate(gameSession, emptyList())
     }
 
     fun handleGameOver(gameSession: GameSession, reason: GameOverReason? = null, events: List<GameEvent> = emptyList()) {
@@ -561,31 +590,31 @@ class GamePlayHandler(
 
         val lobbyId = gameRepository.getLobbyForGame(gameSessionId)
         if (lobbyId != null) {
-            val tournament = lobbyRepository.findTournamentById(lobbyId)
-            if (tournament != null) {
-                // Capture winner's remaining life for tiebreaker calculations
-                val winnerLifeRemaining = if (winnerId != null) {
-                    gameSession.getStateForTesting()?.getEntity(winnerId)
-                        ?.get<LifeTotalComponent>()?.life ?: 0
-                } else {
-                    0
-                }
-                gameRepository.removeLobbyLink(gameSessionId)
-
-                // Clear currentGameSessionId for all players so they are
-                // considered "waiting" and receive the active matches broadcast
-                gameSession.getPlayers().forEach { player ->
-                    player.currentGameSessionId = null
-                    sessionRegistry.getIdentityByWsId(player.webSocketSession.id)
-                        ?.currentGameSessionId = null
-                    // Also clear the registry's PlayerSession to prevent stale references
-                    sessionRegistry.getPlayerSession(player.webSocketSession.id)
-                        ?.currentGameSessionId = null
-                }
-
-                // Report result, notify players, check round complete — all under the per-lobby lock
-                handleMatchResultCallback?.invoke(lobbyId, gameSessionId, winnerId, winnerLifeRemaining)
+            // Every lobby-linked game reports back to its lobby: bracket tournaments via
+            // TournamentManager, Free-for-All pods via FreeForAllHandler (which never creates
+            // a TournamentManager). The callback routes by the lobby's game mode.
+            // Capture winner's remaining life for tiebreaker calculations
+            val winnerLifeRemaining = if (winnerId != null) {
+                gameSession.getStateForTesting()?.getEntity(winnerId)
+                    ?.get<LifeTotalComponent>()?.life ?: 0
+            } else {
+                0
             }
+            gameRepository.removeLobbyLink(gameSessionId)
+
+            // Clear currentGameSessionId for all players so they are
+            // considered "waiting" and receive the active matches broadcast
+            gameSession.getPlayers().forEach { player ->
+                player.currentGameSessionId = null
+                sessionRegistry.getIdentityByWsId(player.webSocketSession.id)
+                    ?.currentGameSessionId = null
+                // Also clear the registry's PlayerSession to prevent stale references
+                sessionRegistry.getPlayerSession(player.webSocketSession.id)
+                    ?.currentGameSessionId = null
+            }
+
+            // Report result, notify players, check round complete — all under the per-lobby lock
+            handleMatchResultCallback?.invoke(lobbyId, gameSessionId, winnerId, winnerLifeRemaining)
         }
 
         // Save replay history if the game had meaningful activity (>= 5 frames)

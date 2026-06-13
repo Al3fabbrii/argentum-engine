@@ -50,6 +50,23 @@ enum class TournamentFormat {
 }
 
 /**
+ * What happens when the lobby's pool-building phase finishes (the *mode* axis, orthogonal to the
+ * [TournamentFormat] *format* axis — any format composes with any mode).
+ */
+enum class LobbyGameMode {
+    /** Round-robin bracket of 2-player matches (the existing tournament flow). */
+    TOURNAMENT,
+
+    /**
+     * One multiplayer Free-for-All game (CR 806) seating every lobby player (2-4). No rounds, no
+     * matches, no bracket — when all decks are in, a single N-player [com.wingedsheep.gameserver.session.GameSession]
+     * starts. Standings are the elimination order; readying up afterwards starts a new game with
+     * the same pod ("play again").
+     */
+    FREE_FOR_ALL;
+}
+
+/**
  * Grid draft row/column selection.
  */
 enum class GridSelection {
@@ -260,7 +277,31 @@ class TournamentLobby(
      * assist endpoints. Defaults off; a host can switch it on to allow assistance.
      */
     var aiAssistEnabled: Boolean = false,
+    /**
+     * Mode axis: what the lobby does once decks are in. [LobbyGameMode.TOURNAMENT] runs the
+     * round-robin bracket; [LobbyGameMode.FREE_FOR_ALL] starts one multiplayer game seating
+     * everyone. Orthogonal to [format] — any pool-building format composes with either mode.
+     */
+    var gameMode: LobbyGameMode = LobbyGameMode.TOURNAMENT,
 ) {
+
+    val isFreeForAll: Boolean get() = gameMode == LobbyGameMode.FREE_FOR_ALL
+
+    // =========================================================================
+    // Free-for-All mode state (unused in TOURNAMENT mode)
+    // =========================================================================
+
+    /** Session id of the FFA game currently in progress, or null between games. */
+    @Volatile
+    var ffaGameSessionId: String? = null
+
+    /** Completed FFA games in this lobby (drives the "Game N" label in the play-again loop). */
+    @Volatile
+    var ffaGamesPlayed: Int = 0
+
+    /** Final standings of the most recent FFA game (placement order), for late joiners/reconnects. */
+    @Volatile
+    var ffaLastStandings: List<ServerMessage.FfaStandingInfo>? = null
 
     /**
      * Update the sets for this lobby. Can only be changed while waiting for players.
@@ -1442,6 +1483,7 @@ class TournamentLobby(
                 chaosBoosters = chaosBoosters,
                 bannedCardNames = bannedCardNames.sorted(),
                 aiAssistEnabled = aiAssistEnabled,
+                gameMode = gameMode.name,
             ),
             isHost = isHost(forPlayerId)
         )
