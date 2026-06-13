@@ -582,13 +582,113 @@ private fun EmitCtx.castTimeCaptureSpell(card: JsonObject): List<Stmt>? {
     return listOf(Sub(Block("spell", stmts)))
 }
 
+/**
+ * Split a modal spell's oracle text into its per-mode bullet strings. mtgish carries no per-mode
+ * label, but the engine's `mode("…")` wants the printed bullet text, so derive it from Scryfall's
+ * oracle text: drop the "Choose one —" (or "Choose up to N —") header line, then split on the `•`
+ * bullet marker. Returns null if the oracle text is absent or has no bullets — the renderer then
+ * declines (→ SCAFFOLD) rather than invent labels.
+ */
+private fun EmitCtx.modeBullets(): List<String>? {
+    val oracle = oracleText ?: return null
+    if ("•" !in oracle) return null
+    return oracle.substringAfter("•").let { "•$it" }
+        .split("•")
+        .map { it.trim().removeSuffix(".").trim() }
+        .filter { it.isNotEmpty() }
+        .takeIf { it.isNotEmpty() }
+}
+
+/**
+ * One arm of a `Modal_ChooseOne` spell → the body statements of a `mode("<bullet>") { … }` block.
+ *
+ * Handles the arm shapes seen in the charm corpus, reusing the same machinery the non-modal spell path
+ * uses so a mode renders exactly as the equivalent stand-alone spell would:
+ *  - `ActionList` (no target) → `effect = <renderEffectList>`.
+ *  - `Targeted` with a single conventional target (`TargetPermanent`/`TargetGraveyardCard`/`TargetPlayer`/
+ *    …) → `val t = target("target", <node>)` + `effect = <renderEffectList(…, "t")>`.
+ *  - `Targeted` with `BetweenOneAndNumberAnyTargets` + a fixed `SpellDealsDamage` to `Ref_AnyTargets`
+ *    ("deals N damage to each of one or two targets") → `target = AnyTarget(count, minCount = 1)` +
+ *    `effect = ForEachTargetEffect(listOf(Effects.DealDamage(N, ContextTarget(0))))`.
+ *
+ * Returns null for any arm shape it can't render exactly, so the whole card declines to SCAFFOLD
+ * rather than emit a partial modal.
+ */
+private fun EmitCtx.modalArmBody(arm: JsonObject): List<Stmt>? {
+    val kind = arm.strField("_Actions")
+    if (kind == "ActionList") {
+        val actions = arm["args"].asArr?.filterIsInstance<JsonObject>() ?: return null
+        val effect = renderEffectList(actions, null) ?: return null
+        return listOf(Assign("effect", effect))
+    }
+    if (kind != "Targeted") return null
+    val (targets, actions) = targetedArms(arm) ?: return null
+    if (targets == null || actions == null) return null
+    if (targets.size != 1) return null
+    val target = targets[0]
+
+    // "deals N damage to each of one or two targets": a `BetweenOneAndNumberAnyTargets` target whose only
+    // action is a fixed `SpellDealsDamage` to `Ref_AnyTargets`. The engine models this as a fixed-amount
+    // `ForEachTargetEffect`, NOT the bound-single-target `DealDamageEffect` the generic SpellDealsDamage
+    // handler would emit — so render it here and decline anything else on this target shape.
+    if (target.strField("_Target") == "BetweenOneAndNumberAnyTargets") {
+        val max = findInteger(target) as? Int ?: return null
+        val damage = actions.singleOrNull()?.takeIf { it.strField("_Action") == "SpellDealsDamage" } ?: return null
+        val amt = (findInteger(damage["args"]) as? Int) ?: return null
+        if (!jsonContains(damage, "_DamageRecipient", "Ref_AnyTargets")) return null
+        val forEach = call(
+            "ForEachTargetEffect",
+            arg(call("listOf", arg(call("Effects.DealDamage", arg("$amt"), arg("EffectTarget.ContextTarget(0)"))))),
+        )
+        return listOf(
+            Assign("target", call("AnyTarget", arg("count", "$max"), arg("minCount", "1"))),
+            Assign("effect", forEach),
+        )
+    }
+
+    val tnode = targetExpr(target, actions) ?: run { reasons.add("target:${target.strField("_Target")}"); return null }
+    val effect = renderEffectList(actions, "t") ?: return null
+    return listOf(
+        Local("t", call("target", arg("\"target\""), arg(tnode))),
+        Assign("effect", effect),
+    )
+}
+
+/**
+ * "Choose one —" modal spell (`SpellActions { Modal_ChooseOne([arm, arm, …]) }`) → a
+ * `spell { modal(chooseCount = 1) { mode("…") { … } … } }` block. Each arm is rendered by
+ * [modalArmBody]; the mode labels come from the oracle-text bullets ([modeBullets]). Declines (→
+ * SCAFFOLD) unless every arm renders AND the bullet count matches the arm count, so a card never emits
+ * with a missing or mislabeled mode.
+ */
+internal fun EmitCtx.modalChooseOneSpell(card: JsonObject): List<Stmt>? {
+    val spellActions = (card["Rules"].asArr ?: return null).filterIsInstance<JsonObject>()
+        .firstNotNullOfOrNull { rule ->
+            (rule["args"] as? JsonObject)?.takeIf { it.strField("_Actions") == "Modal_ChooseOne" }
+        } ?: return null
+    val arms = spellActions["args"].asArr?.filterIsInstance<JsonObject>() ?: return null
+    if (arms.isEmpty()) return null
+
+    val bullets = modeBullets() ?: run { reasons.add("modal-spell"); return null }
+    if (bullets.size != arms.size) { reasons.add("modal-spell"); return null }
+
+    val modeBlocks = arms.mapIndexed { i, arm ->
+        val body = modalArmBody(arm) ?: run { reasons.add("modal-spell"); return null }
+        Sub(Block("mode(\"${bullets[i]}\")", body))
+    }
+    return listOf(Sub(Block("spell", listOf(Sub(Block("modal(chooseCount = 1)", modeBlocks))))))
+}
+
 internal fun EmitCtx.spellBlock(card: JsonObject): List<Stmt>? {
     // "As you cast this spell" cast-time captures arrive as a `Modal_IfElse` envelope; render them
     // (the cast-time form) before the generic modal guard below scaffolds everything `Modal_*`.
     castTimeCaptureSpell(card)?.let { return it }
-    // Modal spells ("Choose one —", "Choose up to four", …) carry a `Modal_*` envelope whose children
-    // are the individual modes. The generic envelope path below would grab only the FIRST mode and
-    // silently drop the rest, so scaffold the whole card rather than emit one arm of a modal spell.
+    // "Choose one —" modal spells (`Modal_ChooseOne`) render to the engine's modal DSL — one
+    // `mode("<bullet>") { … }` per arm. Render them before the generic `Modal_*` scaffold guard.
+    modalChooseOneSpell(card)?.let { return it }
+    // Other modal spells ("Choose up to four", entwine, escalate, …) carry a `Modal_*` envelope whose
+    // children are the individual modes. The generic envelope path below would grab only the FIRST mode
+    // and silently drop the rest, so scaffold the whole card rather than emit one arm of a modal spell.
     if ("\"Modal_" in compact(card["Rules"])) { reasons.add("modal-spell"); return null }
     // One-line `effect =` shortcuts, then whole-block shortcuts, then the generic envelope path.
     eachplayerMaydraw(card)?.let { return spellOf(it) }
@@ -1057,7 +1157,15 @@ private fun EmitCtx.triggerSpecFor(rule: JsonObject): String? {
     if (jsonContains(trig, "_Trigger", "WhenAPlayerCastsASpell")) {
         val argv = trig["args"].asArr
         val scope = castScope(argv?.getOrNull(0) as? JsonObject) ?: return null
-        val category = spellCastCategory(argv?.getOrNull(1) as? JsonObject) ?: return null
+        val spellsNode = argv?.getOrNull(1) as? JsonObject
+        // "an instant or sorcery spell that targets a creature" (Repartee — Forum Necroscribe,
+        // Lecturing Scornmage): an And of the base spell-type filter + a `TargetsAPermanent`
+        // clause. Recover the base category and a `targetsMatching(<filter>)` subfilter; the
+        // whole thing renders only when BOTH render exactly (decline -> SCAFFOLD otherwise).
+        spellCastTargetsMatching(spellsNode)?.let { (category, sub) ->
+            return castTriggerDsl(scope, category, targetsMatching = sub)
+        }
+        val category = spellCastCategory(spellsNode) ?: return null
         return castTriggerDsl(scope, category)
     }
 
@@ -1104,19 +1212,51 @@ private fun spellCastCategory(spells: JsonObject?): String? = when (spells?.strF
     else -> null
 }
 
+/** The base [GameObjectFilter] expression for a cast-trigger category, or null for "any" (no filter). */
+private fun categoryFilter(category: String): String? = when (category) {
+    "any" -> null
+    "creature" -> "GameObjectFilter.Creature"
+    "noncreature" -> "GameObjectFilter.Noncreature"
+    "enchantment" -> "GameObjectFilter.Enchantment"
+    "instantOrSorcery" -> "GameObjectFilter.InstantOrSorcery"
+    "historic" -> "GameObjectFilter.Historic"
+    else -> null
+}
+
+/**
+ * "a [type] spell that targets a [permanent]" (Repartee — Forum Necroscribe, Lecturing Scornmage):
+ * the spell filter is an `And` of a base spell-type filter + a `TargetsAPermanent(<perm filter>)`
+ * clause. Returns `(baseCategory, targetsMatchingFilterExpr)` when BOTH halves render exactly, else
+ * null so the trigger declines -> SCAFFOLD rather than dropping the "targets a creature" clause.
+ */
+private fun EmitCtx.spellCastTargetsMatching(spells: JsonObject?): Pair<String, String>? {
+    if (spells?.strField("_Spells") != "And") return null
+    val parts = spells["args"].asArr.orEmpty().filterIsInstance<JsonObject>()
+    if (parts.size != 2) return null
+    val targetsNode = parts.firstOrNull { it.strField("_Spells") == "TargetsAPermanent" } ?: return null
+    val baseNode = parts.firstOrNull { it !== targetsNode } ?: return null
+    val category = spellCastCategory(baseNode) ?: return null
+    val sub = gameObjectFilterDsl(targetsNode["args"]) ?: return null
+    return category to sub
+}
+
 /** (scope, category) -> the exact `Triggers.*` constant/factory. You has named constants; the
  *  any-player / opponent scopes use the `anyPlayerCasts` / `opponentCasts` factories with a
- *  [GameObjectFilter]. */
-private fun castTriggerDsl(scope: CastScope, category: String): String? {
-    val filter = when (category) {
-        "any" -> null
-        "creature" -> "GameObjectFilter.Creature"
-        "noncreature" -> "GameObjectFilter.Noncreature"
-        "enchantment" -> "GameObjectFilter.Enchantment"
-        "instantOrSorcery" -> "GameObjectFilter.InstantOrSorcery"
-        "historic" -> "GameObjectFilter.Historic"
-        else -> return null
+ *  [GameObjectFilter]. When [targetsMatching] is set ("... that targets a creature"), the base
+ *  filter is narrowed with `.targetsMatching(<filter>)` and the factory form is always used (the
+ *  bare `Triggers.YouCastInstantOrSorcery`-style constants carry no spell filter). */
+private fun castTriggerDsl(scope: CastScope, category: String, targetsMatching: String? = null): String? {
+    val baseFilter = categoryFilter(category)
+    if (targetsMatching != null) {
+        // No bare "any spell that targets …" shape appears in the corpus; require a typed base filter.
+        val composed = (baseFilter ?: return null) + ".targetsMatching($targetsMatching)"
+        return when (scope) {
+            CastScope.YOU -> "Triggers.youCastSpell(spellFilter = $composed)"
+            CastScope.ANY -> "Triggers.anyPlayerCasts($composed)"
+            CastScope.OPPONENT -> "Triggers.opponentCasts($composed)"
+        }
     }
+    val filter = baseFilter
     return when (scope) {
         CastScope.YOU -> when (category) {
             "any" -> "Triggers.YouCastSpell"
@@ -1130,6 +1270,39 @@ private fun castTriggerDsl(scope: CastScope, category: String): String? {
         CastScope.ANY -> if (filter == null) "Triggers.AnyPlayerCastsSpell" else "Triggers.anyPlayerCasts($filter)"
         CastScope.OPPONENT -> if (filter == null) "Triggers.OpponentCastsSpell" else "Triggers.opponentCasts($filter)"
     }
+}
+
+/**
+ * "Ward—<cost>" (CR 702.21) -> `keywordAbility(KeywordAbility.ward(...) / wardDiscard() / wardLife(N)
+ * / wardSacrifice(filter))`. The rule's `args` is the ward cost; only the cost shapes the SDK exposes
+ * render exactly — mana (`Ward {N}`), discard-a-card, pay-N-life, and sacrifice-a-<filter>. Any other
+ * cost (compound `And`, dynamic life, sacrifice-N) declines -> SCAFFOLD rather than approximating the
+ * ward cost. Forum Necroscribe ("Ward—Discard a card") + the broad Ward {N} / Ward—Pay N life corpus.
+ */
+internal fun EmitCtx.wardKeywordLine(rule: JsonObject): List<Stmt>? {
+    val cost = rule["args"] as? JsonObject ?: return null
+    val ability: Dsl = when (cost.strField("_Cost")) {
+        // Pure-mana Ward keeps the existing `KeywordAbility.Ward(WardCost.Mana("{x}"))` rendering so the
+        // large mana-Ward corpus golden stays byte-identical.
+        "PayMana" -> {
+            val mana = renderMana(cost.field("args"))
+            if (mana.isEmpty()) return null
+            call("KeywordAbility.Ward", arg(call("WardCost.Mana", arg("\"$mana\""))))
+        }
+        "DiscardACard" -> call("KeywordAbility.wardDiscard")
+        "DiscardACardAtRandom" -> call("KeywordAbility.wardDiscard", arg("random", "true"))
+        "PayLife" -> {
+            // Only a fixed integer life cost renders; dynamic life (PowerOfPermanent, X) declines.
+            val n = (cost["args"].asInt()) ?: ((cost["args"] as? JsonObject)?.get("args").asInt()) ?: return null
+            call("KeywordAbility.wardLife", arg("$n"))
+        }
+        "SacrificeAPermanent" -> {
+            val filter = gameObjectFilterDsl(cost.field("args")) ?: return null
+            call("KeywordAbility.wardSacrifice", arg(Lit(filter)))
+        }
+        else -> return null  // compound / dynamic ward costs -> SCAFFOLD
+    }
+    return listOf(Eval(call("keywordAbility", arg(ability))))
 }
 
 /** True when a trigger's subject IS this permanent — ThisPermanent present, but NOT merely as the
