@@ -27,6 +27,13 @@ internal fun BridgeBuilder.manaCountersAndState() {
     // recovered group filter (Bounding Felidar's "each other creature you control").
     composed("PutACounterOfTypeOnEachPermanent", "ForEachInGroup(AddCounters) over a group filter",
         composes = listOf("AddCounters"))
+    // "Until end of turn, if you would put one or more +1/+1 counters on a creature you control, put
+    // that many plus N +1/+1 counters on it instead." (Prairie Dog) — the duration-/controller-scoped
+    // analogue of Hardened Scales' static ModifyCounterPlacement, lowered to
+    // Effects.GrantCounterPlacementModifier. The emitter renders only the fully-defaulted +1/+1
+    // creature-you-control until-end-of-turn shape and scaffolds any deviation.
+    effect("CreateReplaceWouldPutCountersUntil", "GrantCounterPlacementModifier",
+        "temporary counter-placement modifier (Hardened Scales as an activated/duration-scoped effect)")
 
     // Earthbend N (TLA keyword action): target land becomes a 0/0 creature-land with haste, gets N
     // +1/+1 counters, and gains "when it dies or is exiled, return it to the battlefield tapped".
