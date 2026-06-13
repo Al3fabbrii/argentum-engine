@@ -189,9 +189,12 @@ are gated on `players.length > 2`).
   name, life (also the floating ±delta anchor via `data-life-display`), hand count, poison,
   commander-damage warning, active-turn ring, priority dot, deciding spinner
   (`opponentDecisionStatus.playerId`), attention pulses, and a tombstone once a player has
-  left the game. In multiplayer the rail chip *is* the opponent's life orb — the center-HUD
-  `LifeDisplay` is not rendered for opponents, and the chip carries the `data-player-id` /
-  `data-life-id` anchors that arrows and animations query.
+  left the game. The *viewed* opponent additionally keeps a full-size life orb in the
+  center HUD (seat-tinted to match their chip) — the familiar, biggest click target for
+  targeting and defender assignment. Anchors (`data-player-id` / `data-life-id` /
+  `data-life-display`) are carried by the orb for the viewed opponent and by the rail chip
+  for everyone else — never both, so arrows, damage floats, and player-target clicks
+  resolve unambiguously.
 - **Board switching**: rail-chip click (pins; re-click unpins), keyboard `1`/`2`/`3`,
   horizontal swipe. Follow-the-action (`useMultiplayerView` + the `boardView` slice:
   `viewedOpponentId`, `viewPinned`, `followAction`) slides automatically on coarse
@@ -207,7 +210,7 @@ are gated on `players.length > 2`).
   change never cancels a selection).
 - **Combat**: with >1 possible defender, the first attacker selection pops a defender pick;
   assignment is sticky (`CombatState.stickyDefenderId`) and per-creature reassignable via
-  rail-chip clicks / the chip's planeswalker flyout. Confirm is disabled until every
+  rail-chip clicks, the viewed opponent's life orb, or the chip's planeswalker flyout. Confirm is disabled until every
   selected attacker has an explicit defender. Arrows against the viewed defender render
   per-creature in the defender's seat color; attacks on slid-away boards bundle into one
   arrow to the defender's rail chip with a creature-count badge (`CombatArrows`), and any

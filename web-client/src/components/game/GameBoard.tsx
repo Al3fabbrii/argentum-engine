@@ -550,16 +550,22 @@ export function GameBoard({ spectatorMode = false, topOffset = 0 }: GameBoardPro
         width: 'auto',
         columnGap: responsive.isMobile ? 6 : 16,
       }}>
-        {/* Opponent life (left side). In multiplayer the life orb is absorbed by
-            the opponent rail (the chip carries the same data + anchors); the
-            transient per-board extras (effect badges, floating mana) stay here
-            for the viewed opponent. */}
+        {/* Opponent life (left side). In multiplayer this is the *viewed*
+            opponent's orb, seat-tinted to match their rail chip — a full-size
+            targeting click target in the familiar spot (the chip carries the
+            anchors for the other, off-screen opponents). */}
         <div style={{ ...styles.centerLifeSection, ...styles.centerLifeSectionLeft }}>
           {effectiveOpponent && (
             <>
-              {!isMulti && (
-                <LifeDisplay life={effectiveOpponent.life} playerId={effectiveOpponent.playerId} playerName={effectiveOpponent.name} spectatorMode={spectatorMode} poisonCounters={effectiveOpponent.poisonCounters} commanderDamage={effectiveOpponent.commanderDamage ?? []} />
-              )}
+              <LifeDisplay
+                life={effectiveOpponent.life}
+                playerId={effectiveOpponent.playerId}
+                playerName={effectiveOpponent.name}
+                spectatorMode={spectatorMode}
+                poisonCounters={effectiveOpponent.poisonCounters}
+                commanderDamage={effectiveOpponent.commanderDamage ?? []}
+                {...(isMulti ? { seatColor: viewedSeatColor.base } : {})}
+              />
               {!responsive.isMobile && <ActiveEffectsBadges effects={effectiveOpponent.activeEffects} />}
               {!responsive.isMobile && effectiveOpponent.manaPool && <ManaPool manaPool={effectiveOpponent.manaPool} />}
             </>

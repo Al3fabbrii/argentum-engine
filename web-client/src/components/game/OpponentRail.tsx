@@ -330,9 +330,18 @@ function RailChip({
     <div style={{ position: 'relative', pointerEvents: 'auto' }}>
       <div
         data-rail-chip={playerId}
-        data-player-id={playerId}
-        data-life-id={playerId}
-        data-life-display={playerId}
+        // The viewed opponent's full-size life orb (center HUD) carries the
+        // player anchors while their board is in view — the chip only anchors
+        // arrows / damage floats / target clicks for off-screen opponents.
+        // Duplicate anchors would make querySelector pick whichever comes
+        // first in the DOM.
+        {...(!isViewed
+          ? {
+              'data-player-id': playerId,
+              'data-life-id': playerId,
+              'data-life-display': playerId,
+            }
+          : {})}
         role="button"
         title={chipTitle(opponent)}
         onClick={handleChipClick}
