@@ -694,6 +694,19 @@ function GameCardImpl({
         const playerId = lifeEl.getAttribute('data-life-id')
         if (playerId) {
           setAttackTarget(draggingAttackerId, playerId as EntityId)
+          return
+        }
+      }
+
+      // Dropped anywhere on an opponent's board (the viewed board in multiplayer) or
+      // their rail chip → attack that player. Validated against the server's attack
+      // targets so a drop on a dead/invalid seat is a no-op.
+      const defenderEl = elementAtPoint.closest('[data-opponent-board], [data-rail-chip]')
+      if (defenderEl) {
+        const playerId = (defenderEl.getAttribute('data-opponent-board')
+          ?? defenderEl.getAttribute('data-rail-chip')) as EntityId | null
+        if (playerId && combatState?.validAttackTargets.includes(playerId)) {
+          setAttackTarget(draggingAttackerId, playerId)
         }
       }
     }

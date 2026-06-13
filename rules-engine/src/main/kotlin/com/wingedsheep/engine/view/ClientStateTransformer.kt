@@ -1515,8 +1515,11 @@ class ClientStateTransformer(
             0
         }
 
-        // Check if player has lost (they're not the winner and game is over)
-        val hasLost = state.gameOver && state.winnerId != null && state.winnerId != playerId
+        // A player has lost when the engine has marked them (mid-game elimination in a
+        // multiplayer pod — drives the opponent-rail tombstone while the game continues),
+        // or at game end when someone else won (2-player degenerate case).
+        val hasLost = container?.has<PlayerLostComponent>() == true ||
+            (state.gameOver && state.winnerId != null && state.winnerId != playerId)
 
         // Mana pool is public information in MTG - show for all players
         val manaPool = if (manaPoolComponent != null) {

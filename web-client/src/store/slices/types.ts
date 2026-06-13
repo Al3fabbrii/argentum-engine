@@ -25,6 +25,8 @@ import type {
   PlayerStandingInfo,
   MatchResultInfo,
   ActiveMatchInfo,
+  FfaStandingInfo,
+  LobbyGameMode,
   SpectatorPlayerState,
   SealedCardInfo,
   Step,
@@ -570,6 +572,23 @@ export interface TournamentState {
 }
 
 /**
+ * Free-for-All pod state (the FFA-mode counterpart of [TournamentState]). Created when the
+ * first FFA game starts and lives for the lifetime of the pod's play-again loop.
+ */
+export interface FfaState {
+  lobbyId: string
+  /** Session id of the running game, or null between games. */
+  currentGameSessionId: string | null
+  /** Number of the running/next game in the play-again loop (1-based). */
+  gameNumber: number
+  /** Final standings of the last completed game (placement order), or null before game 1 ends. */
+  standings: readonly FfaStandingInfo[] | null
+  gamesPlayed: number
+  /** Players who are ready for the next game ("play again"). */
+  readyPlayerIds: readonly string[]
+}
+
+/**
  * State for spectating a game.
  */
 export interface SpectatingState {
@@ -815,15 +834,16 @@ export type GameStore = {
   // Lobby slice
   lobbyState: LobbyState | null
   tournamentState: TournamentState | null
+  ffaState: FfaState | null
   spectatingState: SpectatingState | null
-  createTournamentLobby: (setCodes: string[], format?: TournamentFormat, boosterCount?: number, maxPlayers?: number, pickTimeSeconds?: number, isPublic?: boolean) => void
+  createTournamentLobby: (setCodes: string[], format?: TournamentFormat, boosterCount?: number, maxPlayers?: number, pickTimeSeconds?: number, isPublic?: boolean, gameMode?: LobbyGameMode) => void
   joinLobby: (lobbyId: string) => void
   startLobby: () => void
   leaveLobby: () => void
   addAiToLobby: () => void
   removeAiFromLobby: (playerId: string) => void
   stopLobby: () => void
-  updateLobbySettings: (settings: { setCodes?: string[]; format?: TournamentFormat; boosterCount?: number; boosterDistribution?: Record<string, number>; maxPlayers?: number; gamesPerMatch?: number; pickTimeSeconds?: number; picksPerRound?: number; isPublic?: boolean; deckFormat?: DeckFormat | '' | null; deckSizeMin?: number; allowDuplicates?: boolean; commanderPreset?: CommanderPreset; chaosBoosters?: boolean; bannedCardNames?: string[]; aiAssistEnabled?: boolean }) => void
+  updateLobbySettings: (settings: { setCodes?: string[]; format?: TournamentFormat; boosterCount?: number; boosterDistribution?: Record<string, number>; maxPlayers?: number; gamesPerMatch?: number; pickTimeSeconds?: number; picksPerRound?: number; isPublic?: boolean; deckFormat?: DeckFormat | '' | null; deckSizeMin?: number; allowDuplicates?: boolean; commanderPreset?: CommanderPreset; chaosBoosters?: boolean; bannedCardNames?: string[]; aiAssistEnabled?: boolean; gameMode?: LobbyGameMode }) => void
   /** Disconnected tournament players: playerId -> info */
   disconnectedPlayers: Record<string, { playerName: string; secondsRemaining: number; disconnectedAt: number }>
   readyForNextRound: () => void

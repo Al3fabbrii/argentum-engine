@@ -35,6 +35,9 @@ import type {
   PlayerReadyForRoundMessage,
   TournamentCompleteMessage,
   TournamentResumedMessage,
+  FreeForAllGameStartingMessage,
+  FreeForAllGameCompleteMessage,
+  PlayerEliminatedMessage,
   ActiveMatchesMessage,
   SpectatorStateUpdateMessage,
   SpectatingStartedMessage,
@@ -97,6 +100,10 @@ export interface MessageHandlers {
   onPlayerReadyForRound: (message: PlayerReadyForRoundMessage) => void
   onTournamentComplete: (message: TournamentCompleteMessage) => void
   onTournamentResumed: (message: TournamentResumedMessage) => void
+  // Free-for-All handlers
+  onFreeForAllGameStarting: (message: FreeForAllGameStartingMessage) => void
+  onFreeForAllGameComplete: (message: FreeForAllGameCompleteMessage) => void
+  onPlayerEliminated: (message: PlayerEliminatedMessage) => void
   // Spectating handlers
   onActiveMatches: (message: ActiveMatchesMessage) => void
   onSpectatorStateUpdate: (message: SpectatorStateUpdateMessage) => void
@@ -240,6 +247,16 @@ export function handleServerMessage(message: ServerMessage, handlers: MessageHan
       break
     case 'tournamentResumed':
       handlers.onTournamentResumed(message)
+      break
+    // Free-for-All messages
+    case 'freeForAllGameStarting':
+      handlers.onFreeForAllGameStarting(message)
+      break
+    case 'freeForAllGameComplete':
+      handlers.onFreeForAllGameComplete(message)
+      break
+    case 'playerEliminated':
+      handlers.onPlayerEliminated(message)
       break
     // Spectating messages
     case 'activeMatches':

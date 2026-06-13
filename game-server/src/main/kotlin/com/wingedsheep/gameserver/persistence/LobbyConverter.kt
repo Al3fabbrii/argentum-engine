@@ -1,6 +1,7 @@
 package com.wingedsheep.gameserver.persistence
 
 import com.wingedsheep.engine.registry.CardRegistry
+import com.wingedsheep.gameserver.lobby.LobbyGameMode
 import com.wingedsheep.gameserver.lobby.LobbyPlayerState
 import com.wingedsheep.gameserver.lobby.LobbyState
 import com.wingedsheep.gameserver.lobby.TournamentFormat
@@ -61,7 +62,10 @@ fun TournamentLobby.toPersistent(): PersistentTournamentLobby {
         winstonSeenCardNames = winstonSeenCards.mapKeys { it.key.value }.mapValues { it.value.toList() },
         completedAt = completedAt,
         isPublic = isPublic,
-        aiAssistEnabled = aiAssistEnabled
+        aiAssistEnabled = aiAssistEnabled,
+        gameMode = gameMode.name,
+        ffaGameSessionId = ffaGameSessionId,
+        ffaGamesPlayed = ffaGamesPlayed
     )
 }
 
@@ -96,8 +100,14 @@ fun restoreTournamentLobby(
         pickTimeSeconds = persistent.pickTimeSeconds,
         gamesPerMatch = persistent.gamesPerMatch,
         isPublic = persistent.isPublic,
-        aiAssistEnabled = persistent.aiAssistEnabled
+        aiAssistEnabled = persistent.aiAssistEnabled,
+        gameMode = runCatching { LobbyGameMode.valueOf(persistent.gameMode) }
+            .getOrDefault(LobbyGameMode.TOURNAMENT)
     )
+    // FFA in-flight state (last standings are deliberately not persisted — after a restart the
+    // pod simply readies up for the next game).
+    lobby.ffaGameSessionId = persistent.ffaGameSessionId
+    lobby.ffaGamesPlayed = persistent.ffaGamesPlayed
 
     val playerIdentities = mutableListOf<PlayerIdentity>()
 

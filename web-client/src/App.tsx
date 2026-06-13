@@ -41,6 +41,7 @@ export default function App() {
   const deckBuildingState = useGameStore((state) => state.deckBuildingState)
   const lobbyState = useGameStore((state) => state.lobbyState)
   const tournamentState = useGameStore((state) => state.tournamentState)
+  const ffaState = useGameStore((state) => state.ffaState)
   const spectatingState = useGameStore((state) => state.spectatingState)
   const matchIntro = useGameStore((state) => state.matchIntro)
   const startCombat = useGameStore((state) => state.startCombat)
@@ -264,7 +265,7 @@ export default function App() {
   // Show deck builder during building phase, or during submitted phase if no tournament yet
   // When tournament exists and deck is submitted, TournamentOverlay (in GameUI) handles UI
   const showDeckBuilder = deckBuildingState?.phase === 'building' ||
-    (deckBuildingState?.phase === 'submitted' && !tournamentState)
+    (deckBuildingState?.phase === 'submitted' && !tournamentState && !ffaState)
   const showDraftPick = lobbyState?.state === 'DRAFTING' && lobbyState?.settings.format === 'DRAFT'
   const showWinstonDraft = lobbyState?.state === 'DRAFTING' && lobbyState?.settings.format === 'WINSTON_DRAFT'
   const showGridDraft = lobbyState?.state === 'DRAFTING' && lobbyState?.settings.format === 'GRID_DRAFT'

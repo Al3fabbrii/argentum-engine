@@ -227,6 +227,38 @@ deckbuilder's `setDeck`. `lockedDeck` empty = build fresh; non-empty = keep thos
 the rest (**heuristic** engine). The **draftsim** engine ignores `lockedDeck`/`targetSize` and always
 returns a fresh 40-card limited build (23 nonland + 17 lands), matching the original Auto-Build.
 
+## 3c. Free-for-All Lobby Mode (WebSocket)
+
+A lobby carries two orthogonal axes: the **format** (`SEALED` / `DRAFT` / `PREMADE_DECKS` / …,
+how the card pool is built) and a new **mode** (`gameMode`: `TOURNAMENT` or `FREE_FOR_ALL`, what
+happens once decks are in). `TOURNAMENT` runs the existing round-robin bracket of 2-player matches.
+`FREE_FOR_ALL` (CR 806) seats **every** lobby player (2–4) in **one** multiplayer `GameSession` —
+no rounds, no matches, no bracket. The two axes compose: any pool-building format + FFA = "draft (or
+sealed, or premade), then one N-player game".
+
+- **`CreateTournamentLobby` / `UpdateLobbySettings`** gain an optional `gameMode` (default
+  `TOURNAMENT`). `LobbySettings.gameMode` echoes it. Switching a lobby to `FREE_FOR_ALL` caps
+  `maxPlayers` at 4 and rejects AI seats (the built-in AI is 1v1-only; FFA pods are humans-only).
+- **Start.** When the last deck is submitted (or the host starts a premade FFA lobby), the server
+  creates one `GameSession` seating all players and broadcasts **`freeForAllGameStarting`**
+  `{ lobbyId, gameSessionId, gameNumber, players: PlayerSeatInfo[] }` — the FFA counterpart of
+  `tournamentMatchStarting`. Each recipient's roster flags its own seat (`isYou`); spectators get an
+  all-`isYou=false` roster. `GameStarted` + the mulligan flow follow exactly as in any game.
+- **Mid-game elimination.** Conceding (or a disconnect-forfeit) in a >2 pod concedes that seat and
+  the game **continues** for the rest (CR 800.4a). The conceding player gets a personal
+  **`playerEliminated`** `{ gameId, reason }` so their client shows defeat and returns to the pod
+  standings while the table plays on; everyone else sees the seat drop out via the normal state
+  rebroadcast (the eliminated player's `ClientPlayer.hasLost` is `true`). The game-wide `gameOver`
+  only fires when ≤1 player remains (CR 104.2a).
+- **Standings + play-again.** When the game ends, **`freeForAllGameComplete`**
+  `{ lobbyId, standings: FfaStandingInfo[], gamesPlayed }` reports the **elimination order** as
+  placements (`placement` 1 = winner, then last-eliminated, … back to first-eliminated). The pod
+  stays open: each player sends `readyForNextRound` ("Play Again") and, when all connected players
+  are ready, a new game (`gameNumber + 1`) starts with the same seats. Replays are saved per game as
+  usual and browsable via the lobby's replay endpoint.
+- Quick Game stays strictly 2-player (its `QuickGameLobby.MAX_PLAYERS` is untouched); FFA lives only
+  in the tournament-lobby infrastructure.
+
 ## 4. Scenario Builder Payload (REST / HTTP)
 
 The Scenario Builder lets any player construct an arbitrary board state and play it. It is a

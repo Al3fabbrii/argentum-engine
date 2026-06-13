@@ -449,6 +449,8 @@ sealed interface ServerMessage {
          * When false the client hides the controls and the server rejects assist requests.
          */
         val aiAssistEnabled: Boolean = true,
+        /** Lobby mode axis: "TOURNAMENT" (bracket of 2-player matches) or "FREE_FOR_ALL" (one multiplayer game). */
+        val gameMode: String = "TOURNAMENT",
     )
 
     /**
@@ -756,6 +758,63 @@ sealed interface ServerMessage {
         val nextOpponentName: String? = null,
         /** True if player has a BYE in the next round */
         val nextRoundHasBye: Boolean = false
+    ) : ServerMessage
+
+    // =========================================================================
+    // Free-for-All Mode Messages
+    // =========================================================================
+
+    /**
+     * One player's final placement in a Free-for-All game. Placement is 1-based: the winner is 1,
+     * the last player eliminated is 2, and so on back to the first elimination.
+     */
+    @Serializable
+    data class FfaStandingInfo(
+        val playerId: String,
+        val playerName: String,
+        val placement: Int,
+        val isConnected: Boolean = true,
+    )
+
+    /**
+     * A Free-for-All game is starting — the FFA-mode counterpart of [TournamentMatchStarting].
+     * Sent to every seated player (and lobby spectators, who can spectate via [gameSessionId]).
+     */
+    @Serializable
+    @SerialName("freeForAllGameStarting")
+    data class FreeForAllGameStarting(
+        val lobbyId: String,
+        val gameSessionId: String,
+        /** Number of this game within the pod's play-again loop (1-based). */
+        val gameNumber: Int,
+        /** Seat roster from the recipient's perspective (spectators get an all-`isYou=false` roster). */
+        val players: List<PlayerSeatInfo>,
+    ) : ServerMessage
+
+    /**
+     * A Free-for-All game finished. Standings are the elimination order (winner first). The pod
+     * stays open: readying up ([com.wingedsheep.gameserver.protocol.ClientMessage.ReadyForNextRound])
+     * starts a new game with the same players ("play again").
+     */
+    @Serializable
+    @SerialName("freeForAllGameComplete")
+    data class FreeForAllGameComplete(
+        val lobbyId: String,
+        val standings: List<FfaStandingInfo>,
+        val gamesPlayed: Int,
+    ) : ServerMessage
+
+    /**
+     * Personal notice that the recipient was eliminated from a multiplayer game that continues
+     * without them (e.g. they conceded a 4-player pod). The game-wide [GameOver] only arrives when
+     * the whole game ends; this lets the eliminated player's client show its defeat overlay and
+     * return to the lobby while the table plays on.
+     */
+    @Serializable
+    @SerialName("playerEliminated")
+    data class PlayerEliminated(
+        val gameId: String,
+        val reason: GameOverReason,
     ) : ServerMessage
 
     // =========================================================================

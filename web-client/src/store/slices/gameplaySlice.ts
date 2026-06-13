@@ -129,6 +129,9 @@ export const createGameplaySlice: SliceCreator<GameplaySlice> = (set, get) => ({
   },
 
   joinGame: (sessionId, deckList) => {
+    // Track the joined session locally — the joiner only gets GameStarted (no session id),
+    // and onGameOver matches its gameId against this.
+    set({ sessionId })
     getWebSocket()?.send(createJoinGameMessage(sessionId, deckList))
   },
 
@@ -507,7 +510,9 @@ export const createGameplaySlice: SliceCreator<GameplaySlice> = (set, get) => ({
 
   returnToMenu: () => {
     const state = get()
-    const isInTournament = state.tournamentState != null
+    // FFA pods keep their lobby context too — "Return to Menu" from the game-over (or
+    // eliminated) overlay drops back to the pod's standings screen, not the main menu.
+    const isInTournament = state.tournamentState != null || state.ffaState != null
     set({
       sessionId: null,
       opponentName: null,

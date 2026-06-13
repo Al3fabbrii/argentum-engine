@@ -11,6 +11,7 @@ type LobbyHandlerKeys =
   | 'onTournamentStarted' | 'onTournamentMatchStarting' | 'onTournamentBye'
   | 'onRoundComplete' | 'onMatchComplete'
   | 'onPlayerReadyForRound' | 'onTournamentComplete' | 'onTournamentResumed'
+  | 'onFreeForAllGameStarting' | 'onFreeForAllGameComplete'
 
 export function createLobbyHandlers(set: SetState, get: GetState): Pick<MessageHandlers, LobbyHandlerKeys> {
   return {
@@ -21,7 +22,7 @@ export function createLobbyHandlers(set: SetState, get: GetState): Pick<MessageH
           lobbyId: msg.lobbyId,
           state: 'WAITING_FOR_PLAYERS',
           players: [],
-          settings: { setCodes: [], setNames: [], availableSets: [], format: 'SEALED', boosterCount: 6, boosterDistribution: {}, maxPlayers: 8, pickTimeSeconds: 45, picksPerRound: 1, gamesPerMatch: 1, isPublic: false, deckSizeMin: 60, allowDuplicates: true, commanderPreset: 'BRAWL', chaosBoosters: false, bannedCardNames: [], aiAssistEnabled: false },
+          settings: { setCodes: [], setNames: [], availableSets: [], format: 'SEALED', boosterCount: 6, boosterDistribution: {}, maxPlayers: 8, pickTimeSeconds: 45, picksPerRound: 1, gamesPerMatch: 1, isPublic: false, deckSizeMin: 60, allowDuplicates: true, commanderPreset: 'BRAWL', chaosBoosters: false, bannedCardNames: [], aiAssistEnabled: false, gameMode: 'TOURNAMENT' },
           isHost: true,
           draftState: null,
           winstonDraftState: null,
@@ -60,7 +61,48 @@ export function createLobbyHandlers(set: SetState, get: GetState): Pick<MessageH
     onLobbyStopped: () => {
       clearDeckState()
       clearLobbyId()
-      set({ lobbyState: null, deckBuildingState: null })
+      set({ lobbyState: null, deckBuildingState: null, ffaState: null })
+    },
+
+    onFreeForAllGameStarting: (msg) => {
+      // FFA counterpart of onTournamentMatchStarting: enter the game. The seat roster arrives
+      // again via GameStarted; the legacy opponentName field gets the other seats' names.
+      const opponentName = msg.players.filter((p) => !p.isYou).map((p) => p.name).join(', ')
+      set({
+        ffaState: {
+          lobbyId: msg.lobbyId,
+          currentGameSessionId: msg.gameSessionId,
+          gameNumber: msg.gameNumber,
+          standings: null,
+          gamesPlayed: msg.gameNumber - 1,
+          readyPlayerIds: [],
+        },
+        sessionId: msg.gameSessionId,
+        opponentName,
+      })
+    },
+
+    onFreeForAllGameComplete: (msg) => {
+      set((state) => {
+        // Keep the board visible while the game-over overlay is up (mirrors onTournamentComplete).
+        const inActiveGame = state.gameState != null && state.gameOverState == null
+        return {
+          ffaState: {
+            lobbyId: msg.lobbyId,
+            currentGameSessionId: null,
+            gameNumber: msg.gamesPlayed + 1,
+            standings: msg.standings,
+            gamesPlayed: msg.gamesPlayed,
+            readyPlayerIds: [],
+          },
+          ...(inActiveGame ? {} : {
+            gameState: state.gameOverState ? state.gameState : null,
+            mulliganState: null,
+            waitingForOpponentMulligan: false,
+            legalActions: [],
+          }),
+        }
+      })
     },
 
     onTournamentStarted: (msg) => {
@@ -195,6 +237,9 @@ export function createLobbyHandlers(set: SetState, get: GetState): Pick<MessageH
       set((state) => ({
         tournamentState: state.tournamentState
           ? { ...state.tournamentState, readyPlayerIds: msg.readyPlayerIds }
+          : null,
+        ffaState: state.ffaState
+          ? { ...state.ffaState, readyPlayerIds: msg.readyPlayerIds }
           : null,
       }))
     },

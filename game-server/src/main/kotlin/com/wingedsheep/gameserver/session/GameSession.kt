@@ -70,6 +70,30 @@ class GameSession(
 
     @Volatile
     private var gameState: GameState? = null
+        set(value) {
+            field = value
+            if (value != null) recordEliminations(value)
+        }
+
+    /**
+     * Players in the order they lost the game (first eliminated first). Maintained by the
+     * [gameState] setter — the single chokepoint every state mutation flows through — by diffing
+     * the engine's `PlayerLostComponent` markers against what's already recorded. Drives
+     * Free-for-All standings (placement = reverse elimination order).
+     */
+    private val eliminationOrder = CopyOnWriteArrayList<EntityId>()
+
+    private fun recordEliminations(state: GameState) {
+        for (playerId in state.turnOrder) {
+            if (playerId in eliminationOrder) continue
+            if (state.getEntity(playerId)?.has<PlayerLostComponent>() == true) {
+                eliminationOrder.add(playerId)
+            }
+        }
+    }
+
+    /** Players in the order they lost (first eliminated first). Empty while everyone is alive. */
+    fun getEliminationOrder(): List<EntityId> = eliminationOrder.toList()
 
     /** Checkpoint for undoing the last non-respondable action (e.g., play land, declare attackers) */
     @Volatile

@@ -55,6 +55,10 @@ export type ServerMessage =
   | PlayerReadyForRoundMessage
   | TournamentCompleteMessage
   | TournamentResumedMessage
+  // Free-for-All Messages
+  | FreeForAllGameStartingMessage
+  | FreeForAllGameCompleteMessage
+  | PlayerEliminatedMessage
   // Spectating Messages
   | ActiveMatchesMessage
   | SpectatorStateUpdateMessage
@@ -1119,7 +1123,11 @@ export interface LobbySettings {
   readonly bannedCardNames: readonly string[]
   /** Master switch for in-app AI assistance (Suggest Pick / Auto-build). */
   readonly aiAssistEnabled: boolean
+  /** Lobby mode axis: bracket of 2-player matches vs one multiplayer Free-for-All game. */
+  readonly gameMode: LobbyGameMode
 }
+
+export type LobbyGameMode = 'TOURNAMENT' | 'FREE_FOR_ALL'
 
 export type TournamentFormat =
   | 'SEALED'
@@ -1367,6 +1375,46 @@ export interface TournamentResumedMessage {
   readonly standings: readonly PlayerStandingInfo[]
   readonly nextOpponentName?: string | null
   readonly nextRoundHasBye?: boolean
+}
+
+// ============================================================================
+// Free-for-All Mode Messages
+// ============================================================================
+
+/** One player's final placement in a Free-for-All game (1 = winner). */
+export interface FfaStandingInfo {
+  readonly playerId: string
+  readonly playerName: string
+  readonly placement: number
+  readonly isConnected: boolean
+}
+
+/** A Free-for-All game is starting — the FFA counterpart of `tournamentMatchStarting`. */
+export interface FreeForAllGameStartingMessage {
+  readonly type: 'freeForAllGameStarting'
+  readonly lobbyId: string
+  readonly gameSessionId: string
+  readonly gameNumber: number
+  readonly players: readonly PlayerSeatInfo[]
+}
+
+/** A Free-for-All game finished; standings are the elimination order (winner first). */
+export interface FreeForAllGameCompleteMessage {
+  readonly type: 'freeForAllGameComplete'
+  readonly lobbyId: string
+  readonly standings: readonly FfaStandingInfo[]
+  readonly gamesPlayed: number
+}
+
+/**
+ * Personal notice: you were eliminated from a multiplayer game that continues without you
+ * (e.g. you conceded a 4-player pod). The game-wide `gameOver` only arrives when the whole
+ * game ends.
+ */
+export interface PlayerEliminatedMessage {
+  readonly type: 'playerEliminated'
+  readonly gameId: string
+  readonly reason: GameOverReason
 }
 
 // ============================================================================
@@ -1924,6 +1972,8 @@ export interface CreateTournamentLobbyMessage {
   readonly maxPlayers: number
   readonly pickTimeSeconds: number
   readonly isPublic: boolean
+  /** Lobby mode axis. Omit for the default bracket tournament. */
+  readonly gameMode?: LobbyGameMode
 }
 
 export interface JoinLobbyMessage {
@@ -1999,6 +2049,8 @@ export interface UpdateLobbySettingsMessage {
   readonly bannedCardNames?: readonly string[]
   /** Master switch for in-app AI assistance (Suggest Pick / Auto-build). Omit to leave unchanged. */
   readonly aiAssistEnabled?: boolean
+  /** Lobby mode axis ('TOURNAMENT' / 'FREE_FOR_ALL'). Omit to leave unchanged. */
+  readonly gameMode?: LobbyGameMode
 }
 
 // Tournament Client Messages
@@ -2115,9 +2167,10 @@ export function createCreateTournamentLobbyMessage(
   boosterCount: number = 6,
   maxPlayers: number = 8,
   pickTimeSeconds: number = 45,
-  isPublic: boolean = false
+  isPublic: boolean = false,
+  gameMode: LobbyGameMode = 'TOURNAMENT'
 ): CreateTournamentLobbyMessage {
-  return { type: 'createTournamentLobby', setCodes, format, boosterCount, maxPlayers, pickTimeSeconds, isPublic }
+  return { type: 'createTournamentLobby', setCodes, format, boosterCount, maxPlayers, pickTimeSeconds, isPublic, gameMode }
 }
 
 // Backwards compatibility alias
@@ -2193,6 +2246,7 @@ export function createUpdateLobbySettingsMessage(
     chaosBoosters?: boolean
     bannedCardNames?: readonly string[]
     aiAssistEnabled?: boolean
+    gameMode?: LobbyGameMode
   }
 ): UpdateLobbySettingsMessage {
   return { type: 'updateLobbySettings', ...settings }

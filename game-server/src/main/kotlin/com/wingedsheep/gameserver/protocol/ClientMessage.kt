@@ -146,7 +146,9 @@ sealed interface ClientMessage {
         val pickTimeSeconds: Int = 45,     // Draft only
         val isPublic: Boolean = false,
         /** Master switch for in-app AI assistance (Suggest Pick / Auto-build). Defaults off. */
-        val aiAssistEnabled: Boolean = false
+        val aiAssistEnabled: Boolean = false,
+        /** Lobby mode axis: "TOURNAMENT" (default) or "FREE_FOR_ALL" (one multiplayer game, 2-4 players). */
+        val gameMode: String = "TOURNAMENT",
     ) : ClientMessage
 
     /**
@@ -258,6 +260,8 @@ sealed interface ClientMessage {
         val bannedCardNames: List<String>? = null,
         /** Master switch for in-app AI assistance (Suggest Pick / Auto-build). Null = unchanged. */
         val aiAssistEnabled: Boolean? = null,
+        /** Lobby mode axis: "TOURNAMENT" or "FREE_FOR_ALL". Null = unchanged. */
+        val gameMode: String? = null,
     ) : ClientMessage
 
     /**
