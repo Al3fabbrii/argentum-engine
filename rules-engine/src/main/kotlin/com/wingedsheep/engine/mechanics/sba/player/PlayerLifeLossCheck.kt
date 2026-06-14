@@ -48,9 +48,13 @@ class PlayerLifeLossCheck : StateBasedActionCheck {
 }
 
 internal fun playerCantLoseGame(state: GameState, playerId: EntityId): Boolean {
+    // CR 810.8a — "if an effect says a player can't lose the game, that player's team can't lose":
+    // a can't-lose grant controlled by any teammate protects the whole team. In a non-team game the
+    // team is just [playerId], so this is the ordinary single-player check.
+    val team = state.teamOf(playerId).toHashSet()
     return state.getBattlefield().any { entityId ->
         val container = state.getEntity(entityId) ?: return@any false
         container.has<GrantsCantLoseGameComponent>() &&
-            container.get<ControllerComponent>()?.playerId == playerId
+            container.get<ControllerComponent>()?.playerId in team
     }
 }

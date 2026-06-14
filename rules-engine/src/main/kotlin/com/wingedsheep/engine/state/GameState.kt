@@ -501,6 +501,28 @@ data class GameState(
             getEntity(it)?.has<com.wingedsheep.engine.state.components.player.PlayerLostComponent>() != true
         }
 
+    /**
+     * Teams with at least one player still in the game (not lost/left), in turn order. The
+     * team-level analogue of [activePlayers] — the game ends when only one of these remains
+     * (CR 810.8a). In a non-team game each player is its own team, so this mirrors [activePlayers].
+     */
+    val activeTeams: List<List<EntityId>>
+        get() = teams.filter { team ->
+            team.any { getEntity(it)?.has<com.wingedsheep.engine.state.components.player.PlayerLostComponent>() != true }
+        }
+
+    /**
+     * The shared poison-counter total for [playerId]'s team (CR 810.10 — poison counters are placed
+     * on players individually but pooled by the team). Summed across all team members. For a player
+     * with no team this is just that player's own poison count.
+     */
+    fun teamPoison(playerId: EntityId): Int =
+        teamOf(playerId).sumOf { member ->
+            getEntity(member)
+                ?.get<com.wingedsheep.engine.state.components.battlefield.CountersComponent>()
+                ?.getCount(com.wingedsheep.sdk.core.CounterType.POISON) ?: 0
+        }
+
     // =========================================================================
     // Shared life total (Two-Headed Giant — CR 810.4 / 810.9)
     //

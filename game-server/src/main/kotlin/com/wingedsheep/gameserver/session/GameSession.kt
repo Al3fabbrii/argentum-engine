@@ -1061,17 +1061,22 @@ class GameSession(
             return GameOverReason.DRAW
         }
 
-        // Find the losing player (the one who is not the winner)
-        val loserId = state.turnOrder.find { it != state.winnerId }
-        val lossComponent = loserId?.let { state.getEntity(it)?.get<PlayerLostComponent>() }
+        // Find why the losing side lost. In Two-Headed Giant a whole team is defeated, so prefer a
+        // meaningful cause over the propagated TEAM_DEFEATED marker (CR 810.8a) — mirrors the
+        // engine's GameEndCheck reason derivation. (Team-aware winner display is Phase 6.)
+        val lostReasons = state.turnOrder
+            .mapNotNull { state.getEntity(it)?.get<PlayerLostComponent>()?.reason }
+        val reason = lostReasons.firstOrNull { it != LossReason.TEAM_DEFEATED }
+            ?: lostReasons.firstOrNull()
 
-        return when (lossComponent?.reason) {
+        return when (reason) {
             LossReason.LIFE_ZERO -> GameOverReason.LIFE_ZERO
             LossReason.EMPTY_LIBRARY -> GameOverReason.DECK_OUT
             LossReason.POISON_COUNTERS -> GameOverReason.POISON_COUNTERS
             LossReason.CONCESSION -> GameOverReason.CONCESSION
             LossReason.CARD_EFFECT -> GameOverReason.CARD_EFFECT
             LossReason.COMMANDER_DAMAGE -> GameOverReason.COMMANDER_DAMAGE
+            LossReason.TEAM_DEFEATED -> GameOverReason.CARD_EFFECT
             null -> GameOverReason.LIFE_ZERO // Fallback
         }
     }
