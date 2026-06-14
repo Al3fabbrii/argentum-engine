@@ -31,8 +31,11 @@ class PlayerLifeLossCheck : StateBasedActionCheck {
             if (container.has<PlayerLostComponent>()) continue
             if (playerCantLoseGame(state, playerId)) continue
 
-            val lifeComponent = container.get<LifeTotalComponent>() ?: continue
-            if (lifeComponent.life <= 0) {
+            // Presence guard stays per-player; the value is the team's shared total (CR 810.9c).
+            // Reading through the resolver means every member of a 0-life team is marked in this
+            // same pass — the principled single team-loss check is Phase 3.
+            if (container.get<LifeTotalComponent>() == null) continue
+            if (state.lifeTotal(playerId) <= 0) {
                 newState = newState.updateEntity(playerId) { c ->
                     c.with(PlayerLostComponent(LossReason.LIFE_ZERO))
                 }

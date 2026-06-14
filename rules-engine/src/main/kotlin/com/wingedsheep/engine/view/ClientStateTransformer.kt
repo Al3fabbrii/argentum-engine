@@ -1534,7 +1534,8 @@ class ClientStateTransformer(
     ): ClientPlayer {
         val container = state.getEntity(playerId)
         val playerComponent = container?.get<PlayerComponent>()
-        val lifeTotalComponent = container?.get<LifeTotalComponent>()
+        // CR 810.9a — a player's displayed life is the team's shared total in Two-Headed Giant.
+        val displayedLife = if (container?.get<LifeTotalComponent>() != null) state.lifeTotal(playerId) else null
         val landDropsComponent = container?.get<LandDropsComponent>()
         val manaPoolComponent = container?.get<ManaPoolComponent>()
 
@@ -1589,7 +1590,7 @@ class ClientStateTransformer(
         return ClientPlayer(
             playerId = playerId,
             name = playerComponent?.name ?: "Unknown",
-            life = lifeTotalComponent?.life ?: 20,
+            life = displayedLife ?: 20,
             poisonCounters = container?.get<CountersComponent>()?.getCount(CounterType.POISON) ?: 0,
             handSize = handSize,
             librarySize = librarySize,

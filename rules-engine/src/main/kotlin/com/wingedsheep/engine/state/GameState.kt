@@ -430,8 +430,13 @@ data class GameState(
      * specific opponent must say which one (a chosen target, an iteration, or the
      * per-creature defending player — CR 802.2a).
      */
-    fun getOpponents(playerId: EntityId): List<EntityId> =
-        activePlayers.filter { it != playerId }
+    fun getOpponents(playerId: EntityId): List<EntityId> {
+        // CR 810: an opponent is a player on an opposing team, so exclude the player's whole team
+        // (themselves and any teammates), not just themselves. In a non-team game a player is its
+        // own team, so this is identical to "everyone but me".
+        val ownTeam = teamOf(playerId).toHashSet()
+        return activePlayers.filter { it !in ownTeam }
+    }
 
     // =========================================================================
     // Teams (Two-Headed Giant and other team variants — CR 810)
@@ -495,6 +500,56 @@ data class GameState(
         teamOf(playerId).filter {
             getEntity(it)?.has<com.wingedsheep.engine.state.components.player.PlayerLostComponent>() != true
         }
+
+    // =========================================================================
+    // Shared life total (Two-Headed Giant — CR 810.4 / 810.9)
+    //
+    // A team has ONE life total (CR 810.4); "if a cost or effect needs an individual player's life
+    // total, it uses the team's life total instead" (CR 810.9a). We model this by storing the single
+    // [LifeTotalComponent] for a team on a stable *canonical owner* — the first member of the team in
+    // turn order ([teamLifeOwnerOf]) — and resolving every life read/write to that owner.
+    //
+    // Every player still carries a [LifeTotalComponent] so player-detection (`has<LifeTotalComponent>`)
+    // and entity shape are unchanged; only the canonical owner's value is authoritative. A
+    // non-canonical teammate's component value is never read — all reads go through [lifeTotal] and
+    // all writes through [withLifeTotal] / [adjustLife], which target the owner. In a non-team game a
+    // player is its own team, so the owner is the player itself and these helpers are a pure pass-through.
+    // =========================================================================
+
+    /**
+     * The entity that holds [playerId]'s team's authoritative [LifeTotalComponent] — the first
+     * member of [teamOf] (stable across the game; team membership and turn order never change). For
+     * a player with no team this is the player itself.
+     */
+    fun teamLifeOwnerOf(playerId: EntityId): EntityId = teamOf(playerId).firstOrNull() ?: playerId
+
+    /**
+     * [playerId]'s life total — the team's shared total in a team game (CR 810.9a), the player's own
+     * total otherwise. Returns 0 if the owner somehow has no [LifeTotalComponent] (should not happen
+     * for a real player).
+     */
+    fun lifeTotal(playerId: EntityId): Int =
+        getEntity(teamLifeOwnerOf(playerId))
+            ?.get<com.wingedsheep.engine.state.components.identity.LifeTotalComponent>()?.life ?: 0
+
+    /**
+     * Set [playerId]'s (team's) life total to [newLife], writing the canonical owner's component.
+     * Low-level — callers still emit the appropriate `LifeChangedEvent` (attributed to the
+     * individual player per CR 810.9) and run any prevention/replacement before computing [newLife].
+     */
+    fun withLifeTotal(playerId: EntityId, newLife: Int): GameState =
+        updateEntity(teamLifeOwnerOf(playerId)) { container ->
+            container.with(
+                com.wingedsheep.engine.state.components.identity.LifeTotalComponent(newLife)
+            )
+        }
+
+    /**
+     * Convenience: adjust [playerId]'s (team's) life by [delta] (negative to lose), returning the new
+     * state. Equivalent to `withLifeTotal(playerId, lifeTotal(playerId) + delta)`.
+     */
+    fun adjustLife(playerId: EntityId, delta: Int): GameState =
+        withLifeTotal(playerId, lifeTotal(playerId) + delta)
 
     /**
      * Returns the player who currently has *input authority* for [playerId] — that is,

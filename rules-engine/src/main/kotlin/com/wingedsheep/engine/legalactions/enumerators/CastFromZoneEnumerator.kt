@@ -1637,8 +1637,7 @@ class CastFromZoneEnumerator : ActionEnumerator {
 
                 // Check life affordability (only when there is a life cost)
                 if (lifeCost > 0) {
-                    val currentLife = state.getEntity(playerId)
-                        ?.get<com.wingedsheep.engine.state.components.identity.LifeTotalComponent>()?.life ?: 0
+                    val currentLife = state.lifeTotal(playerId) // CR 810.9a — team's shared total
                     if (currentLife < lifeCost) continue
                 }
 

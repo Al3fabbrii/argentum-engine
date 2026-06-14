@@ -274,8 +274,8 @@ class ConditionEvaluator(
             // Existential over all players: some player has at most [threshold] life.
             // Reads each player's LifeTotalComponent from state.turnOrder.
             is APlayerLifeAtMost -> state.turnOrder.any { playerId ->
-                val life = state.getEntity(playerId)?.get<LifeTotalComponent>()?.life
-                life != null && life <= condition.threshold
+                // CR 810.9a — read the team's shared total; existential so teams don't double-count.
+                state.lifeTotal(playerId) <= condition.threshold
             }
 
             // Board-derived only — no targets/triggering/kicker — so it works identically in
