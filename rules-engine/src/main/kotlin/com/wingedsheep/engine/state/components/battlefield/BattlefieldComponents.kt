@@ -116,7 +116,13 @@ data object SaddledComponent : Component
  */
 @Serializable
 data class CrewSaddleContributorsComponent(
-    val creatureIds: Set<EntityId>
+    val creatureIds: Set<EntityId>,
+    /**
+     * How many times the *crew* ability has been activated on this permanent this turn. Used to
+     * enforce a "Crew N. Activate only once each turn." cap (Luxurious Locomotive). Saddle
+     * activations don't increment it. Reset with the rest of the component at end of turn.
+     */
+    val crewActivations: Int = 0
 ) : Component
 
 /**
