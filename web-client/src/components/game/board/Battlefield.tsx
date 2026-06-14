@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useBattlefieldCards, groupCards, selectViewingPlayerId } from '@/store/selectors.ts'
+import { useBattlefieldCards, groupCards, visibleStackDepth, selectViewingPlayerId } from '@/store/selectors.ts'
 import { useGameStore } from '@/store/gameStore.ts'
 import { useInteraction } from '@/hooks/useInteraction.ts'
 import { ResponsiveContext, useResponsiveContext, useSlotSizedResponsive, handleImageError } from './shared'
@@ -90,8 +90,13 @@ export function Battlefield({ isOpponent, playerId, spectatorMode = false }: {
     for (const groups of groupLists) {
       for (const group of groups) {
         count++
-        if (group.cards.some((c) => c.isTapped)) tapped++
-        stackedExtra += group.count - 1
+        // Every member of a group shares its tapped state (it's part of the
+        // group key), so the representative answers for the whole stack.
+        if (group.card.isTapped) tapped++
+        // Only the *rendered* peek layers occupy horizontal space — a collapsed
+        // horde paints at most MAX_VISUAL_STACK_DEPTH cards, so the footprint
+        // (and thus the fit search) must use the capped depth, not the raw count.
+        stackedExtra += visibleStackDepth(group.count) - 1
       }
     }
     return { count, tapped, stackedExtra }
