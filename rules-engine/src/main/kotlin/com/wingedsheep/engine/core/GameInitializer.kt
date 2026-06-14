@@ -70,6 +70,18 @@ data class GameConfig(
     val attackMode: com.wingedsheep.sdk.core.AttackMode = com.wingedsheep.sdk.core.AttackMode.MULTIPLE,
 
     /**
+     * Team assignment for team variants (Two-Headed Giant — CR 810). Each entry is one team: a
+     * list of indices into [players]. When supplied, every listed player is stamped with a
+     * [com.wingedsheep.engine.state.components.identity.TeamComponent] carrying its team's index.
+     * The indices must partition [players] exactly — every player appears in exactly one team.
+     *
+     * Null (the default) means no teams: every player is its own team and no component is stamped,
+     * so Standard / Commander / FFA games are unaffected. Phase 1 only stamps membership; shared
+     * life, shared turns, and combined combat come in later phases.
+     */
+    val teams: List<List<Int>>? = null,
+
+    /**
      * Seed for the game's deterministic RNG (turn order, library shuffles, coin flips, every
      * "at random" choice). When null, the initializer draws a fresh seed from entropy so live
      * play stays random — but the chosen seed is always recorded on [InitializationResult.seed],
@@ -177,6 +189,9 @@ class GameInitializer(
         val formatStartingLife: Int? = when (val f = config.format) {
             is Format.Commander -> f.startingLife
             is Format.MomirBasic -> f.startingLife
+            // 2HG shares one 30-life total per team (CR 810.4). The shared pool arrives in a later
+            // phase; for now each player is initialized to the team's starting value.
+            is Format.TwoHeadedGiant -> f.startingLife
             else -> null
         }
 
@@ -207,6 +222,26 @@ class GameInitializer(
             )
 
             state = state.withEntity(playerId, playerContainer)
+        }
+
+        // 1b. Stamp team membership (Two-Headed Giant and other team variants — CR 810). Each entry
+        // in config.teams is a team of indices into config.players; the indices must partition the
+        // player list exactly. A player without a team entry is implicitly its own team (see
+        // GameState.teamOf), so non-team formats pass null here and stamp nothing.
+        config.teams?.let { teams ->
+            require(teams.flatten().sorted() == config.players.indices.toList()) {
+                "GameConfig.teams must partition all ${config.players.size} player indices exactly once, got: $teams"
+            }
+            teams.forEachIndexed { teamIndex, memberIndices ->
+                for (memberIndex in memberIndices) {
+                    val pid = playerIds[memberIndex]
+                    state = state.updateEntity(pid) { container ->
+                        container.with(
+                            com.wingedsheep.engine.state.components.identity.TeamComponent(teamIndex)
+                        )
+                    }
+                }
+            }
         }
 
         // 2. Set turn order
