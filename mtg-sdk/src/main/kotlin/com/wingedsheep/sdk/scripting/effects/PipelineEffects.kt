@@ -1072,6 +1072,29 @@ data class GrantMayPlayFromExileEffect(
 }
 
 /**
+ * Make every card in a named collection *plotted* (CR 718, Outlaws of Thunder Junction).
+ * The cards must already be in exile (chain after a [MoveCollectionEffect] to `Zone.EXILE`).
+ *
+ * For each card this stamps the plotted designation and grants a permanent "cast as a sorcery
+ * without paying its mana cost on a later turn" permission — the same state the Plot keyword's
+ * special action produces, expressed as an effect so cards like Make Your Own Luck ("you may
+ * exile a nonland card … it becomes plotted") can plot a card without the plot ability. Emits a
+ * `CardPlottedEvent` per card so "when this card becomes plotted" triggers fire.
+ *
+ * Unlike the Plot keyword, the source card need not itself have plot, and there is no plot cost
+ * to pay — the exile + selection is performed by the preceding pipeline steps.
+ *
+ * @property from Name of the collection containing the already-exiled card(s) to plot.
+ */
+@SerialName("MakePlotted")
+@Serializable
+data class MakePlottedEffect(
+    val from: String
+) : Effect {
+    override val description: String = "Those cards become plotted"
+}
+
+/**
  * Conditionally execute an effect based on the size of a named collection.
  *
  * Used for "if you do" effects where a subsequent action depends on whether

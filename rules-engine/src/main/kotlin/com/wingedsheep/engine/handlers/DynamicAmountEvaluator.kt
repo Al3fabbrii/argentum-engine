@@ -859,6 +859,21 @@ class DynamicAmountEvaluator(
             // honored. Falls back to the printed colors off the battlefield.
             is EntityNumericProperty.ColorCount ->
                 resolveColorCount(state, entityId, useProjected, explicitProjected)
+
+            // Excess damage (CR 120.4a) marked on the creature: max(0, marked − toughness).
+            // Amount-valued twin of the TargetMarkedDamageExceedsToughness condition — read it after
+            // a deal-damage step in the same composite (Hell to Pay's "excess damage dealt this
+            // way"). Off the battlefield / non-creature → 0.
+            is EntityNumericProperty.ExcessMarkedDamage -> {
+                if (entityId !in state.getBattlefield()) return 0
+                val projection = resolveProjection(state, explicitProjected)
+                if (!projection.isCreature(entityId)) return 0
+                val marked = state.getEntity(entityId)
+                    ?.get<com.wingedsheep.engine.state.components.battlefield.DamageComponent>()
+                    ?.amount ?: 0
+                val toughness = projection.getToughness(entityId) ?: return 0
+                (marked - toughness).coerceAtLeast(0)
+            }
         }
     }
 

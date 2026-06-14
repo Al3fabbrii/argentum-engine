@@ -630,6 +630,49 @@ internal fun EmitCtx.renderLook(node: JsonObject, args: JsonElement?, tvar: Stri
             arg("restOrder", "CardOrder.Random"),
         )
     }
+    // "Look at the top N. You may exile a nonland card from among them. If you do, it becomes plotted.
+    // Put the rest into your hand." (Make Your Own Luck). The IR is a `MayExileACardOfType` (filter) +
+    // `CreateExiledCardEffect[IsPlotted]` + `PutRemainingCardsInHand` sub-action triple. Render the
+    // atomic gather -> choose-up-to-split(filter) -> exile -> MakePlotted -> rest-to-hand pipeline.
+    // Only the nonland filter and the IsPlotted exiled-card effect are renderable here; any other
+    // filter or exiled-card effect declines (-> SCAFFOLD) rather than drop a constraint. Plotting
+    // a card with no plot cost has no cast-time-X / additional-cost hazard, so a complete render is safe.
+    if ("MayExileACardOfType" in blob && "IsPlotted" in blob && "PutRemainingCardsInHand" in blob) {
+        val n = findInteger(node) ?: return null
+        val subActions = node.field("args").asArr?.getOrNull(1).asArr ?: return null
+        // Decline if the exiled-card effect is anything other than the lone IsPlotted designation.
+        val exiledEffects = subActions
+            .firstOrNull { it.strField("_LookAtTopOfLibraryAction") == "CreateExiledCardEffect" }
+            ?.field("args").asArr?.getOrNull(1).asArr
+            ?.mapNotNull { (it as? JsonObject)?.strField("_ExiledCardEffect") } ?: return null
+        if (exiledEffects != listOf("IsPlotted")) return null
+        // Render the exile filter. Only "nonland" (IsNonCardtype Land) is supported here.
+        val exileFilterNode = subActions
+            .firstOrNull { it.strField("_LookAtTopOfLibraryAction") == "MayExileACardOfType" }
+            ?.field("args") as? JsonObject ?: return null
+        val filterExpr = when {
+            exileFilterNode.strField("_Cards") == "IsNonCardtype" &&
+                exileFilterNode.field("args").asStr() == "Land" -> "GameObjectFilter.Nonland"
+            else -> return null
+        }
+        return Composite(listOf(
+            Lit("GatherCardsEffect(CardSource.TopOfLibrary(DynamicAmount.Fixed($n)), storeAs = \"looked\")"),
+            Raw(
+                "SelectFromCollectionEffect(\n" +
+                    "                from = \"looked\",\n" +
+                    "                selection = SelectionMode.ChooseUpTo(DynamicAmount.Fixed(1)),\n" +
+                    "                filter = $filterExpr,\n" +
+                    "                storeSelected = \"toPlot\",\n" +
+                    "                storeRemainder = \"toHand\",\n" +
+                    "                selectedLabel = \"Exile and plot\",\n" +
+                    "                remainderLabel = \"Put into hand\"\n" +
+                    "            )",
+            ),
+            Lit("MoveCollectionEffect(from = \"toPlot\", destination = CardDestination.ToZone(Zone.EXILE))"),
+            Lit("MakePlottedEffect(from = \"toPlot\")"),
+            Lit("MoveCollectionEffect(from = \"toHand\", destination = CardDestination.ToZone(Zone.HAND))"),
+        ))
+    }
     // "Look at the top N, put some into your hand" — only a fixed look/keep count renders this way.
     val look = findInteger(node)
     var keep: Int? = null

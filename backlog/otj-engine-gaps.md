@@ -280,11 +280,12 @@ this turn" can't be expressed. Add the tracker (engine accumulates on draw event
     a chosen creature on arrival — a targeted reanimate-attached effect.
     → **One Last Job** (third Spree mode only; modes 1–2 buildable).
 
-16. **Inline "excess damage dealt this way" captured within one resolving spell.** Excess damage is
-    only surfaced as a *trigger* payload (`DealsDamageEvent(requireExcess=true)`), not as a value
-    usable later in the same resolving spell. Needs a reflexive/stored excess amount feeding a
-    dynamic-count token create.
-    → **Hell to Pay** (tapped Treasures = excess damage dealt).
+16. **Inline "excess damage dealt this way" captured within one resolving spell.** ✅ DONE —
+    `EntityNumericProperty.ExcessMarkedDamage` reads `max(0, marked − toughness)` of a context target
+    post-damage (the amount-valued twin of the existing `TargetMarkedDamageExceedsToughness` condition).
+    Composite resolves with no interleaved SBA, so a `DealDamage → CreateTreasure(count = EntityProperty(
+    Target(0), ExcessMarkedDamage))` pipeline reads the just-dealt excess while the creature is still present.
+    → **Hell to Pay** (tapped Treasures = excess damage dealt) — implemented.
 
 17. **Condition on the type of a permanent sacrificed as an activated-ability cost.** No primitive
     exposes the identity/type of the cost-sacrificed permanent to a follow-up effect. Needs to record
