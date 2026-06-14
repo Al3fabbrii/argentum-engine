@@ -1840,6 +1840,9 @@ private fun castScope(players: JsonObject?): CastScope? = when (players?.strFiel
 private fun spellCastCategory(spells: JsonObject?): String? = when (spells?.strField("_Spells")) {
     "AnySpell" -> "any"
     "IsHistoric" -> "historic"
+    // "an outlaw spell" — a spell with one or more outlaw creature types (Double Down). Maps to the
+    // shared Subtype.OUTLAW_TYPES group via withAnyOfSubtypes.
+    "IsAnOutlaw" -> "outlaw"
     "IsCardtype" -> when (spells.field("args").asStr()) {
         "Creature" -> "creature"
         "Enchantment" -> "enchantment"
@@ -1863,6 +1866,7 @@ private fun categoryFilter(category: String): String? = when (category) {
     "enchantment" -> "GameObjectFilter.Enchantment"
     "instantOrSorcery" -> "GameObjectFilter.InstantOrSorcery"
     "historic" -> "GameObjectFilter.Historic"
+    "outlaw" -> "GameObjectFilter.Any.withAnyOfSubtypes(Subtype.OUTLAW_TYPES)"
     else -> null
 }
 
@@ -1908,6 +1912,7 @@ private fun castTriggerDsl(scope: CastScope, category: String, targetsMatching: 
             "enchantment" -> "Triggers.YouCastEnchantment"
             "instantOrSorcery" -> "Triggers.YouCastInstantOrSorcery"
             "historic" -> "Triggers.YouCastHistoric"
+            "outlaw" -> "Triggers.youCastSpell(spellFilter = ${categoryFilter("outlaw")})"
             else -> null
         }
         CastScope.ANY -> if (filter == null) "Triggers.AnyPlayerCastsSpell" else "Triggers.anyPlayerCasts($filter)"

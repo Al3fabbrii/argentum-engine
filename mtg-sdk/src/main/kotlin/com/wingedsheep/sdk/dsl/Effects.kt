@@ -2179,6 +2179,15 @@ object Effects {
         ForceSacrificeEffect(filter, count, target)
 
     /**
+     * Force a player to sacrifice a [DynamicAmount] of permanents matching a filter — e.g.
+     * "sacrifices half the creatures they control, rounded up" (Rush of Dread). The amount is
+     * evaluated at resolution against the resolving context, so a per-target player reference
+     * (`Player.ContextPlayer(0)` / `Player.TargetOpponent`) counts the chosen player's permanents.
+     */
+    fun Sacrifice(filter: GameObjectFilter, count: DynamicAmount, target: EffectTarget = EffectTarget.PlayerRef(Player.TargetOpponent)): Effect =
+        ForceSacrificeEffect(filter = filter, target = target, dynamicCount = count)
+
+    /**
      * Sacrifice a specific permanent identified by target.
      * Used in delayed triggers where the exact permanent was determined at resolution time.
      */

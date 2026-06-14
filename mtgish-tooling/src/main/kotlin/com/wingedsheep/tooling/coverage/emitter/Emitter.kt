@@ -196,6 +196,12 @@ object Emitter {
                 rname == "FlashForCasters" -> block = ctx.conditionalFlashLines(rule)
                 rname == "Flashback" -> block = manaKeywordCost(rule)?.let { listOf(Eval(call("keywordAbility", arg(call("KeywordAbility.flashback", arg("\"$it\"")))))) }
                 rname == "Crew" -> block = rule["args"].asInt()?.let { listOf(Eval(call("keywordAbility", arg(call("KeywordAbility.crew", arg("$it")))))) }
+                // "Crew N. Activate only once each turn." (Luxurious Locomotive) — CrewOnceEachTurn carries
+                // the crew power N. Renders `KeywordAbility.crew(N, onceEachTurn = true)`; the engine enforces
+                // the once-per-turn cap in the crew enumerator/handler.
+                rname == "CrewOnceEachTurn" -> block = rule["args"].asInt()?.let {
+                    listOf(Eval(call("keywordAbility", arg(call("KeywordAbility.crew", arg("$it"), arg("onceEachTurn", "true"))))))
+                }
                 // Saddle N (CR 702.171) — a numeric keyword ability. mtgish shapes the count as a nested
                 // `_GameNumber: Integer` game number, so dig the integer out of the args (findInteger) rather
                 // than reading args directly as an Int. Renders `keywordAbility(KeywordAbility.saddle(N))`,

@@ -375,6 +375,18 @@ internal fun EmitCtx.dynamicAmountExpr(node: JsonElement?): Dsl? {
         // the flat type/subtype/controller filter below — emitting the aggregate without it would silently
         // over-count, so decline (-> SCAFFOLD) rather than misrender.
         if ("SharesACreatureTypeWithPermanent" in compact(node)) return null
+        // "for each creature that crewed it this turn" — a CrewedVehicleThisTurn predicate scoped to the
+        // source Vehicle (Luxurious Locomotive). This is a per-source set-tracker count, not a flat
+        // battlefield aggregate; the search filter below would silently drop the CrewedVehicleThisTurn
+        // clause and over-count every creature. Render the dedicated source-relative DynamicAmount instead
+        // (which retains contributors that have since left, matching the ruling). Only the source-Vehicle
+        // subject (Trigger_ThatCreature / ThisPermanent) is recognised; any other subject declines.
+        if ("CrewedVehicleThisTurn" in compact(node)) {
+            val subj = compact(node)
+            return if ("Trigger_ThatCreature" in subj || "ThisPermanent" in subj)
+                Lit("DynamicAmount.CreaturesThatCrewedOrSaddledThisTurn")
+            else null
+        }
         val oracle = oracleText?.lowercase() ?: ""
         // The count filter is recovered by landSearchFilterExpr, which renders only type/subtype/color/land
         // shapes — it silently widens anything else (its `else` arm is GameObjectFilter.Any) and its

@@ -4190,6 +4190,76 @@
     ]
 }
 
+// Double Down
+{
+    "name": "Double Down",
+    "manaCost": "{3}{U}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever you cast an outlaw spell, copy that spell. (Assassins, Mercenaries, Pirates, Rogues, and Warlocks are outlaws. Copies of permanent spells become tokens.)",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "SpellCastEvent",
+                    "spellFilter": {
+                        "cardPredicates": [
+                            {
+                                "type": "HasAnyOfSubtypes",
+                                "subtypes": [
+                                    "Assassin",
+                                    "Mercenary",
+                                    "Pirate",
+                                    "Rogue",
+                                    "Warlock"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "CopyTargetSpell",
+                    "target": "TriggeringEntity"
+                },
+                "descriptionOverride": "Whenever you cast an outlaw spell, copy that spell."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "44",
+        "rarity": "MYTHIC",
+        "artist": "Javier Charro",
+        "flavorText": "The best alibi is being in multiple places at the same time.",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/e/8ecccdf3-98c6-4aed-8757-913623efb677.jpg?1712355404",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "Double Down's ability and the copy it creates will resolve before the spell that caused it to trigger. They resolve even if that spell is countered."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "As a copy of a permanent spell resolves, it's put onto the battlefield as a token rather than putting a copy of the spell onto the battlefield."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "If a spell has the kindred card type and one of the outlaw creature types, Double Down will copy it."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "Double Down's ability doesn't trigger if an outlaw permanent is put onto the battlefield without being cast."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "A card, spell, or permanent is an outlaw if it has the Assassin, Mercenary, Pirate, Rogue, or Warlock creature type."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Drover Grizzly
 {
     "name": "Drover Grizzly",
@@ -8584,6 +8654,63 @@
     ]
 }
 
+// Luxurious Locomotive
+{
+    "name": "Luxurious Locomotive",
+    "manaCost": "{5}",
+    "typeLine": "Artifact — Vehicle",
+    "oracleText": "Whenever this Vehicle attacks, create a Treasure token for each creature that crewed it this turn. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")\nCrew 1. Activate only once each turn. (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 5
+    },
+    "keywords": [
+        "CREW"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Numeric",
+            "keyword": "CREW",
+            "n": 1,
+            "onceEachTurn": true
+        }
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "CreatePredefinedToken",
+                    "tokenType": "Treasure",
+                    "dynamicCount": "CreaturesThatCrewedOrSaddledThisTurn"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "244",
+        "rarity": "UNCOMMON",
+        "artist": "Leon Tukker",
+        "imageUri": "https://cards.scryfall.io/normal/front/c/c/cc598338-eeba-4815-a0a6-ff2dc09790d2.jpg?1712356268",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "You may tap more creatures than necessary to activate a crew ability."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "Once a player announces that they are activating a crew ability, no player may take other actions until the ability has been paid for."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "Luxurious Locomotive's triggered ability counts each creature that crewed it this turn, including creatures that are no longer on the battlefield as the ability resolves."
+            }
+        ]
+    },
+    "colorIdentityOverride": []
+}
+
 // Magda, the Hoardmaster
 {
     "name": "Magda, the Hoardmaster",
@@ -12534,6 +12661,174 @@
         "artist": "Josu Hernaiz",
         "flavorText": "\"Sneaking behind people? Pedestrian.\"",
         "imageUri": "https://cards.scryfall.io/normal/front/e/4/e4e4311a-8583-4cf0-8126-508dbfbcddb6.jpg?1712355656"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
+// Rush of Dread
+{
+    "name": "Rush of Dread",
+    "manaCost": "{1}{B}{B}",
+    "typeLine": "Sorcery",
+    "oracleText": "Spree (Choose one or more additional costs.)\n+ {1} — Target opponent sacrifices half the creatures they control of their choice, rounded up.\n+ {2} — Target opponent discards half the cards in their hand, rounded up.\n+ {2} — Target opponent loses half their life, rounded up.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "ForceSacrifice",
+                        "filter": "creature",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        },
+                        "dynamicCount": {
+                            "type": "Divide",
+                            "numerator": {
+                                "type": "AggregateBattlefield",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                },
+                                "filter": "creature"
+                            },
+                            "denominator": {
+                                "type": "Fixed",
+                                "amount": 2
+                            }
+                        }
+                    },
+                    "targetRequirements": [
+                        "TargetOpponent"
+                    ],
+                    "description": "+ {1} — Target opponent sacrifices half the creatures they control of their choice, rounded up.",
+                    "additionalManaCost": "{1}"
+                },
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Hand",
+                                    "player": {
+                                        "type": "ContextPlayer",
+                                        "index": 0
+                                    }
+                                },
+                                "storeAs": "hand"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "hand",
+                                "selection": {
+                                    "type": "ChooseExactly",
+                                    "count": {
+                                        "type": "Divide",
+                                        "numerator": {
+                                            "type": "AggregateZone",
+                                            "player": {
+                                                "type": "ContextPlayer",
+                                                "index": 0
+                                            },
+                                            "zone": "Hand"
+                                        },
+                                        "denominator": {
+                                            "type": "Fixed",
+                                            "amount": 2
+                                        }
+                                    }
+                                },
+                                "chooser": "TargetPlayer",
+                                "storeSelected": "discarded",
+                                "prompt": "Choose cards to discard"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "discarded",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Graveyard",
+                                    "player": {
+                                        "type": "ContextPlayer",
+                                        "index": 0
+                                    }
+                                },
+                                "moveType": "Discard"
+                            }
+                        ]
+                    },
+                    "targetRequirements": [
+                        "TargetOpponent"
+                    ],
+                    "description": "+ {2} — Target opponent discards half the cards in their hand, rounded up.",
+                    "additionalManaCost": "{2}"
+                },
+                {
+                    "effect": {
+                        "type": "LoseLife",
+                        "amount": {
+                            "type": "Divide",
+                            "numerator": {
+                                "type": "LifeTotal",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            },
+                            "denominator": {
+                                "type": "Fixed",
+                                "amount": 2
+                            }
+                        },
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        }
+                    },
+                    "targetRequirements": [
+                        "TargetOpponent"
+                    ],
+                    "description": "+ {2} — Target opponent loses half their life, rounded up.",
+                    "additionalManaCost": "{2}"
+                }
+            ],
+            "chooseCount": 3,
+            "minChooseCount": 1
+        }
+    },
+    "metadata": {
+        "collectorNumber": "104",
+        "rarity": "RARE",
+        "artist": "Chris Seaman",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/2/721c7122-91b6-45ea-ba28-de0246a2fc1b.jpg?1712860603",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "Like the effects of all modal spells, Rush of Dread's effects happen in order. If the first two modes target different opponents, the opponent targeted by the second mode will see what the first opponent sacrificed before choosing what to discard."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You must choose at least one of the listed modes and pay its associated additional cost in order to cast a spell with spree."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You can't choose the same mode more than once."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "If all targets for the chosen modes become illegal before a spell with spree resolves, the spell won't resolve. If at least one target is still legal, the spell resolves but has no effect on illegal targets."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "The mana value of a spell with spree is determined only by its mana cost. It doesn't matter which modes you choose or which additional costs you pay."
+            }
+        ]
     },
     "colorIdentityOverride": [
         "BLACK"

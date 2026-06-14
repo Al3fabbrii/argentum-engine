@@ -108,8 +108,10 @@ Tests: `CrewSaddleContributorsScenarioTest`.
 
 → Unblocks: Giant Beaver, Ornery Tumblewagg, Rambling Possum (saddlers get counters / bounce),
   The Gitrog Ravenous Ride & Calamity (consume the saddlers), **Luxurious Locomotive** (Treasure per
-  creature that crewed it this turn — note: dynamic-count Treasure creation is still Int-only; that
-  card additionally needs a dynamic `CreateTreasure` or a `CreateTokenEffect`-based Treasure).
+  creature that crewed it this turn — ✅ implemented: `Effects.CreateTreasure(count: DynamicAmount)`
+  already supports a dynamic count, and "Crew 1. Activate only once each turn." is now
+  `KeywordAbility.crew(1, onceEachTurn = true)`, enforced by the crew enumerator/handler via
+  `CrewSaddleContributorsComponent.crewActivations`). Tests: `OtjLuxuriousLocomotiveScenarioTest`.
 
 ### 3. `DynamicAmount` over spells cast this turn (filtered, per-player, exclude-self) — ✅ DONE
 

@@ -669,7 +669,13 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `SacrificeTargetEffect(target, sacrificedByItsController = false)` — sacrifice a specific permanent. By
   default only fires if the resolving player controls it; set `sacrificedByItsController = true` for
   "[that creature]'s controller sacrifices it" (e.g. The Ring's Ring-bearer ability).
-- `ForceSacrificeEffect(target, count)` — edict; target sacrifices N creatures.
+- `Effects.Sacrifice(filter, count, target)` / `ForceSacrificeEffect(target, count)` — edict; target
+  sacrifices N permanents matching the filter (target chooses). `count` accepts an `Int` or a
+  `DynamicAmount` — pass a `DynamicAmount` (via the `Effects.Sacrifice(filter, count: DynamicAmount, …)`
+  overload / `ForceSacrificeEffect.dynamicCount`) for "sacrifices half the creatures they control,
+  rounded up" (Rush of Dread): `Divide(AggregateBattlefield(Player.ContextPlayer(0), Creature), Fixed(2),
+  roundUp = true)`. The amount is evaluated at resolution against the resolving context, so a per-target
+  player reference counts the chosen player's permanents.
 - "Return a permanent you control [to its owner's hand]" is a pipeline composition, not an effect type:
   `GatherCards(BattlefieldMatching(filter, Player.You, excludeSelf?))` →
   `SelectFromCollection(ChooseExactly(1), useTargetingUI = true)` → `MoveCollection(→ HAND)` (the
@@ -2395,7 +2401,11 @@ composite abilities).
   `rampage()`). The second-spell-cast event is matched by `EventPattern.NthSpellCastEvent`; no new engine
   subsystem is involved. Example: `flurry { effect = Effects.DealDamage(1, EffectTarget.PlayerRef(Player.EachOpponent), damageSource = EffectTarget.Self) }`.
 - `Afflict(n)` — defender loses N when this becomes blocked.
-- `Crew(n)` — tap N power worth to animate a Vehicle.
+- `Crew(n)` (`KeywordAbility.crew(n, onceEachTurn = false)` / `Numeric(Keyword.CREW, n, onceEachTurn)`) —
+  tap N power worth to animate a Vehicle. Pass `onceEachTurn = true` for "Crew N. Activate only once each
+  turn." (Luxurious Locomotive): the crew enumerator + handler then refuse a second crew activation in the
+  same turn (counted via `CrewSaddleContributorsComponent.crewActivations`, reset at end of turn). Vanilla
+  Crew is uncapped. `onceEachTurn` is omitted from compiled JSON when false (`encodeDefaults = false`).
 - `saddle(n)` (`KeywordAbility.saddle(n)`) — Saddle N (CR 702.171). A sorcery-speed activated
   ability whose cost is tapping any number of *other* untapped creatures you control with total
   power ≥ N; on resolution this permanent **becomes saddled** until end of turn. Reuses the same
