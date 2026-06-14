@@ -3870,6 +3870,135 @@
     ]
 }
 
+// Getaway Glamer
+{
+    "name": "Getaway Glamer",
+    "manaCost": "{W}",
+    "typeLine": "Instant",
+    "oracleText": "Spree (Choose one or more additional costs.)\n+ {1} — Exile target nontoken creature. Return it to the battlefield under its owner's control at the beginning of the next end step.\n+ {2} — Destroy target creature if no other creature has greater power.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "MoveToZone",
+                                "target": {
+                                    "type": "ContextTarget",
+                                    "index": 0
+                                },
+                                "destination": "Exile"
+                            },
+                            {
+                                "type": "CreateDelayedTrigger",
+                                "step": "END",
+                                "effect": {
+                                    "type": "MoveToZone",
+                                    "target": {
+                                        "type": "ContextTarget",
+                                        "index": 0
+                                    },
+                                    "destination": "Battlefield"
+                                }
+                            }
+                        ]
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature nontoken"
+                            }
+                        }
+                    ],
+                    "description": "+ {1} — Exile target nontoken creature. Return it to the battlefield under its owner's control at the beginning of the next end step.",
+                    "additionalManaCost": "{1}"
+                },
+                {
+                    "effect": {
+                        "type": "Gated",
+                        "gate": {
+                            "type": "Gate.WhenCondition",
+                            "condition": {
+                                "type": "Compare",
+                                "left": {
+                                    "type": "EntityProperty",
+                                    "entity": "Target",
+                                    "numericProperty": "Power"
+                                },
+                                "operator": "GTE",
+                                "right": {
+                                    "type": "AggregateBattlefield",
+                                    "player": "Each",
+                                    "filter": "creature",
+                                    "aggregation": "MAX",
+                                    "property": "POWER"
+                                }
+                            }
+                        },
+                        "then": {
+                            "type": "MoveToZone",
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            },
+                            "destination": "Graveyard",
+                            "byDestruction": true
+                        }
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            }
+                        }
+                    ],
+                    "description": "+ {2} — Destroy target creature if no other creature has greater power.",
+                    "additionalManaCost": "{2}"
+                }
+            ],
+            "chooseCount": 2,
+            "minChooseCount": 1
+        }
+    },
+    "metadata": {
+        "collectorNumber": "14",
+        "rarity": "UNCOMMON",
+        "artist": "Forrest Imel",
+        "flavorText": "As the vault collapsed around them, Kellan made sure Akul couldn't follow them out.",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/9/69689049-a704-4f16-84ee-4d5d915028ec.jpg?1712860589",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "You must choose at least one of the listed modes and pay its associated additional cost in order to cast a spell with spree."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You choose the modes as you cast the spell with spree. Once modes are chosen, they can't be changed."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You can't choose the same mode more than once."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "The second mode's destruction is conditional. As the spell resolves, you check whether any creature has greater power than the targeted creature. If one does, the targeted creature isn't destroyed."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "The exiled creature returns at the beginning of the next end step as a new object with no relation to its previous existence."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Geyser Drake
 {
     "name": "Geyser Drake",
@@ -4435,6 +4564,68 @@
     ]
 }
 
+// Hell to Pay
+{
+    "name": "Hell to Pay",
+    "manaCost": "{X}{R}",
+    "typeLine": "Sorcery",
+    "oracleText": "Hell to Pay deals X damage to target creature. Create a number of tapped Treasure tokens equal to the amount of excess damage dealt to that creature this way.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "DealDamage",
+                    "amount": "XValue",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "creature"
+                    }
+                },
+                {
+                    "type": "CreatePredefinedToken",
+                    "tokenType": "Treasure",
+                    "tapped": true,
+                    "dynamicCount": {
+                        "type": "EntityProperty",
+                        "entity": "Target",
+                        "numericProperty": "ExcessMarkedDamage"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature"
+                },
+                "id": "creature"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "126",
+        "rarity": "RARE",
+        "artist": "Liiga Smilshkalne",
+        "flavorText": "For years afterward, lucky explorers who found the cave could chip gold fragments off the rocky walls.",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/4/84ad8ed7-1429-432e-8217-a4db3b97675c.jpg?1712355764",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "Excess damage is the amount of damage dealt to the creature beyond what was needed to be lethal. Damage already marked on the creature and any damage that would be prevented are taken into account."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "If the targeted creature is an illegal target by the time Hell to Pay tries to resolve, the spell doesn't resolve and you don't create any Treasure tokens."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Hellspur Brute
 {
     "name": "Hellspur Brute",
@@ -4903,6 +5094,124 @@
     "colorIdentityOverride": [
         "BLACK",
         "GREEN"
+    ]
+}
+
+// Insatiable Avarice
+{
+    "name": "Insatiable Avarice",
+    "manaCost": "{B}",
+    "typeLine": "Sorcery",
+    "oracleText": "Spree (Choose one or more additional costs.)\n+ {2} — Search your library for a card, then shuffle and put that card on top.\n+ {B}{B} — Target player draws three cards and loses 3 life.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Library"
+                                },
+                                "storeAs": "searchable"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "searchable",
+                                "selection": {
+                                    "type": "ChooseUpTo",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "found"
+                            },
+                            "ShuffleLibrary",
+                            {
+                                "type": "MoveCollection",
+                                "from": "found",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Library",
+                                    "placement": "Top"
+                                }
+                            }
+                        ]
+                    },
+                    "description": "+ {2} — Search your library for a card, then shuffle and put that card on top.",
+                    "additionalManaCost": "{2}"
+                },
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "DrawCards",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 3
+                                },
+                                "target": {
+                                    "type": "ContextTarget",
+                                    "index": 0
+                                }
+                            },
+                            {
+                                "type": "LoseLife",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 3
+                                },
+                                "target": {
+                                    "type": "ContextTarget",
+                                    "index": 0
+                                }
+                            }
+                        ]
+                    },
+                    "targetRequirements": [
+                        "TargetPlayer"
+                    ],
+                    "description": "+ {B}{B} — Target player draws three cards and loses 3 life.",
+                    "additionalManaCost": "{B}{B}"
+                }
+            ],
+            "chooseCount": 2,
+            "minChooseCount": 1
+        }
+    },
+    "metadata": {
+        "collectorNumber": "91",
+        "rarity": "RARE",
+        "artist": "Scott Murphy",
+        "flavorText": "Akul didn't know what lay inside Tarnation's great vault, but the mystery fueled his obsession.",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/1/a108b0e4-1b43-4659-9e91-facb0bd57ebb.jpg?1712860590",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "You must choose at least one of the listed modes and pay its associated additional cost in order to cast a spell with spree."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You choose the modes as you cast the spell with spree. Once modes are chosen, they can't be changed."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "You can't choose the same mode more than once."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "For the first mode, you shuffle your library before putting the found card on top. The card you searched for won't be shuffled into your library."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "BLACK"
     ]
 }
 
@@ -6103,6 +6412,89 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Make Your Own Luck
+{
+    "name": "Make Your Own Luck",
+    "manaCost": "{3}{G}{U}",
+    "typeLine": "Sorcery",
+    "oracleText": "Look at the top three cards of your library. You may exile a nonland card from among them. If you do, it becomes plotted. Put the rest into your hand. (You may cast it as a sorcery on a later turn without paying its mana cost.)",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "TopOfLibrary",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 3
+                        }
+                    },
+                    "storeAs": "looked"
+                },
+                {
+                    "type": "SelectFromCollection",
+                    "from": "looked",
+                    "selection": {
+                        "type": "ChooseUpTo",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    },
+                    "filter": "nonland",
+                    "storeSelected": "toPlot",
+                    "storeRemainder": "toHand",
+                    "selectedLabel": "Exile and plot",
+                    "remainderLabel": "Put into hand"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "toPlot",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Exile"
+                    }
+                },
+                {
+                    "type": "MakePlotted",
+                    "from": "toPlot"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "toHand",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Hand"
+                    }
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "218",
+        "rarity": "UNCOMMON",
+        "artist": "Chris Seaman",
+        "flavorText": "\"Aim alone won't win you a duel if you can't keep your nerve.\"\n—Annie Flash",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/5/0557b0a3-2b48-408f-a508-9f4da2ab1cd1.jpg?1712356151",
+        "rulings": [
+            {
+                "date": "2024-04-12",
+                "text": "A plotted card is exiled face up. You may cast it as a sorcery on a later turn without paying its mana cost, but not on the turn it became plotted."
+            },
+            {
+                "date": "2024-04-12",
+                "text": "If you don't exile a card, all three cards are put into your hand."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "BLUE",
+        "GREEN"
     ]
 }
 

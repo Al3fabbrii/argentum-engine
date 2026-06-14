@@ -69,6 +69,7 @@ import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
 import com.wingedsheep.sdk.scripting.effects.EachPlayerReturnsPermanentToHandEffect
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.GrantMayPlayFromExileEffect
+import com.wingedsheep.sdk.scripting.effects.MakePlottedEffect
 import com.wingedsheep.sdk.scripting.effects.GrantPlayWithoutPayingCostEffect
 import com.wingedsheep.sdk.scripting.effects.GrantFreeCastTargetFromExileEffect
 import com.wingedsheep.sdk.scripting.effects.FightEffect
@@ -689,6 +690,14 @@ object Effects {
         condition: com.wingedsheep.sdk.scripting.conditions.Condition? = null,
         landEntersTapped: Boolean = false
     ): Effect = GrantMayPlayFromExileEffect(from, expiry, withAnyManaType, condition, landEntersTapped)
+
+    /**
+     * Make every card in a named collection *plotted* (CR 718). The cards must already be in
+     * exile (chain after a `MoveCollection` to `Zone.EXILE`). Each card gets the plotted
+     * designation + a permanent free-cast-as-a-sorcery-on-a-later-turn permission — the Plot
+     * keyword's state without the plot cost. Used by Make Your Own Luck ("it becomes plotted").
+     */
+    fun MakePlotted(from: String): Effect = MakePlottedEffect(from)
 
     /**
      * Grant "play without paying mana cost" permission to all cards in a named collection.

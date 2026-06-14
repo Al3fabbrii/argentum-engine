@@ -188,6 +188,7 @@ object CardLinter {
         for (type in listOf(
             "CaptureControllers", "GatherSubtypes", "RevealCollection", "SelectFromCollection",
             "ChoosePile", "MoveCollection", "GrantMayPlayFromExile", "GrantPlayWithoutPayingCost",
+            "MakePlotted",
             "GrantPlayWithAdditionalCost", "GrantPlayWithCostIncrease", "FilterCollection",
             "StoreCardName", "CastFromCollectionWithoutPayingCost",
             "CastAnyNumberFromCollectionWithoutPayingCost", "ExileFromStorage",

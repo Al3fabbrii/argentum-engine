@@ -418,6 +418,7 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `GrantPlayWithoutPayingCost(from)` — same, without paying mana costs.
 - `GrantPlayWithCostIncrease(from, amount)` — stamp `PlayWithCostIncreaseComponent(controllerId, amount)` on every card in the collection, so the next cast pays `{amount}` extra generic. Pair with `GrantMayPlayFromExile` for "each spell cast this way costs {N} more" clauses (Lightstall Inquisitor); for target-based "exile this permanent, owner may play it, opponents tax" effects use `Effects.ExileAndGrantOwnerPlayPermission` instead.
 - `GrantFreeCastTargetFromExile(target)` — cast specific exiled card for free.
+- `MakePlotted(from)` — make every card in the named collection *plotted* (CR 718). The cards must already be in exile (chain after a `MoveCollection` to `Zone.EXILE`). Each card gets the plotted designation (`PlottedComponent`) + a permanent free-cast-as-a-sorcery-on-a-later-turn permission (`PlayWithoutPayingCostComponent` + `MayPlayPermission` gated by `SourcePlottedOnPriorTurn`) — the Plot keyword's state without a plot cost. Emits a `CardPlottedEvent` per card so "when this card becomes plotted" triggers fire. No-ops on an empty collection (so an optional "you may exile … it becomes plotted" fork is safe). Used by Make Your Own Luck.
 
 ### Stats & keywords
 
@@ -3042,6 +3043,15 @@ Numbers computed at resolution time.
   `EntityProperty(entity, EntityNumericProperty.ColorCount)`. Read from projected state for
   battlefield permanents (honors layer-5 color-changing — a creature turned colorless counts 0).
   Powers "for each color of [it]" amounts, e.g. Dragonfire Blade's equip cost reduction.
+- `EntityProperty(entity, EntityNumericProperty.ExcessMarkedDamage)` — the excess damage (CR 120.4a)
+  marked on a creature: `max(0, marked − toughness)`, read from post-damage state. Amount-valued twin of
+  the `TargetMarkedDamageExceedsToughness` condition. Read it AFTER a deal-damage step in the same
+  composite/pipeline resolution so the marked damage in scope is the damage that step just dealt — e.g.
+  Hell to Pay: "deals X damage to target creature. Create a number of tapped Treasure tokens equal to the
+  amount of excess damage dealt to that creature this way." (`EntityProperty(EntityReference.Target(0),
+  ExcessMarkedDamage)`). CompositeEffect resolves sub-effects sequentially with no interleaved SBA pass, so
+  the creature is still present mid-composite with its just-marked damage. Returns 0 off the battlefield or
+  for a non-creature.
 - `CardNumericProperty(card, property)` — generic numeric property accessor.
 
 ### Triggering-entity shortcuts (`DynamicAmounts.*` facades)
