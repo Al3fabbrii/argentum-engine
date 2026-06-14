@@ -433,6 +433,69 @@ data class GameState(
     fun getOpponents(playerId: EntityId): List<EntityId> =
         activePlayers.filter { it != playerId }
 
+    // =========================================================================
+    // Teams (Two-Headed Giant and other team variants — CR 810)
+    //
+    // Team membership lives on the player entity as a
+    // [com.wingedsheep.engine.state.components.identity.TeamComponent]; these helpers are the
+    // single read surface for it. A player without that component is its own team, so every helper
+    // degrades to per-player behaviour in non-team formats — `teamOf(p) == [p]`,
+    // `teammatesOf(p) == []`, and `teams` is one singleton list per player. That is what keeps
+    // future team-aware turn/priority/combat/SBA code a no-op for ordinary games.
+    // =========================================================================
+
+    /**
+     * The game's teams, in turn order. Players sharing a `TeamComponent.teamIndex` are grouped into
+     * one list; a player without the component forms a singleton team. Teams appear in the order
+     * their first member appears in [turnOrder], and members keep turn order within a team. Includes
+     * players who have lost or left — filter with [teamActivePlayers] when liveness matters.
+     */
+    val teams: List<List<EntityId>>
+        get() {
+            val ordered = mutableListOf<MutableList<EntityId>>()
+            val byIndex = mutableMapOf<Int, MutableList<EntityId>>()
+            for (playerId in turnOrder) {
+                val idx = getEntity(playerId)
+                    ?.get<com.wingedsheep.engine.state.components.identity.TeamComponent>()?.teamIndex
+                if (idx == null) {
+                    ordered.add(mutableListOf(playerId))
+                } else {
+                    val team = byIndex.getOrPut(idx) { mutableListOf<EntityId>().also { ordered.add(it) } }
+                    team.add(playerId)
+                }
+            }
+            return ordered
+        }
+
+    /**
+     * Every player on [playerId]'s team, including [playerId] itself, in turn order. Returns just
+     * `[playerId]` when it has no [com.wingedsheep.engine.state.components.identity.TeamComponent]
+     * (its own team). Includes lost/left teammates.
+     */
+    fun teamOf(playerId: EntityId): List<EntityId> {
+        val idx = getEntity(playerId)
+            ?.get<com.wingedsheep.engine.state.components.identity.TeamComponent>()?.teamIndex
+            ?: return listOf(playerId)
+        return turnOrder.filter {
+            getEntity(it)?.get<com.wingedsheep.engine.state.components.identity.TeamComponent>()?.teamIndex == idx
+        }
+    }
+
+    /**
+     * [playerId]'s teammates — its team minus itself, in turn order. Empty in non-team formats.
+     */
+    fun teammatesOf(playerId: EntityId): List<EntityId> =
+        teamOf(playerId).filter { it != playerId }
+
+    /**
+     * Members of [playerId]'s team still in the game (not lost/left), in turn order. The team-level
+     * analogue of [activePlayers].
+     */
+    fun teamActivePlayers(playerId: EntityId): List<EntityId> =
+        teamOf(playerId).filter {
+            getEntity(it)?.has<com.wingedsheep.engine.state.components.player.PlayerLostComponent>() != true
+        }
+
     /**
      * Returns the player who currently has *input authority* for [playerId] — that is,
      * who clicks the buttons and answers the decisions. Normally this is [playerId]

@@ -69,6 +69,34 @@ sealed interface Format {
         val avatarCardName: String = "Momir Vig, Simic Visionary",
         val eligibleCreatureNames: List<String> = emptyList(),
     ) : Format
+
+    /**
+     * Two-Headed Giant — the 2v2 team variant (CR 810). Two teams of two players each; a team
+     * shares one life total and one pool of poison counters, takes a shared turn (CR 805), fights
+     * combined combat, and wins or loses together (CR 810.8a).
+     *
+     * Like [Commander] this is runtime config, not a code path: the engine reads it at game init
+     * to set the shared starting life and (via [com.wingedsheep.engine.core.GameConfig.teams]) to
+     * stamp team membership on the player entities.
+     *
+     * **Phasing note.** This Phase 1 type only carries the format config + drives team membership.
+     * The behaviours it *describes* — shared life total (CR 810.4 / 810.9), shared turns and
+     * priority (CR 805), combined combat (CR 805.10 / 810.7), and team win/loss (CR 810.8) — are
+     * implemented in later phases. Until then a 2HG game boots with the right teams and life values
+     * but otherwise runs the standard per-player rules.
+     *
+     * @property startingLife The team's shared starting life total. Regular two-player 2HG is 30
+     *   (CR 810.4). In Phase 1 (no shared pool yet) each player is initialized to this value.
+     * @property startingHandSize Cards drawn for each player's opening hand.
+     * @property poisonThreshold Poison counters at which a team loses the game (CR 810.8d). 2HG
+     *   raises the normal 10 to 15.
+     */
+    @Serializable
+    data class TwoHeadedGiant(
+        val startingLife: Int = 30,
+        val startingHandSize: Int = 7,
+        val poisonThreshold: Int = 15,
+    ) : Format
 }
 
 /**
