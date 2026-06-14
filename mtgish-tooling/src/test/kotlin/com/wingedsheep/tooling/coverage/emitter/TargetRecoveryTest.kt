@@ -272,14 +272,17 @@ class TargetRecoveryTest : StringSpec({
             "GameObjectFilter.Creature.withAnyOfSubtypes(Subtype.OUTLAW_TYPES).youControl()"
     }
 
-    "gameObjectFilterDsl declines a group controlled by a target player (Neutralize the Guards)" {
+    "gameObjectFilterDsl renders a group controlled by a target player (Neutralize the Guards)" {
         // "creatures target opponent controls get -1/-1" — the controller is the chosen Ref_TargetPlayer,
-        // which no static GroupFilter expresses; dropping it would debuff every creature on the battlefield.
+        // which binds to the mode/spell's first target slot via `targetPlayerControls(ContextTarget(0))`
+        // (see TargetRecovery's SinglePlayer/Ref_TargetPlayer branch). This is the shape Neutralize the
+        // Guards' hand-authored card uses, scoped to the chosen opponent rather than every creature.
         val targetPlayersCreatures = obj(
             """{"_Permanents":"And","args":[{"_Permanents":"IsCardtype","args":"Creature"},""" +
                 """{"_Permanents":"ControlledByAPlayer","args":{"_Players":"SinglePlayer","args":{"_Player":"Ref_TargetPlayer"}}}]}""",
         )
-        ctx.gameObjectFilterDsl(targetPlayersCreatures).shouldBeNull()
+        ctx.gameObjectFilterDsl(targetPlayersCreatures) shouldBe
+            "GameObjectFilter.Creature.targetPlayerControls(EffectTarget.ContextTarget(0))"
     }
 
     "gameObjectFilterDsl renders 'a player other than you' as opponentControls (Artistic Process)" {
