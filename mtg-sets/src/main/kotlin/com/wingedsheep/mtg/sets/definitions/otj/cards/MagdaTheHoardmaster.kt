@@ -9,8 +9,6 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.TimingRule
-import com.wingedsheep.sdk.scripting.effects.CreateTokenEffect
-import com.wingedsheep.sdk.scripting.values.DynamicAmount
 
 /**
  * Magda, the Hoardmaster
@@ -49,17 +47,14 @@ val MagdaTheHoardmaster = card("Magda, the Hoardmaster") {
     activatedAbility {
         cost = Costs.SacrificeMultiple(3, GameObjectFilter.Artifact.withSubtype("Treasure"))
         timing = TimingRule.SorcerySpeed
-        // Raw CreateTokenEffect (not the Effects.CreateToken facade) so the token carries its
-        // printed name "Scorpion Dragon" rather than the facade's type-derived default.
-        effect = CreateTokenEffect(
-            count = DynamicAmount.Fixed(1),
+        // The token's name ("Scorpion Dragon") derives from its creature types, matching the codebase
+        // convention for type-named tokens (so the mtgish emitter renders it identically — AUTO tier).
+        effect = Effects.CreateToken(
             power = 4,
             toughness = 4,
             colors = setOf(Color.RED),
             creatureTypes = setOf("Scorpion", "Dragon"),
-            keywords = setOf(Keyword.FLYING, Keyword.HASTE),
-            name = "Scorpion Dragon",
-            imageUri = "https://cards.scryfall.io/normal/front/3/3/334178bb-970b-4f5a-af9b-1729eab65808.jpg?1712316350"
+            keywords = setOf(Keyword.FLYING, Keyword.HASTE)
         )
         description = "Sacrifice three Treasures: Create a 4/4 red Scorpion Dragon creature " +
             "token with flying and haste. Activate only as a sorcery."

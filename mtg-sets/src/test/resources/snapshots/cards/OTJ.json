@@ -7990,9 +7990,7 @@
                     "keywords": [
                         "FLYING",
                         "HASTE"
-                    ],
-                    "name": "Scorpion Dragon",
-                    "imageUri": "https://cards.scryfall.io/normal/front/3/3/334178bb-970b-4f5a-af9b-1729eab65808.jpg?1712316350"
+                    ]
                 },
                 "timing": "SorcerySpeed",
                 "descriptionOverride": "Sacrifice three Treasures: Create a 4/4 red Scorpion Dragon creature token with flying and haste. Activate only as a sorcery."

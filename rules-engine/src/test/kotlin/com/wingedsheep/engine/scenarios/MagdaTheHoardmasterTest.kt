@@ -88,7 +88,7 @@ class MagdaTheHoardmasterTest : FunSpec({
         driver.treasures(me).size shouldBe 0
 
         // A 4/4 red Scorpion Dragon with flying and haste was created.
-        val dragon = driver.getPermanents(me).firstOrNull { driver.getCardName(it) == "Scorpion Dragon" }
+        val dragon = driver.getPermanents(me).firstOrNull { driver.getCardName(it) == "Scorpion Dragon Token" }
         dragon shouldNotBe null
         driver.state.projectedState.getPower(dragon!!) shouldBe 4
         driver.state.projectedState.getToughness(dragon) shouldBe 4
@@ -114,7 +114,7 @@ class MagdaTheHoardmasterTest : FunSpec({
         driver.submit(ActivateAbility(playerId = me, sourceId = magda, abilityId = abilityId))
             .isSuccess shouldBe false
         // No dragon, treasures untouched.
-        driver.getPermanents(me).none { driver.getCardName(it) == "Scorpion Dragon" } shouldBe true
+        driver.getPermanents(me).none { driver.getCardName(it) == "Scorpion Dragon Token" } shouldBe true
         driver.treasures(me).size shouldBe 3
     }
 })
