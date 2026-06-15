@@ -1485,6 +1485,68 @@
     "colorIdentityOverride": []
 }
 
+// Rakalite
+{
+    "name": "Rakalite",
+    "manaCost": "{6}",
+    "typeLine": "Artifact",
+    "oracleText": "{2}: Prevent the next 1 damage that would be dealt to any target this turn. Return this artifact to its owner's hand at the beginning of the next end step.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{2}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "PreventDamageShield",
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            },
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        },
+                        {
+                            "type": "CreateDelayedTrigger",
+                            "step": "END",
+                            "effect": {
+                                "type": "MoveToZone",
+                                "target": "Self",
+                                "destination": "Hand"
+                            }
+                        }
+                    ]
+                },
+                "targetRequirements": [
+                    {
+                        "type": "AnyTarget",
+                        "id": "any target"
+                    }
+                ],
+                "descriptionOverride": "{2}: Prevent the next 1 damage that would be dealt to any target this turn. Return this artifact to its owner's hand at the beginning of the next end step."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "62",
+        "rarity": "UNCOMMON",
+        "artist": "Christopher Rush",
+        "flavorText": "Urza was the first to understand that the war would not be lost for lack of power, but for lack of troops.",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/f/0fd7c711-3ff4-4691-914f-242e6737066c.jpg?1562898310"
+    },
+    "colorIdentityOverride": []
+}
+
 // Reconstruction
 {
     "name": "Reconstruction",
