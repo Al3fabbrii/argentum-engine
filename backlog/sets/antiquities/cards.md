@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 47 / 85
+**Implemented:** 48 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -117,4 +117,4 @@
 - [x] Strip Mine
 - [x] Urza's Mine
 - [x] Urza's Power Plant
-- [ ] Urza's Tower
+- [x] Urza's Tower
