@@ -1961,6 +1961,15 @@ object Effects {
         CopyCardIntoCollectionEffect(source = source, storeAs = storeAs)
 
     /**
+     * The [affected] permanent becomes a copy of a creature card exiled with the effect's source,
+     * for as long as the source remains attached to it (Assimilation Aegis). Defaults [affected]
+     * to [EffectTarget.AttachedToTriggeringPermanent] — the creature the source just attached to.
+     */
+    fun BecomeCopyOfLinkedExile(
+        affected: EffectTarget = EffectTarget.AttachedToTriggeringPermanent,
+    ): Effect = com.wingedsheep.sdk.scripting.effects.BecomeCopyOfLinkedExileEffect(affected = affected)
+
+    /**
      * Cast the (0..1) card stored under [from] without paying its mana cost. The card must
      * already be in a zone where casting is legal (e.g. exile after a move/copy step, or the
      * hand for "you may cast … from your hand without paying its mana cost"). When [storeCastTo]
