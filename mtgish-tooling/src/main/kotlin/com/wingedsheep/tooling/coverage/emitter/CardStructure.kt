@@ -2413,7 +2413,11 @@ internal fun EmitCtx.abilityCostDsl(node: JsonElement?): String? {
         "ExileGraveyardCard" ->
             if (obj.field("args").strField("_GraveyardCard") == "ThisGraveyardCard") "Costs.ExileSelf" else null
         "SacrificeAPermanent" -> costFilterDsl(obj.field("args"))?.let {
-            if (it == "GameObjectFilter.Any") "Costs.Sacrifice()" else "Costs.Sacrifice($it)"
+            // "Sacrifice ANOTHER <permanent>" carries an `Other(ThisPermanent)` clause (Hungry Ghoul:
+            // "Sacrifice another creature"); render Costs.SacrificeAnother (excludeSelf) so the source
+            // can't pay by sacrificing itself. A bare "Sacrifice a <permanent>" stays Costs.Sacrifice.
+            val verb = if (jsonContains(obj.field("args"), "_Permanents", "Other")) "Costs.SacrificeAnother" else "Costs.Sacrifice"
+            if (it == "GameObjectFilter.Any") "$verb()" else "$verb($it)"
         }
         // "Sacrifice N <permanents>" as an activation cost (Magda, the Hoardmaster's "Sacrifice three
         // Treasures"). IR args are [<N Integer>, <permanent filter>]. Maps to Costs.SacrificeMultiple(N,
