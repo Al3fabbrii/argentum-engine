@@ -2079,6 +2079,69 @@
     "colorIdentityOverride": []
 }
 
+// Urza's Mine
+{
+    "name": "Urza's Mine",
+    "manaCost": "",
+    "typeLine": "Land — Urza's Mine",
+    "oracleText": "{T}: Add {C}. If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "All",
+                            "conditions": [
+                                {
+                                    "type": "Exists",
+                                    "player": "You",
+                                    "zone": "Battlefield",
+                                    "filter": "land name:Urza's Power-Plant"
+                                },
+                                {
+                                    "type": "Exists",
+                                    "player": "You",
+                                    "zone": "Battlefield",
+                                    "filter": "land name:Urza's Tower"
+                                }
+                            ]
+                        }
+                    },
+                    "then": {
+                        "type": "AddColorlessMana",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 2
+                        }
+                    },
+                    "otherwise": {
+                        "type": "AddColorlessMana",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    }
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true,
+                "descriptionOverride": "{T}: Add {C}. If you control an Urza's Power-Plant and an Urza's Tower, add {C}{C} instead."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "83c",
+        "artist": "Anson Maddocks",
+        "flavorText": "Mines became common as cities during the days of the artificers.",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/a/da68a5c0-84fe-4a8f-93b2-790eca3cc95c.jpg?1562941120"
+    },
+    "colorIdentityOverride": []
+}
+
 // Wall of Spears
 {
     "name": "Wall of Spears",
