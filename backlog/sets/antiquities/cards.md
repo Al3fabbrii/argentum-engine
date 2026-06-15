@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 15 / 85
+**Implemented:** 16 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -103,7 +103,7 @@
 - [ ] Tawnos's Weaponry
 - [ ] Tetravus
 - [ ] The Rack
-- [ ] Triskelion
+- [x] Triskelion
 - [ ] Urza's Avenger
 - [ ] Urza's Chalice
 - [ ] Urza's Miter
