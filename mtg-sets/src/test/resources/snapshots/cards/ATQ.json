@@ -1991,6 +1991,56 @@
     "colorIdentityOverride": []
 }
 
+// Urza's Chalice
+{
+    "name": "Urza's Chalice",
+    "manaCost": "{1}",
+    "typeLine": "Artifact",
+    "oracleText": "Whenever a player casts an artifact spell, you may pay {1}. If you do, you gain 1 life.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "SpellCastEvent",
+                    "spellFilter": {
+                        "cardPredicates": [
+                            "IsArtifact"
+                        ]
+                    },
+                    "player": "Each"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.MayPay",
+                        "cost": {
+                            "type": "PayManaCost",
+                            "cost": "{1}"
+                        }
+                    },
+                    "then": {
+                        "type": "GainLife",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    }
+                },
+                "descriptionOverride": "Whenever a player casts an artifact spell, you may pay {1}. If you do, you gain 1 life."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "75",
+        "artist": "Jeff A. Menges",
+        "flavorText": "When sorely wounded or tired, Urza would often retreat to the workshops of his apprentices. They were greatly amazed at how much better he looked each time he took a sip of water.",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/3/f3728537-86d3-42be-9046-90bba1bfafc1.jpg?1562946411"
+    },
+    "colorIdentityOverride": []
+}
+
 // Wall of Spears
 {
     "name": "Wall of Spears",

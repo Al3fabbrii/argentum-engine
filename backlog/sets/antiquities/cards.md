@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 43 / 85
+**Implemented:** 44 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -105,7 +105,7 @@
 - [ ] The Rack
 - [x] Triskelion
 - [ ] Urza's Avenger
-- [ ] Urza's Chalice
+- [x] Urza's Chalice
 - [ ] Urza's Miter
 - [x] Wall of Spears
 - [x] Weakstone
