@@ -163,6 +163,45 @@
     "colorIdentityOverride": []
 }
 
+// Onulet
+{
+    "name": "Onulet",
+    "manaCost": "{3}",
+    "typeLine": "Artifact Creature — Construct",
+    "oracleText": "When this creature dies, you gain 2 life.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "GainLife",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 2
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "59",
+        "rarity": "UNCOMMON",
+        "artist": "Anson Maddocks",
+        "flavorText": "An early inspiration for Urza, Tocasia's Onulets contained magical essences that could be cannibalized after they stopped functioning.",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/7/d77fe8e2-8438-473e-ace5-01baddd2c4ed.jpg?1562940572"
+    },
+    "colorIdentityOverride": []
+}
+
 // Ornithopter
 {
     "name": "Ornithopter",
