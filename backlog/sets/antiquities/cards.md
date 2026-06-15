@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 34 / 85
+**Implemented:** 35 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -45,7 +45,7 @@
 - [ ] Phyrexian Gremlins
 - [ ] Priest of Yawgmoth
 - [ ] Xenic Poltergeist
-- [ ] Yawgmoth Demon
+- [x] Yawgmoth Demon
 
 ### Red
 - [x] Artifact Blast

@@ -1633,6 +1633,66 @@
     "colorIdentityOverride": []
 }
 
+// Yawgmoth Demon
+{
+    "name": "Yawgmoth Demon",
+    "manaCost": "{4}{B}{B}",
+    "typeLine": "Creature — Phyrexian Demon",
+    "oracleText": "Flying, first strike\nAt the beginning of your upkeep, you may sacrifice an artifact. If you don't, tap this creature and it deals 2 damage to you.",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 6
+    },
+    "keywords": [
+        "FLYING",
+        "FIRST_STRIKE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "UPKEEP"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Sacrifice",
+                    "filter": "artifact"
+                },
+                "optional": true,
+                "elseEffect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "TapUntap",
+                            "target": "Self"
+                        },
+                        {
+                            "type": "DealDamage",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "target": "Controller",
+                            "damageSource": "Self"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "21",
+        "rarity": "RARE",
+        "artist": "Sandra Everingham",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/4/04bbd231-0d5f-4cbf-92a7-10d2c5c4b82c.jpg?1562895987"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Yotian Soldier
 {
     "name": "Yotian Soldier",
