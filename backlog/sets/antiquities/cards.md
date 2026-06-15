@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 37 / 85
+**Implemented:** 38 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -60,7 +60,7 @@
 - [x] Argothian Pixies
 - [x] Argothian Treefolk
 - [x] Citanul Druid
-- [ ] Crumble
+- [x] Crumble
 - [x] Gaea's Avenger
 - [ ] Powerleech
 - [ ] Titania's Song

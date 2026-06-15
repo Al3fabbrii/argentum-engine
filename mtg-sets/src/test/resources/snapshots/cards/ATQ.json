@@ -567,6 +567,69 @@
     "colorIdentityOverride": []
 }
 
+// Crumble
+{
+    "name": "Crumble",
+    "manaCost": "{G}",
+    "typeLine": "Instant",
+    "oracleText": "Destroy target artifact. It can't be regenerated. That artifact's controller gains life equal to its mana value.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GainLife",
+                    "amount": {
+                        "type": "EntityProperty",
+                        "entity": "Target",
+                        "numericProperty": "ManaValue"
+                    },
+                    "target": "TargetController"
+                },
+                {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "CantBeRegenerated",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target artifact"
+                            }
+                        },
+                        {
+                            "type": "MoveToZone",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target artifact"
+                            },
+                            "destination": "Graveyard",
+                            "byDestruction": true
+                        }
+                    ]
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "artifact"
+                },
+                "id": "target artifact"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "32",
+        "artist": "Jesper Myrfors",
+        "flavorText": "The spirits of Argoth grant new life to those who repent the folly of enslaving their labors to devices.",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/2/d2101f86-8d3c-4ba8-ac42-bd3df0644280.jpg?1562939468"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Detonate
 {
     "name": "Detonate",
