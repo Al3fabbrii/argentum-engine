@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 38 / 85
+**Implemented:** 39 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -70,7 +70,7 @@
 - [ ] Armageddon Clock
 - [x] Ashnod's Altar
 - [ ] Ashnod's Battle Gear
-- [ ] Ashnod's Transmogrant
+- [x] Ashnod's Transmogrant
 - [ ] Battering Ram
 - [ ] Bronze Tablet
 - [x] Candelabra of Tawnos

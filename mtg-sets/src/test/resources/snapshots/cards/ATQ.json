@@ -313,6 +313,68 @@
     "colorIdentityOverride": []
 }
 
+// Ashnod's Transmogrant
+{
+    "name": "Ashnod's Transmogrant",
+    "manaCost": "{1}",
+    "typeLine": "Artifact",
+    "oracleText": "{T}, Sacrifice this artifact: Put a +1/+1 counter on target nonartifact creature. That creature becomes an artifact in addition to its other types.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        "CostTap",
+                        "CostSacrificeSelf"
+                    ]
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddCounters",
+                            "counterType": "+1/+1",
+                            "count": 1,
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target nonartifact creature"
+                            }
+                        },
+                        {
+                            "type": "AddCardType",
+                            "cardType": "ARTIFACT",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target nonartifact creature"
+                            }
+                        }
+                    ]
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "creature nonartifact"
+                        },
+                        "id": "target nonartifact creature"
+                    }
+                ],
+                "descriptionOverride": "{T}, Sacrifice this artifact: Put a +1/+1 counter on target nonartifact creature. That creature becomes an artifact in addition to its other types."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "40",
+        "rarity": "UNCOMMON",
+        "artist": "Mark Tedin",
+        "flavorText": "Ashnod found few willing to trade their humanity for the power she offered them.",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/a/2aa5b289-36ba-49b1-a5ac-f23bf71f8241.jpg?1562904041"
+    },
+    "colorIdentityOverride": []
+}
+
 // Atog
 {
     "name": "Atog",
