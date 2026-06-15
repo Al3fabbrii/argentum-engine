@@ -97,8 +97,8 @@ class CreateTokenCopyOfSourceExecutor(
                 SummoningSicknessComponent,
                 EnteredThisTurnComponent
             )
-            // CR 701.53d / TDFC token rules: a copy of a transforming permanent is itself a
-            // transforming permanent and enters with the same face up as the source. Counters
+            // CR 707.8a: a token copy of a double-faced permanent has both faces and enters
+            // with the same face up as the source. Counters
             // are intentionally not copied (handled by the absence of CountersComponent copy
             // throughout this executor).
             sourceContainer.get<DoubleFacedComponent>()?.let { sourceDfc ->

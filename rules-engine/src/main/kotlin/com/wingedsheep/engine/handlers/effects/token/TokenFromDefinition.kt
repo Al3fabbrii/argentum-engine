@@ -14,6 +14,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.SummoningSicknessComponent
 import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
+import com.wingedsheep.engine.state.components.identity.DoubleFacedComponent
 import com.wingedsheep.engine.state.components.identity.TokenComponent
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.model.CardDefinition
@@ -75,6 +76,17 @@ object TokenFromDefinition {
         var container = CardEntityFactory.create(cardDef, ownerId = controllerId)
             .with(TokenComponent)
             .with(SummoningSicknessComponent)
+
+        // CR 707.8a: a token copy of a double-faced card has both faces and can transform.
+        cardDef.backFace?.let { backFace ->
+            container = container.with(
+                DoubleFacedComponent(
+                    frontCardDefinitionId = cardDef.name,
+                    backCardDefinitionId = backFace.name,
+                    currentFace = DoubleFacedComponent.Face.FRONT
+                )
+            )
+        }
 
         if (staticAbilityHandler != null) {
             container = staticAbilityHandler.addContinuousEffectComponent(container)

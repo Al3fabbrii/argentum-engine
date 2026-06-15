@@ -7,6 +7,7 @@ import com.wingedsheep.engine.support.ScenarioTestBase
 import com.wingedsheep.engine.state.components.battlefield.TappedComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
+import com.wingedsheep.engine.state.components.identity.DoubleFacedComponent
 import com.wingedsheep.engine.state.components.identity.TokenComponent
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Format
@@ -111,6 +112,33 @@ class MomirBasicScenarioTest : ScenarioTestBase() {
             // ETB: "When Elvish Visionary enters the battlefield, draw a card."
             // Hand: started at 2, discarded 1 for the cost, +1 from the ETB draw = 2.
             game.state.getZone(game.player1Id, Zone.HAND).size shouldBe handBefore
+        }
+
+        test("a minted token copy of a double-faced card can transform") {
+            val game = scenario()
+                .withPlayers()
+                .withFormat(Format.MomirBasic(eligibleCreatureNames = listOf("Test DFC Front")))
+                .withCardInCommandZone(1, avatar)
+                .withLandsOnBattlefield(1, "Island", 5)
+                .withCardInHand(1, "Mountain")
+                .withCardInHand(1, "Transform Target Creature")
+                .build()
+
+            game.execute(game.momirAction(xValue = 3)).error shouldBe null
+            game.resolveStack()
+
+            val tokenId = game.findPermanents("Test DFC Front").single()
+            val token = game.state.getEntity(tokenId)!!
+            token.has<TokenComponent>().shouldBeTrue()
+            token.get<DoubleFacedComponent>()?.currentFace shouldBe DoubleFacedComponent.Face.FRONT
+
+            game.castSpell(1, "Transform Target Creature", tokenId).error shouldBe null
+            game.resolveStack()
+
+            val transformed = game.state.getEntity(tokenId)!!
+            transformed.get<CardComponent>()?.name shouldBe "Test DFC Back"
+            transformed.get<DoubleFacedComponent>()?.currentFace shouldBe DoubleFacedComponent.Face.BACK
+            transformed.has<TokenComponent>().shouldBeTrue()
         }
 
         test("search-library ETB (Wood Elves) fires for the minted token") {
