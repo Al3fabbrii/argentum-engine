@@ -1483,6 +1483,98 @@
     ]
 }
 
+// Erode
+{
+    "name": "Erode",
+    "manaCost": "{W}",
+    "typeLine": "Instant",
+    "oracleText": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature or planeswalker"
+                    },
+                    "destination": "Graveyard",
+                    "byDestruction": true
+                },
+                {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Library",
+                                    "player": {
+                                        "type": "ControllerOf",
+                                        "targetDescription": "target"
+                                    },
+                                    "filter": "basicland"
+                                },
+                                "storeAs": "searchable"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "searchable",
+                                "selection": {
+                                    "type": "ChooseUpTo",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "found"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "found",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Battlefield",
+                                    "player": {
+                                        "type": "ControllerOf",
+                                        "targetDescription": "target"
+                                    },
+                                    "placement": "Tapped"
+                                }
+                            },
+                            {
+                                "type": "ShuffleLibrary",
+                                "target": "TargetController"
+                            }
+                        ]
+                    },
+                    "decisionMaker": "TargetController"
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetCreatureOrPlaneswalker",
+                "id": "target creature or planeswalker"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "15",
+        "rarity": "RARE",
+        "artist": "Florian Herold",
+        "flavorText": "\"Our lives are built upon our pasts. What happens, then, if we are cut off from them?\"\n—Augusta, dean of order",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/2/32e670da-7563-4f6a-a7db-4c126a440eb8.jpg"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Expressive Firedancer
 {
     "name": "Expressive Firedancer",
@@ -2507,6 +2599,106 @@
     ]
 }
 
+// Heated Argument
+{
+    "name": "Heated Argument",
+    "manaCost": "{4}{R}",
+    "typeLine": "Instant",
+    "oracleText": "Heated Argument deals 6 damage to target creature. You may exile a card from your graveyard. If you do, Heated Argument also deals 2 damage to that creature's controller.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 6
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature"
+                    }
+                },
+                {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Gated",
+                        "gate": {
+                            "type": "Gate.DoAction",
+                            "action": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "FromZone",
+                                            "zone": "Graveyard"
+                                        },
+                                        "storeAs": "graveyardCards"
+                                    },
+                                    {
+                                        "type": "SelectFromCollection",
+                                        "from": "graveyardCards",
+                                        "selection": {
+                                            "type": "ChooseExactly",
+                                            "count": {
+                                                "type": "Fixed",
+                                                "amount": 1
+                                            }
+                                        },
+                                        "storeSelected": "toExile",
+                                        "selectedLabel": "Exile"
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "toExile",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Exile"
+                                        }
+                                    }
+                                ]
+                            },
+                            "successCriterion": {
+                                "type": "SuccessCriterion.CollectionNonEmpty",
+                                "name": "toExile"
+                            }
+                        },
+                        "then": {
+                            "type": "DealDamage",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "target": "TargetController"
+                        }
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature"
+                },
+                "id": "target creature"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "118",
+        "artist": "Aleksi Briclot",
+        "flavorText": "\"I don't want to hurt you, Ajani, but whatever Jace is planning needs to be stopped!\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/0/0038d212-3d95-4f98-8c2e-7b2404d0ced7.jpg"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Hungry Graffalon
 {
     "name": "Hungry Graffalon",
@@ -3274,6 +3466,69 @@
     "colorIdentityOverride": [
         "WHITE",
         "RED"
+    ]
+}
+
+// Mana Sculpt
+{
+    "name": "Mana Sculpt",
+    "manaCost": "{1}{U}{U}",
+    "typeLine": "Instant",
+    "oracleText": "Counter target spell. If you control a Wizard, add an amount of {C} equal to the amount of mana spent to cast that spell at the beginning of your next main phase.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "Exists",
+                            "player": "You",
+                            "zone": "Battlefield",
+                            "filter": "creature Wizard"
+                        }
+                    },
+                    "then": {
+                        "type": "CreateDelayedTrigger",
+                        "step": "PRECOMBAT_MAIN",
+                        "effect": {
+                            "type": "AddColorlessMana",
+                            "amount": {
+                                "type": "EntityProperty",
+                                "entity": "Target",
+                                "numericProperty": "ManaSpent"
+                            }
+                        },
+                        "fireOnPlayer": {
+                            "type": "PlayerRef",
+                            "player": "You"
+                        }
+                    }
+                },
+                "Counter"
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": {},
+                    "zone": "Stack"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "57",
+        "rarity": "RARE",
+        "artist": "Cristi Balanescu",
+        "flavorText": "The harder a foe strikes, the stronger a Dragonsguard's defenses become.",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/0/200c8e3d-c53b-40c7-a29a-fccc1281bfc6.jpg"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
     ]
 }
 
