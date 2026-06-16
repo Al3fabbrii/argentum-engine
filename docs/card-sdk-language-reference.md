@@ -2073,6 +2073,16 @@ Triggers.youCastSpell(
     effect = Effects.GrantKeyword(Keyword.DOUBLE_STRIKE))` — "whenever you cast a noncreature spell
     this turn, target creature you control gains double strike". Works on both event-based and
     step-based delayed triggers; null (default) for non-targeting delayed triggers.
+  - **Amount snapshot at creation time.** When `effect` is an `AddManaEffect` / `AddColorlessManaEffect`
+    carrying a non-`Fixed` `DynamicAmount` that reads from the *current* resolution context — e.g.
+    `DynamicAmounts.targetManaSpent(0)` (`EntityProperty(Target(0), ManaSpent)`) — the executor
+    evaluates that amount **now** and bakes it into a `DynamicAmount.Fixed` literal, exactly as it
+    bakes `ContextTarget(n)` target references into `SpecificEntity`. This is required for "at the
+    beginning of your next main phase, add an amount of {C} equal to the amount of mana spent to cast
+    that spell" (**Mana Sculpt**): the referenced spell is gone by the time the delayed trigger fires,
+    so a lazy read would yield 0 — author the gated delayed-trigger creation *before* the counter so
+    the target spell is still on the stack when the snapshot is taken. Already-`Fixed` amounts pass
+    through untouched.
 
 ---
 
