@@ -2980,3 +2980,27 @@
   color: #cfe7ff;
   text-decoration-color: rgba(207, 231, 255, 0.9);
 }
+
+/*
+ * On narrow screens the overlay scrolls and the absolutely-pinned attribution
+ * floats over the content (it overlapped the public-lobby panel). Drop it back
+ * into normal flow so it sits below the content as a full-width footer.
+ * Placed after the base rules so these overrides win at equal specificity.
+ */
+@media (max-width: 639px) {
+  .attribution {
+    position: static;
+    transform: none;
+    margin: var(--space-2) auto 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 11px;
+    line-height: 1.45;
+    padding: 10px 14px;
+  }
+
+  .attributionDisclaimer {
+    font-size: 10px;
+  }
+}
