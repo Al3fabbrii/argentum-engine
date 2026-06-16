@@ -8,6 +8,7 @@ import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.TimingRule
 import com.wingedsheep.sdk.scripting.AbilityId
 import com.wingedsheep.sdk.scripting.ActivatedAbility
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -28,7 +29,7 @@ val ARealmReborn = card("A Realm Reborn") {
     oracleText = "Other permanents you control have \"{T}: Add one mana of any color.\""
     staticAbility {
         ability = GrantActivatedAbility(
-            ability = ActivatedAbility(id = AbilityId.generate(), cost = Costs.Tap, effect = Effects.AddManaOfChoice()),
+            ability = ActivatedAbility(id = AbilityId.generate(), cost = Costs.Tap, effect = Effects.AddManaOfChoice(), isManaAbility = true, timing = TimingRule.ManaAbility),
             filter = GroupFilter(GameObjectFilter.Permanent.youControl(), excludeSelf = true)
         )
     }
