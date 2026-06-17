@@ -21,7 +21,7 @@ import io.kotest.matchers.shouldNotBe
  *
  * The first three "enter prepared" (they carry `Keyword.PREPARED`). Joined Researchers does NOT
  * enter prepared — it only becomes prepared via its end-step trigger ("if an opponent has more
- * cards in hand than you"), exercising the new `Effects.MakePrepared` effect.
+ * cards in hand than you"), exercising the `Effects.BecomePrepared` effect.
  */
 class SosPrepareCardsScenarioTest : ScenarioTestBase() {
 

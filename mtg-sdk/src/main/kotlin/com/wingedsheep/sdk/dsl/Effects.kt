@@ -30,8 +30,8 @@ import com.wingedsheep.sdk.scripting.effects.AddCountersToCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.AnimateLandEffect
 import com.wingedsheep.sdk.scripting.effects.ExploreEffect
-import com.wingedsheep.sdk.scripting.effects.MakePreparedEffect
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureEffect
+import com.wingedsheep.sdk.scripting.effects.BecomePreparedEffect
 import com.wingedsheep.sdk.scripting.effects.BecomeSaddledEffect
 import com.wingedsheep.sdk.scripting.effects.EachPermanentBecomesCopyOfTargetEffect
 import com.wingedsheep.sdk.scripting.effects.SetBasePowerEffect
@@ -1645,20 +1645,6 @@ object Effects {
         ExploreEffect(target)
 
     /**
-     * The target permanent becomes prepared (Prepare — Secrets of Strixhaven).
-     *
-     * Gives the permanent the "prepared" status and creates a castable copy of its card's prepare
-     * spell in its controller's exile; casting that copy unprepares it. Already-prepared permanents
-     * are unaffected. Use for cards that *become* prepared mid-game (e.g. Joined Researchers'
-     * end-step trigger); cards that "enter prepared" rely on [com.wingedsheep.sdk.model.CardLayout.PREPARE]
-     * instead.
-     *
-     * @param target The permanent that becomes prepared (default: the effect's source).
-     */
-    fun MakePrepared(target: EffectTarget = EffectTarget.Self): Effect =
-        MakePreparedEffect(target)
-
-    /**
      * Create a Map artifact token.
      * "{1}, {T}, Sacrifice this artifact: Target creature you control explores.
      *  Activate only as a sorcery."
@@ -2910,6 +2896,14 @@ object Effects {
      */
     fun BecomeSaddled(target: EffectTarget = EffectTarget.Self): Effect =
         BecomeSaddledEffect(target)
+
+    /**
+     * [target] becomes prepared (Secrets of Strixhaven). The target must be a PREPARE-layout
+     * permanent; becoming prepared creates a castable copy of its prepare spell in exile. A
+     * creature that is already prepared does not re-prepare. Defaults to the source.
+     */
+    fun BecomePrepared(target: EffectTarget = EffectTarget.Self): Effect =
+        BecomePreparedEffect(target)
 
     /**
      * Each permanent matching [filter] becomes a copy of [target].

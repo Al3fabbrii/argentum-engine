@@ -22,7 +22,7 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  *
  * Prepare (Secrets of Strixhaven): unlike most prepare cards, this creature does NOT enter
  * prepared — it has no PREPARED keyword. Instead its end-step trigger makes it become prepared
- * (via [com.wingedsheep.sdk.dsl.Effects.MakePrepared]) while an opponent is hoarding cards.
+ * (via [com.wingedsheep.sdk.dsl.Effects.BecomePrepared]) while an opponent is hoarding cards.
  * Becoming prepared creates a copy of its prepare spell ("Secret Rendezvous") in exile that its
  * controller may cast for {1}{W}{W}; casting that copy unprepares the creature. The prepare spell
  * itself is declared via the `prepare(name) { }` DSL ([com.wingedsheep.sdk.model.CardLayout.PREPARE]).
@@ -44,7 +44,7 @@ val JoinedResearchers = card("Joined Researchers") {
     triggeredAbility {
         trigger = Triggers.EachEndStep
         triggerCondition = Conditions.OpponentHasMoreCardsInHand
-        effect = Effects.MakePrepared()
+        effect = Effects.BecomePrepared()
         description = "At the beginning of each end step, if an opponent has more cards in hand " +
             "than you, this creature becomes prepared."
     }

@@ -1377,38 +1377,22 @@ class StackResolver(
             newState = newState.addDelayedTrigger(delayedTrigger)
         }
 
-        // Prepared (Secrets of Strixhaven): a preparation creature with the PREPARED keyword
-        // ("This creature enters prepared") enters prepared. Becoming prepared creates a copy of
-        // the card's prepare spell in exile that its controller may cast (paying that spell's
-        // cost); casting it unprepares the creature. PREPARE-layout cards that *become* prepared
-        // some other way (e.g. Joined Researchers' end-step trigger) omit the keyword and don't
-        // enter prepared.
+        // Prepared (Secrets of Strixhaven): a preparation creature whose face carries the PREPARED
+        // keyword ("This creature enters prepared") enters prepared. Becoming prepared creates a
+        // copy of the card's prepare spell in exile that its controller may cast (paying that
+        // spell's cost); casting it unprepares the creature. PREPARE-layout creatures that lack the
+        // keyword (e.g. Leech Collector, which only becomes prepared via a trigger) do not enter
+        // prepared.
         if (cardDef != null && cardDef.layout == com.wingedsheep.sdk.model.CardLayout.PREPARE &&
-            cardDef.hasKeyword(com.wingedsheep.sdk.core.Keyword.PREPARED) &&
+            cardDef.keywords.contains(com.wingedsheep.sdk.core.Keyword.PREPARED) &&
             !spellComponent.castFaceDown
         ) {
-            newState = makePrepared(newState, spellId, cardDef, controllerId)
+            newState = PreparationLogic.makePrepared(newState, spellId, cardDef, controllerId)
         }
 
         return newState to counterEvents
     }
 
-    /**
-     * Make the permanent [permanentId] prepared (Secrets of Strixhaven): create a copy of the
-     * card's prepare spell (`cardFaces[0]`) in [controllerId]'s exile, grant a permanent
-     * cast-from-exile permission for it, and link the two via [PreparedComponent] /
-     * [PreparedSpellCopyComponent]. The copy carries a [CopyOfComponent] (stack-style copy) so it
-     * ceases to exist on resolution, and a [PreparedSpellCopyComponent] so the cast-from-exile
-     * enumerator casts it as face 0 and the phantom-copy state-based action leaves it in exile.
-     */
-    private fun makePrepared(
-        state: GameState,
-        permanentId: EntityId,
-        cardDef: com.wingedsheep.sdk.model.CardDefinition,
-        controllerId: EntityId,
-    ): GameState = com.wingedsheep.engine.handlers.effects.permanent.PreparedService.makePrepared(
-        state, permanentId, cardDef, controllerId
-    )
 
     /**
      * Resolve a non-permanent spell - execute effects, put in graveyard.

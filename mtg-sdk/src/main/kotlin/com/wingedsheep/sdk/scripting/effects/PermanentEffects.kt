@@ -160,6 +160,22 @@ data class BecomeSaddledEffect(
 }
 
 /**
+ * Make [target] become prepared (Secrets of Strixhaven). The target must be a permanent whose
+ * card has the [com.wingedsheep.sdk.model.CardLayout.PREPARE] layout. Becoming prepared creates a
+ * copy of its prepare spell in the controller's exile that may be cast (paying that spell's cost);
+ * casting that copy unprepares the creature. A creature that is already prepared does not
+ * re-prepare. Used by Leech Collector ("Whenever you gain life for the first time each turn, this
+ * creature becomes prepared.").
+ */
+@SerialName("BecomePrepared")
+@Serializable
+data class BecomePreparedEffect(
+    val target: EffectTarget = EffectTarget.Self
+) : Effect {
+    override val description: String = "${target.description} becomes prepared"
+}
+
+/**
  * Turn target creature face down.
  * "Turn target creature with a morph ability face down."
  * Used for Backslide and similar effects.
@@ -301,26 +317,3 @@ data class ExploreEffect(
 ) : Effect {
     override val description: String = "${target.description} explores"
 }
-
-/**
- * The target permanent becomes prepared (Prepare — Secrets of Strixhaven).
- *
- * Becoming prepared gives the permanent the "prepared" status and creates a copy of its card's
- * prepare spell ([com.wingedsheep.sdk.model.CardDefinition.cardFaces] index 0) in its controller's
- * exile that the controller may cast (paying that spell's cost); casting that copy unprepares the
- * permanent. A permanent that is already prepared doesn't become prepared again (no second copy).
- *
- * Most prepare cards "enter prepared" — that is wired by [com.wingedsheep.sdk.model.CardLayout.PREPARE]
- * on entry. This effect covers the cases where a creature *becomes* prepared from a triggered or
- * resolution effect mid-game (e.g. Joined Researchers' end-step trigger).
- *
- * @property target The permanent to make prepared. Defaults to the effect's source ([EffectTarget.Self]).
- */
-@SerialName("MakePrepared")
-@Serializable
-data class MakePreparedEffect(
-    val target: EffectTarget = EffectTarget.Self
-) : Effect {
-    override val description: String = "${target.description} becomes prepared"
-}
-
