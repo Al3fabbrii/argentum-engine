@@ -50,8 +50,23 @@ class MoveCollectionExecutor(
         effect: MoveCollectionEffect,
         context: EffectContext
     ): EffectResult {
-        val cards = context.pipeline.storedCollections[effect.from]
+        val allCards = context.pipeline.storedCollections[effect.from]
             ?: return EffectResult.error(state, "No collection named '${effect.from}' in storedCollections")
+
+        // Optional per-card filter: only move cards matching it; the rest stay put. Lets a single
+        // gathered pile be split by type across multiple MoveCollection steps.
+        val cards = if (effect.filter != null) {
+            val predicateEvaluator = com.wingedsheep.engine.handlers.PredicateEvaluator()
+            val predicateContext = com.wingedsheep.engine.handlers.PredicateContext(
+                controllerId = context.controllerId,
+                sourceId = context.sourceId
+            )
+            allCards.filter { cardId ->
+                predicateEvaluator.matches(state, state.projectedState, cardId, effect.filter!!, predicateContext)
+            }
+        } else {
+            allCards
+        }
 
         val destination = effect.destination
         if (cards.isEmpty()) {
@@ -699,11 +714,18 @@ class MoveCollectionExecutor(
             events.add(CardsDiscardedEvent(destPlayerId, cards, discardNames))
         }
 
-        // Emit sacrifice event if configured
+        // Emit sacrifice event if configured. Track the per-turn sacrifice count + Food
+        // sacrifice off the *pre-move* state, where the sacrificed permanents (and their
+        // projected subtypes) still exist on the battlefield.
         if (moveType == MoveType.Sacrifice && cards.isNotEmpty()) {
             val sacrificeNames = cards.map { cardId ->
                 state.getEntity(cardId)?.get<CardComponent>()?.name ?: "Unknown"
             }
+            val tracked = com.wingedsheep.engine.handlers.effects.ZoneTransitionService
+                .trackPermanentSacrifice(state, cards, context.controllerId)
+            newState = newState.copy(
+                permanentsSacrificedThisTurn = tracked.permanentsSacrificedThisTurn,
+            )
             events.add(0, PermanentsSacrificedEvent(context.controllerId, cards, sacrificeNames))
         }
 
