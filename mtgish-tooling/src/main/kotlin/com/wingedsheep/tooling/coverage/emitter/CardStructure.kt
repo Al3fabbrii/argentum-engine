@@ -571,6 +571,44 @@ private fun EmitCtx.youCommittedCrimeConditionDsl(condNode: JsonElement?): Strin
 }
 
 /**
+ * Delirium (ability word) — "there are N or more card types among cards in your graveyard." mtgish
+ * carries two equivalent shapes:
+ *  - `PlayerPassesFilter(You, NumCardTypesInGraveyardIs(GreaterThanOrEqualTo Integer N))` — the static
+ *    "as long as …" gate (Spineseeker Centipede).
+ *  - `ThereAreNumberCardTypesInPlayersGraveyard(GreaterThanOrEqualTo Integer N, You)` — the
+ *    activation/cost gate (Balustrade Wurm's "Activate only if …").
+ * Both render to `Conditions.Delirium(N)` (the DISTINCT_TYPES aggregation over your graveyard).
+ * The printed threshold is four, but N is read from the comparison so any "N or more card types"
+ * variant renders. Only the You scope + GreaterThanOrEqualTo + Integer threshold renders; any other
+ * player, comparison, or dynamic threshold declines -> SCAFFOLD.
+ */
+internal fun EmitCtx.deliriumConditionDsl(condNode: JsonElement?): String? {
+    val cond = condNode as? JsonObject ?: return null
+    val (comparison, player) = when (cond.strField("_Condition")) {
+        // Static gate: PlayerPassesFilter(You, NumCardTypesInGraveyardIs(>= N))
+        "PlayerPassesFilter" -> {
+            val args = cond["args"].asArr ?: return null
+            if ((args.getOrNull(0) as? JsonObject)?.strField("_Player") != "You") return null
+            val num = args.getOrNull(1) as? JsonObject ?: return null
+            if (num.strField("_Players") != "NumCardTypesInGraveyardIs") return null
+            (num["args"] as? JsonObject) to "You"
+        }
+        // Activation gate: ThereAreNumberCardTypesInPlayersGraveyard(>= N, You)
+        "ThereAreNumberCardTypesInPlayersGraveyard" -> {
+            val args = cond["args"].asArr ?: return null
+            val p = (args.getOrNull(1) as? JsonObject)?.strField("_Player") ?: return null
+            (args.getOrNull(0) as? JsonObject) to p
+        }
+        else -> return null
+    }
+    if (player != "You") return null
+    if (comparison?.strField("_Comparison") != "GreaterThanOrEqualTo") return null
+    val n = (comparison["args"] as? JsonObject)?.takeIf { it.strField("_GameNumber") == "Integer" }
+        ?.get("args").asInt() ?: return null
+    return "Conditions.Delirium($n)"
+}
+
+/**
  * "this permanent has N or more +1/+1 counters on it"
  * (`PermanentPassesFilter(ThisPermanent, HasNumCountersOfType(GreaterThanOrEqualTo Integer N,
  * PTCounter(1,1)))`, Vadmir, New Blood) -> the `Conditions.SourceCounterCountAtLeast(
@@ -705,44 +743,47 @@ internal fun EmitCtx.ifRuleBlock(rule: JsonObject): List<Stmt>? {
         val condDsl = youHaventCastASpellConditionDsl(cond)
             ?: youCommittedCrimeConditionDsl(cond)
             ?: sourceCounterCountAtLeastConditionDsl(cond)
+            ?: deliriumConditionDsl(cond)
             ?: run { reasons.add("If"); return null }
         val layerEffects = (innerRule["args"].asArr?.getOrNull(1) as? JsonArray)?.filterIsInstance<JsonObject>()
             ?: run { reasons.add("If"); return null }
-        // All-AddAbility layer effects: grant each bare keyword to SELF, gated on the same condition.
-        // One layer effect or several (Vadmir grants two) — emit one ConditionalStaticAbility per keyword.
-        if (layerEffects.isNotEmpty() && layerEffects.all { it.strField("_StaticLayerEffect") == "AddAbility" }) {
-            val keywords = layerEffects.map { le ->
-                // An AddAbility whose granted rule is anything richer than a plain keyword (an activated
-                // ability, landwalk, protection-from-color) isn't a bare keyword grant — decline.
-                val granted = (le["args"] as? JsonArray)?.singleOrNull() as? JsonObject
-                if (granted?.strField("_Rule") != null && granted.size > 1) { reasons.add("If"); return null }
-                keywordOf(le) ?: run { reasons.add("If"); return null }
-            }
-            return keywords.map { kw ->
-                staticAbilityStmt(call(
-                    "ConditionalStaticAbility",
-                    arg("ability", call("GrantKeyword", arg("Keyword.$kw"), arg("Filters.Self"))),
-                    arg("condition", Lit(condDsl)),
-                ))
+        if (layerEffects.isEmpty()) { reasons.add("If"); return null }
+        // Render each layer effect to its own SELF-scoped ConditionalStaticAbility, gated on the same
+        // condition. Supports a mix of AdjustPT (fixed +p/+t) and AddAbility (bare keyword) rows — e.g.
+        // Spineseeker Centipede's Delirium grants both +1/+2 (AdjustPT) and vigilance (AddAbility).
+        // One row per layer effect (Vadmir's two keywords, Spineseeker's buff + keyword). Any layer
+        // effect we can't reproduce exactly (dynamic P/T, non-keyword AddAbility, …) declines -> SCAFFOLD.
+        val stmts = layerEffects.map { le ->
+            when (le.strField("_StaticLayerEffect")) {
+                "AddAbility" -> {
+                    // An AddAbility whose granted rule is anything richer than a plain keyword (an
+                    // activated ability, landwalk, protection-from-color) isn't a bare keyword grant — decline.
+                    val granted = (le["args"] as? JsonArray)?.singleOrNull() as? JsonObject
+                    if (granted?.strField("_Rule") != null && granted.size > 1) { reasons.add("If"); return null }
+                    val kw = keywordOf(le) ?: run { reasons.add("If"); return null }
+                    staticAbilityStmt(call(
+                        "ConditionalStaticAbility",
+                        arg("ability", call("GrantKeyword", arg("Keyword.$kw"), arg("Filters.Self"))),
+                        arg("condition", Lit(condDsl)),
+                    ))
+                }
+                "AdjustPT" -> {
+                    // A fixed +p/+t buff: `args` is the [p, t] pair. Anything else (a dynamic AdjustPTX /
+                    // AdjustPTForEach) declines rather than dropping the variable count.
+                    val pt = le["args"].asArr
+                    val p = pt?.getOrNull(0).asInt()
+                    val t = pt?.getOrNull(1).asInt()
+                    if (pt == null || pt.size != 2 || p == null || t == null) { reasons.add("If"); return null }
+                    staticAbilityStmt(call(
+                        "ConditionalStaticAbility",
+                        arg("ability", call("ModifyStats", arg("$p"), arg("$t"), arg("Filters.Self"))),
+                        arg("condition", Lit(condDsl)),
+                    ))
+                }
+                else -> { reasons.add("If"); return null }
             }
         }
-        val le = layerEffects.singleOrNull()
-        when (le?.strField("_StaticLayerEffect")) {
-            "AdjustPT" -> {
-                // A fixed +p/+t buff: `args` is the [p, t] pair. Anything else (a dynamic AdjustPTX /
-                // AdjustPTForEach) declines rather than dropping the variable count.
-                val pt = le["args"].asArr
-                val p = pt?.getOrNull(0).asInt()
-                val t = pt?.getOrNull(1).asInt()
-                if (pt == null || pt.size != 2 || p == null || t == null) { reasons.add("If"); return null }
-                return listOf(staticAbilityStmt(call(
-                    "ConditionalStaticAbility",
-                    arg("ability", call("ModifyStats", arg("$p"), arg("$t"), arg("Filters.Self"))),
-                    arg("condition", Lit(condDsl)),
-                )))
-            }
-            else -> { reasons.add("If"); return null }
-        }
+        return stmts
     }
 
     // At Knifepoint: "During your turn, outlaws you control have first strike."
@@ -1959,18 +2000,24 @@ private fun EmitCtx.singleInterveningIfDsl(cond: JsonObject): String? {
     ) {
         return "Conditions.Not(Conditions.YouCastSpellsThisTurn(1, fromZone = Zone.HAND))"
     }
-    // "if it's tapped" — PermanentPassesFilter(Ref_TargetPermanent, IsTapped) over the bound target
-    // (Shackle Slinger's "If it's tapped, put a stun counter on it. Otherwise, tap it."). The subject
-    // must be the ability's first targeted permanent and the filter a bare IsTapped (no other clause);
-    // maps to Conditions.TargetIsTapped(). Any other subject/filter declines -> SCAFFOLD.
+    // "if it's tapped" — PermanentPassesFilter(<subject>, IsTapped) over a bare IsTapped filter (no
+    // other clause). Two subjects render:
+    //  - Ref_TargetPermanent (the ability's first targeted permanent) -> Conditions.TargetIsTapped()
+    //    (Shackle Slinger's "If it's tapped, put a stun counter on it. Otherwise, tap it.").
+    //  - ThisPermanent (the source itself) -> Conditions.SourceIsTapped (the Survival ability word's
+    //    "if this creature is tapped" — Cautious Survivor, Veteran Survivor).
+    // Any other subject/filter declines -> SCAFFOLD.
     if (cond.strField("_Condition") == "PermanentPassesFilter") {
         val condArgs = cond["args"].asArr
         val subject = (condArgs?.getOrNull(0) as? JsonObject)?.strField("_Permanent")
         val filt = condArgs?.getOrNull(1) as? JsonObject
-        if ((subject == "Ref_TargetPermanent" || subject == "Ref_TargetPermanent1") &&
-            filt?.strField("_Permanents") == "IsTapped" && filt.size == 1
-        ) {
-            return "Conditions.TargetIsTapped()"
+        if (filt?.strField("_Permanents") == "IsTapped" && filt.size == 1) {
+            if (subject == "Ref_TargetPermanent" || subject == "Ref_TargetPermanent1") {
+                return "Conditions.TargetIsTapped()"
+            }
+            if (subject == "ThisPermanent") {
+                return "Conditions.SourceIsTapped"
+            }
         }
     }
     // "this creature doesn't have a <counter> counter on it" — PermanentPassesFilter(ThisPermanent,
@@ -2200,6 +2247,13 @@ private fun EmitCtx.triggerSpecFor(rule: JsonObject): String? {
         if (jsonContains(trig, "_Player", "You")) return "Triggers.YourUpkeep"
         if (jsonContains(trig, "_Players", "AnyPlayer")) return "Triggers.EachUpkeep"
         if (jsonContains(trig, "_Players", "Opponent")) return "Triggers.EachOpponentUpkeep"
+    }
+    // "At the beginning of your second main phase" (You) — the postcombat main step trigger used by
+    // the Survival ability word (Cautious Survivor, Veteran Survivor). Scoped exactly like upkeep/end-
+    // step: only the You scope has a matching Triggers.* constant, so an any-player / opponent scope
+    // declines -> SCAFFOLD.
+    if (jsonContains(trig, "_Trigger", "AtTheBeginningOfAPlayersSecondMainPhase")) {
+        if (jsonContains(trig, "_Player", "You")) return "Triggers.YourPostcombatMain"
     }
     // "your end step" is scoped to You (a SinglePlayer(You) subject); "each end step" to any player.
     // The opponent / host-relative end-step scopes have no matching Triggers.* constant yet, so they
@@ -2578,6 +2632,41 @@ private fun castTriggerDsl(scope: CastScope, category: String, targetsMatching: 
  * cost (compound `And`, dynamic life, sacrifice-N) declines -> SCAFFOLD rather than approximating the
  * ward cost. Forum Necroscribe ("Ward—Discard a card") + the broad Ward {N} / Ward—Pay N life corpus.
  */
+/**
+ * Typecycling (CR 702.29) — the subtype/land-type cycling variants ("Forestcycling {2}",
+ * "Slivercycling {3}", …). The IR is `[Cards IsLandType|IsCreatureType <Subtype>, Cost PayMana
+ * {cost}]`. Renders `keywordAbility(KeywordAbility.typecycling("<Subtype>", ManaCost.parse("{cost}")))`,
+ * the same builder hand-authored Forestcycling cards use (Wirewood Guardian, Slavering Branchsnapper).
+ * Pure-mana cost only; a non-mana typecycling cost (none printed) declines -> scaffold.
+ */
+internal fun EmitCtx.typecyclingLine(rule: JsonObject): List<Stmt>? {
+    val args = rule["args"] as? JsonArray ?: return null
+    val cardsNode = args.getOrNull(0) as? JsonObject ?: return null
+    // The subtype rides as `IsLandType <Type>` (Forest/Swamp/…) or `IsCreatureType <Type>` (Sliver/…).
+    val subtype = when (cardsNode.strField("_Cards")) {
+        "IsLandType", "IsCreatureType" -> cardsNode["args"].asStr() ?: return null
+        else -> return null
+    }
+    val costNode = args.getOrNull(1) as? JsonObject ?: return null
+    if (costNode.strField("_Cost") != "PayMana") return null
+    val mana = renderMana(costNode.field("args"))
+    if (mana.isEmpty()) return null
+    return listOf(
+        Eval(
+            call(
+                "keywordAbility",
+                arg(
+                    call(
+                        "KeywordAbility.typecycling",
+                        arg("\"$subtype\""),
+                        arg(call("ManaCost.parse", arg("\"$mana\"")))
+                    )
+                )
+            )
+        )
+    )
+}
+
 internal fun EmitCtx.wardKeywordLine(rule: JsonObject): List<Stmt>? {
     val cost = rule["args"] as? JsonObject ?: return null
     val ability: Dsl = when (cost.strField("_Cost")) {
