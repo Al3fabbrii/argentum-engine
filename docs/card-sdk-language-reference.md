@@ -1144,6 +1144,15 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   under `then` read it through `ManaValueEqualsX` (`.manaValueEqualsX()`). Compose with `CompositeEffect` for
   multi-step cards (Void: destroy all artifacts/creatures with that mana value, then a target player reveals their
   hand and discards all nonland cards with that mana value).
+- `Effects.ChooseNumberForSource(minValue=0, maxValue=7, slot=ChoiceSlot.CHOSEN_NUMBER, prompt)` — pick a number in
+  `[minValue, maxValue]` and **store it durably on the source permanent** under `slot` (a `ChoiceValue.NumberChoice`
+  in its `CastChoicesComponent`, replacing any prior value). Unlike `ChooseNumberThen` (transient X for one inner
+  effect), the number persists so a characteristic-defining ability can read it for the permanent's whole life via
+  `DynamicAmount.CastChoice(slot)`. Re-callable — the **last** chosen value wins. Use it both at entry (from a
+  `Triggers.EntersBattlefield` triggered ability) and from an upkeep trigger; for a "you **may** choose" clause mark
+  the running triggered ability `optional = true` (declining keeps the prior value). Powers Shapeshifter, whose P/T is
+  a `SetBasePowerToughnessDynamicStatic(power = CastChoice(CHOSEN_NUMBER), toughness = Subtract(Fixed(7),
+  CastChoice(CHOSEN_NUMBER)))` CDA — power = last chosen number, toughness = 7 − it.
 - `GrantHexproofFromChosenColorEffect(target)` — hexproof from chosen color.
 - `GrantProtectionFromChosenColorEffect(target)` — protection from chosen color. Must run inside `ChooseColorThen`; wrap in `ForEachInGroup` for the group case (Akroma's Blessing: "Creatures you control gain protection from the chosen color").
 - `Effects.GrantProtectionFromChosenCardType(target, duration)` — "gains protection from the card type of your choice" (Pippin, Guard of the Citadel). The card-type analogue of `GrantProtectionFromChosenColor`, but **self-contained**: its executor owns the choice — it presents a `ChooseOptionDecision` over the fixed protectable card-type set (Artifact, Creature, Enchantment, Instant, Land, Planeswalker, Sorcery, Battle) and, on response, grants a floating `PROTECTION_FROM_CARDTYPE_<TYPE>` keyword for `duration`. The targeting validator, `StackResolver` spell-targeting, `DamageUtils`, the combat-damage pipeline/manager, and a `ProtectionFromCardTypeRule` block-evasion rule all match the protected keyword against the source's projected card types. (The "can't be enchanted/equipped by that type" clause is reminder text and unenforced at attach time, mirroring color/subtype protection.)
@@ -4010,11 +4019,15 @@ Other gates available in both contexts:
   ```
 
 **Cast-choice slots (`ChoiceSlot`).** The choices an object locks in *as it is cast / as it enters*
-(CR 601.2b) — color, creature type, land type, mode, chosen creature, kicked-ness, blight amount — all
-ride one durable `CastChoicesComponent` on the stable entity (the immutable-ECS analogue of Forge's
-SVar bag). `{X}` has its own dedicated reader (`DynamicAmount.CastX`); the other slots are read
-generically via `DynamicAmount.CastChoice(slot)` (numeric), `CastChoiceMade(slot)` / `CastChoiceIs(slot,
-value)` (conditions), or consumed directly by effects (e.g. `Effects.CreateTokenOfChosenColorAndType`).
+(CR 601.2b) — color, creature type, land type, mode, chosen creature, kicked-ness, blight amount,
+`CHOSEN_NUMBER` — all ride one durable `CastChoicesComponent` on the stable entity (the immutable-ECS
+analogue of Forge's SVar bag). `{X}` has its own dedicated reader (`DynamicAmount.CastX`); the other
+slots are read generically via `DynamicAmount.CastChoice(slot)` (numeric), `CastChoiceMade(slot)` /
+`CastChoiceIs(slot, value)` (conditions), or consumed directly by effects (e.g.
+`Effects.CreateTokenOfChosenColorAndType`). `ChoiceSlot.CHOSEN_NUMBER` is the general-purpose,
+re-settable numeric slot written by `Effects.ChooseNumberForSource` and read by `DynamicAmount.CastChoice`
+— distinct from `BLIGHT_AMOUNT` (a one-time cast additional-cost X); it backs a free-standing repeatable
+number choice not tied to casting (Shapeshifter's 0–7 P/T choice).
 
 ---
 

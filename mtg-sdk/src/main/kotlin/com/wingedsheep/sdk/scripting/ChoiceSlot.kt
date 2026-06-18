@@ -65,4 +65,17 @@ enum class ChoiceSlot {
      * [com.wingedsheep.sdk.scripting.references.Player.ChosenOpponent] reference.
      */
     OPPONENT,
+
+    /**
+     * A general-purpose chosen number stored durably on the permanent and re-settable over its
+     * lifetime (e.g. Shapeshifter "as this enters and at each upkeep, choose a number between 0
+     * and 7; its power is that number and its toughness is 7 minus it"). Written by
+     * [com.wingedsheep.sdk.scripting.effects.ChooseNumberForSourceEffect] — at entry (wrapped in
+     * an `OnEnterRunEffect`) and again by an upkeep trigger — and read back through
+     * [com.wingedsheep.sdk.scripting.values.DynamicAmount.CastChoice], typically feeding a
+     * [com.wingedsheep.sdk.scripting.SetBasePowerToughnessDynamicStatic] CDA. Distinct from
+     * [BLIGHT_AMOUNT] (a cast-time additional-cost X) — this is a free-standing repeatable choice
+     * that is not tied to casting.
+     */
+    CHOSEN_NUMBER,
 }

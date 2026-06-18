@@ -202,6 +202,7 @@ val engineSerializersModule = SerializersModule {
         subclass(CostPaymentContinuation::class)
         subclass(ChooseColorThenContinuation::class)
         subclass(ChooseNumberThenContinuation::class)
+        subclass(ChooseNumberForSourceContinuation::class)
         subclass(ChooseManaColorContinuation::class)
         subclass(ChooseColorForTargetContinuation::class)
         subclass(ChooseAnyColorTapBonusContinuation::class)
