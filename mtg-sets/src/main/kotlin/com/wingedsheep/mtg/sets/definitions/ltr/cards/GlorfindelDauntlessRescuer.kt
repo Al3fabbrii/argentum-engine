@@ -21,13 +21,10 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  * • Glorfindel must be blocked this turn if able.
  * • Glorfindel can't be blocked by more than one creature each combat this turn.
  *
- * Engine notes (Gap 39 — granted "can't be blocked by more than one creature"):
- * - The +1/+1 always happens (it's outside the bullet list), so the trigger effect is a
- *   `Composite` of `ModifyStats(1, 1, Self)` then the `ModalEffect.chooseOne(...)`.
- * - Mode 1 = `MustBeBlockedEffect(Self, allCreatures = false)` ("must be blocked if able").
- * - Mode 2 grants `AbilityFlag.CANT_BE_BLOCKED_BY_MORE_THAN_ONE` for the turn. This required wiring
- *   that flag into `BlockPhaseManager.validateMaxBlockersRequirements` (Gap 39): a projected grant of
- *   the flag now caps blockers at one, alongside the printed `CantBeBlockedByMoreThan` static.
+ * The +1/+1 always happens (it sits before the bullet list), so it is folded into each mode
+ * (exactly one mode is chosen → +1/+1 once). Mode 1 = `MustBeBlockedEffect(Self, allCreatures =
+ * false)` ("must be blocked if able"); mode 2 grants `AbilityFlag.CANT_BE_BLOCKED_BY_MORE_THAN_ONE`
+ * for the turn.
  */
 val GlorfindelDauntlessRescuer = card("Glorfindel, Dauntless Rescuer") {
     manaCost = "{2}{G}"
@@ -39,9 +36,8 @@ val GlorfindelDauntlessRescuer = card("Glorfindel, Dauntless Rescuer") {
         "• Glorfindel must be blocked this turn if able.\n" +
         "• Glorfindel can't be blocked by more than one creature each combat this turn."
 
-    // The +1/+1 always happens (it sits before the bullet list), so it is folded into each mode:
-    // exactly one mode is chosen, so Glorfindel always gets +1/+1 once. Modeling it as the top-level
-    // modal effect (rather than Composite(pump, modal)) matches the engine's modal-decision path.
+    // Folding the +1/+1 into each mode (rather than Composite(pump, modal)) keeps it on the
+    // engine's modal-decision path.
     triggeredAbility {
         trigger = Triggers.WheneverYouScry
         effect = ModalEffect.chooseOne(

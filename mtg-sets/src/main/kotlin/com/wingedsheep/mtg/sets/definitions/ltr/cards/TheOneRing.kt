@@ -25,10 +25,9 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  * Engine notes (Gap 8 — player-level protection):
  * - "You gain protection from everything until your next turn" is the player counterpart of the
  *   creature protection statics. Modeled via `Effects.GrantPlayerProtection()` (defaults to
- *   ProtectionScope.Everything / Duration.UntilYourNextTurn / the controller), which adds a
- *   `PlayerProtectionComponent`. The targeting validator + target enumerator + damage executor
- *   all consult `PlayerProtectionRules`, so while protected the controller can't be targeted by,
- *   or dealt damage from, any source (CR 702.16). Cleared after the untap step of their next turn.
+ *   ProtectionScope.Everything / Duration.UntilYourNextTurn / the controller). While protected the
+ *   controller can't be targeted by, or dealt damage from, any source (CR 702.16), until cleared
+ *   after the untap step of their next turn.
  * - The ETB is gated on `Conditions.WasCast` ("if you cast it") — putting The One Ring onto the
  *   battlefield by another effect grants no protection (CR 603.4 intervening-if).
  * - The {T} ability adds the burden counter first, then draws reading the *new* count (sequential

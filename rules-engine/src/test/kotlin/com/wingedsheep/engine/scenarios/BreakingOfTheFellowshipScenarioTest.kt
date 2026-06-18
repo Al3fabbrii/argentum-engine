@@ -1,6 +1,7 @@
 package com.wingedsheep.engine.scenarios
 
 import com.wingedsheep.engine.core.CastSpell
+import com.wingedsheep.engine.state.components.player.TheRingComponent
 import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.engine.support.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
@@ -39,6 +40,10 @@ class BreakingOfTheFellowshipScenarioTest : ScenarioTestBase() {
             // The 3/3 dealt 3 to the 2/2, which died; the dealer survives.
             game.findPermanent("Grizzly Bears") shouldBe null
             game.findPermanent("Hill Giant") shouldBe giant
+
+            // The trailing "The Ring tempts you" resolved (caster controls no creatures, so no
+            // Ring-bearer is chosen, but the temptation still happened).
+            (game.state.getEntity(game.player1Id)?.get<TheRingComponent>()?.temptCount ?: 0) shouldBe 1
         }
     }
 }

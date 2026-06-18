@@ -9,7 +9,9 @@ import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.mtg.sets.definitions.blc.cards.TempleOfMystery
 import com.wingedsheep.mtg.sets.definitions.ltr.cards.GaladrielOfLothlorien
+import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Deck
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -55,5 +57,40 @@ class GaladrielOfLothlorienScenarioTest : FunSpec({
         }
         (forestOnBf != null) shouldBe true
         driver.state.getEntity(forestOnBf!!)?.has<TappedComponent>() shouldBe true
+    }
+
+    test("a scry that reveals a non-land leaves it on top of the library") {
+        val driver = GameTestDriver()
+        val testOgre = CardDefinition.creature("Test Ogre", ManaCost.parse("{3}"), emptySet(), 3, 3)
+        driver.registerCards(TestCards.all + listOf(GaladrielOfLothlorien, TempleOfMystery, testOgre))
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        val active = driver.activePlayer!!
+
+        driver.putCreatureOnBattlefield(active, "Galadriel of Lothlórien")
+        // A non-land on top: Galadriel reveals it, finds no land, so nothing enters.
+        driver.putCardOnTopOfLibrary(active, "Test Ogre")
+
+        val temple = driver.putCardInHand(active, "Temple of Mystery")
+        driver.playLand(active, temple)
+
+        var guard = 0
+        while (guard++ < 12) {
+            when (val pd = driver.pendingDecision) {
+                is SelectCardsDecision -> driver.submitCardSelection(active, emptyList())
+                is ReorderLibraryDecision -> driver.submitOrderedResponse(active, pd.cards)
+                is YesNoDecision -> driver.submitYesNo(active, true) // Galadriel: yes, reveal
+                else -> if (driver.state.stack.isNotEmpty()) driver.bothPass() else break
+            }
+        }
+
+        // The Ogre did not enter the battlefield...
+        driver.state.getBattlefield().none {
+            driver.state.getEntity(it)?.get<CardComponent>()?.name == "Test Ogre"
+        } shouldBe true
+        // ...and it's still in the library — not lost in a gather/reveal limbo.
+        driver.state.getLibrary(active).any {
+            driver.state.getEntity(it)?.get<CardComponent>()?.name == "Test Ogre"
+        } shouldBe true
     }
 })

@@ -8,6 +8,7 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.predicates.ControllerPredicate
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import com.wingedsheep.sdk.scripting.targets.TargetCreature
 
@@ -22,10 +23,11 @@ import com.wingedsheep.sdk.scripting.targets.TargetCreature
  * Whenever you cast a spell that targets a creature you don't control, Legolas deals
  * damage equal to its power to up to one target creature.
  *
- * Both abilities use the new `SpellCastPredicate.TargetsSource` / `TargetsMatching`
- * cast-time predicates (Triggers.youCastSpellTargetingSource / youCastSpellTargeting).
- * The damage clause composes `DealDamage(sourcePower(), target)` — the damage source
- * defaults to Legolas (the trigger source).
+ * Both abilities use the `SpellCastPredicate.TargetsSource` / `TargetsMatching` cast-time
+ * predicates (Triggers.youCastSpellTargetingSource / youCastSpellTargeting). "A creature you
+ * don't control" is `Not(ControlledByYou)` (not `opponentControls()`, which would miss a
+ * teammate's creatures in multiplayer). The damage clause composes `DealDamage(sourcePower(),
+ * target)` — the damage source defaults to Legolas (the trigger source).
  */
 val LegolasMasterArcher = card("Legolas, Master Archer") {
     manaCost = "{1}{G}{G}"
@@ -46,7 +48,11 @@ val LegolasMasterArcher = card("Legolas, Master Archer") {
     }
 
     triggeredAbility {
-        trigger = Triggers.youCastSpellTargeting(GameObjectFilter.Creature.opponentControls())
+        trigger = Triggers.youCastSpellTargeting(
+            GameObjectFilter.Creature.withControllerPredicate(
+                ControllerPredicate.Not(ControllerPredicate.ControlledByYou)
+            )
+        )
         val t = target("up to one target creature", TargetCreature(optional = true))
         effect = Effects.DealDamage(DynamicAmounts.sourcePower(), t)
     }

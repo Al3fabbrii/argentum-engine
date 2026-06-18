@@ -9017,7 +9017,15 @@
                     "requires": [
                         {
                             "type": "SpellTargetsMatching",
-                            "filter": "creature ctrl:opponent"
+                            "filter": {
+                                "cardPredicates": [
+                                    "IsCreature"
+                                ],
+                                "controllerPredicate": {
+                                    "type": "ControllerNot",
+                                    "predicate": "ControlledByYou"
+                                }
+                            }
                         }
                     ]
                 },
