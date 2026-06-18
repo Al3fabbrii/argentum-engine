@@ -703,6 +703,63 @@
     ]
 }
 
+// Battering Ram
+{
+    "name": "Battering Ram",
+    "manaCost": "{2}",
+    "typeLine": "Artifact Creature — Construct",
+    "oracleText": "At the beginning of combat on your turn, this creature gains banding until end of combat.\nWhenever this creature becomes blocked by a Wall, destroy that Wall at end of combat.",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "BEGIN_COMBAT"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "GrantKeyword",
+                    "keyword": "BANDING",
+                    "target": "Self",
+                    "duration": "EndOfCombat"
+                },
+                "descriptionOverride": "At the beginning of combat on your turn, this creature gains banding until end of combat."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "BecomesBlockedEvent",
+                    "filter": "creature Wall"
+                },
+                "effect": {
+                    "type": "CreateDelayedTrigger",
+                    "step": "END_COMBAT",
+                    "effect": {
+                        "type": "MoveToZone",
+                        "target": "TriggeringEntity",
+                        "destination": "Graveyard",
+                        "byDestruction": true
+                    }
+                },
+                "descriptionOverride": "Whenever this creature becomes blocked by a Wall, destroy that Wall at end of combat."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "41",
+        "artist": "Jeff A. Menges",
+        "flavorText": "By the time Mishra was defeated, no mage was foolish enough to rely heavily on walls.",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/7/f7a69e35-d209-41c0-aa3c-c78414617075.jpg?1562947317"
+    },
+    "colorIdentityOverride": []
+}
+
 // Candelabra of Tawnos
 {
     "name": "Candelabra of Tawnos",
