@@ -275,6 +275,63 @@
     ]
 }
 
+// Artifact Possession
+{
+    "name": "Artifact Possession",
+    "manaCost": "{2}{B}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant artifact\nWhenever enchanted artifact becomes tapped or a player activates an ability of enchanted artifact without {T} in its activation cost, this Aura deals 2 damage to that artifact's controller.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "TapEvent",
+                "binding": "ATTACHED",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "target": "ControllerOfTriggeringEntity"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "AbilityActivatedEvent",
+                    "player": "Each",
+                    "requireNoTapInCost": true
+                },
+                "binding": "ATTACHED",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "target": "ControllerOfTriggeringEntity"
+                }
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "artifact"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "15",
+        "artist": "Christopher Rush",
+        "flavorText": "Any black mage could coax a Thraxodemon to inhabit a magical device.",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/8/587d6ac8-fad8-49e0-862e-636e06628ff9.jpg?1562913472"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Ashnod's Altar
 {
     "name": "Ashnod's Altar",
@@ -1072,6 +1129,65 @@
     "colorIdentityOverride": []
 }
 
+// Haunting Wind
+{
+    "name": "Haunting Wind",
+    "manaCost": "{3}{B}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever an artifact becomes tapped or a player activates an artifact's ability without {T} in its activation cost, this enchantment deals 1 damage to that artifact's controller.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "TapEvent",
+                    "filter": "artifact"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": "ControllerOfTriggeringEntity"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "AbilityActivatedEvent",
+                    "player": "Each",
+                    "sourceFilter": "artifact",
+                    "requireNoTapInCost": true
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "TriggeringPlayer"
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "17",
+        "rarity": "UNCOMMON",
+        "artist": "Jeff A. Menges",
+        "flavorText": "These devices lured so many spirits that sometimes entire battlefields would become haunted at once.",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/2/a2f6ef2f-a3a2-4e1f-b7eb-59abc8414114.jpg?1562929345"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Ivory Tower
 {
     "name": "Ivory Tower",
@@ -1525,6 +1641,60 @@
         "imageUri": "https://cards.scryfall.io/normal/front/5/9/59cc9bdb-7cf2-4795-bac7-ffff605c9eb0.jpg?1562913725"
     },
     "colorIdentityOverride": []
+}
+
+// Powerleech
+{
+    "name": "Powerleech",
+    "manaCost": "{G}{G}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever an artifact an opponent controls becomes tapped or an opponent activates an artifact's ability without {T} in its activation cost, you gain 1 life.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "TapEvent",
+                    "filter": "artifact ctrl:opponent"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "GainLife",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "AbilityActivatedEvent",
+                    "player": "EachOpponent",
+                    "sourceFilter": "artifact ctrl:opponent",
+                    "requireNoTapInCost": true
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "GainLife",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "34",
+        "rarity": "UNCOMMON",
+        "artist": "Christopher Rush",
+        "flavorText": "The Forest of Argoth has developed a resistance to mechanical intrusion.",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/e/ae1d7b09-3a1f-410f-b330-04ae768b0455.jpg?1562931798"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
 }
 
 // Rakalite
