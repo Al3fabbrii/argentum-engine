@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 52 / 85
+**Implemented:** 53 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -94,7 +94,7 @@
 - [x] Primal Clay
 - [x] Rakalite
 - [ ] Rocket Launcher
-- [ ] Shapeshifter
+- [x] Shapeshifter
 - [x] Staff of Zegon
 - [x] Su-Chi
 - [x] Tablet of Epityr
