@@ -874,6 +874,37 @@
     ]
 }
 
+// Cursed Rack
+{
+    "name": "Cursed Rack",
+    "manaCost": "{4}",
+    "typeLine": "Artifact",
+    "oracleText": "As this artifact enters, choose an opponent.\nThe chosen player's maximum hand size is four.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "SetMaximumHandSize",
+                "size": 4,
+                "player": "ChosenOpponent"
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "EntersWithChoice",
+                "choiceType": "OPPONENT"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "48",
+        "rarity": "UNCOMMON",
+        "artist": "Richard Thomas",
+        "flavorText": "Ashnod invented several torture techniques that could make victims even miles away beg for mercy as if the End had come.",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/2/720d871d-1e7b-482e-bd1e-8ec79519fb86.jpg?1562918942"
+    },
+    "colorIdentityOverride": []
+}
+
 // Damping Field
 {
     "name": "Damping Field",

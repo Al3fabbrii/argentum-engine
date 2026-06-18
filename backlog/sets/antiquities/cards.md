@@ -2,7 +2,7 @@
 
 **Set Size:** 85 cards
 **Release Date:** March 4, 1994
-**Implemented:** 56 / 85
+**Implemented:** 57 / 85
 | Color       | Count |
 |-------------|-------|
 | White       | 7     |
@@ -78,7 +78,7 @@
 - [ ] Clockwork Avian
 - [ ] Colossus of Sardia
 - [x] Coral Helm
-- [ ] Cursed Rack
+- [x] Cursed Rack
 - [x] Dragon Engine
 - [x] Feldon's Cane
 - [ ] Golgothian Sylex
