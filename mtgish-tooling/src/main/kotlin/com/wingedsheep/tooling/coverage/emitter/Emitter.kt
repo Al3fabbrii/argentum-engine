@@ -191,6 +191,7 @@ object Emitter {
                 rname == "TriggerA" -> block = ctx.triggerBlock(rule)
                 rname == "TriggerI" -> block = ctx.triggerIBlock(rule)
                 rname == "TriggerOnceEachTurn" -> block = ctx.triggerBlock(rule, oncePerTurn = true)
+                rname == "TriggerMayOnceEachTurn" -> block = ctx.triggerMayOnceEachTurnBlock(rule)
                 rname == "PermanentRuleEffect" -> block = ctx.staticBlock(rule)
                 rname == "If" -> block = ctx.ifRuleBlock(rule)
                 rname == "PlayerEffect" -> block = ctx.playerEffectBlock(rule)
