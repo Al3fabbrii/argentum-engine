@@ -532,6 +532,51 @@ private fun EmitCtx.youControlAtLeastConditionDsl(condNode: JsonElement?): Strin
 }
 
 /**
+ * The "slow land" enters-tapped gate (Deathcap Glade, Dreamroot Cascade, Sundown Pass; VOW/SOS/INR):
+ * an `Unless{<condition>}[EntersTapped]` replacement node whose condition is
+ * `PlayerPassesFilter(You, ControlsNum(>= N, And(Other(ThisPermanent), IsCardtype Land)))` —
+ * "you control N or more OTHER lands". Renders the `unlessCondition` argument for
+ * `EntersTapped(...)` as `Conditions.YouControlAtLeast(N + 1, GameObjectFilter.Land)`.
+ *
+ * The `+ 1` accounts for the IR's `Other(ThisPermanent)` exclusion: Argentum's
+ * [com.wingedsheep.sdk.scripting.values.DynamicAmount.AggregateBattlefield] over `GameObjectFilter.Land`
+ * counts the entering land itself, so "N or more *other* lands" is "N + 1 or more lands total".
+ *
+ * Conservative by design — returns null (-> SCAFFOLD) unless the shape is exactly: the `Unless`
+ * action is a single `EntersTapped`, the condition is the You/ControlsNum/`>=`/Integer gate over an
+ * `And(Other(ThisPermanent), IsCardtype Land)` filter. A `<=` comparison (the parallel "fast land"
+ * cycle, "two or fewer other lands") or any other filter declines rather than miscount.
+ */
+private fun EmitCtx.slowLandEntersTappedConditionDsl(rep: JsonObject): String? {
+    val args = rep["args"].asArr ?: return null
+    // Second arg is the list of replacement actions the Unless gates — must be a lone EntersTapped.
+    val gated = (args.getOrNull(1) as? JsonArray)?.filterIsInstance<JsonObject>() ?: return null
+    if (gated.singleOrNull()?.strField("_ReplacementActionWouldEnter") != "EntersTapped") return null
+
+    val cond = args.getOrNull(0) as? JsonObject ?: return null
+    if (cond.strField("_Condition") != "PlayerPassesFilter") return null
+    val condArgs = cond["args"].asArr ?: return null
+    if ((condArgs.getOrNull(0) as? JsonObject)?.strField("_Player") != "You") return null
+    val controls = condArgs.getOrNull(1) as? JsonObject ?: return null
+    if (controls.strField("_Players") != "ControlsNum") return null
+    val cArgs = controls["args"].asArr ?: return null
+    val comparison = cArgs.getOrNull(0) as? JsonObject ?: return null
+    if (comparison.strField("_Comparison") != "GreaterThanOrEqualTo") return null
+    val n = (comparison["args"] as? JsonObject)?.takeIf { it.strField("_GameNumber") == "Integer" }
+        ?.get("args").asInt() ?: return null
+    // The filter must be exactly "other lands": And(Other(ThisPermanent), IsCardtype Land).
+    val filter = cArgs.getOrNull(1) as? JsonObject ?: return null
+    if (filter.strField("_Permanents") != "And") return null
+    val parts = filter["args"].asArr?.filterIsInstance<JsonObject>() ?: return null
+    if (parts.size != 2) return null
+    val other = parts.firstOrNull { it.strField("_Permanents") == "Other" } ?: return null
+    if ((other["args"] as? JsonObject)?.strField("_Permanent") != "ThisPermanent") return null
+    val land = parts.firstOrNull { it.strField("_Permanents") == "IsCardtype" } ?: return null
+    if (land["args"].asStr() != "Land") return null
+    return render(call("Conditions.YouControlAtLeast", arg("${n + 1}"), arg(Lit("GameObjectFilter.Land"))))
+}
+
+/**
  * A `FlashForCasters { Condition }` rule -> the card-level `conditionalFlash = <condition>`
  * assignment ("<this> has flash as long as <condition>", CR 702.8 / Colossal Rattlewurm). Only the
  * "you control a [filter]" condition the shared [youControlConditionDsl] renders exactly produces a
@@ -2669,6 +2714,19 @@ internal fun EmitCtx.asEntersBlock(rule: JsonObject, condition: String? = null):
     for (rep in replacements) {
         val dsl: Dsl = when (rep.strField("_ReplacementActionWouldEnter")) {
             "EntersTapped" -> call("EntersTapped")
+            // The "slow land" cycle (Deathcap Glade, Dreamroot Cascade, Sundown Pass; VOW/SOS/INR):
+            // "~ enters tapped unless you control two or more OTHER lands." The IR wraps the tapped
+            // replacement in an `Unless{<condition>}[EntersTapped]`. Only the conservative
+            // control-N-other-lands gate renders -> EntersTapped(unlessCondition = ...); any other
+            // Unless condition declines (-> SCAFFOLD) rather than guess the gate. Note the parallel
+            // "fast land" cycle ("two or FEWER other lands") uses a `<=` comparison this helper
+            // deliberately doesn't render — the at-least condition facade only models `>=`.
+            "Unless" -> {
+                if (!onSelf) { reasons.add("AsPermanentEnters"); return null }
+                val cond = slowLandEntersTappedConditionDsl(rep)
+                    ?: run { reasons.add("AsPermanentEnters"); return null }
+                call("EntersTapped", arg("unlessCondition", Lit(cond)))
+            }
             "ChooseACreatureType" -> call("EntersWithChoice", arg("ChoiceType.CREATURE_TYPE"))
             // "As ~ enters, choose a color." Only the unrestricted any-color choice (Mirage Mesa,
             // Uncharted Haven) renders exactly; a constrained color pick scaffolds. Pairs with the
