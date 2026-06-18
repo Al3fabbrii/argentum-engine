@@ -404,6 +404,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   save the ID list for follow-up. `excludeTriggering = true` spares the triggering entity, for "destroy all
   *other* … with it" triggers (Spreading Plague).
 - `DestroyAllAndAttached(filter, noRegenerate?)` — also destroys auras/equipment on the matching permanents.
+- `SacrificeAll(filter, excludeTriggering?)` — each matching permanent is *sacrificed by its controller*
+  (CR 701.21): emits `PermanentsSacrificedEvent` (sacrifice triggers fire), routes each card to its owner's
+  graveyard, and ignores regeneration/indestructibility. The "is sacrificed" sibling of `DestroyAll`.
+  `excludeTriggering = true` spares the source ("except for ~", Golgothian Sylex).
 - `DestroyLeastPowerCreature(noRegenerate?)` — destroy the creature with the least power among **all**
   creatures on the battlefield (global, both players). On a tie for least power the controller chooses which
   one dies (Drop of Honey). Backed by the `GameObjectFilter.Creature.hasLeastPowerAmongAllCreatures()` filter
@@ -1730,6 +1734,11 @@ This is the player-arm prerequisite for the planned composable mixed `TargetUnio
   evaluated. Pair with `replacementEffect(EntersWithChoice(ChoiceType.CARD_NAME))`. Fails closed (no match) before
   a name is chosen. Used by name-keyed static abilities (Petrified Hamlet — "sources with the chosen name … /
   Lands with the chosen name …").
+- `.originallyPrintedInSet(setCode)` — `CardPredicate.OriginallyPrintedInSet`: matches a card whose
+  *canonical* set code equals `setCode` (case-insensitive), i.e. the set it was *originally printed* in —
+  reprints still match their original set, regardless of the printing in play. Reads the entity's
+  `CardComponent.originalSetCode` (populated from the canonical `CardDefinition.setCode`); tokens never
+  match. Used by Golgothian Sylex (`"ATQ"`) and ARN City in a Bottle (`"ARN"`).
 - `.power(n)` / `.minPower(n)` / `.maxPower(n)` — P/T comparator.
 - `.manaValue(n)` / `.manaValueAtMost(n)` / `.manaValueAtLeast(n)` — mana-value comparator.
 - `.manaValueAtMostX()` — mana value ≤ the X chosen for the source spell/ability.
