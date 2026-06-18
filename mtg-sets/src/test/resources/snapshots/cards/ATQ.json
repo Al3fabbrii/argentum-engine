@@ -3266,6 +3266,102 @@
     "colorIdentityOverride": []
 }
 
+// Titania's Song
+{
+    "name": "Titania's Song",
+    "manaCost": "{3}{G}",
+    "typeLine": "Enchantment",
+    "oracleText": "Each noncreature artifact loses all abilities and becomes an artifact creature with power and toughness each equal to its mana value. If this enchantment leaves the battlefield, this effect continues until end of turn.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield"
+                },
+                "effect": {
+                    "type": "MassAnimateByManaValue",
+                    "filter": {
+                        "cardPredicates": [
+                            "IsArtifact",
+                            {
+                                "type": "Not",
+                                "predicate": "IsCreature"
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "GrantCardType",
+                "cardType": "CREATURE",
+                "filter": {
+                    "baseFilter": {
+                        "cardPredicates": [
+                            "IsArtifact",
+                            {
+                                "type": "Not",
+                                "predicate": "IsCreature"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "type": "LoseAllAbilities",
+                "filter": {
+                    "baseFilter": {
+                        "cardPredicates": [
+                            "IsArtifact",
+                            {
+                                "type": "Not",
+                                "predicate": "IsCreature"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "type": "SetBasePowerToughnessDynamicStatic",
+                "power": {
+                    "type": "EntityProperty",
+                    "entity": "AffectedEntity",
+                    "numericProperty": "ManaValue"
+                },
+                "toughness": {
+                    "type": "EntityProperty",
+                    "entity": "AffectedEntity",
+                    "numericProperty": "ManaValue"
+                },
+                "filter": {
+                    "baseFilter": {
+                        "cardPredicates": [
+                            "IsArtifact",
+                            {
+                                "type": "Not",
+                                "predicate": "IsCreature"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "35",
+        "rarity": "UNCOMMON",
+        "artist": "Kerstin Kaman",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/8/583a53af-2e2a-4f3f-8eab-bd874c6ed80a.jpg?1562913410"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Transmute Artifact
 {
     "name": "Transmute Artifact",
