@@ -382,7 +382,8 @@ export function mergeResult(
         }
         // Casualty sacrifices a single chosen creature into its own dedicated field.
         if (costType === 'Casualty') {
-          return { ...action, casualtyCreature: selectedTargets[0] }
+          const casualtyCreature = selectedTargets[0]
+          return casualtyCreature ? { ...action, casualtyCreature } : action
         }
         const fieldUpdate =
           costType === 'DiscardCard'
