@@ -710,7 +710,8 @@ class TargetValidator {
         target: ChosenTarget,
         filter: TargetFilter,
         casterId: EntityId,
-        xValue: Int? = null
+        xValue: Int? = null,
+        sourceId: EntityId? = null
     ): String? {
         if (target !is ChosenTarget.Spell) {
             return "Target must be a spell on the stack"
@@ -719,8 +720,10 @@ class TargetValidator {
             return "Target spell not on the stack"
         }
 
-        // Use unified filter with projected state (face-down spells need projection to be seen as creatures)
-        val predicateContext = PredicateContext(controllerId = casterId, xValue = xValue)
+        // Use unified filter with projected state (face-down spells need projection to be seen as
+        // creatures); sourceId lets source-relative predicates evaluate (Goblin Artisans'
+        // NotTargetedByAbilityFromSameNamedSource).
+        val predicateContext = PredicateContext(controllerId = casterId, sourceId = sourceId, xValue = xValue)
         val matches = predicateEvaluator.matches(state, state.projectedState, target.spellEntityId, filter.baseFilter, predicateContext)
         if (!matches) {
             return "Target does not match filter: ${filter.description}"
@@ -743,7 +746,7 @@ class TargetValidator {
         return when (filter.zone) {
             Zone.GRAVEYARD -> validateGraveyardTarget(state, target, filter, casterId, sourceId, xValue, targetPlayerId)
             Zone.BATTLEFIELD -> validatePermanentTarget(state, target, filter, casterId, sourceId, xValue)
-            Zone.STACK -> validateSpellTarget(state, target, filter, casterId, xValue)
+            Zone.STACK -> validateSpellTarget(state, target, filter, casterId, xValue, sourceId)
             else -> validateCardInZoneTarget(state, target, filter, casterId, xValue)
         }
     }

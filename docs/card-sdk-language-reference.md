@@ -1920,6 +1920,16 @@ work for abilities-on-stack (which carry no `CardComponent`).
   `stampCreator = true`. Backs "tokens created with this creature" (Tetravus reabsorbing its own Tetravite
   tokens), which `"{filter} tokens you control"` can't express when several sources mint the same token.
   Yields false for non-tokens / unstamped tokens / no source context.
+- `NotTargetedByAbilityFromSameNamedSource` (filter builder
+  `notTargetedByAbilityFromSameNamedSource()`) — source-relative + stack-aware: the candidate object
+  (a spell or permanent) is **not** currently the target of an *ability* on the stack whose source is
+  *another* battlefield permanent sharing the effect source's (`PredicateContext.sourceId`) name.
+  Backs Goblin Artisans' self-referential targeting restriction ("counter target artifact spell you
+  control that isn't the target of an ability from another creature named Goblin Artisans") so two
+  Goblin Artisans can't both lock onto the same spell. Evaluated in target validation/choice via
+  `PredicateEvaluator`; the spell-target validation path now passes the activating ability's
+  `sourceId` so it can resolve. Inert (true) with no source context, and in group-static projection
+  (no source / no candidate-on-stack).
 - `CrewedOrSaddledSourceThisTurn` (filter builder `crewedOrSaddledSourceThisTurn()`) —
   source-relative (CR 702.122 / 702.171): matches a creature that crewed or saddled the effect's
   source permanent this turn (i.e. one tapped to pay that permanent's Crew/Saddle cost). Resolves
