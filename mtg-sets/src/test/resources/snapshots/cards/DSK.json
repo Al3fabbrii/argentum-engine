@@ -4529,6 +4529,79 @@
     ]
 }
 
+// Resurrected Cultist
+{
+    "name": "Resurrected Cultist",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Human Cleric",
+    "oracleText": "Delirium — {2}{B}{B}: Return this card from your graveyard to the battlefield with a finality counter on it. Activate only if there are four or more card types among cards in your graveyard and only as a sorcery. (If a creature with a finality counter on it would die, exile it instead.)",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 1
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{2}{B}{B}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "MoveToZone",
+                            "target": "Self",
+                            "destination": "Battlefield",
+                            "fromZone": "Graveyard"
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "finality",
+                            "count": 1,
+                            "target": "Self"
+                        }
+                    ]
+                },
+                "timing": "SorcerySpeed",
+                "restrictions": [
+                    {
+                        "type": "ActivationOnlyIfCondition",
+                        "condition": {
+                            "type": "Compare",
+                            "left": {
+                                "type": "AggregateZone",
+                                "player": "You",
+                                "zone": "Graveyard",
+                                "aggregation": "DISTINCT_TYPES"
+                            },
+                            "operator": "GTE",
+                            "right": {
+                                "type": "Fixed",
+                                "amount": 4
+                            }
+                        }
+                    }
+                ],
+                "activateFromZone": "Graveyard",
+                "descriptionOverride": "Delirium — {2}{B}{B}: Return this card from your graveyard to the battlefield with a finality counter on it. Activate only as a sorcery."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "115",
+        "artist": "Tyler Walpole",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/4/e41bd259-e81f-432a-bebf-4c6534f23db7.jpg?1726286277"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Ripchain Razorkin
 {
     "name": "Ripchain Razorkin",
@@ -5049,6 +5122,62 @@
     },
     "colorIdentityOverride": [
         "WHITE"
+    ]
+}
+
+// Shrewd Storyteller
+{
+    "name": "Shrewd Storyteller",
+    "manaCost": "{1}{G}{W}",
+    "typeLine": "Creature — Human Survivor",
+    "oracleText": "Survival — At the beginning of your second main phase, if this creature is tapped, put a +1/+1 counter on target creature.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "POSTCOMBAT_MAIN"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "+1/+1",
+                    "count": 1,
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature"
+                    },
+                    "id": "target creature"
+                },
+                "triggerCondition": {
+                    "type": "EntityMatches",
+                    "entity": "Self",
+                    "filter": "tapped"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "232",
+        "rarity": "UNCOMMON",
+        "artist": "David Palumbo",
+        "flavorText": "All his tales are cautionary.",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/9/f9636877-8fcc-4ad5-8eb2-a5d5ba49583d.jpg?1726286734"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "GREEN"
     ]
 }
 
