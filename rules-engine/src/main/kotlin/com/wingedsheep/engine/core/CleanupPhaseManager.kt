@@ -695,6 +695,9 @@ class CleanupPhaseManager(
             if (container.has<BlockedOrWasBlockedByLegendaryThisTurnComponent>()) {
                 needsUpdate = true
             }
+            if (container.has<com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent>()) {
+                needsUpdate = true
+            }
             if (container.has<DamageDealtByPlayersThisTurnComponent>()) {
                 needsUpdate = true
             }
@@ -727,6 +730,7 @@ class CleanupPhaseManager(
                         .without<TokenReplacementOfferedThisTurnComponent>()
                         .without<WasDealtDamageThisTurnComponent>()
                         .without<BlockedOrWasBlockedByLegendaryThisTurnComponent>()
+                        .without<com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent>()
                         .without<DamageDealtByPlayersThisTurnComponent>()
                         .without<DamagedBySourcesThisTurnComponent>()
                         .without<DealtCombatDamageToPlayersThisTurnComponent>()

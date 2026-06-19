@@ -168,6 +168,7 @@ internal class BlockPhaseManager(
         for ((blockerId, attackerIds) in expandedBlockers) {
             newState = newState.updateEntity(blockerId) { container ->
                 container.with(BlockingComponent(attackerIds))
+                    .with(com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent)
             }
 
             // Mark attackers as blocked

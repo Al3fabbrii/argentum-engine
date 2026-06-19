@@ -890,6 +890,12 @@ class PredicateEvaluator {
                 entityId in attackerSet
             }
 
+            // Whether this creature was declared as a blocker this turn — backed by the
+            // per-entity BlockedThisTurnComponent marker stamped at block-declaration time.
+            StatePredicate.BlockedThisTurn -> {
+                container.has<com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent>()
+            }
+
             // "Put there from the battlefield this turn" filter for graveyard-zone targets
             // (Samwise the Stouthearted, Lobelia Sackville-Baggins — LTR). Reads the marker
             // set by ZoneTransitionService on battlefield→graveyard moves. The marker is

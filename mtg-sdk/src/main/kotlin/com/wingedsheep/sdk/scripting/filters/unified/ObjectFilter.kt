@@ -543,6 +543,15 @@ data class GameObjectFilter(
     )
 
     /**
+     * Was declared as a blocker this turn (CR 509.1). Backed by a per-entity marker stamped at
+     * block-declaration time; cleared at end-of-turn cleanup. Pair with [attackedThisTurn] for
+     * "attacked or blocked this turn".
+     */
+    fun blockedThisTurn() = copy(
+        statePredicates = statePredicates + StatePredicate.BlockedThisTurn
+    )
+
+    /**
      * Must have been dealt damage this turn (marked-damage *history*, not current marked damage).
      * Survives damage removal / leaving combat; cleared at end-of-turn cleanup. Used by
      * "...that was dealt damage this turn" (Rooftop Assassin, Unsparing Boltcaster).

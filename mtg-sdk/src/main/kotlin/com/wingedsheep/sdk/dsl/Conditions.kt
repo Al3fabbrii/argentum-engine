@@ -787,6 +787,20 @@ object Conditions {
         SourceMatches(com.wingedsheep.sdk.scripting.GameObjectFilter.Any.attackedThisTurn())
 
     /**
+     * If this creature was declared as a blocker at least once during the current turn (CR 509.1).
+     */
+    val SourceBlockedThisTurn: ConditionInterface =
+        SourceMatches(com.wingedsheep.sdk.scripting.GameObjectFilter.Any.blockedThisTurn())
+
+    /**
+     * If this creature attacked or blocked at least once during the current turn. Used by
+     * Clockwork Avian's end-of-combat "if this creature attacked or blocked this combat, remove a
+     * +1/+0 counter" trigger.
+     */
+    val SourceAttackedOrBlockedThisTurn: ConditionInterface =
+        Any(SourceAttackedThisTurn, SourceBlockedThisTurn)
+
+    /**
      * As long as this creature is a specific subtype.
      * Used for conditional static abilities like "has defender as long as it's a Wall."
      */
@@ -823,6 +837,10 @@ object Conditions {
             is CounterTypeFilter.Any -> StatePredicate.HasAnyCounter
             is CounterTypeFilter.PlusOnePlusOne -> StatePredicate.HasCounter("PLUS_ONE_PLUS_ONE")
             is CounterTypeFilter.MinusOneMinusOne -> StatePredicate.HasCounter("MINUS_ONE_MINUS_ONE")
+            is CounterTypeFilter.PlusOnePlusZero -> StatePredicate.HasCounter("PLUS_ONE_PLUS_ZERO")
+            is CounterTypeFilter.PlusZeroPlusOne -> StatePredicate.HasCounter("PLUS_ZERO_PLUS_ONE")
+            is CounterTypeFilter.MinusOneMinusZero -> StatePredicate.HasCounter("MINUS_ONE_MINUS_ZERO")
+            is CounterTypeFilter.MinusZeroMinusOne -> StatePredicate.HasCounter("MINUS_ZERO_MINUS_ONE")
             is CounterTypeFilter.Loyalty -> StatePredicate.HasCounter("LOYALTY")
             is CounterTypeFilter.Named -> StatePredicate.HasCounter(
                 counterType.name.uppercase().replace(' ', '_')

@@ -182,6 +182,18 @@ sealed interface StatePredicate {
     }
 
     /**
+     * Was declared as a blocker at least once during the current turn (CR 509.1). Backed by the
+     * [com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent] marker stamped at
+     * block-declaration time and cleared at end-of-turn cleanup. Pairs with [AttackedThisTurn] to
+     * express "attacked or blocked this turn" (Clockwork Avian's end-of-combat counter shed).
+     */
+    @SerialName("BlockedThisTurn")
+    @Serializable
+    data object BlockedThisTurn : History {
+        override val description: String = "blocked this turn"
+    }
+
+    /**
      * This card is currently in a graveyard *and* was put there from the battlefield
      * during the current turn. Used as a target predicate on graveyard-zone filters:
      *

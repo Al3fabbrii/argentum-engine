@@ -44,6 +44,16 @@ data class BlockedComponent(
 data object BlockedOrWasBlockedByLegendaryThisTurnComponent : Component
 
 /**
+ * Marks a creature that was declared as a blocker at least once during the current turn
+ * (CR 509.1). Stamped at block-declaration time and cleared at end-of-turn cleanup, mirroring
+ * the attacker-side [PlayerAttackersThisTurnComponent] derivation. Backs
+ * [com.wingedsheep.sdk.scripting.predicates.StatePredicate.BlockedThisTurn] — e.g. Clockwork
+ * Avian's "if this creature attacked or blocked this combat" end-of-combat trigger.
+ */
+@Serializable
+data object BlockedThisTurnComponent : Component
+
+/**
  * Combat damage assignment for a creature.
  */
 @Serializable

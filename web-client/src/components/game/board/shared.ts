@@ -670,6 +670,10 @@ export const PASSIVE_COUNTER_TYPES: readonly CounterType[] = [
   CounterType.NEST,
   CounterType.PAGE,
   CounterType.REV,
+  CounterType.PLUS_ONE_PLUS_ZERO,
+  CounterType.PLUS_ZERO_PLUS_ONE,
+  CounterType.MINUS_ONE_MINUS_ZERO,
+  CounterType.MINUS_ZERO_MINUS_ONE,
 ]
 
 /**

@@ -401,6 +401,8 @@ internal class AffectsFilterResolver {
             } ?: emptySet()
             entityId in attackerSet
         }
+        StatePredicate.BlockedThisTurn ->
+            container.has<com.wingedsheep.engine.state.components.combat.BlockedThisTurnComponent>()
         // Graveyard-zone-only predicate (Samwise/Lobelia). Battlefield projection
         // never sees a card whose stamp would match — every battlefield permanent
         // has had its from-graveyard marker stripped on battlefield entry — so the

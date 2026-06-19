@@ -9,6 +9,10 @@ import kotlinx.serialization.Serializable
 enum class CounterType {
     PLUS_ONE_PLUS_ONE,
     MINUS_ONE_MINUS_ONE,
+    PLUS_ONE_PLUS_ZERO,
+    PLUS_ZERO_PLUS_ONE,
+    MINUS_ONE_MINUS_ZERO,
+    MINUS_ZERO_MINUS_ONE,
     LOYALTY,
     CHARGE,
     GEM,
@@ -64,6 +68,10 @@ enum class CounterType {
 object Counters {
     const val PLUS_ONE_PLUS_ONE = "+1/+1"
     const val MINUS_ONE_MINUS_ONE = "-1/-1"
+    const val PLUS_ONE_PLUS_ZERO = "+1/+0"
+    const val PLUS_ZERO_PLUS_ONE = "+0/+1"
+    const val MINUS_ONE_MINUS_ZERO = "-1/-0"
+    const val MINUS_ZERO_MINUS_ONE = "-0/-1"
     const val LOYALTY = "loyalty"
     const val CHARGE = "charge"
     const val GEM = "gem"
