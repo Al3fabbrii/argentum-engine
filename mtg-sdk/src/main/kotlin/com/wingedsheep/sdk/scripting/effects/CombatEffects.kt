@@ -57,6 +57,13 @@ sealed interface PreventionSourceFilter {
     @SerialName("ChosenColoredSource") @Serializable data object ChosenColoredSource : PreventionSourceFilter
     /** Uses the chosen creature type from the source permanent's component. */
     @SerialName("ChosenCreatureType") @Serializable data object ChosenCreatureType : PreventionSourceFilter
+    /**
+     * Player chooses a damage source on resolution, but only **artifact** sources are eligible —
+     * "an artifact source of your choice" (Circle of Protection: Artifacts). Creates a
+     * next-instance shield (prevent the next time that source would deal damage), mirroring the
+     * Circle of Protection family, not an all-damage-from-source shield.
+     */
+    @SerialName("ChosenArtifactSource") @Serializable data object ChosenArtifactSource : PreventionSourceFilter
     /** Only damage from creatures matching a group filter. */
     @SerialName("FromGroup") @Serializable data class FromGroup(val filter: GroupFilter) : PreventionSourceFilter
 }
@@ -134,6 +141,7 @@ data class PreventDamageEffect(
             PreventionSourceFilter.ChosenColoredSource ->
                 append(" by a source of your choice that shares a color with the mana spent")
             PreventionSourceFilter.ChosenCreatureType -> append(" by a creature of the chosen type")
+            PreventionSourceFilter.ChosenArtifactSource -> append(" by an artifact source of your choice")
             is PreventionSourceFilter.FromGroup ->
                 append(" by ${sourceFilter.filter.description.replaceFirstChar { it.lowercase() }}")
         }

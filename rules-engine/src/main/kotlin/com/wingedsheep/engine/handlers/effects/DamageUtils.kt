@@ -799,6 +799,25 @@ object DamageUtils {
             }
         }
 
+        // Check for single-instance chosen-source prevention shields (Circle of Protection family:
+        // "the next time a [quality] source of your choice would deal damage to you, prevent it").
+        // Prevents the entire next instance from the matching source, then is consumed.
+        if (remainingDamage > 0 && sourceId != null) {
+            for (i in updatedEffects.indices) {
+                if (remainingDamage <= 0) break
+                if (i in toRemove) continue
+                val effect = updatedEffects[i]
+                val mod = effect.effect.modification
+                if (mod is SerializableModification.PreventNextDamageInstanceFromSource &&
+                    targetId in effect.effect.affectedEntities &&
+                    mod.damageSourceId == sourceId
+                ) {
+                    remainingDamage = 0
+                    toRemove.add(i)
+                }
+            }
+        }
+
         // Remove fully consumed shields in reverse order to maintain indices
         for (idx in toRemove.sortedDescending()) {
             updatedEffects.removeAt(idx)

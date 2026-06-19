@@ -48,7 +48,8 @@ class PreventDamageExecutor(
         // creating the shield. ChosenColoredSource additionally restricts the candidate list to
         // colored sources (Protective Sphere).
         if (effect.sourceFilter is PreventionSourceFilter.ChosenSource ||
-            effect.sourceFilter is PreventionSourceFilter.ChosenColoredSource
+            effect.sourceFilter is PreventionSourceFilter.ChosenColoredSource ||
+            effect.sourceFilter is PreventionSourceFilter.ChosenArtifactSource
         ) {
             return handleChosenSource(state, effect, context)
         }
@@ -71,17 +72,20 @@ class PreventDamageExecutor(
         // "a source of your choice that shares a color with the mana spent" — only colored
         // sources qualify (Protective Sphere). A colorless source shares a color with no mana.
         val coloredOnly = effect.sourceFilter is PreventionSourceFilter.ChosenColoredSource
+        val artifactOnly = effect.sourceFilter is PreventionSourceFilter.ChosenArtifactSource
 
         // Gather all possible damage sources: permanents + spells on stack
         val sourceIds = mutableListOf<EntityId>()
         for (entityId in state.getBattlefield()) {
             if (state.getEntity(entityId)?.get<CardComponent>() == null) continue
             if (coloredOnly && state.projectedState.getColors(entityId).isEmpty()) continue
+            if (artifactOnly && !state.projectedState.isArtifact(entityId)) continue
             sourceIds.add(entityId)
         }
         for (entityId in state.stack) {
             val cardComponent = state.getEntity(entityId)?.get<CardComponent>() ?: continue
             if (coloredOnly && cardComponent.colors.isEmpty()) continue
+            if (artifactOnly && !cardComponent.typeLine.isArtifact) continue
             sourceIds.add(entityId)
         }
 
@@ -131,7 +135,8 @@ class PreventDamageExecutor(
                 amount = amount,
                 gainLifeFromColors = effect.gainLifeFromColors.map { it.name }.toSet(),
                 sourceId = context.sourceId,
-                sourceName = context.sourceId?.let { state.getEntity(it)?.get<CardComponent>()?.name }
+                sourceName = context.sourceId?.let { state.getEntity(it)?.get<CardComponent>()?.name },
+                nextInstanceOnly = effect.sourceFilter is PreventionSourceFilter.ChosenArtifactSource
             )
             val newState = state.withPendingDecision(decision).pushContinuation(continuation)
             return EffectResult.paused(newState, decision)
