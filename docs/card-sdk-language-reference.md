@@ -1587,6 +1587,14 @@ This is the player-arm prerequisite for the planned composable mixed `TargetUnio
   `chosenValues[variableName]` (case-insensitive). Set the name with `Effects.ChooseCardName` (player names it)
   or `Effects.StoreCardName` (captured from a chosen card). Fails closed in static/projection contexts. Used by
   the "name a card … cards with that name" family (Desperate Research, Lobotomy).
+- `.namedFromChosenComponent(slot = ChoiceSlot.CARD_NAME)` — `CardPredicate.NameEqualsChosenComponent`: matches
+  the card name **durably chosen by the source permanent as it entered** — read from that permanent's
+  `CastChoicesComponent` under `slot` (case-insensitive). Unlike `.namedFromVariable` (transient pipeline variable,
+  fails closed in projection), this is **static-projection / activation-legality safe**: it keys off the granting
+  permanent's id, which the predicate context supplies as the source wherever a static ability's filter is
+  evaluated. Pair with `replacementEffect(EntersWithChoice(ChoiceType.CARD_NAME))`. Fails closed (no match) before
+  a name is chosen. Used by name-keyed static abilities (Petrified Hamlet — "sources with the chosen name … /
+  Lands with the chosen name …").
 - `.power(n)` / `.minPower(n)` / `.maxPower(n)` — P/T comparator.
 - `.manaValue(n)` / `.manaValueAtMost(n)` / `.manaValueAtLeast(n)` — mana-value comparator.
 - `.manaValueAtMostX()` — mana value ≤ the X chosen for the source spell/ability.
@@ -1793,7 +1801,16 @@ work for abilities-on-stack (which carry no `CardComponent`).
 
 ## 8. Triggered abilities (`Triggers.*`)
 
-`triggeredAbility { trigger; effect; target?; triggerCondition?; optional?; elseEffect?; checkOnNextState?; dealsDamageBeforeResolve?; controlledByTriggeringEntityController? }`.
+`triggeredAbility { trigger; effect; target?; triggerCondition?; optional?; elseEffect?; checkOnNextState?; dealsDamageBeforeResolve?; controlledByTriggeringEntityController?; oncePerTurn?; triggersOnce? }`.
+
+**`oncePerTurn` vs `triggersOnce` — two firing caps.** `oncePerTurn = true` caps the ability to one
+fire per turn ("This ability triggers only once each turn", e.g. Scavenger's Talent), tracked by a
+per-turn component cleared in cleanup. `triggersOnce = true` is the lifetime cap ("This ability
+triggers only once", e.g. Acrobatic Cheerleader): once the source has fired it, it never fires again
+while that permanent stays on the battlefield — tracked by a `TriggeredAbilityFiredEverComponent`
+that is **not** cleared at end of turn (it lives on the entity, so re-entering the battlefield as a
+new object — a distinct game object — triggers afresh). Both caps share one detection-time filter and
+collapse simultaneous fires of the same `(source, ability)` to a single instance.
 
 **`optional` + `elseEffect` = "you may [effect]. If you don't, [elseEffect]."** For a **targeted**
 trigger, `optional` lets the player choose 0 targets to decline, and `elseEffect` runs on decline or
@@ -4247,7 +4264,14 @@ EntersWithChoice(
 `SetEnchantedLandTypeFromChosen` and `GrantLandwalkOfChosenType`), and
 `ChoiceType.OPPONENT` writes an entity-id choice into the `CastChoicesComponent` under
 `ChoiceSlot.OPPONENT` — read back via the `Player.ChosenOpponent` reference (e.g. Jihad's
-anthem + state-trigger condition: `Exists(Player.ChosenOpponent, Zone.BATTLEFIELD, …)`). Example — Phantasmal Terrain
+anthem + state-trigger condition: `Exists(Player.ChosenOpponent, Zone.BATTLEFIELD, …)`), and
+`ChoiceType.CARD_NAME` writes a chosen **land card name** (every registered land name, presented as
+a searchable option list) into the `CastChoicesComponent` under `ChoiceSlot.CARD_NAME` as a
+`ChoiceValue.TextChoice` — read back via `chosenCardName()` or, for name-keyed static-ability
+filters, `GameObjectFilter.namedFromChosenComponent()` (→ `CardPredicate.NameEqualsChosenComponent`,
+see §7). Used by Petrified Hamlet ("When this land enters, choose a land card name", then two
+statics — `PreventActivatedAbilities(nonManaAbilitiesOnly = true)` and `GrantActivatedAbility` of a
+`{T}: Add {C}` mana ability — both filtered by `namedFromChosenComponent()`). Example — Phantasmal Terrain
 ("As this Aura enters, choose a basic land type. Enchanted land is the chosen type."):
 
 ```kotlin
