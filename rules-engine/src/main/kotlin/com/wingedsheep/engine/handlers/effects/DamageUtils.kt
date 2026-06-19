@@ -953,6 +953,17 @@ object DamageUtils {
                 }
                 if (!recipientMatches) continue
 
+                // Optional condition gate evaluated against the replacement *source* — e.g.
+                // Martyrs of Korlis only redirects "as long as this creature is untapped".
+                val gateCondition = effect.condition
+                if (gateCondition != null) {
+                    val gateContext = EffectContext(
+                        sourceId = entityId,
+                        controllerId = sourceControllerId,
+                    )
+                    if (!conditionEvaluator.evaluate(state, gateCondition, gateContext)) continue
+                }
+
                 val redirectTo = resolveRedirectTarget(state, effect.redirectTo, sourceId, entityId, targetId)
                 if (redirectTo != null && redirectTo != targetId) {
                     return redirectTo to entityId

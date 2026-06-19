@@ -4867,11 +4867,16 @@ replacementEffect {
   "as long as …, prevent …" statics (Spirit of Resistance: a five-distinct-colors `Compare` gate).
 - `CapDamage(maxAmount, appliesTo)` — clamp matching damage to `maxAmount` (a *replacement* distinct
   from prevent/modify; applied after all amplification). Divine Presence: `CapDamage(3, DamageEvent(recipient = Any))`.
-- `RedirectDamage(redirectTo, appliesTo)` — redirect matching damage to another recipient. Now wired
-  as a continuous static replacement (each source applies at most once per damage event). `redirectTo`
-  supports `EffectTarget.ControllerOfDamageSource` (the controller of the damaging source),
-  `Controller`/`Self` (the replacement's owner/controller), and `TargetController`. Harsh Judgment:
-  redirect chosen-color instant/sorcery damage dealt to you back to the spell's controller.
+- `RedirectDamage(redirectTo, appliesTo, condition = null)` — redirect matching damage to another
+  recipient. Now wired as a continuous static replacement (each source applies at most once per damage
+  event). `redirectTo` supports `EffectTarget.ControllerOfDamageSource` (the controller of the damaging
+  source), `Controller`/`Self` (the replacement's owner/controller), and `TargetController`. Harsh
+  Judgment: redirect chosen-color instant/sorcery damage dealt to you back to the spell's controller.
+  The optional `condition: Condition?` gates the redirect on the *replacement source* at the moment
+  damage would be redirected (mirrors `PreventDamage.restrictions`); a `null` condition always applies.
+  Martyrs of Korlis uses `Conditions.SourceIsUntapped` for "As long as this creature is untapped, all
+  damage that would be dealt to you by artifacts is dealt to this creature instead" (`redirectTo =
+  EffectTarget.Self`, `source = SourceFilter.Matching(GameObjectFilter.Artifact)`).
 - **DamageEvent filters (gap #7):** `EventPattern.DamageEvent(recipient, source, damageType, amount)`.
   `amount: AmountFilter` (`Any` / `AtMost(n)` / `AtLeast(n)` / `Exactly(n)`) gates on the would-be
   amount (Callous Giant: `AtMost(3)`). `source = SourceFilter.Matching(filter)` can carry relational
