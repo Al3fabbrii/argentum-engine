@@ -155,6 +155,57 @@ internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
         ))
     }
 
+    // "Reveal cards from the top of your library until you reveal an instant or sorcery card. Put that
+    // card into your hand and the rest on the bottom of your library in a random order." (Secrets of
+    // Strixhaven — Page, Loose Leaf's Grandeur ability). IR args are
+    // [<the stop filter>, [<reveal-actions>]]. The engine idiom walks the library with
+    // GatherUntilMatchEffect (stops at the first match, stashing the matched card + every revealed card),
+    // reveals the pile, then splits it with two filtered MoveCollectionEffects: the matched
+    // instant/sorcery -> hand, the non-matching rest -> the bottom of the library in a random order.
+    // Renders ONLY this exact shape — an instant-or-sorcery stop filter, the matched card to hand, the
+    // rest to the bottom at random; any other filter, reveal-action set, or destination declines
+    // (-> SCAFFOLD) rather than emit a lossy approximation.
+    on("RevealCardsFromTheTopOfLibraryUntilACardOfTypeIsRevealed") { _, args, _ ->
+        val arr = args.asArr ?: return@on null
+        if (arr.size != 2) return@on null
+        // 1. The stop filter must be exactly "Or(IsCardtype Instant, IsCardtype Sorcery)".
+        val filterBlob = compact(arr.getOrNull(0))
+        val isInstantOrSorcery = "\"Or\"" in filterBlob &&
+            "IsCardtype" in filterBlob && "\"Instant\"" in filterBlob && "\"Sorcery\"" in filterBlob
+        if (!isInstantOrSorcery) return@on null
+        // 2. The two reveal-actions must be exactly "found card -> hand" + "rest -> bottom at random".
+        val revealActions = (arr.getOrNull(1) as? JsonArray)?.filterIsInstance<JsonObject>()
+            ?.map { it.strField("_RevealTheTopNumberCardsOfLibraryAction") } ?: return@on null
+        if (revealActions != listOf(
+                "PutTheCardFoundThisWayIntoHand",
+                "PutTheRemainingCardsOnTheBottomOfLibraryInARandomOrder",
+            )
+        ) return@on null
+        Composite(listOf(
+            Lit(
+                "GatherUntilMatchEffect(filter = GameObjectFilter.InstantOrSorcery, " +
+                    "storeMatch = \"spell\", storeRevealed = \"revealed\")",
+            ),
+            Lit("RevealCollectionEffect(from = \"revealed\")"),
+            Lit(
+                "MoveCollectionEffect(from = \"revealed\", filter = GameObjectFilter.InstantOrSorcery, " +
+                    "destination = CardDestination.ToZone(Zone.HAND))",
+            ),
+            Raw(
+                "MoveCollectionEffect(\n" +
+                    "                from = \"revealed\",\n" +
+                    "                filter = GameObjectFilter(\n" +
+                    "                    cardPredicates = listOf(\n" +
+                    "                        CardPredicate.Not(CardPredicate.Or(listOf(CardPredicate.IsInstant, CardPredicate.IsSorcery)))\n" +
+                    "                    )\n" +
+                    "                ),\n" +
+                    "                destination = CardDestination.ToZone(Zone.LIBRARY, placement = ZonePlacement.Bottom),\n" +
+                    "                order = CardOrder.Random,\n" +
+                    "            )",
+            ),
+        ))
+    }
+
     // "Return the exiled card to the battlefield under its owner's control" (the second half of the
     // exile-then-return idiom — Conciliator's Duelist, Parting Gust). `TheCardExiledThisWay` refers to
     // the same bound target that was exiled earlier in the ability, so it resolves to the ability's
@@ -483,7 +534,6 @@ internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
 
     on("SearchLibrary") { _, args, _ -> renderSearch(args) }
     on("LookAtTheTopNumberCardsOfLibrary", "LookAtTheTopNumberCardsOfPlayersLibrary") { node, args, tvar -> renderLook(node, args, tvar) }
-    on("RevealCardsFromTheTopOfLibraryUntilACardOfTypeIsRevealed") { node, _, _ -> renderRevealUntil(node) }
 
     on("PutGraveyardCardOnBottomOfLibrary") { _, args, tvar ->
         // "Put target card from your graveyard on the bottom of your library" (Tomb Trawler). The
@@ -733,83 +783,6 @@ private fun cardTypeUnionFilter(types: List<String>): String? {
         sortedSetOf("creature", "planeswalker") to "CreatureOrPlaneswalker",
     )[set] ?: return null
     return "GameObjectFilter.$constant"
-}
-
-/**
- * "Reveal cards from the top of your library until you reveal a <type> card. Put that card
- * [into your hand | onto the battlefield tapped] and the rest on the bottom of your library
- * in a random/any order." (House Cartographer — to hand; Clifftop Lookout — onto the battlefield
- * tapped). This is the reveal-UNTIL-a-type dig, distinct from the look-at-top-N shapes above.
- *
- * Renders the atomic GatherUntilMatch -> Reveal -> Filter(exclude match) -> Move(match) ->
- * Move(rest, bottom) pipeline — the same shape the hand-authored cards use. Only a single card-type
- * filter (Land/Creature/...) and the two recognised destinations (hand, battlefield-tapped) render;
- * any richer filter, an unrecognised destination, or any extra enter-flag declines (-> SCAFFOLD)
- * rather than drop a constraint.
- */
-internal fun EmitCtx.renderRevealUntil(node: JsonObject): Dsl? {
-    val args = node.field("args").asArr ?: return null
-    // args[0] is the "until you reveal" type filter; only a bare IsCardtype renders.
-    val filterNode = args.getOrNull(0) as? JsonObject ?: return null
-    if (filterNode.strField("_Cards") != "IsCardtype") return null
-    val gameObjectFilter = when (filterNode.field("args").asStr()) {
-        "Land" -> "GameObjectFilter.Land"
-        "Creature" -> "GameObjectFilter.Creature"
-        "Artifact" -> "GameObjectFilter.Artifact"
-        "Enchantment" -> "GameObjectFilter.Enchantment"
-        "Planeswalker" -> "GameObjectFilter.Planeswalker"
-        else -> return null
-    }
-
-    val subActions = args.getOrNull(1).asArr ?: return null
-    fun sub(kind: String): JsonObject? = subActions.firstOrNull {
-        it.strField("_RevealTheTopNumberCardsOfLibraryAction") == kind
-    } as? JsonObject
-
-    // The destination of the matched card: hand, or battlefield tapped.
-    val toHand = sub("PutTheCardFoundThisWayIntoHand")
-    val toBattlefield = sub("PutTheCardFoundThisWayOntoTheBattlefield")
-    val matchDestination = when {
-        toHand != null -> "CardDestination.ToZone(Zone.HAND)"
-        toBattlefield != null -> {
-            // Only EntersTapped renders; any other (or missing) enter flag declines.
-            val flags = (toBattlefield.field("args").asArr)
-                ?.mapNotNull { (it as? JsonObject)?.strField("_EnterFlag") } ?: emptyList()
-            if (flags != listOf("EntersTapped")) return null
-            "CardDestination.ToZone(Zone.BATTLEFIELD, placement = ZonePlacement.Tapped)"
-        }
-        else -> return null
-    }
-
-    // The destination of the remaining reveals: bottom of library, random or controller-chosen order.
-    val restOrder = when {
-        sub("PutTheRemainingCardsOnTheBottomOfLibraryInARandomOrder") != null -> "CardOrder.Random"
-        sub("PutTheRemainingCardsOnTheBottomOfLibraryInAnyOrder") != null -> "CardOrder.ControllerChooses"
-        else -> return null
-    }
-
-    return Composite(listOf(
-        Lit(
-            "GatherUntilMatchEffect(filter = $gameObjectFilter, " +
-                "storeMatch = \"revealedMatch\", storeRevealed = \"allRevealed\")"
-        ),
-        Lit("RevealCollectionEffect(from = \"allRevealed\")"),
-        Raw(
-            "FilterCollectionEffect(\n" +
-                "                from = \"allRevealed\",\n" +
-                "                filter = CollectionFilter.ExcludeOtherCollection(\"revealedMatch\"),\n" +
-                "                storeMatching = \"rest\"\n" +
-                "            )",
-        ),
-        Lit("MoveCollectionEffect(from = \"revealedMatch\", destination = $matchDestination)"),
-        Raw(
-            "MoveCollectionEffect(\n" +
-                "                from = \"rest\",\n" +
-                "                destination = CardDestination.ToZone(Zone.LIBRARY, placement = ZonePlacement.Bottom),\n" +
-                "                order = $restOrder\n" +
-                "            )",
-        ),
-    ))
 }
 
 internal fun EmitCtx.renderLook(node: JsonObject, args: JsonElement?, tvar: String?): Dsl? {
