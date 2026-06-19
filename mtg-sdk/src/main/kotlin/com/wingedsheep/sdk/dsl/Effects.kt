@@ -1184,6 +1184,14 @@ object Effects {
         AddCountersToCollectionEffect(collectionName, counterType, count)
 
     /**
+     * Add a resolution-time–evaluated number of counters to all entities in a named collection —
+     * "create a token, then put X counters on it, where X is [amount]" (Emil, Vastlands Roamer).
+     * Pair with a token-creating effect that publishes the well-known `CREATED_TOKENS` collection.
+     */
+    fun AddCountersToCollection(collectionName: String, counterType: String, amount: DynamicAmount): Effect =
+        AddCountersToCollectionEffect(collectionName, counterType, amount = amount)
+
+    /**
      * Distribute any number of counters from this creature onto other creatures.
      * Used for Forgotten Ancient's upkeep ability.
      */
@@ -2727,11 +2735,23 @@ object Effects {
         CantActivateLoyaltyAbilitiesEffect(target, duration)
 
     /**
-     * Target player skips their next turn.
-     * Used for cards like Lethal Vapors.
+     * Target player skips their next [count] turns (default one).
+     * Used for cards like Lethal Vapors (one turn) and Ral Zarek, Guest Lecturer (a coin-flip
+     * tally of turns, via [DynamicAmount.VariableReference]).
      */
-    fun SkipNextTurn(target: EffectTarget = EffectTarget.Controller): Effect =
-        SkipNextTurnEffect(target)
+    fun SkipNextTurn(
+        target: EffectTarget = EffectTarget.Controller,
+        count: DynamicAmount = DynamicAmount.Fixed(1)
+    ): Effect = SkipNextTurnEffect(target, count)
+
+    /**
+     * Flip [count] coins and store the number that came up heads under [storeHeadsAs] in the
+     * pipeline, so a later sub-effect in the same composite can scale off it via
+     * [DynamicAmount.VariableReference]. The general "flip N coins, count heads" primitive
+     * (Ral Zarek, Guest Lecturer's ultimate).
+     */
+    fun FlipCoins(count: Int, storeHeadsAs: String = "heads"): Effect =
+        com.wingedsheep.sdk.scripting.effects.FlipCoinsEffect(count, storeHeadsAs)
 
     /**
      * Target player skips their next draw step.
