@@ -32,9 +32,10 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  * [Player.TriggeringPlayer] to the inner conditional.
  *
  * When the delayed trigger resolves, it checks whether the chosen opponent attacked
- * Faramir's controller this turn (CR 508.6 — declared one or more attackers whose
- * defending player was the controller, including attacking the controller's
- * planeswalkers). If they did NOT, the controller draws a card; otherwise the
+ * Faramir's controller this turn (CR 508.6 — a player "has attacked [a player]" if they
+ * declared one or more creatures as attackers attacking that player). Attacking a
+ * planeswalker or battle the controller owns is not attacking the controller, so it
+ * doesn't count here. If they did NOT, the controller draws a card; otherwise the
  * controller creates three 1/1 white Human Soldier tokens.
  */
 val FaramirPrinceOfIthilien = card("Faramir, Prince of Ithilien") {

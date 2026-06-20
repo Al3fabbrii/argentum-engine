@@ -20,7 +20,8 @@ import com.wingedsheep.sdk.scripting.values.DynamicAmount
  *
  * - "Damage can't be prevented this turn." sets a turn-scoped flag (DamageCantBePreventedThisTurn)
  *   so every damage event this turn ignores prevention shields / protection's prevention clause
- *   (CR 615.6).
+ *   (CR 615.12: prevention effects still "apply" but prevent nothing, and existing shields aren't
+ *   reduced by damage that can't be prevented).
  * - The group clause deals 1 to each OTHER creature controlled by the target creature's controller:
  *   `targetPlayerControls(TargetController)` scopes to the target's controller and `otherThanTarget()`
  *   excludes the target creature itself.
