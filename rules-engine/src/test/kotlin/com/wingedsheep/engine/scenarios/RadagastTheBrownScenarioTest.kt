@@ -40,12 +40,18 @@ class RadagastTheBrownScenarioTest : FunSpec({
     val LibraryBear = CardDefinition.creature("Library Bear", ManaCost.parse("{1}{G}"), setOf(Subtype("Bear")), 1, 1)
     val LibrarySoldier = CardDefinition.creature("Library Soldier", ManaCost.parse("{1}{W}"), setOf(Subtype("Soldier")), 1, 1)
     val LibrarySpirit = CardDefinition.creature("Library Spirit", ManaCost.parse("{1}{U}"), setOf(Subtype("Spirit")), 1, 1)
+    // Shares "Wizard" with Radagast itself (Avatar Wizard) → never selectable while Radagast is in play.
+    val LibraryWizard = CardDefinition.creature("Library Wizard", ManaCost.parse("{1}{U}"), setOf(Subtype("Wizard")), 1, 1)
+    // A 5th card stacked beneath the top four: with X = 4 it must NOT be looked at, proving X is
+    // Radagast's own mana value (4) and not the {2}{G} = 3 used by the other-creature tests.
+    val LibraryDruid = CardDefinition.creature("Library Druid", ManaCost.parse("{1}{G}"), setOf(Subtype("Druid")), 1, 1)
 
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
         driver.registerCards(
             TestCards.all + listOf(
-                RadagastTheBrown, TestSoldier, TestBear, LibraryBear, LibrarySoldier, LibrarySpirit
+                RadagastTheBrown, TestSoldier, TestBear,
+                LibraryBear, LibrarySoldier, LibrarySpirit, LibraryWizard, LibraryDruid
             )
         )
         return driver
@@ -143,5 +149,53 @@ class RadagastTheBrownScenarioTest : FunSpec({
         val library = libraryNames(driver, active)
         library.takeLast(3) shouldContainExactlyInAnyOrder
             listOf("Library Bear", "Library Soldier", "Library Spirit")
+    }
+
+    test("Radagast's own ETB fires the trigger with X = its own mana value (4)") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Forest" to 40))
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        val active = driver.activePlayer!!
+
+        // Stack five distinguishable cards on top. Radagast's mana value is 4, so only the top
+        // four are looked at; the Druid (5th) must remain on top, untouched. putCardOnTopOfLibrary
+        // prepends, so push in reverse to get [Wizard, Soldier, Bear, Spirit, Druid] from the top.
+        val druidId = driver.putCardOnTopOfLibrary(active, "Library Druid")
+        val spiritId = driver.putCardOnTopOfLibrary(active, "Library Spirit")
+        val bearId = driver.putCardOnTopOfLibrary(active, "Library Bear")
+        val soldierId = driver.putCardOnTopOfLibrary(active, "Library Soldier")
+        val wizardId = driver.putCardOnTopOfLibrary(active, "Library Wizard")
+
+        // Cast Radagast itself (no other creatures in play). Its own entry triggers the ability.
+        val radagast = driver.putCardInHand(active, "Radagast the Brown")
+        driver.giveMana(active, Color.GREEN, 4)
+        driver.castSpell(active, radagast)
+        driver.bothPass() // resolve Radagast — it enters and fires its own ETB trigger
+        driver.bothPass() // resolve the triggered ability → look at top 4 (X = Radagast's MV)
+
+        val select = driver.pendingDecision.shouldBeInstanceOf<SelectCardsDecision>()
+        select.minSelections shouldBe 0
+        select.maxSelections shouldBe 1
+
+        // Exactly the top FOUR are presented (Druid, the 5th card, is not — proving X = 4 not 3).
+        // Radagast (Avatar Wizard) is the only creature we control, so the Wizard shares a type
+        // and is non-selectable; Soldier, Bear, and Spirit share nothing and are selectable.
+        (select.options + select.nonSelectableOptions) shouldContainExactlyInAnyOrder
+            listOf(wizardId, soldierId, bearId, spiritId)
+        select.options shouldContainExactlyInAnyOrder listOf(soldierId, bearId, spiritId)
+        select.nonSelectableOptions shouldContainExactlyInAnyOrder listOf(wizardId)
+
+        driver.submitCardSelection(active, listOf(spiritId))
+
+        driver.getHand(active).any {
+            driver.state.getEntity(it)?.get<CardComponent>()?.name == "Library Spirit"
+        } shouldBe true
+
+        // The Druid was never looked at, so it's still on top; the three unselected looked-at
+        // cards went to the bottom.
+        val library = libraryNames(driver, active)
+        library.first() shouldBe "Library Druid"
+        library.takeLast(3) shouldContainExactlyInAnyOrder
+            listOf("Library Wizard", "Library Soldier", "Library Bear")
     }
 })
