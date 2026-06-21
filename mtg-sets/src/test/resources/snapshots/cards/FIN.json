@@ -2757,6 +2757,166 @@
     "colorIdentityOverride": []
 }
 
+// Ishgard, the Holy See
+{
+    "name": "Ishgard, the Holy See",
+    "manaCost": "",
+    "typeLine": "Land — Town",
+    "oracleText": "This land enters tapped.\n{T}: Add {W}.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "WHITE"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "283",
+        "rarity": "RARE",
+        "artist": "Kohei Yamada",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/6/068bc755-9d3d-430b-abc5-c775a5415bf9.jpg?1748706839"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ],
+    "layout": "ADVENTURE",
+    "cardFaces": [
+        {
+            "name": "Faith & Grief",
+            "manaCost": "{3}{W}{W}",
+            "typeLine": "Sorcery — Adventure",
+            "oracleText": "Return up to two target artifact and/or enchantment cards from your graveyard to your hand. (Then exile this card. You may play the land later from exile.)",
+            "script": {
+                "spellEffect": {
+                    "type": "ForEach",
+                    "space": "IterationSpace.Targets",
+                    "body": {
+                        "type": "MoveToZone",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        },
+                        "destination": "Hand"
+                    }
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "count": 2,
+                        "optional": true,
+                        "filter": {
+                            "baseFilter": "artifact|enchantment own:you",
+                            "zone": "Graveyard"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+// Jidoor, Aristocratic Capital
+{
+    "name": "Jidoor, Aristocratic Capital",
+    "manaCost": "",
+    "typeLine": "Land — Town",
+    "oracleText": "This land enters tapped.\n{T}: Add {U}.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "BLUE"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "284",
+        "rarity": "RARE",
+        "artist": "Erikas Perl",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/8/98b2d5b5-f85b-4c42-a0f5-a76f6af304ba.jpg?1748962589"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ],
+    "layout": "ADVENTURE",
+    "cardFaces": [
+        {
+            "name": "Overture",
+            "manaCost": "{4}{U}{U}",
+            "typeLine": "Sorcery — Adventure",
+            "oracleText": "Target opponent mills half their library, rounded down. (Then exile this card. You may play the land later from exile.)",
+            "script": {
+                "spellEffect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Divide",
+                                    "numerator": {
+                                        "type": "AggregateZone",
+                                        "player": {
+                                            "type": "ContextPlayer",
+                                            "index": 0
+                                        },
+                                        "zone": "Library"
+                                    },
+                                    "denominator": {
+                                        "type": "Fixed",
+                                        "amount": 2
+                                    },
+                                    "roundUp": false
+                                },
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            },
+                            "storeAs": "milled"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "milled",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            }
+                        }
+                    ]
+                },
+                "targetRequirements": [
+                    "TargetOpponent"
+                ]
+            }
+        }
+    ]
+}
+
 // Jumbo Cactuar
 {
     "name": "Jumbo Cactuar",
@@ -2796,6 +2956,87 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Lindblum, Industrial Regency
+{
+    "name": "Lindblum, Industrial Regency",
+    "manaCost": "",
+    "typeLine": "Land — Town",
+    "oracleText": "This land enters tapped.\n{T}: Add {R}.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "RED"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "285",
+        "rarity": "RARE",
+        "artist": "Piotr Dura",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/4/548dd152-f0b6-4e8f-9afc-a4ec1671b648.jpg?1748706846"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ],
+    "layout": "ADVENTURE",
+    "cardFaces": [
+        {
+            "name": "Mage Siege",
+            "manaCost": "{2}{R}",
+            "typeLine": "Instant — Adventure",
+            "oracleText": "Create a 0/1 black Wizard creature token with \"Whenever you cast a noncreature spell, this token deals 1 damage to each opponent.\" (Then exile this card. You may play the land later from exile.)",
+            "script": {
+                "spellEffect": {
+                    "type": "CreateToken",
+                    "power": 0,
+                    "toughness": 1,
+                    "colors": [
+                        "BLACK"
+                    ],
+                    "creatureTypes": [
+                        "Wizard"
+                    ],
+                    "triggeredAbilities": [
+                        {
+                            "id": "ability_2",
+                            "trigger": {
+                                "type": "SpellCastEvent",
+                                "spellFilter": {
+                                    "cardPredicates": [
+                                        "IsNoncreature"
+                                    ]
+                                }
+                            },
+                            "binding": "ANY",
+                            "effect": {
+                                "type": "DealDamage",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                },
+                                "target": {
+                                    "type": "PlayerRef",
+                                    "player": "EachOpponent"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
     ]
 }
 
@@ -3268,6 +3509,101 @@
     },
     "colorIdentityOverride": [
         "WHITE"
+    ]
+}
+
+// Midgar, City of Mako
+{
+    "name": "Midgar, City of Mako",
+    "manaCost": "",
+    "typeLine": "Land — Town",
+    "oracleText": "This land enters tapped.\n{T}: Add {B}.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "BLACK"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "286",
+        "rarity": "RARE",
+        "artist": "Anthony Devine",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/a/8a837256-6bb4-4a60-962d-d2793548d26c.jpg?1748706848"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ],
+    "layout": "ADVENTURE",
+    "cardFaces": [
+        {
+            "name": "Reactor Raid",
+            "manaCost": "{2}{B}",
+            "typeLine": "Sorcery — Adventure",
+            "oracleText": "You may sacrifice an artifact or creature. If you do, draw two cards. (Then exile this card. You may play the land later from exile.)",
+            "script": {
+                "spellEffect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.DoAction",
+                        "action": {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "BattlefieldMatching",
+                                        "filter": "creature|artifact",
+                                        "player": "You"
+                                    },
+                                    "storeAs": "gathered0"
+                                },
+                                {
+                                    "type": "SelectFromCollection",
+                                    "from": "gathered0",
+                                    "selection": {
+                                        "type": "ChooseUpTo",
+                                        "count": {
+                                            "type": "Fixed",
+                                            "amount": 1
+                                        }
+                                    },
+                                    "storeSelected": "selected1",
+                                    "prompt": "Choose an artifact or creature to sacrifice",
+                                    "useTargetingUI": true
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "selected1",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard"
+                                    },
+                                    "moveType": "Sacrifice"
+                                }
+                            ]
+                        }
+                    },
+                    "then": {
+                        "type": "DrawCards",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 2
+                        }
+                    }
+                }
+            }
+        }
     ]
 }
 
@@ -5596,4 +5932,73 @@
         "imageUri": "https://cards.scryfall.io/normal/front/7/0/70d9ab99-ec8a-402e-ba1d-ffa6c4c84a3f.jpg"
     },
     "colorIdentityOverride": []
+}
+
+// Zanarkand, Ancient Metropolis
+{
+    "name": "Zanarkand, Ancient Metropolis",
+    "manaCost": "",
+    "typeLine": "Land — Town",
+    "oracleText": "This land enters tapped.\n{T}: Add {G}.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "GREEN"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "293",
+        "rarity": "RARE",
+        "artist": "Erikas Perl",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/8/881e4c00-3b9a-47a1-bf66-1badda994c88.jpg?1748706876"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ],
+    "layout": "ADVENTURE",
+    "cardFaces": [
+        {
+            "name": "Lasting Fayth",
+            "manaCost": "{4}{G}{G}",
+            "typeLine": "Sorcery — Adventure",
+            "oracleText": "Create a 1/1 colorless Hero creature token. Put a +1/+1 counter on it for each land you control. (Then exile this card. You may play the land later from exile.)",
+            "script": {
+                "spellEffect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "CreateToken",
+                            "power": 1,
+                            "toughness": 1,
+                            "colors": [],
+                            "creatureTypes": [
+                                "Hero"
+                            ]
+                        },
+                        {
+                            "type": "AddCountersToCollection",
+                            "collectionName": "createdTokens",
+                            "counterType": "+1/+1",
+                            "amount": {
+                                "type": "AggregateBattlefield",
+                                "player": "You",
+                                "filter": "land"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
 }

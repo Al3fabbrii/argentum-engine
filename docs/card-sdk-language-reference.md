@@ -84,8 +84,12 @@ section; do not let SDK additions land without a corresponding doc update.
   cast independently via `CastSpell.faceIndex`; only the chosen half goes on the stack (CR 709.4). A non-permanent half
   carries its effect in a `face("Name") { spell { … } }` block (with its own `target(...)` requirements); a permanent
   half (Room) carries triggered/activated/static abilities instead.
-- `ADVENTURE` — primary face is a creature, `cardFaces[0]` is an instant/sorcery Adventure (CR 715). Resolving the
-  Adventure exiles the card and grants permission to cast the creature from exile.
+- `ADVENTURE` — primary face is a permanent (usually a creature; **may also be a land** — FIN Towns), `cardFaces[0]`
+  is an instant/sorcery Adventure (CR 715). Resolving the Adventure exiles the card and grants permission to play
+  the primary face from exile — *cast* the creature, or *play* the land for a **land // spell** Adventure
+  (`Land — Town // Sorcery — Adventure`, e.g. Ishgard, the Holy See // Faith & Grief). The generic may-play
+  permission covers both; from hand a land-primary Adventure offers *play the land* (PlayLandEnumerator) **and**
+  *cast the Adventure spell* (`CastSpell.faceIndex = 0`).
 - `OMEN` — primary face is a permanent (creature), `cardFaces[0]` is an instant/sorcery Omen (Tarkir: Dragonstorm).
   Casts exactly like an Adventure (creature face, or Omen via `CastSpell.faceIndex = 0`), but resolving the Omen
   **shuffles the card into its owner's library** instead of exiling it — no cast-from-exile linkage. DSL:
@@ -4944,7 +4948,13 @@ Card authors rarely reference these directly; they are created/updated by the ma
   The cast-from-exile path is the standard `MayPlayPermission` flow in `CastFromZoneEnumerator` — `permanent = true`
   keeps the grant alive across end-of-turn cleanup. Emits `CardPlottedEvent` / `ClientEvent.CardPlotted`.
 - **Adventure (CR 715)** — `layout = ADVENTURE` + `cardFaces[0]` Adventure spell; DSL:
-  `card { adventure("Name") { spell { … } } }`.
+  `card { adventure("Name") { spell { … } } }`. The primary face may be a **land** (`Land — Town`) instead of a
+  creature — FIN's "Town land // spell" DFCs (Ishgard, the Holy See // Faith & Grief, …). No new layout: resolving
+  the Adventure exiles the card with the same generic `MayPlayPermission`, which `CastFromZoneEnumerator` /
+  `PlayLandHandler` already honor as a *play-the-land-from-exile* permission. The only seam beyond the creature case
+  is `CastSpellEnumerator` — it now enumerates the Adventure spell face for a land-primary card (the land itself is
+  played via `PlayLandEnumerator`). First land users: Ishgard, the Holy See; Jidoor, Aristocratic Capital; Lindblum,
+  Industrial Regency; Midgar, City of Mako; Zanarkand, Ancient Metropolis.
 - **Omen (Tarkir: Dragonstorm)** — `layout = OMEN` + `cardFaces[0]` Omen spell; DSL:
   `card { omen("Name") { spell { … } } }`. Reuses the Adventure cast/enumeration path (`enumerateSecondaryFace`,
   cast via `CastSpell.faceIndex = 0`), but `StackResolver` routes the resolving Omen to `Zone.LIBRARY` and shuffles
