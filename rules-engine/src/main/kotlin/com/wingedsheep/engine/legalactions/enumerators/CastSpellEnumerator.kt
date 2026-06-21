@@ -54,7 +54,33 @@ class CastSpellEnumerator : ActionEnumerator {
         // --- Normal spell casting ---
         for (cardId in hand) {
             val cardComponent = state.getEntity(cardId)?.get<CardComponent>() ?: continue
-            if (cardComponent.typeLine.isLand) continue
+            if (cardComponent.typeLine.isLand) {
+                // A land's primary characteristics are *played*, not cast (PlayLandEnumerator
+                // handles that). But a land//spell Adventure (FIN Towns — "Land — Town //
+                // Sorcery — Adventure", CR 715) still exposes a castable Adventure spell face
+                // from hand. Enumerate that face, then skip the normal cast path below, which
+                // never applies to a land. When the Adventure resolves it exiles itself and
+                // grants permission to *play the land* from exile (StackResolver / CR 715.3d).
+                if (!context.cantCastSpell(cardId)) {
+                    val landCardDef = context.cardRegistry.getCard(cardComponent.name)
+                    if (landCardDef != null &&
+                        (landCardDef.layout == com.wingedsheep.sdk.model.CardLayout.ADVENTURE ||
+                            landCardDef.layout == com.wingedsheep.sdk.model.CardLayout.OMEN ||
+                            landCardDef.layout == com.wingedsheep.sdk.model.CardLayout.MODAL_DFC) &&
+                        landCardDef.cardFaces.isNotEmpty() &&
+                        context.castPermissionUtils.checkCastRestrictions(
+                            state, playerId, landCardDef.script.castRestrictions
+                        )
+                    ) {
+                        // The land primary is always an available alternative, so surface the
+                        // spell face even when unaffordable (grayed out in the drag-to-play menu).
+                        enumerateSecondaryFace(
+                            context, cardId, landCardDef, result, primaryFaceAffordable = true
+                        )
+                    }
+                }
+                continue
+            }
 
             // Skip this spell if the player can't cast it — a blanket lock, Mana Maze color
             // sharing, or a PlayersCantCastSpells restriction (all routed through one chokepoint).
