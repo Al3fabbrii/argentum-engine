@@ -19,6 +19,10 @@ internal fun BridgeBuilder.zoneMovement() {
     composed("PutGraveyardCardIntoHand", "MoveCollection graveyard->hand", composes = listOf("MoveToZone"))
     composed("PutGraveyardCardOntoBattlefield", "MoveCollection graveyard->battlefield (reanimate)", composes = listOf("MoveToZone"))
     composed("ShuffleGraveyardCardIntoLibrary", "MoveCollection + ShuffleLibrary", composes = listOf("MoveToZone", "ShuffleLibrary"))
+    // "Shuffle this creature and target creature ... into their owners' libraries" (Floodpits Drowner):
+    // two sequential Effects.ShuffleIntoLibrary moves (self + bound target), each into its own owner's
+    // library. The emitter renders only the self + one-bound-target `Or` shape; other groups scaffold.
+    composed("ShuffleEachPermanentIntoLibrary", "self + target ShuffleIntoLibrary (each to owner's library)", composes = listOf("MoveToZone", "ShuffleLibrary"))
     composed("ReturnDeadGraveyardCardToTopOfLibrary", "MoveCollection -> library top", composes = listOf("MoveToZone"))
     composed("PutGraveyardCardOnBottomOfLibrary", "MoveCollection -> library bottom (Tomb Trawler)", composes = listOf("MoveToZone"))
     composed("ReturnGraveyardCardToHand", UNIVERSAL, composes = listOf("MoveToZone"))

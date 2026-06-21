@@ -232,6 +232,30 @@ class TargetRecoveryTest : StringSpec({
         ctx.creatureFilterDsl(nonMount) shouldBe "TargetFilter(GameObjectFilter.Creature.notSubtype(Subtype(\"Mount\")))"
     }
 
+    "creatureFilterDsl renders a 'with a stun counter on it' restriction (Floodpits Drowner)" {
+        // "target creature with a stun counter on it" — HasACounterOfType has no TargetFilter passthrough,
+        // so it must render the GameObjectFilter form wrapped in TargetFilter rather than dropping the
+        // counter constraint (which would let the ability shuffle away any creature).
+        val withStun = obj(
+            """{"_Permanents":"And","args":[""" +
+                """{"_Permanents":"IsCardtype","args":"Creature"},""" +
+                """{"_Permanents":"HasACounterOfType","args":{"_CounterType":"StunCounter"}}]}""",
+        )
+        ctx.creatureFilterDsl(withStun) shouldBe
+            "TargetFilter(GameObjectFilter.Creature.withCounter(Counters.STUN))"
+    }
+
+    "creatureFilterDsl declines a counter restriction whose kind it can't name exactly" {
+        // The counter constraint must never be silently dropped; an unnamed counter kind declines
+        // (-> SCAFFOLD) rather than widening the target to any creature.
+        val withUnknownCounter = obj(
+            """{"_Permanents":"And","args":[""" +
+                """{"_Permanents":"IsCardtype","args":"Creature"},""" +
+                """{"_Permanents":"HasACounterOfType","args":{"_CounterType":"OmenCounter"}}]}""",
+        )
+        ctx.creatureFilterDsl(withUnknownCounter).shouldBeNull()
+    }
+
     "creatureFilterDsl renders a 'dealt damage this turn' restriction (Rooftop Assassin)" {
         // "target creature an opponent controls that was dealt damage this turn" -> the
         // .dealtDamageThisTurn() state-predicate suffix composed with the controller suffix.

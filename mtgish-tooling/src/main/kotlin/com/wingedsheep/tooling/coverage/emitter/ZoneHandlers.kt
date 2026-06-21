@@ -13,6 +13,7 @@ import com.wingedsheep.tooling.coverage.asInt
 import com.wingedsheep.tooling.coverage.asStr
 import com.wingedsheep.tooling.coverage.call
 import com.wingedsheep.tooling.coverage.compact
+import com.wingedsheep.tooling.coverage.dot
 import com.wingedsheep.tooling.coverage.field
 import com.wingedsheep.tooling.coverage.findInteger
 import com.wingedsheep.tooling.coverage.findRef
@@ -338,6 +339,29 @@ internal val zoneHandlers: Map<String, ActionHandler> = actionHandlers {
     on("ShuffleGraveyardCardIntoLibrary") { _, args, tvar ->  // e.g. Alabaster Dragon
         val tgt = refTarget(args, tvar) ?: "EffectTarget.Self"
         call("Effects.Move", arg(Lit(tgt)), arg("Zone.LIBRARY"), arg("ZonePlacement.Shuffled"))
+    }
+
+    // "Shuffle this creature and target creature with a stun counter on it into their owners'
+    // libraries" (Floodpits Drowner). The IR shuffles each permanent of an `Or` group; render ONLY the
+    // self + one-bound-target shape: an `Or` of exactly two `SinglePermanent`s, one a self-ref
+    // (ThisPermanent) and the other the bound `Ref_TargetPermanent`. Each is shuffled into its own
+    // owner's library, so it becomes two sequential `Effects.ShuffleIntoLibrary` moves — source first,
+    // then the target — matching the IR order. Any other group (more permanents, a filtered group, no
+    // bound target, no self member) declines -> SCAFFOLD rather than emit a lossy shuffle.
+    on("ShuffleEachPermanentIntoLibrary") { _, args, tvar ->
+        if (args.strField("_Permanents") != "Or") return@on null
+        val members = args.field("args").asArr ?: return@on null
+        if (members.size != 2) return@on null
+        val refs = members.map { m ->
+            if (m.strField("_Permanents") != "SinglePermanent") return@on null
+            findRef(m.field("args"))
+        }
+        val selfIdx = refs.indexOfFirst { it in SELF_REFS }
+        val targetIdx = refs.indexOfFirst { it == "Ref_TargetPermanent" }
+        if (selfIdx < 0 || targetIdx < 0 || selfIdx == targetIdx) return@on null
+        val targetDsl = refTarget(members[targetIdx].field("args"), tvar) ?: return@on null
+        call("Effects.ShuffleIntoLibrary", arg("EffectTarget.Self"))
+            .dot("then", arg(call("Effects.ShuffleIntoLibrary", arg(Lit(targetDsl)))))
     }
 
     on("Surveil") { _, args, _ ->  // "Surveil N" -> the look-top / keep-or-bin pipeline

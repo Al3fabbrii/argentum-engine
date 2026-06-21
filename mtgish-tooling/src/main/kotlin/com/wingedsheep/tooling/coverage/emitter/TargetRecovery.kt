@@ -250,6 +250,33 @@ internal fun EmitCtx.creatureFilterExpr(filterNode: JsonElement?): Dsl? {
         }
         return Call("TargetFilter", listOf(arg(g)))
     }
+    // "target creature with a <kind> counter on it" (HasACounterOfType) — Floodpits Drowner's "target
+    // creature with a stun counter on it". The named state predicate lives on GameObjectFilter
+    // (.withCounter(Counters.X)), not on the TargetFilter surface, so render the GameObjectFilter form
+    // wrapped in TargetFilter — matching the hand-authored `TargetFilter(GameObjectFilter.Creature
+    // .withCounter(Counters.STUN))`. Guard strictly: only the bare Creature + counter shape (optionally a
+    // You/Opponent controller); any other predicate would be silently dropped, so decline -> SCAFFOLD.
+    // The counter kind must be one counterTypeDsl can name exactly, else decline rather than widen.
+    run {
+        val counterNodes = filterNode.nodesTagged("HasACounterOfType")
+        if (counterNodes.size == 1) {
+            val otherPredicates = listOf(
+                "IsTapped", "IsUntapped", "IsAttacking", "IsBlocking", "PowerIs", "ToughnessIs", "ManaValueIs",
+                "IsColor", "IsNonColor", "HasAbility", "DoesntHaveAbility", "IsNonToken", "IsCreatureType",
+                "IsNonCreatureType", "IsNonCardtype", "Other", "WasDealtDamageThisTurn",
+            )
+            if (otherPredicates.none { it in blob }) {
+                val counter = counterTypeDsl(counterNodes.first()["args"]) ?: return null
+                var g: Dsl = Lit("GameObjectFilter.Creature").dot("withCounter", arg(counter))
+                when {
+                    "\"You\"" in blob -> g = g.dot("youControl")
+                    "\"Opponent\"" in blob -> g = g.dot("opponentControls")
+                    "ControlledByAPlayer" in blob -> return null  // unrenderable controller ref -> SCAFFOLD
+                }
+                return Call("TargetFilter", listOf(arg(g)))
+            }
+        }
+    }
     // "nonartifact creature" (the Terror template) renders via .nonartifact(); any OTHER non-cardtype
     // restriction has no faithful filter rendering yet, so drop to SCAFFOLD rather than omit it.
     val nonCardtypes = filterNode.argWordsTagged("IsNonCardtype")
