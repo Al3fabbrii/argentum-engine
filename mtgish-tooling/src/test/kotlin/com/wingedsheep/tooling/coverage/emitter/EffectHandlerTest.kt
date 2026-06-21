@@ -165,4 +165,29 @@ class EffectHandlerTest : StringSpec({
             "t",
         ).shouldBeNull()
     }
+
+    // --- ShuffleEachPermanentIntoLibrary (self + bound target, Floodpits Drowner) -----------------
+
+    "ShuffleEachPermanentIntoLibrary renders self + target as two ShuffleIntoLibrary moves" {
+        // "Shuffle this creature and target creature with a stun counter on it into their owners'
+        // libraries" — Or(SinglePermanent ThisPermanent, SinglePermanent Ref_TargetPermanent), each
+        // shuffled into its own owner's library, source first then the bound target.
+        layer(
+            """{"_Action":"ShuffleEachPermanentIntoLibrary","args":{"_Permanents":"Or","args":[""" +
+                """{"_Permanents":"SinglePermanent","args":{"_Permanent":"ThisPermanent"}},""" +
+                """{"_Permanents":"SinglePermanent","args":{"_Permanent":"Ref_TargetPermanent"}}]}}""",
+            "t",
+        ) shouldBe "Effects.ShuffleIntoLibrary(EffectTarget.Self).then(Effects.ShuffleIntoLibrary(t))"
+    }
+
+    "ShuffleEachPermanentIntoLibrary declines a group that isn't self + one bound target" {
+        // No self member (two bound targets) — not the modeled self + target shape, so decline rather
+        // than emit a shuffle that drops the source half.
+        layer(
+            """{"_Action":"ShuffleEachPermanentIntoLibrary","args":{"_Permanents":"Or","args":[""" +
+                """{"_Permanents":"SinglePermanent","args":{"_Permanent":"Ref_TargetPermanent1"}},""" +
+                """{"_Permanents":"SinglePermanent","args":{"_Permanent":"Ref_TargetPermanent2"}}]}}""",
+            "t",
+        ).shouldBeNull()
+    }
 })
