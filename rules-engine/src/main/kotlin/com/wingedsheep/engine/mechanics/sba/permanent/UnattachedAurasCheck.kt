@@ -7,6 +7,7 @@ import com.wingedsheep.engine.mechanics.sba.SbaZoneMovementHelper
 import com.wingedsheep.engine.mechanics.sba.StateBasedActionCheck
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.AttachedToComponent
+import com.wingedsheep.engine.state.components.battlefield.AttachmentHostLeftComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 
 /**
@@ -40,6 +41,29 @@ class UnattachedAurasCheck : StateBasedActionCheck {
             val isEquipment = cardComponent.typeLine.isEquipment
 
             if (!isAura && !isEquipment) continue
+
+            // CR 400.7 / 704.5m-n: the host this attachment was on left the battlefield. The host's
+            // EntityId may have returned via a blink (a same-id but *new* object), so the id-based
+            // checks below can't see the leave — the leave-time marker does. An Aura goes to the
+            // graveyard; an Equipment unattaches and stays on the battlefield.
+            val hostLeft = container.get<AttachmentHostLeftComponent>()
+            if (hostLeft != null) {
+                newState = newState.updateEntity(entityId) { c -> c.without<AttachmentHostLeftComponent>() }
+                if (isAura) {
+                    val result = SbaZoneMovementHelper.putPermanentInGraveyard(
+                        newState, entityId, cardComponent,
+                        lastKnownAttachedTo = hostLeft.lastKnownHostId
+                    )
+                    newState = result.newState
+                    events.addAll(result.events)
+                } else {
+                    newState = cleanupReverseAttachmentLink(newState, entityId)
+                    newState = newState.updateEntity(entityId) { c ->
+                        c.without<AttachedToComponent>()
+                    }
+                }
+                continue
+            }
 
             val attachedTo = container.get<AttachedToComponent>()
             if (attachedTo == null) {

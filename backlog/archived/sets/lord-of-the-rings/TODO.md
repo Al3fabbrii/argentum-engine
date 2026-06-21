@@ -10,31 +10,25 @@ Verify status anytime with: `scripts/card-status --set LTR` (and `--list --set L
 
 ## Status
 
-Draft cards at **192/261** (Extra **17/28**); whole set **209/291** — verify with
-`scripts/card-status --set LTR`. Every remaining unchecked card in `cards.md` (excluding the five
-basic lands, which `basicLandsFallback` covers) still needs at least one new engine primitive — see
-the "Engine gaps blocking the remaining cards" section below. Each card is listed under the
-primitive it is waiting on, with the exact blocking clause. Stop and open a dedicated PR per
-gap rather than approximating.
+> ✅ **COMPLETE — 291/291 implemented (100%).** Verified with `scripts/card-status --set LTR`
+> (261/261 Draft, 28/28 Extra). Every card in `cards.md` is implemented with a passing scenario
+> test, and every engine gap catalogued below has LANDED. The sections that follow are retained as
+> a historical record of which engine primitive unblocked which card — not as open work.
 
-> **Foundational mechanics now LANDED** (no longer blockers): the Ring temptation mechanic,
-> Amass/Army tokens, Food/Treasure tokens, the `WheneverYouScry` trigger, the LTR counter types
-> (hope/verse/influence/burden/stun), Goad, and the Gap 17/19/20 condition primitives. The
-> remaining tail is blocked on the specific gaps below; see `missing-effects.md` for the
-> per-card family map and the "what unblocks the most cards" ranking.
+Previously-tracked residual blockers, now resolved:
 
-One card has a residual blocker that doesn't share a clean reusable gap with anything else;
-it's listed here so it doesn't get lost:
-
-- **Grishnákh, Brash Instigator** — needs pipeline state threaded into target-predicate
-  filters (its "with power ≤ the amassed Army's power" filter resolves the reference to
-  `null` during targeting today).
-
-- **Shagrat, Loot Bearer** — ✅ implemented. Landed `DynamicAmounts.equipmentAttachedToSelf()`
+- **Grishnákh, Brash Instigator** — ✅ implemented. Pipeline state is threaded into the target
+  search (`findLegalTargets(..., pipelineContext = …)`), so the reflexive "creature with power ≤
+  the amassed Army's power" filter resolves against `EntityReference.AmassedArmy`.
+- **Shagrat, Loot Bearer** — ✅ implemented via `DynamicAmounts.equipmentAttachedToSelf()`
   (Equipment-only attachment count, `EntityNumericProperty.AttachmentCount(AttachmentKind.EQUIPMENT)`)
   so the amass X counts only Equipment attached to Shagrat.
 
 ## Data sources — do NOT hit the network
+
+> ℹ️ Historical (the set is complete). The `ltr_set.json` Scryfall dump referenced below has
+> since been removed from the repo as an unneeded large file; re-export it from Scryfall if a
+> future correction pass needs it.
 
 - **Card data** (name, mana cost, type line, oracle text, P/T, rarity, collector number,
   artist, flavor, image URI): read from `ltr_set.json`, **not** Scryfall. It is a full
@@ -85,13 +79,15 @@ For each unchecked card in `cards.md`:
 
 ---
 
-## Engine gaps blocking the remaining cards
+## Engine gaps (historical changelog — all LANDED)
 
-Every card still unchecked in `cards.md` (excluding the five basic lands, which the fallback
-covers) needs at least one new engine primitive. They are grouped below by the gap they wait
-on; each bullet quotes the **specific clause** that cannot be composed today. A card with more
-than one gap is listed under its dominant gap with the secondary one noted inline. Clear a gap
-in its own PR, then attach all of its cards.
+> ✅ **Every gap below has LANDED and every card listed is implemented.** Kept as a historical
+> engine-feature changelog — which primitive unblocked which card — not as open work. Some per-card
+> bullets are frozen from when their gap was open and still read "still blocked on Gap X"; the
+> authoritative current status is `scripts/card-status --set LTR` (100%).
+
+Originally each of these cards needed at least one new engine primitive, grouped by the gap it
+waited on; each bullet quotes the **specific clause** that drove the engine change.
 
 ### Gap 2 — "draw your second card each turn" trigger
 **Status:** LANDED as `Triggers.NthCardDrawn(n, player)` (PR `Add NthCardDrawn trigger primitive`).

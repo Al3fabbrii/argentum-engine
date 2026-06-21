@@ -4,6 +4,7 @@ import com.wingedsheep.engine.handlers.PredicateContext
 import com.wingedsheep.engine.handlers.PredicateEvaluator
 import com.wingedsheep.engine.handlers.effects.DamageUtils
 import com.wingedsheep.engine.mechanics.layers.ProjectedState
+import com.wingedsheep.engine.mechanics.targeting.PlayerProtectionRules
 import com.wingedsheep.engine.mechanics.layers.SerializableModification
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.combat.AttackingComponent
@@ -112,6 +113,35 @@ internal class ProtectionModifier : CombatDamageModifier {
                     srcController != null && tgtController != null && srcController != tgtController
                 }
             !protectedByColor && !protectedBySubtype && !protectedBySupertype && !protectedByCardType && !protectedFromOpponent
+        }
+    }
+}
+
+/**
+ * Prevents combat damage to a player with player-level protection from the damage's source
+ * (CR 702.16 — the **D**amage half of DEBT; e.g. The One Ring's "protection from everything").
+ * The combat Apply phase ([CombatDamageManager.applyDamageToPlayer]) reduces life directly and
+ * never consults [PlayerProtectionRules], so — unlike non-combat damage via
+ * [DamageUtils.dealDamageToTarget] — the prevention has to happen here, by dropping the assignment.
+ *
+ * The protected player is the assignment target, the attacking creature its source; this mirrors
+ * the keyword [ProtectionModifier] and the floating-effect [PreventDamageFromAttackingCreaturesModifier]
+ * (Deep Wood). [PlayerProtectionRules.isProtectedFromSource] is false for any non-player or
+ * unprotected target, so creature assignments pass through untouched. Protection prevents damage
+ * (CR 702.16e), but damage that simply can't be prevented still reduces life — so this is skipped
+ * when prevention is globally disabled (Fear, Fire, Foes! / Sunspine Lynx); cf. The One Ring's
+ * Gatherer ruling (2023-06-16).
+ */
+internal class PlayerProtectionModifier : CombatDamageModifier {
+    override fun modify(state: GameState, projected: ProjectedState, assignments: List<CombatDamageAssignment>): List<CombatDamageAssignment> {
+        if (DamageUtils.isDamagePreventionDisabled(state)) return assignments
+        return assignments.filter { assignment ->
+            !PlayerProtectionRules.isProtectedFromSource(
+                state,
+                playerId = assignment.targetId,
+                sourceId = assignment.sourceId,
+                casterId = projected.getController(assignment.sourceId)
+            )
         }
     }
 }

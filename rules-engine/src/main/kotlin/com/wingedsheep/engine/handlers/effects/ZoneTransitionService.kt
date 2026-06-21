@@ -241,11 +241,15 @@ object ZoneTransitionService {
         if (leavingBattlefield) {
             newState = cleanupReverseAttachmentLink(newState, entityId)
             newState = cleanupCombatReferences(newState, entityId)
+            // Equipment/Auras attached *to* this permanent come off when their host leaves the
+            // battlefield (CR 704.5n unattaches Equipment, 704.5m graveyards Auras) — applied by
+            // the UnattachedAurasCheck state-based action,
+            // which runs after any "when equipped creature dies/leaves" triggers (Forebears Blade)
+            // have been detected, so the attachment must NOT be cleared eagerly here. We only *mark*
+            // the attachments now: the host's EntityId is reused across a blink (exile→battlefield),
+            // so the SBA can't otherwise tell the host left and returned as a new object.
+            newState = ZoneMovementUtils.markAttachmentsHostLeft(newState, entityId)
         }
-        // Equipment/Auras attached *to* this permanent become unattached when their host leaves
-        // the battlefield (CR 704.5q) — handled by the UnattachedAurasCheck state-based action,
-        // which runs after any "when equipped creature dies/leaves" triggers (Forebears Blade) have
-        // been detected, so the attachment must NOT be cleared eagerly here.
 
         // 5. Strip face-down if leaving exile
         if (fromZone == Zone.EXILE) {

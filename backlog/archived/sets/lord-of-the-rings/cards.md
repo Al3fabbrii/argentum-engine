@@ -2,7 +2,7 @@
 
 **Set Size:** 291 cards (261 Draft / 30 Extra)
 **Release Date:** June 23, 2023
-**Implemented:** 212 / 291
+**Implemented:** 291 / 291
 Run `scripts/card-status --set LTR` (and `--list --set LTR`) to verify status at any time.
 The split below mirrors that script: **Draft** = Scryfall `booster: true`; **Extra** =
 starter-deck/special cards and basic lands.
@@ -27,14 +27,14 @@ starter-deck/special cards and basic lands.
 
 - [x] Banish from Edoras
 - [x] The Battle of Bywater
-- [ ] Bill the Pony
-- [ ] Boromir, Warden of the Tower
+- [x] Bill the Pony
+- [x] Boromir, Warden of the Tower
 - [x] Dawn of a New Age
 - [x] Dúnedain Blade
 - [x] Eagles of the North
 - [x] Eastfarthing Farmer
 - [x] East-Mark Cavalier
-- [ ] Éowyn, Lady of Rohan
+- [x] Éowyn, Lady of Rohan
 - [x] Errand-Rider of Gondor
 - [x] Escape from Orthanc
 - [x] Esquire of the King
@@ -42,7 +42,7 @@ starter-deck/special cards and basic lands.
 - [x] Flowering of the White Tree
 - [x] Fog on the Barrow-Downs
 - [x] Forge Anew
-- [ ] Frodo, Sauron's Bane
+- [x] Frodo, Sauron's Bane
 - [x] Gandalf the White
 - [x] Hobbit's Sting
 - [x] Landroval, Horizon Witness
@@ -55,31 +55,31 @@ starter-deck/special cards and basic lands.
 - [x] Samwise the Stouthearted
 - [x] Second Breakfast
 - [x] Shire Shirriff
-- [ ] Slip On the Ring
+- [x] Slip On the Ring
 - [x] Soldier of the Grey Host
 - [x] Stalwarts of Osgiliath
 - [x] Tale of Tinúviel
 - [x] Took Reaper
 - [x] War of the Last Alliance
 - [x] Westfold Rider
-- [ ] You Cannot Pass!
+- [x] You Cannot Pass!
 
 ### Blue
 
 - [x] Arwen's Gift
 - [x] The Bath Song
-- [ ] Bewitching Leechcraft
+- [x] Bewitching Leechcraft
 - [x] Bill Ferny, Bree Swindler
 - [x] Birthday Escape
 - [x] Borne Upon a Wind
 - [x] Captain of Umbar
 - [x] Council's Deliberation
 - [x] Deceive the Messenger
-- [ ] Dreadful as the Storm
-- [ ] Elrond, Lord of Rivendell
+- [x] Dreadful as the Storm
+- [x] Elrond, Lord of Rivendell
 - [x] Gandalf, Friend of the Shire
-- [ ] Glorious Gale
-- [ ] Goldberry, River-Daughter
+- [x] Glorious Gale
+- [x] Goldberry, River-Daughter
 - [x] Grey Havens Navigator
 - [x] Hithlain Knots
 - [x] Horses of the Bruinen
@@ -88,12 +88,12 @@ starter-deck/special cards and basic lands.
 - [x] Ithilien Kingfisher
 - [x] Knights of Dol Amroth
 - [x] Lórien Revealed
-- [ ] Lost Isle Calling
+- [x] Lost Isle Calling
 - [x] Meneldor, Swift Savior
 - [x] Nimrodel Watcher
 - [x] Pelargir Survivor
-- [ ] Press the Enemy
-- [ ] Rangers of Ithilien
+- [x] Press the Enemy
+- [x] Rangers of Ithilien
 - [x] Saruman the White
 - [x] Saruman's Trickery
 - [x] Scroll of Isildur
@@ -109,17 +109,17 @@ starter-deck/special cards and basic lands.
 
 - [x] Bitter Downfall
 - [x] The Black Breath
-- [ ] Call of the Ring
+- [x] Call of the Ring
 - [x] Cirith Ungol Patrol
 - [x] Claim the Precious
 - [x] Dunland Crebain
 - [x] Easterling Vanguard
-- [ ] Gollum, Patient Plotter
-- [ ] Gollum's Bite
+- [x] Gollum, Patient Plotter
+- [x] Gollum's Bite
 - [x] Gorbag of Minas Morgul
 - [x] Gothmog, Morgul Lieutenant
 - [x] Gríma Wormtongue
-- [ ] Grond, the Gatebreaker
+- [x] Grond, the Gatebreaker
 - [x] Haunt of the Dead Marshes
 - [x] Isildur's Fateful Strike
 - [x] Lash of the Balrog
@@ -132,33 +132,33 @@ starter-deck/special cards and basic lands.
 - [x] Nasty End
 - [x] Nazgûl
 - [x] Oath of the Grey Host
-- [ ] One Ring to Rule Them All
+- [x] One Ring to Rule Them All
 - [x] Orcish Bowmasters
 - [x] Orcish Medicine
 - [x] Sam's Desperate Rescue
-- [ ] Sauron, the Necromancer
+- [x] Sauron, the Necromancer
 - [x] Shadow of the Enemy
 - [x] Shelob's Ambush
 - [x] Snarling Warg
 - [x] The Torment of Gollum
-- [ ] Troll of Khazad-dûm
+- [x] Troll of Khazad-dûm
 - [x] Uruk-hai Berserker
-- [ ] Voracious Fell Beast
-- [ ] Witch-king of Angmar
+- [x] Voracious Fell Beast
+- [x] Witch-king of Angmar
 
 ### Red
 
-- [ ] Battle-Scarred Goblin
+- [x] Battle-Scarred Goblin
 - [x] Book of Mazarbul
-- [ ] Breaking of the Fellowship
+- [x] Breaking of the Fellowship
 - [x] Cast into the Fire
-- [ ] Display of Power
+- [x] Display of Power
 - [x] Éomer, Marshal of Rohan
 - [x] Éomer of the Riddermark
 - [x] Erebor Flamesmith
 - [x] Erkenbrand, Lord of Westfold
 - [x] Fall of Cair Andros
-- [ ] Fear, Fire, Foes!
+- [x] Fear, Fire, Foes!
 - [x] Fiery Inscription
 - [x] Fire of Orthanc
 - [x] Foray of Orcs
@@ -167,9 +167,9 @@ starter-deck/special cards and basic lands.
 - [x] Gimli's Fury
 - [x] Glóin, Dwarf Emissary
 - [x] Goblin Fireleaper
-- [ ] Grishnákh, Brash Instigator
+- [x] Grishnákh, Brash Instigator
 - [x] Haradrim Spearmaster
-- [ ] Hew the Entwood
+- [x] Hew the Entwood
 - [x] Improvised Club
 - [x] Moria Marauder
 - [x] Oliphaunt
@@ -194,8 +194,8 @@ starter-deck/special cards and basic lands.
 - [x] Brandywine Farmer
 - [x] Celeborn the Wise
 - [x] Chance-Met Elves
-- [ ] Delighted Halfling
-- [ ] Dúnedain Rangers
+- [x] Delighted Halfling
+- [x] Dúnedain Rangers
 - [x] Elven Chorus
 - [x] Elven Farsight
 - [x] Enraged Huorn
@@ -207,9 +207,9 @@ starter-deck/special cards and basic lands.
 - [x] Galadhrim Guide
 - [x] Generous Ent
 - [x] Gift of Strands
-- [ ] Glorfindel, Dauntless Rescuer
+- [x] Glorfindel, Dauntless Rescuer
 - [x] Last March of the Ents
-- [ ] Legolas, Master Archer
+- [x] Legolas, Master Archer
 - [x] Long List of the Ents
 - [x] Lothlórien Lookout
 - [x] Many Partings
@@ -217,12 +217,12 @@ starter-deck/special cards and basic lands.
 - [x] Mirkwood Spider
 - [x] Mirrormere Guardian
 - [x] Mushroom Watchdogs
-- [ ] Peregrin Took
+- [x] Peregrin Took
 - [x] Pippin's Bravery
 - [x] Quickbeam, Upstart Ent
-- [ ] Radagast the Brown
+- [x] Radagast the Brown
 - [x] Revive the Shire
-- [ ] The Ring Goes South
+- [x] The Ring Goes South
 - [x] Shortcut to Mushrooms
 - [x] Shower of Arrows
 - [x] Stew the Coneys
@@ -230,80 +230,80 @@ starter-deck/special cards and basic lands.
 
 ### Multicolor
 
-- [ ] Aragorn, Company Leader
+- [x] Aragorn, Company Leader
 - [x] Aragorn, the Uniter
 - [x] Arwen, Mortal Queen
 - [x] Arwen Undómiel
-- [ ] The Balrog, Durin's Bane
+- [x] The Balrog, Durin's Bane
 - [x] Bilbo, Retired Burglar
 - [x] Butterbur, Bree Innkeeper
 - [x] Denethor, Ruling Steward
 - [x] Doors of Durin
 - [x] Elrond, Master of Healing
 - [x] Éowyn, Fearless Knight
-- [ ] Faramir, Prince of Ithilien
-- [ ] Flame of Anor
+- [x] Faramir, Prince of Ithilien
+- [x] Flame of Anor
 - [x] Friendly Rivalry
-- [ ] Frodo Baggins
-- [ ] Galadriel of Lothlórien
-- [ ] Gandalf the Grey
-- [ ] Gandalf's Sanction
+- [x] Frodo Baggins
+- [x] Galadriel of Lothlórien
+- [x] Gandalf the Grey
+- [x] Gandalf's Sanction
 - [x] Gimli, Mournful Avenger
-- [ ] Gwaihir the Windlord
-- [ ] King of the Oathbreakers
+- [x] Gwaihir the Windlord
+- [x] King of the Oathbreakers
 - [x] Legolas, Counter of Kills
 - [x] Lotho, Corrupt Shirriff
 - [x] Mauhúr, Uruk-hai Captain
 - [x] Merry, Esquire of Rohan
 - [x] The Mouth of Sauron
 - [x] Old Man Willow
-- [ ] Pippin, Guard of the Citadel
+- [x] Pippin, Guard of the Citadel
 - [x] Prince Imrahil the Fair
-- [ ] Ringsight
+- [x] Ringsight
 - [x] Rise of the Witch-king
 - [x] Samwise Gamgee
-- [ ] Saruman of Many Colors
-- [ ] Sauron, the Dark Lord
-- [ ] Sauron's Ransom
+- [x] Saruman of Many Colors
+- [x] Sauron, the Dark Lord
+- [x] Sauron's Ransom
 - [x] Shadow Summoning
-- [ ] Shadowfax, Lord of Horses
+- [x] Shadowfax, Lord of Horses
 - [x] Shagrat, Loot Bearer
-- [ ] Sharkey, Tyrant of the Shire
-- [ ] Shelob, Child of Ungoliant
-- [ ] Sméagol, Helpful Guide
+- [x] Sharkey, Tyrant of the Shire
+- [x] Shelob, Child of Ungoliant
+- [x] Sméagol, Helpful Guide
 - [x] Strider, Ranger of the North
 - [x] Théoden, King of Rohan
-- [ ] Tom Bombadil
+- [x] Tom Bombadil
 - [x] Uglúk of the White Hand
 
 ### Artifact
 
 - [x] Andúril, Flame of the West
-- [ ] Barrow-Blade
-- [ ] Ent-Draught Basin
-- [ ] Glamdring
+- [x] Barrow-Blade
+- [x] Ent-Draught Basin
+- [x] Glamdring
 - [x] Horn of Gondor
 - [x] Horn of the Mark
 - [x] Inherited Envelope
 - [x] Lembas
 - [x] Mirror of Galadriel
 - [x] Mithril Coat
-- [ ] The One Ring
-- [ ] Palantír of Orthanc
-- [ ] Phial of Galadriel
+- [x] The One Ring
+- [x] Palantír of Orthanc
+- [x] Phial of Galadriel
 - [x] Shire Scarecrow
-- [ ] Sting, the Glinting Dagger
+- [x] Sting, the Glinting Dagger
 - [x] Stone of Erech
 - [x] Wizard's Rockets
 
 ### Land
 
-- [ ] Barad-dûr
-- [ ] Great Hall of the Citadel
-- [ ] The Grey Havens
+- [x] Barad-dûr
+- [x] Great Hall of the Citadel
+- [x] The Grey Havens
 - [x] Minas Tirith
 - [x] Mines of Moria
-- [ ] Mount Doom
+- [x] Mount Doom
 - [x] Rivendell
 - [x] The Shire
 - [x] Shire Terrace
@@ -318,7 +318,7 @@ starter-deck/special cards and basic lands.
 
 ### Artifact
 
-- [ ] A-The One Ring
+- [x] A-The One Ring
 
 ### White
 
@@ -330,7 +330,7 @@ starter-deck/special cards and basic lands.
 
 ### Black
 
-- [ ] Ringwraiths
+- [x] Ringwraiths
 
 ### Red
 
@@ -353,12 +353,12 @@ starter-deck/special cards and basic lands.
 
 ### Black
 
-- [ ] Gollum, Scheming Guide
-- [ ] Witch-king, Bringer of Ruin
+- [x] Gollum, Scheming Guide
+- [x] Witch-king, Bringer of Ruin
 
 ### Red
 
-- [ ] Fires of Mount Doom
+- [x] Fires of Mount Doom
 - [x] Goblin Assailant
 
 ### Green
@@ -372,15 +372,15 @@ starter-deck/special cards and basic lands.
 ### Artifact
 
 - [x] Bilbo's Ring
-- [ ] Trailblazer's Boots
+- [x] Trailblazer's Boots
 
 ### Land
 
-- [ ] Plains
-- [ ] Island
-- [ ] Swamp
-- [ ] Mountain
-- [ ] Forest
+- [x] Plains
+- [x] Island
+- [x] Swamp
+- [x] Mountain
+- [x] Forest
 
 ### White
 
@@ -396,7 +396,7 @@ starter-deck/special cards and basic lands.
 
 ### Red
 
-- [ ] Riders of the Mark
+- [x] Riders of the Mark
 
 ### Green
 

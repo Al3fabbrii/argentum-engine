@@ -1,6 +1,10 @@
 # LTR — Missing Effects
 
-Auto-generated triage of the unimplemented LTR cards, **refreshed 2026-06-10**.
+> ✅ **COMPLETE — 0 missing. All 291 LTR cards are implemented (100%).** Verified with
+> `scripts/card-status --set LTR`. Every effect family below has LANDED; this triage is retained as
+> a historical record of the gap analysis and is no longer open work.
+
+Auto-generated triage of the (formerly) unimplemented LTR cards, **refreshed 2026-06-10**.
 For each card we list every engine primitive / mechanic family it touches; the
 leaderboard ranks each family by how many missing cards it appears on.
 
@@ -9,7 +13,7 @@ leaderboard ranks each family by how many missing cards it appears on.
 > the 2026-06-08 snapshot were dropped and counts recomputed. Card→family tags are
 > still hand-curated; verify against `cards.md` + `ltr_set.json` when in doubt.
 
-**Missing cards:** 82 of 291 (72% implemented)
+**Missing cards:** 0 of 291 (100% implemented). _The historical snapshot below recorded 82 missing._
 
 ## Foundational families now IMPLEMENTED (no longer blockers)
 

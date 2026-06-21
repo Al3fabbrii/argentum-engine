@@ -377,11 +377,16 @@ data class TargetObject(
     override val description: String = run {
         val base = if (id != null) {
             buildString {
-                when {
-                    unlimited -> append("any number of ")
-                    optional -> append("up to ")
-                    minCount < count -> append("$minCount to ")
+                // The author-supplied id is often the complete phrase already (e.g. Elrond,
+                // Master of Healing's "up to X target creatures"). Only add the quantifier when
+                // the id doesn't already begin with it, so we don't render "up to up to …".
+                val quantifier = when {
+                    unlimited -> "any number of "
+                    optional -> "up to "
+                    minCount < count -> "$minCount to "
+                    else -> ""
                 }
+                if (quantifier.isNotEmpty() && !id.startsWith(quantifier)) append(quantifier)
                 append(id)
             }
         } else {
