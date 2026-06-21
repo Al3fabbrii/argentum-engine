@@ -242,7 +242,7 @@ structural template; needs a sibling layout + loader so the land becomes the pla
 1. ✅ **Warm-ups (Tier 2, cheap) — DONE:** Equipment/equipped-creature count `DynamicAmount` (§6), devotion dynamic amount
    (§7), scry-or-surveil trigger (§11). These unlock ~10 scattered cards with trivial engine work, and the bulk of
    the standard cycling/flashback/kicker/affinity/crew cards are already buildable today via the `add-card` skill.
-2. **Job select (§3)** — publish the created-token id into the pipeline, then `jobSelect()` shell. Unlocks all 16
+2. ✅ **Job select (§3)** — publish the created-token id into the pipeline, then `jobSelect()` shell. Unlocks all 16
    Equipment at once; isolated and high-yield.
 3. **Tiered (§4)** — extend the modal/Spree cast pipeline to charge the chosen mode's additional cost + `tiered { }`
    builder. 6 spells, contained.
