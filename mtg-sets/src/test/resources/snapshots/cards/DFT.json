@@ -662,7 +662,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -1835,7 +1836,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -3907,7 +3909,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -3996,7 +3999,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }

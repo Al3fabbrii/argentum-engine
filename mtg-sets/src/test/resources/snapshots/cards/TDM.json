@@ -2032,7 +2032,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, surveil 1."
@@ -3091,7 +3092,8 @@
                                         "placement": "Top"
                                     },
                                     "order": "ControllerChooses"
-                                }
+                                },
+                                "EmitSurveiledEvent"
                             ]
                         }
                     ]
@@ -3180,6 +3182,7 @@
                     },
                     "order": "ControllerChooses"
                 },
+                "EmitSurveiledEvent",
                 {
                     "type": "DrawCards",
                     "count": {
@@ -5397,7 +5400,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "descriptionOverride": "At the beginning of your upkeep, surveil 1."
@@ -5535,7 +5539,8 @@
                                                     "placement": "Top"
                                                 },
                                                 "order": "ControllerChooses"
-                                            }
+                                            },
+                                            "EmitSurveiledEvent"
                                         ]
                                     }
                                 ]
@@ -8698,7 +8703,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "descriptionOverride": "Surveil 2."
@@ -11085,7 +11091,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "descriptionOverride": "When this creature enters, surveil 1."
@@ -11489,7 +11496,8 @@
                                     "placement": "Top"
                                 },
                                 "order": "ControllerChooses"
-                            }
+                            },
+                            "EmitSurveiledEvent"
                         ]
                     }
                 }

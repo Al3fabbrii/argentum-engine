@@ -798,7 +798,8 @@
                                             "placement": "Top"
                                         },
                                         "order": "ControllerChooses"
-                                    }
+                                    },
+                                    "EmitSurveiledEvent"
                                 ]
                             }
                         ]
@@ -4176,7 +4177,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -4371,7 +4373,8 @@
                                     "placement": "Top"
                                 },
                                 "order": "ControllerChooses"
-                            }
+                            },
+                            "EmitSurveiledEvent"
                         ]
                     }
                 }
@@ -5628,7 +5631,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "descriptionOverride": "{2}{U}: Surveil 1."
@@ -6086,7 +6090,8 @@
                                     "placement": "Top"
                                 },
                                 "order": "ControllerChooses"
-                            }
+                            },
+                            "EmitSurveiledEvent"
                         ]
                     }
                 }
@@ -12027,7 +12032,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "oncePerTurn": true,
@@ -12759,7 +12765,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             ]
@@ -14440,7 +14447,8 @@
                                     "placement": "Top"
                                 },
                                 "order": "ControllerChooses"
-                            }
+                            },
+                            "EmitSurveiledEvent"
                         ]
                     }
                 },
@@ -18879,7 +18887,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
