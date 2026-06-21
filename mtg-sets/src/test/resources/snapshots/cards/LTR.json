@@ -15907,28 +15907,39 @@
                             "amount": 4
                         }
                     },
-                    "storeAs": "revealed",
-                    "revealed": true
+                    "storeAs": "looked",
+                    "lookAudience": "None"
                 },
                 {
                     "type": "SelectFromCollection",
-                    "from": "revealed",
+                    "from": "looked",
                     "selection": "ChooseAnyNumber",
                     "chooser": "Opponent",
-                    "storeSelected": "pileA",
-                    "storeRemainder": "pileB",
-                    "prompt": "Separate the revealed cards into two piles. The cards you select form Pile 1; the rest form Pile 2.",
-                    "selectedLabel": "Pile 1",
-                    "remainderLabel": "Pile 2",
+                    "storeSelected": "faceUp",
+                    "storeRemainder": "faceDown",
+                    "prompt": "Separate the top four cards into a face-up pile and a face-down pile. The cards you select are placed face up; the rest stay face down.",
+                    "selectedLabel": "Face-up pile",
+                    "remainderLabel": "Face-down pile",
                     "alwaysPrompt": true
                 },
                 {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "FromVariable",
+                        "variableName": "faceUp"
+                    },
+                    "storeAs": "faceUp",
+                    "revealed": true
+                },
+                {
                     "type": "ChoosePile",
-                    "pileA": "pileA",
-                    "pileB": "pileB",
+                    "pileA": "faceUp",
+                    "pileB": "faceDown",
+                    "pileALabel": "Face-up pile",
+                    "pileBLabel": "Face-down pile",
                     "storeChosenAs": "keepPile",
                     "storeOtherAs": "otherPile",
-                    "prompt": "Choose which pile goes to your Hand; the other goes to your Graveyard."
+                    "prompt": "Choose which pile goes to your hand; the other goes to your graveyard."
                 },
                 {
                     "type": "MoveCollection",
