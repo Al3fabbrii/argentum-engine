@@ -245,7 +245,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 {

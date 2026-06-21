@@ -1263,7 +1263,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             ]
@@ -5438,7 +5439,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -5971,7 +5973,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -6780,6 +6783,7 @@
                             },
                             "order": "ControllerChooses"
                         },
+                        "EmitSurveiledEvent",
                         {
                             "type": "Gated",
                             "gate": {
@@ -7784,7 +7788,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -8099,7 +8104,8 @@
                                         "placement": "Top"
                                     },
                                     "order": "ControllerChooses"
-                                }
+                                },
+                                "EmitSurveiledEvent"
                             ]
                         }
                     ]
@@ -10574,7 +10580,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             ]
@@ -10999,7 +11006,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             },
@@ -11213,7 +11221,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -12343,6 +12352,7 @@
                                 },
                                 "order": "ControllerChooses"
                             },
+                            "EmitSurveiledEvent",
                             {
                                 "type": "DrawCards",
                                 "count": {
@@ -13280,7 +13290,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 },
                 "timing": "SorcerySpeed",
@@ -15432,7 +15443,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -16362,7 +16374,8 @@
                                         "placement": "Top"
                                     },
                                     "order": "ControllerChooses"
-                                }
+                                },
+                                "EmitSurveiledEvent"
                             ]
                         }
                     ]
@@ -17497,7 +17510,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -17841,7 +17855,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             }
@@ -18420,7 +18435,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             ]
@@ -18864,7 +18880,8 @@
                                 "placement": "Top"
                             },
                             "order": "ControllerChooses"
-                        }
+                        },
+                        "EmitSurveiledEvent"
                     ]
                 }
             ]
