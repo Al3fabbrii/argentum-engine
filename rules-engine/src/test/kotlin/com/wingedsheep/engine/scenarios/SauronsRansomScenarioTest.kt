@@ -67,7 +67,7 @@ class SauronsRansomScenarioTest : FunSpec({
         val handBefore = driver.getHandSize(active)
         val graveBefore = driver.state.getZone(ZoneKey(active, Zone.GRAVEYARD)).size
 
-        driver.castSpell(active, spell).isSuccess shouldBe true
+        driver.castSpell(active, spell, targets = listOf(opponent)).isSuccess shouldBe true
         driver.bothPass()
 
         // 1. The opponent — not the caster — separates the top four. The opponent looks at them
@@ -143,7 +143,7 @@ class SauronsRansomScenarioTest : FunSpec({
         driver.giveMana(active, Color.BLUE, 2)
         driver.giveMana(active, Color.BLACK, 1)
 
-        driver.castSpell(active, spell).isSuccess shouldBe true
+        driver.castSpell(active, spell, targets = listOf(opponent)).isSuccess shouldBe true
         driver.bothPass()
 
         // Opponent selects nothing → the whole face-down pile, an empty face-up pile (CR 700.3d).

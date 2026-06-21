@@ -15914,7 +15914,7 @@
                     "type": "SelectFromCollection",
                     "from": "looked",
                     "selection": "ChooseAnyNumber",
-                    "chooser": "Opponent",
+                    "chooser": "TargetPlayer",
                     "storeSelected": "faceUp",
                     "storeRemainder": "faceDown",
                     "prompt": "Separate the top four cards into a face-up pile and a face-down pile. The cards you select are placed face up; the rest stay face down.",
@@ -15959,7 +15959,10 @@
                 },
                 "TheRingTemptsYou"
             ]
-        }
+        },
+        "targetRequirements": [
+            "TargetOpponent"
+        ]
     },
     "metadata": {
         "collectorNumber": "225",
@@ -19560,12 +19563,11 @@
                         },
                         {
                             "type": "MoveCollection",
-                            "from": "allRevealed",
+                            "from": "revealedSaga",
                             "destination": {
                                 "type": "ToZone",
                                 "zone": "Battlefield"
-                            },
-                            "filter": "Saga"
+                            }
                         },
                         {
                             "type": "MoveCollection",

@@ -85,10 +85,9 @@ val TomBombadil = card("Tom Bombadil") {
                     storeRevealed = "allRevealed"
                 ),
                 RevealCollectionEffect(from = "allRevealed"),
-                // The Saga enters the battlefield under your control.
+                // The revealed Saga (the match) enters the battlefield under your control.
                 MoveCollectionEffect(
-                    from = "allRevealed",
-                    filter = GameObjectFilter().withSubtype("Saga"),
+                    from = "revealedSaga",
                     destination = CardDestination.ToZone(
                         Zone.BATTLEFIELD,
                         player = Player.You

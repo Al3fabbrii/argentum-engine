@@ -2,6 +2,7 @@ package com.wingedsheep.mtg.sets.definitions.ltr.cards
 
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
@@ -38,7 +39,11 @@ import com.wingedsheep.sdk.scripting.effects.SelectionMode
  *  4. You choose which pile goes to your hand; the other goes to your graveyard.
  * Then "The Ring tempts you."
  *
- * In a two-player game the lone opponent is the looker/partitioner automatically.
+ * "Choose an opponent" is the caster picking which opponent looks/partitions. It is modeled
+ * with [Targets.Opponent] (the engine's mechanism for "choose an opponent", as on Faramir,
+ * Prince of Ithilien); the split decision then uses [Chooser.TargetPlayer] so the chosen
+ * opponent — not just "an opponent" — is the one who looks and separates the cards. In a
+ * two-player game the lone opponent is the only legal choice.
  */
 val SauronsRansom = card("Sauron's Ransom") {
     manaCost = "{1}{U}{B}"
@@ -47,6 +52,8 @@ val SauronsRansom = card("Sauron's Ransom") {
     oracleText = "Choose an opponent. They look at the top four cards of your library and separate them into a face-down pile and a face-up pile. Put one pile into your hand and the other into your graveyard. The Ring tempts you."
 
     spell {
+        // "Choose an opponent." — the caster picks which opponent looks and partitions.
+        target = Targets.Opponent
         effect = Effects.Composite(
             listOf(
                 // 1. The chosen opponent looks at the top four cards. LookAudience.None keeps
@@ -56,12 +63,12 @@ val SauronsRansom = card("Sauron's Ransom") {
                     storeAs = "looked",
                     lookAudience = LookAudience.None
                 ),
-                // 2. The opponent separates them: the cards they select become the face-up
-                //    pile, the rest the face-down pile.
+                // 2. The chosen opponent separates them: the cards they select become the
+                //    face-up pile, the rest the face-down pile.
                 SelectFromCollectionEffect(
                     from = "looked",
                     selection = SelectionMode.ChooseAnyNumber,
-                    chooser = Chooser.Opponent,
+                    chooser = Chooser.TargetPlayer,
                     storeSelected = "faceUp",
                     storeRemainder = "faceDown",
                     selectedLabel = "Face-up pile",
