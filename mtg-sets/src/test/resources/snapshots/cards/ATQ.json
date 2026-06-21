@@ -884,8 +884,11 @@
         "staticAbilities": [
             {
                 "type": "SetMaximumHandSize",
-                "size": 4,
-                "player": "ChosenOpponent"
+                "player": "ChosenOpponent",
+                "amount": {
+                    "type": "Fixed",
+                    "amount": 4
+                }
             }
         ],
         "replacementEffects": [
