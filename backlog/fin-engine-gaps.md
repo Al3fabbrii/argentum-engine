@@ -155,17 +155,22 @@ All six cards implemented and covered by `TieredScenarioTest` (per-tier cost cha
 affordability gating, scaled effects, targeting, double/triple P/T, Vincent's dies→return-tapped).
 → Fire Magic, Ice Magic, Thunder Magic, Restoration Magic, Tifa's Limit Break, Vincent's Limit Break.
 
-### 5. Town land // spell DFC — "play the land from exile later" (≈6) — ❌ **GAP** (new layout)
+### 5. Town land // spell DFC — "play the land from exile later" (5) — ✅ **DONE** (reused ADVENTURE layout)
 
 Several Town lands are double-faced: front = `Land — Town` (enters tapped, taps for mana), back = a one-shot
-sorcery, with reminder *"(Then exile this card. You may play the land later from exile.)"* You either play the land
-**or** cast the spell; casting the spell exiles the card and lets you **play the land half from exile** later. This
-is the **inverse of Adventure** (Adventure exiles after the spell and lets you cast the *creature*; here the
-permanent half is a *land*). No `CardLayout` variant models "spell-then-exile, replay the land from exile"
-(`CardDefinition.kt` `CardLayout`). Adventure's machinery (`CastSpell.faceIndex`, exile-with-play-permission) is the
-structural template; needs a sibling layout + loader so the land becomes the playable-from-exile half.
+instant/sorcery, with reminder *"(Then exile this card. You may play the land later from exile.)"* You either play
+the land **or** cast the spell; casting the spell exiles the card and lets you **play the land half from exile**
+later. These cards are literally typed `— Adventure` (CR 715) on Scryfall, and it turned out **no new `CardLayout`
+was needed**: `CardLayout.ADVENTURE` already models "spell resolves → exile → replay the main face from exile", and
+the resolution grant (`StackResolver` `adventureFaceExile` → generic `MayPlayPermission`) plus the exile-replay
+(`CastFromZoneEnumerator` / `PlayLandHandler`) are blind to whether the primary face is a creature or a land. The
+only engine gap was `CastSpellEnumerator` skipping land-primary cards before its secondary-face enumeration — fixed
+so a land // spell Adventure offers *both* "play the land" (PlayLandEnumerator) and "cast the Adventure spell"
+(`CastSpell.faceIndex = 0`). All five lands implemented + `TownLandSpellAdventureEnumerationTest` /
+`TownLandSpellAdventureScenarioTest` (play-from-hand, cast → exile → replay-from-exile, land-drop gating).
 → Ishgard the Holy See, Jidoor Aristocratic Capital, Lindblum Industrial Regency, Midgar City of Mako, Zanarkand
-  Ancient Metropolis (and Balamb Garden, which is a land→Vehicle *transform* land — closer to a DFC land that flips).
+  Ancient Metropolis. (Balamb Garden is a land→Vehicle *transform* land — a separate "DFC land that flips" mechanic,
+  still a gap.)
 
 ---
 
@@ -249,7 +254,8 @@ structural template; needs a sibling layout + loader so the land becomes the pla
    Equipment at once; isolated and high-yield.
 3. ✅ **Tiered (§4) — DONE:** the modal/Spree cast pipeline already charged the chosen mode's additional cost on the
    choose-1 path (no engine change); shipped the `tiered { }` builder + all 6 spells.
-4. **Town land // spell DFC (§5)** — new inverse-Adventure layout. ~6 lands.
+4. ✅ **Town land // spell DFC (§5) — DONE:** reused `CardLayout.ADVENTURE` (these cards are typed `— Adventure`);
+   the only engine change was enumerating the Adventure spell face for a land-primary card. 5 lands shipped.
 5. **Summon Sagas (§1)** — the headline `add-feature`: make Sagas co-exist with creatures + an opt-out-of-sacrifice
    flag + self-referential chapter resolution. Largest lift; gates ~15 cards.
 6. **Dominant / Eikon transform (§2)** — depends on §1; add exile-and-return-transformed (new object). ~8 cards.
