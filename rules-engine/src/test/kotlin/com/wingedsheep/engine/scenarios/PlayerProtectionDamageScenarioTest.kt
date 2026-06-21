@@ -1,10 +1,12 @@
 package com.wingedsheep.engine.scenarios
 
+import com.wingedsheep.engine.state.components.player.PlayerProtectionComponent
 import com.wingedsheep.engine.support.ScenarioTestBase
 import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.card
+import com.wingedsheep.sdk.scripting.ProtectionScope
 import com.wingedsheep.sdk.scripting.references.Player
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import io.kotest.assertions.withClue
@@ -71,6 +73,64 @@ class PlayerProtectionDamageScenarioTest : ScenarioTestBase() {
                 }
                 withClue("Unprotected opponent still takes the full 3 from the same source") {
                     game.getLifeTotal(2) shouldBe p2Before - 3
+                }
+            }
+        }
+
+        context("player protection prevents combat damage") {
+
+            // The reported bug: The One Ring grants "protection from everything", yet the protected
+            // player still took combat damage. Combat damage is applied by CombatDamageManager (not
+            // DamageUtils.dealDamageToTarget), so the prevention lives in PlayerProtectionModifier.
+            test("a creature can attack a protected player, but its combat damage is prevented") {
+                val game = scenario()
+                    .withPlayers("Defender", "Attacker")
+                    .withCardOnBattlefield(2, "Grizzly Bears", summoningSickness = false)
+                    .withActivePlayer(2)
+                    .inPhase(Phase.COMBAT, Step.DECLARE_ATTACKERS)
+                    .build()
+
+                // The defending player carries The One Ring's protection from everything.
+                game.state = game.state.updateEntity(game.player1Id) { c ->
+                    c.with(PlayerProtectionComponent(scopes = listOf(ProtectionScope.Everything)))
+                }
+
+                val defenderBefore = game.getLifeTotal(1)
+
+                // Creatures can still attack a protected player (CR 702.16e ruling).
+                game.declareAttackers(mapOf("Grizzly Bears" to 1)).error shouldBe null
+                game.passUntilPhase(Phase.COMBAT, Step.COMBAT_DAMAGE)
+                game.resolveStack()
+                if (game.state.pendingDecision != null) {
+                    game.submitDefaultCombatDamage()
+                    game.resolveStack()
+                }
+
+                withClue("protected player's life is unchanged — the combat damage is prevented") {
+                    game.getLifeTotal(1) shouldBe defenderBefore
+                }
+            }
+
+            test("control: without protection the same attack deals its 2 combat damage") {
+                val game = scenario()
+                    .withPlayers("Defender", "Attacker")
+                    .withCardOnBattlefield(2, "Grizzly Bears", summoningSickness = false)
+                    .withActivePlayer(2)
+                    .inPhase(Phase.COMBAT, Step.DECLARE_ATTACKERS)
+                    .build()
+
+                val defenderBefore = game.getLifeTotal(1)
+
+                game.declareAttackers(mapOf("Grizzly Bears" to 1)).error shouldBe null
+                game.passUntilPhase(Phase.COMBAT, Step.COMBAT_DAMAGE)
+                game.resolveStack()
+                if (game.state.pendingDecision != null) {
+                    game.submitDefaultCombatDamage()
+                    game.resolveStack()
+                }
+
+                withClue("unprotected player takes Grizzly Bears' 2 combat damage") {
+                    game.getLifeTotal(1) shouldBe defenderBefore - 2
                 }
             }
         }

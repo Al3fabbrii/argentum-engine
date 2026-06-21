@@ -351,6 +351,29 @@ data class AttachmentsComponent(
 ) : Component
 
 /**
+ * Transient marker placed on an Aura/Equipment whose host left the battlefield (CR 400.7 new
+ * object; 704.5m sends the Aura to the graveyard, 704.5n unattaches the Equipment).
+ *
+ * The host object the attachment was attached to ceased to exist the moment it left, so the
+ * attachment must become unattached (Equipment) or be put into the graveyard (Aura) — even when a
+ * blink returns a *same-id* object (e.g. Meneldor, Swift Savior exiling and returning a creature):
+ * the returning permanent is a new object, so the old attachment is no longer legal.
+ *
+ * This marker exists because the unattached-permanents state-based action keys off the host's
+ * EntityId, which `ZoneTransitionService.moveToZone` reuses across a zone round-trip — leaving the
+ * SBA unable to tell that the host left and came back. It is set at leave-time (so it does NOT
+ * disturb the live `aurasByTarget` index that `AttachmentTriggerDetector` reads for ATTACHED-binding
+ * "when equipped creature dies/leaves" triggers like Forebears Blade, which is why the attachment
+ * itself must not be cleared eagerly) and consumed by [UnattachedAurasCheck], which runs after
+ * triggers are detected. [stripBattlefieldComponents] clears it so a returning object never carries
+ * a stale marker.
+ */
+@Serializable
+data class AttachmentHostLeftComponent(
+    val lastKnownHostId: EntityId
+) : Component
+
+/**
  * Permanent entered the battlefield this turn.
  */
 @Serializable

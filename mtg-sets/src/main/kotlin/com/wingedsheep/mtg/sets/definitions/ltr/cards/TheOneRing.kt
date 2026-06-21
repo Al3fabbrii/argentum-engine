@@ -77,5 +77,33 @@ val TheOneRing = card("The One Ring") {
         collectorNumber = "246"
         artist = "Veli Nyström"
         imageUri = "https://cards.scryfall.io/normal/front/d/5/d5806e68-1054-458e-866d-1f2470f682b2.jpg?1763472900"
+        ruling(
+            "2023-06-16",
+            "If a player has protection from everything, it means three things: 1) All damage that " +
+                "would be dealt to that player is prevented. 2) Auras can't be attached to that " +
+                "player. 3) That player can't be the target of spells or abilities."
+        )
+        ruling(
+            "2023-06-16",
+            "Nothing other than the specified events are prevented or illegal. An effect that " +
+                "doesn't target you could still cause you to discard cards, for example. Creatures " +
+                "can still attack you while you have protection from everything, although combat " +
+                "damage that they would deal to you will be prevented."
+        )
+        ruling(
+            "2023-06-16",
+            "Gaining protection from everything causes a spell or ability on the stack to have an " +
+                "illegal target if it targets you. As a spell or ability tries to resolve, if all " +
+                "its targets are illegal, that spell or ability doesn't resolve and none of its " +
+                "effects happen, including effects unrelated to the target. If at least one target " +
+                "is still legal, the spell or ability does as much as it can to the remaining legal " +
+                "targets, and its other effects still happen."
+        )
+        ruling(
+            "2023-06-16",
+            "Protection from everything will usually prevent damage if it would be dealt to you, " +
+                "but some damage can't be prevented. In this case, that damage reduces your life " +
+                "total as normal."
+        )
     }
 }

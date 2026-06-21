@@ -11,6 +11,7 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.ComponentContainer
 import com.wingedsheep.engine.state.components.battlefield.AttachedToComponent
+import com.wingedsheep.engine.state.components.battlefield.AttachmentHostLeftComponent
 import com.wingedsheep.engine.state.components.battlefield.AttachmentsComponent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.engine.state.components.battlefield.DamageComponent
@@ -257,6 +258,34 @@ object ZoneMovementUtils {
     }
 
     /**
+     * Mark every Aura/Equipment attached to a permanent that is leaving the battlefield so the
+     * unattached-permanents state-based action ([UnattachedAurasCheck]) detaches/graveyards it
+     * afterwards (CR 400.7 new object; 704.5n unattaches Equipment, 704.5m graveyards Auras).
+     *
+     * The host's EntityId is reused across a blink (exile → battlefield round-trip via
+     * [ZoneTransitionService.moveToZone]), so the SBA's "host no longer on the battlefield" check is
+     * defeated when a same-id object returns. This records the leave directly on each attachment
+     * instead of relying on the host's id being absent. The attachment's [AttachedToComponent] is
+     * deliberately left intact so the live `aurasByTarget` index still surfaces ATTACHED-binding
+     * "when equipped creature dies/leaves" triggers (e.g. Forebears Blade) during detection.
+     */
+    fun markAttachmentsHostLeft(state: GameState, leavingHostId: EntityId): GameState {
+        val attachedIds = state.getEntity(leavingHostId)
+            ?.get<AttachmentsComponent>()?.attachedIds ?: return state
+        var newState = state
+        for (attachmentId in attachedIds) {
+            val attachment = newState.getEntity(attachmentId) ?: continue
+            // Only mark things still pointing at this host; an attachment already re-pointed or
+            // detached by an earlier step in the same batch must not be dragged off.
+            if (attachment.get<AttachedToComponent>()?.targetId != leavingHostId) continue
+            newState = newState.updateEntity(attachmentId) { c ->
+                c.with(AttachmentHostLeftComponent(lastKnownHostId = leavingHostId))
+            }
+        }
+        return newState
+    }
+
+    /**
      * Strip all battlefield-specific components from an entity leaving the battlefield.
      * Per MTG Rule 400.7, when an object changes zones it becomes a new object with no
      * memory of its previous existence. This removes all transient battlefield state:
@@ -304,6 +333,9 @@ object ZoneMovementUtils {
             .without<CountersComponent>()
             .without<AttachedToComponent>()
             .without<AttachmentsComponent>()
+            // A blink returns a new object (CR 400.7); it must not carry a stale "host left" marker
+            // from a prior attachment, and an Equipment that itself re-enters starts unmarked.
+            .without<AttachmentHostLeftComponent>()
             .without<EnteredThisTurnComponent>()
             .without<ExileOnLeaveBattlefieldComponent>()
             .without<com.wingedsheep.engine.state.components.battlefield.EnteredViaAbilityComponent>()

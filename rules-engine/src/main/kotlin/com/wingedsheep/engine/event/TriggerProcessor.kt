@@ -879,7 +879,12 @@ class TriggerProcessor(
                         sourceId = trigger.sourceId,
                         controllerId = trigger.controllerId,
                         triggeringEntityId = trigger.triggerContext.triggeringEntityId,
-                        triggeringPlayerId = trigger.triggerContext.triggeringPlayerId
+                        triggeringPlayerId = trigger.triggerContext.triggeringPlayerId,
+                        // The dynamic cap may read trigger-context properties — e.g. Elrond,
+                        // Master of Healing's "up to X target creatures, where X is the number of
+                        // cards looked at while scrying" (ContextPropertyKey.TRIGGER_SCRY_COUNT).
+                        // Without this the cap resolves to 0 and the player can pick no targets.
+                        triggerScryCount = trigger.triggerContext.scryCount,
                     )
                     DynamicAmountEvaluator().evaluate(state, dyn, context)
                 } catch (_: Exception) {
