@@ -53,9 +53,11 @@ val TransmuteArtifact = card("Transmute Artifact") {
 
     spell {
         effect = Effects.Composite(listOf(
-            // Sacrifice an artifact (storing the choice so its mana value can be compared later).
+            // Sacrifice an artifact you control (storing the choice so its mana value can be
+            // compared later). Scoped with youControl() — you can only sacrifice permanents you
+            // control (CR 701.21a), and BattlefieldMatching defaults to all players' battlefields.
             GatherCardsEffect(
-                source = CardSource.BattlefieldMatching(filter = GameObjectFilter.Artifact),
+                source = CardSource.BattlefieldMatching(filter = GameObjectFilter.Artifact.youControl()),
                 storeAs = "sacrificeable"
             ),
             SelectFromCollectionEffect(

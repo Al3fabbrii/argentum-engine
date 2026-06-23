@@ -2755,12 +2755,14 @@ staticAbility {
   monocolored (exactly one color, CR 105.2) spells and abilities opponents control. Colorless and
   multicolored sources are unaffected; the controller can still target their own creatures. (Dragonfire
   Blade)
-- `CantBeTargetedByArtifactSourceAbilities(filter = attachedCreature())` — "[filter] can't be the target of
-  abilities from artifact sources" — hexproof keyed to a source *category* (the source being an artifact)
-  rather than a controller or color. Projects the keyword `CANT_BE_TARGETED_BY_ARTIFACT_SOURCES`; the engine
-  (`TargetFinder`/`StackResolver`) blocks an *ability* (not a spell) whose source is an artifact, **regardless
-  of who controls the source**. Deliberately not protection-from-artifacts (which would also stop equipping/
-  enchanting). (Artifact Ward)
+- `CantBeTargetedBySourceTypeAbilities(sourceType, filter = attachedCreature())` — "[filter] can't be the
+  target of abilities from [sourceType] sources" — hexproof keyed to a source *card type* (e.g.
+  `CardType.ARTIFACT`) rather than a controller or color. Projects the keyword
+  `CANT_BE_TARGETED_BY_CARDTYPE_<TYPE>_SOURCE_ABILITIES` (mirroring the `PROTECTION_FROM_CARDTYPE_<TYPE>`
+  idiom); the engine (`TargetFinder`/`StackResolver`, via `SourceTypeTargeting`) blocks an *ability* (not a
+  spell) whose source has that card type, **regardless of who controls the source**. Deliberately not
+  protection-from-[type] (which would also stop equipping/enchanting/blocking/damage). (Artifact Ward, with
+  `CardType.ARTIFACT`)
 - `GrantCardType(cardType, filter)` / `RemoveCardType(cardType, filter)` — Layer 4 type-changing statics that add or
   remove a card type (e.g. `"CREATURE"`). `RemoveCardType` backs Impending's "isn't a creature while it has a time
   counter" (wrapped in a `ConditionalStaticAbility`); reuse it for any "it's no longer a [type]" effect.

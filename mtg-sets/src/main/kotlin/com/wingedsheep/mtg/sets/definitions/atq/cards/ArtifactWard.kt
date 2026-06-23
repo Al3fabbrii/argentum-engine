@@ -1,10 +1,11 @@
 package com.wingedsheep.mtg.sets.definitions.atq.cards
 
+import com.wingedsheep.sdk.core.CardType
 import com.wingedsheep.sdk.dsl.Targets
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.CantBeBlockedBy
-import com.wingedsheep.sdk.scripting.CantBeTargetedByArtifactSourceAbilities
+import com.wingedsheep.sdk.scripting.CantBeTargetedBySourceTypeAbilities
 import com.wingedsheep.sdk.scripting.EventPattern
 import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.PreventDamage
@@ -25,10 +26,10 @@ import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
  *  - [CantBeBlockedBy] artifact creatures (block restriction),
  *  - a continuous [PreventDamage] replacement (CR 615) with recipient = the enchanted creature and
  *    source = any artifact, and
- *  - [CantBeTargetedByArtifactSourceAbilities] — hexproof keyed to the *artifact source category*
- *    (blocks abilities from artifact sources, regardless of who controls them). Deliberately NOT
- *    modelled as protection from artifacts, which would also stop the creature from being
- *    equipped/enchanted by artifacts; this clause does not.
+ *  - [CantBeTargetedBySourceTypeAbilities] with [CardType.ARTIFACT] — hexproof keyed to the source
+ *    *card type* (blocks abilities from artifact sources, regardless of who controls them).
+ *    Deliberately NOT modelled as protection from artifacts, which would also stop the creature from
+ *    being equipped/enchanted by artifacts; this clause does not.
  */
 val ArtifactWard = card("Artifact Ward") {
     manaCost = "{W}"
@@ -61,7 +62,7 @@ val ArtifactWard = card("Artifact Ward") {
 
     // Can't be the target of abilities from artifact sources.
     staticAbility {
-        ability = CantBeTargetedByArtifactSourceAbilities(GroupFilter.attachedCreature())
+        ability = CantBeTargetedBySourceTypeAbilities(CardType.ARTIFACT, GroupFilter.attachedCreature())
     }
 
     metadata {

@@ -14,7 +14,7 @@ import io.kotest.matchers.shouldBe
  *  - Prevent all damage that would be dealt to enchanted creature by artifact sources.
  *  - Enchanted creature can't be the target of abilities from artifact sources.
  *
- * The targeting clause is the engine gap (`CantBeTargetedByArtifactSourceAbilities`); the other
+ * The targeting clause is the engine gap (`CantBeTargetedBySourceTypeAbilities`); the other
  * two compose from existing primitives. These tests prove the targeting clause and the
  * prevent-artifact-damage clause, plus a control: a NON-artifact ability can still target the
  * warded creature.

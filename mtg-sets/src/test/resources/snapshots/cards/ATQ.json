@@ -448,7 +448,10 @@
                     "scope": "AttachedTo"
                 }
             },
-            "CantBeTargetedByArtifactSourceAbilities"
+            {
+                "type": "CantBeTargetedBySourceTypeAbilities",
+                "sourceType": "ARTIFACT"
+            }
         ],
         "replacementEffects": [
             {
@@ -3277,7 +3280,7 @@
                     "type": "GatherCards",
                     "source": {
                         "type": "BattlefieldMatching",
-                        "filter": "artifact"
+                        "filter": "artifact ctrl:you"
                     },
                     "storeAs": "sacrificeable"
                 },

@@ -222,27 +222,30 @@ data object CantBeTargetedByOpponentAbilities : StaticAbility {
 }
 
 /**
- * Creatures matching [filter] can't be the target of *abilities from artifact sources* — hexproof
- * keyed to a source *category* (the source being an artifact) rather than a controller or color.
- * This blocks only abilities (activated/triggered), not spells, and applies regardless of who
- * controls the artifact source (CR 109.5 source typing).
+ * Creatures matching [filter] can't be the target of *abilities from sources of a given card type*
+ * ([sourceType]) — hexproof keyed to a source *category* (the source's card type) rather than a
+ * controller or color. This blocks only abilities (activated/triggered), not spells, and applies
+ * regardless of who controls the source (CR 109.5 source typing).
  *
- * Projected as the keyword `CANT_BE_TARGETED_BY_ARTIFACT_SOURCES`; enforced at targeting by the
- * engine's `TargetFinder`, which checks the targeting source's projected/base artifact-ness. Used
- * by Artifact Ward ("Enchanted creature can't be the target of abilities from artifact sources").
+ * Projected as the keyword `CANT_BE_TARGETED_BY_CARDTYPE_<TYPE>_SOURCE_ABILITIES`; enforced at
+ * targeting by the engine (`TargetFinder`/`StackResolver`), which checks the targeting source's
+ * projected/base card types. Used by Artifact Ward with [CardType.ARTIFACT] ("Enchanted creature
+ * can't be the target of abilities from artifact sources").
  *
- * Deliberately *not* protection-from-artifacts: protection would also stop the creature from being
- * enchanted/equipped by artifacts, which this clause does not.
+ * Deliberately *not* protection-from-[type]: protection would also stop the creature from being
+ * enchanted/equipped/blocked/damaged by such sources, which this clause does not.
  *
+ * @property sourceType The card type the restricted source must have (e.g. [CardType.ARTIFACT]).
  * @property filter What this applies to — defaults to the attached/enchanted creature for Auras.
  */
-@SerialName("CantBeTargetedByArtifactSourceAbilities")
+@SerialName("CantBeTargetedBySourceTypeAbilities")
 @Serializable
-data class CantBeTargetedByArtifactSourceAbilities(
+data class CantBeTargetedBySourceTypeAbilities(
+    val sourceType: CardType,
     val filter: GroupFilter = GroupFilter.attachedCreature()
 ) : StaticAbility {
     override val description: String =
-        "${filter.description} can't be the target of abilities from artifact sources"
+        "${filter.description} can't be the target of abilities from ${sourceType.displayName.lowercase()} sources"
     override fun applyTextReplacement(replacer: TextReplacer): StaticAbility {
         val newFilter = filter.applyTextReplacement(replacer)
         return if (newFilter !== filter) copy(filter = newFilter) else this

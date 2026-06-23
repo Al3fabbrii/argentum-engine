@@ -66,6 +66,7 @@ import com.wingedsheep.engine.handlers.PredicateEvaluator
 import com.wingedsheep.engine.handlers.TargetingSourceType
 import com.wingedsheep.engine.mechanics.targeting.HexproofSuppression
 import com.wingedsheep.engine.mechanics.targeting.PlayerTargetRestriction
+import com.wingedsheep.engine.handlers.SourceTypeTargeting
 import com.wingedsheep.engine.state.components.battlefield.CantBeTargetedByOpponentAbilitiesComponent
 import com.wingedsheep.engine.state.components.battlefield.ReplacementEffectSourceComponent
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
@@ -2532,16 +2533,14 @@ class StackResolver(
                         }
                     }
 
-                    // Artifact Ward: can't be the target of abilities from artifact sources (CR
-                    // 109.5). Not controller-gated — applies even to the warded creature's own
-                    // controller's artifacts. Spells bypass (it's an abilities-only restriction).
-                    if (targetingSourceType != TargetingSourceType.SPELL && sourceId != null &&
-                        projected.hasKeyword(target.entityId, "CANT_BE_TARGETED_BY_ARTIFACT_SOURCES")
+                    // Artifact Ward family: can't be the target of abilities from sources of a
+                    // given card type (CR 109.5). Not controller-gated — applies even to the warded
+                    // creature's own controller's sources. Spells bypass (abilities-only).
+                    if (SourceTypeTargeting.cantBeTargetedBySourceTypeAbility(
+                            state, target.entityId, sourceId, targetingSourceType
+                        )
                     ) {
-                        val sourceIsArtifact = projected.hasType(sourceId, "ARTIFACT") ||
-                            state.getEntity(sourceId)?.get<CardComponent>()?.typeLine?.cardTypes
-                                ?.any { it.name == "ARTIFACT" } == true
-                        if (sourceIsArtifact) return@filterIndexed false
+                        return@filterIndexed false
                     }
 
                     // Check protection from source colors/subtypes (Rule 702.16)

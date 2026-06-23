@@ -111,5 +111,34 @@ class TransmuteArtifactScenarioTest : ScenarioTestBase() {
                 }
             }
         }
+
+        context("Transmute Artifact sacrifice is scoped to artifacts you control") {
+
+            test("an opponent's artifact is not an eligible sacrifice (only your own is)") {
+                val game = scenario()
+                    .withPlayers("Player1", "Player2")
+                    .withCardInHand(1, "Transmute Artifact")
+                    .withCardOnBattlefield(1, "Triskelion", summoningSickness = false) // your only artifact
+                    .withCardOnBattlefield(2, "Ornithopter") // opponent's artifact — must be untouchable
+                    .withCardInLibrary(1, "Forest") // no artifact to find; search resolves to nothing
+                    .withLandsOnBattlefield(1, "Island", 2)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                game.castSpell(1, "Transmute Artifact")
+                game.resolveStack()
+
+                // Only your Triskelion is eligible, so the ChooseExactly(1) sacrifice auto-resolves
+                // to it. Were the gather not scoped with youControl(), the opponent's Ornithopter
+                // would also be eligible and the selection would not auto-resolve here.
+                withClue("Your own artifact is the one sacrificed") {
+                    game.isInGraveyard(1, "Triskelion") shouldBe true
+                }
+                withClue("The opponent's artifact is never an eligible sacrifice and remains") {
+                    game.isOnBattlefield("Ornithopter") shouldBe true
+                }
+            }
+        }
     }
 }
