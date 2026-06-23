@@ -153,8 +153,17 @@ class TargetFinder(
         entityId: EntityId,
         entityController: EntityId?,
         controllerId: EntityId,
-        targetingSourceType: TargetingSourceType
+        targetingSourceType: TargetingSourceType,
+        sourceId: EntityId? = null
     ): Boolean {
+        // Source-card-type restriction (Artifact Ward) is checked first because, unlike the
+        // opponent-ability restriction, it is NOT controller-gated: a matching source can't target
+        // the warded creature even if the same player controls both. It still only blocks abilities
+        // (not spells); the helper handles the spell/unknown-source short-circuit.
+        if (SourceTypeTargeting.cantBeTargetedBySourceTypeAbility(state, entityId, sourceId, targetingSourceType)) {
+            return true
+        }
+
         if (entityController == controllerId) return false  // own permanents are never restricted
         if (targetingSourceType == TargetingSourceType.SPELL) return false  // spells bypass this restriction
 
@@ -195,7 +204,7 @@ class TargetFinder(
             // Check hexproof from color
             if (hasHexproofFromSourceColors(state, projected, entityId, entityController, controllerId, sourceId)) continue
             // Check can't-be-targeted-by-abilities
-            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) continue
+            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) continue
 
             targets.add(entityId)
         }
@@ -231,7 +240,7 @@ class TargetFinder(
             // Check hexproof from color
             if (hasHexproofFromSourceColors(state, projected, entityId, entityController, controllerId, sourceId)) continue
             // Check can't-be-targeted-by-abilities
-            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) continue
+            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) continue
 
             targets.add(entityId)
         }
@@ -281,7 +290,7 @@ class TargetFinder(
                     return@filter false
                 }
                 // Check can't-be-targeted-by-abilities
-                if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) {
+                if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) {
                     return@filter false
                 }
             }
@@ -329,7 +338,7 @@ class TargetFinder(
                 continue
             }
             // Check can't-be-targeted-by-abilities
-            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) {
+            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) {
                 continue
             }
 
@@ -389,7 +398,7 @@ class TargetFinder(
                 return@filter false
             }
             // Check can't-be-targeted-by-abilities
-            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) {
+            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) {
                 return@filter false
             }
 
@@ -513,7 +522,7 @@ class TargetFinder(
             if (projected.hasKeyword(entityId, Keyword.SHROUD)) continue
             // Check hexproof from color
             if (hasHexproofFromSourceColors(state, projected, entityId, entityController, controllerId, sourceId)) continue
-            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType)) continue
+            if (hasCantBeTargetedRestriction(state, entityId, entityController, controllerId, targetingSourceType, sourceId)) continue
 
             if (permanentFilter != null &&
                 !predicateEvaluator.matches(state, projected, entityId, permanentFilter, predicateContext)

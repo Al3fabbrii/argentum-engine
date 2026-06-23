@@ -250,6 +250,94 @@
     ]
 }
 
+// Armageddon Clock
+{
+    "name": "Armageddon Clock",
+    "manaCost": "{6}",
+    "typeLine": "Artifact",
+    "oracleText": "At the beginning of your upkeep, put a doom counter on this artifact.\nAt the beginning of your draw step, this artifact deals damage equal to the number of doom counters on it to each player.\n{4}: Remove a doom counter from this artifact. Any player may activate this ability but only during any upkeep step.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "UPKEEP"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "doom",
+                    "count": 1,
+                    "target": "Self"
+                },
+                "descriptionOverride": "At the beginning of your upkeep, put a doom counter on this artifact."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "DRAW"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "EntityProperty",
+                        "entity": "Source",
+                        "numericProperty": {
+                            "type": "CounterCount",
+                            "counterType": {
+                                "type": "Named",
+                                "name": "doom"
+                            }
+                        }
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "Each"
+                    }
+                },
+                "descriptionOverride": "At the beginning of your draw step, this artifact deals damage equal to the number of doom counters on it to each player."
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_3",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{4}"
+                    }
+                },
+                "effect": {
+                    "type": "RemoveCounters",
+                    "counterType": "doom",
+                    "count": 1,
+                    "target": "Self"
+                },
+                "restrictions": [
+                    "AnyPlayerMay",
+                    {
+                        "type": "DuringStep",
+                        "step": "UPKEEP"
+                    }
+                ],
+                "descriptionOverride": "{4}: Remove a doom counter from this artifact. Any player may activate this ability but only during any upkeep step."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "37",
+        "rarity": "UNCOMMON",
+        "artist": "Amy Weber",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/4/44a31889-6a8d-450c-a73d-381a7ff28bf9.jpg?1562909201"
+    },
+    "colorIdentityOverride": []
+}
+
 // Artifact Blast
 {
     "name": "Artifact Blast",
@@ -336,6 +424,63 @@
     },
     "colorIdentityOverride": [
         "BLACK"
+    ]
+}
+
+// Artifact Ward
+{
+    "name": "Artifact Ward",
+    "manaCost": "{W}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nEnchanted creature can't be blocked by artifact creatures.\nPrevent all damage that would be dealt to enchanted creature by artifact sources.\nEnchanted creature can't be the target of abilities from artifact sources.",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "CantBeBlockedBy",
+                "blockerFilter": {
+                    "cardPredicates": [
+                        "IsArtifact",
+                        "IsCreature"
+                    ]
+                },
+                "filter": {
+                    "baseFilter": "permanent",
+                    "scope": "AttachedTo"
+                }
+            },
+            {
+                "type": "CantBeTargetedBySourceTypeAbilities",
+                "sourceType": "ARTIFACT"
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "PreventDamage",
+                "appliesTo": {
+                    "type": "DamageEvent",
+                    "recipient": "RecipientEnchantedCreature",
+                    "source": {
+                        "type": "SourceMatching",
+                        "filter": "artifact"
+                    }
+                }
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "3",
+        "artist": "Douglas Shuler",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/3/b3a5101a-ec66-4658-950c-9ad49c29b836.jpg?1562932896"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
     ]
 }
 
@@ -1134,6 +1279,56 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Energy Flux
+{
+    "name": "Energy Flux",
+    "manaCost": "{2}{U}",
+    "typeLine": "Enchantment",
+    "oracleText": "All artifacts have \"At the beginning of your upkeep, sacrifice this artifact unless you pay {2}.\"",
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "GrantTriggeredAbility",
+                "ability": {
+                    "id": "ability_1",
+                    "trigger": {
+                        "type": "StepEvent",
+                        "step": "UPKEEP"
+                    },
+                    "binding": "ANY",
+                    "effect": {
+                        "type": "PayOrSuffer",
+                        "cost": {
+                            "type": "PayAtom",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{2}"
+                            }
+                        },
+                        "suffer": {
+                            "type": "SacrificeTarget",
+                            "target": "Self"
+                        }
+                    }
+                },
+                "filter": {
+                    "baseFilter": "artifact"
+                }
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "9",
+        "rarity": "UNCOMMON",
+        "artist": "Kaja Foglio",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/d/bd1f624b-e8f2-462f-838a-7cb9e8fda988.jpg?1562934930"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
     ]
 }
 
@@ -3071,6 +3266,161 @@
     "colorIdentityOverride": []
 }
 
+// Transmute Artifact
+{
+    "name": "Transmute Artifact",
+    "manaCost": "{U}{U}",
+    "typeLine": "Sorcery",
+    "oracleText": "Sacrifice an artifact. If you do, search your library for an artifact card. If that card's mana value is less than or equal to the sacrificed artifact's mana value, put it onto the battlefield. If it's greater, you may pay {X}, where X is the difference. If you do, put it onto the battlefield. If you don't, put it into its owner's graveyard. Then shuffle.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "BattlefieldMatching",
+                        "filter": "artifact ctrl:you"
+                    },
+                    "storeAs": "sacrificeable"
+                },
+                {
+                    "type": "SelectFromCollection",
+                    "from": "sacrificeable",
+                    "selection": {
+                        "type": "ChooseExactly",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    },
+                    "storeSelected": "sacrificed",
+                    "prompt": "Sacrifice an artifact"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "sacrificed",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Graveyard"
+                    },
+                    "moveType": "Sacrifice"
+                },
+                {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "CollectionContainsMatch",
+                            "collection": "sacrificed"
+                        }
+                    },
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Library",
+                                    "filter": "artifact"
+                                },
+                                "storeAs": "searchable"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "searchable",
+                                "selection": {
+                                    "type": "ChooseUpTo",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "found",
+                                "prompt": "Search your library for an artifact card"
+                            },
+                            {
+                                "type": "Gated",
+                                "gate": {
+                                    "type": "Gate.WhenCondition",
+                                    "condition": {
+                                        "type": "Compare",
+                                        "left": {
+                                            "type": "StoredCardManaValue",
+                                            "collectionName": "found"
+                                        },
+                                        "operator": "LTE",
+                                        "right": {
+                                            "type": "StoredCardManaValue",
+                                            "collectionName": "sacrificed"
+                                        }
+                                    }
+                                },
+                                "then": {
+                                    "type": "MoveCollection",
+                                    "from": "found",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Battlefield"
+                                    }
+                                },
+                                "otherwise": {
+                                    "type": "Gated",
+                                    "gate": {
+                                        "type": "Gate.MayPay",
+                                        "cost": {
+                                            "type": "PayDynamicManaCost",
+                                            "amount": {
+                                                "type": "Subtract",
+                                                "left": {
+                                                    "type": "StoredCardManaValue",
+                                                    "collectionName": "found"
+                                                },
+                                                "right": {
+                                                    "type": "StoredCardManaValue",
+                                                    "collectionName": "sacrificed"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "type": "MoveCollection",
+                                        "from": "found",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Battlefield"
+                                        }
+                                    },
+                                    "otherwise": {
+                                        "type": "MoveCollection",
+                                        "from": "found",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Graveyard"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "ShuffleLibrary"
+            ]
+        }
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "14",
+        "rarity": "UNCOMMON",
+        "artist": "Anson Maddocks",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/e/6eab6765-eba3-4844-81ca-ae37a6e903df.jpg?1562918256"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Triskelion
 {
     "name": "Triskelion",
@@ -3124,6 +3474,142 @@
         "artist": "Douglas Shuler",
         "flavorText": "A brainchild of Tawnos, the Triskelion proved its versatility and usefulness in many of the later battles between the brothers.",
         "imageUri": "https://cards.scryfall.io/normal/front/a/7/a79c99e1-722a-44b6-8fa3-2be3f0c193d8.jpg?1562930328"
+    },
+    "colorIdentityOverride": []
+}
+
+// Urza's Avenger
+{
+    "name": "Urza's Avenger",
+    "manaCost": "{6}",
+    "typeLine": "Artifact Creature — Shapeshifter",
+    "oracleText": "{0}: This creature gets -1/-1 and gains your choice of banding, flying, first strike, or trample until end of turn.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 4
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostFree",
+                "effect": {
+                    "type": "Modal",
+                    "modes": [
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "ModifyStats",
+                                        "powerModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "toughnessModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "target": "Self"
+                                    },
+                                    {
+                                        "type": "GrantKeyword",
+                                        "keyword": "BANDING",
+                                        "target": "Self"
+                                    }
+                                ]
+                            },
+                            "description": "This creature gets -1/-1 and gains banding until end of turn"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "ModifyStats",
+                                        "powerModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "toughnessModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "target": "Self"
+                                    },
+                                    {
+                                        "type": "GrantKeyword",
+                                        "keyword": "FLYING",
+                                        "target": "Self"
+                                    }
+                                ]
+                            },
+                            "description": "This creature gets -1/-1 and gains flying until end of turn"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "ModifyStats",
+                                        "powerModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "toughnessModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "target": "Self"
+                                    },
+                                    {
+                                        "type": "GrantKeyword",
+                                        "keyword": "FIRST_STRIKE",
+                                        "target": "Self"
+                                    }
+                                ]
+                            },
+                            "description": "This creature gets -1/-1 and gains first strike until end of turn"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "ModifyStats",
+                                        "powerModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "toughnessModifier": {
+                                            "type": "Fixed",
+                                            "amount": -1
+                                        },
+                                        "target": "Self"
+                                    },
+                                    {
+                                        "type": "GrantKeyword",
+                                        "keyword": "TRAMPLE",
+                                        "target": "Self"
+                                    }
+                                ]
+                            },
+                            "description": "This creature gets -1/-1 and gains trample until end of turn"
+                        }
+                    ],
+                    "countsAsModalSpell": false
+                },
+                "descriptionOverride": "{0}: This creature gets -1/-1 and gains your choice of banding, flying, first strike, or trample until end of turn."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "74",
+        "rarity": "RARE",
+        "artist": "Amy Weber",
+        "flavorText": "Unable to settle on just one design, Urza decided to create one versatile being.",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/4/448e1811-fb16-4390-ac22-b7066a4a019c.jpg?1562909193"
     },
     "colorIdentityOverride": []
 }

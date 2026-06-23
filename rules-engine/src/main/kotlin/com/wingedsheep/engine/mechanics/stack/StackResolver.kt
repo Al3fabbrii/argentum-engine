@@ -66,6 +66,7 @@ import com.wingedsheep.engine.handlers.PredicateEvaluator
 import com.wingedsheep.engine.handlers.TargetingSourceType
 import com.wingedsheep.engine.mechanics.targeting.HexproofSuppression
 import com.wingedsheep.engine.mechanics.targeting.PlayerTargetRestriction
+import com.wingedsheep.engine.handlers.SourceTypeTargeting
 import com.wingedsheep.engine.state.components.battlefield.CantBeTargetedByOpponentAbilitiesComponent
 import com.wingedsheep.engine.state.components.battlefield.ReplacementEffectSourceComponent
 import com.wingedsheep.sdk.scripting.filters.unified.TargetFilter
@@ -2530,6 +2531,17 @@ class StackResolver(
                         if (container?.has<CantBeTargetedByOpponentAbilitiesComponent>() == true) {
                             return@filterIndexed false
                         }
+                    }
+
+                    // Artifact Ward family: can't be the target of abilities from sources of a
+                    // given card type. Keys off the ability's source (CR 113.7) by card type, not
+                    // controller — applies even to the warded creature's own controller's sources.
+                    // Spells bypass (abilities-only).
+                    if (SourceTypeTargeting.cantBeTargetedBySourceTypeAbility(
+                            state, target.entityId, sourceId, targetingSourceType
+                        )
+                    ) {
+                        return@filterIndexed false
                     }
 
                     // Check protection from source colors/subtypes (Rule 702.16)

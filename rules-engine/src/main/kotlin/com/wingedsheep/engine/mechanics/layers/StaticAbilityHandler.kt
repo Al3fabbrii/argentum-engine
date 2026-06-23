@@ -59,6 +59,8 @@ import com.wingedsheep.sdk.scripting.TransformPermanent
 import com.wingedsheep.sdk.scripting.SetBasePowerToughnessDynamicStatic
 import com.wingedsheep.sdk.scripting.SetBasePowerToughnessStatic
 import com.wingedsheep.sdk.scripting.SetBaseToughnessForCreatureGroup
+import com.wingedsheep.engine.handlers.SourceTypeTargeting
+import com.wingedsheep.sdk.scripting.CantBeTargetedBySourceTypeAbilities
 import com.wingedsheep.sdk.scripting.CantBeTargetedByOpponentAbilities
 import com.wingedsheep.sdk.scripting.CantBeSacrificed
 import com.wingedsheep.sdk.scripting.CantReceiveCounters
@@ -445,6 +447,17 @@ class StaticAbilityHandler(
                 ContinuousEffectData(
                     modification = Modification.GrantKeyword(
                         "PROTECTION_FROM_CARDTYPE_${ability.cardType.name}"
+                    ),
+                    affectsFilter = convertGroupFilter(ability.filter)
+                )
+            }
+            is CantBeTargetedBySourceTypeAbilities -> {
+                // Projected as the keyword CANT_BE_TARGETED_BY_CARDTYPE_<TYPE>_SOURCE_ABILITIES;
+                // enforced at targeting by SourceTypeTargeting.cantBeTargetedBySourceTypeAbility
+                // (Artifact Ward). Mirrors the PROTECTION_FROM_CARDTYPE_<TYPE> keyword idiom.
+                ContinuousEffectData(
+                    modification = Modification.GrantKeyword(
+                        SourceTypeTargeting.keyword(ability.sourceType.name)
                     ),
                     affectsFilter = convertGroupFilter(ability.filter)
                 )
