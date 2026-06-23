@@ -5,6 +5,8 @@ import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.ChoiceSlot
+import com.wingedsheep.sdk.scripting.ChoiceType
+import com.wingedsheep.sdk.scripting.EntersWithChoice
 import com.wingedsheep.sdk.scripting.SetBasePowerToughnessDynamicStatic
 import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
@@ -21,12 +23,12 @@ import com.wingedsheep.sdk.scripting.values.DynamicAmount
  * that number.
  *
  * Implementation: a [Effects.ChooseNumberForSource] (0–7) records the chosen number durably on the
- * permanent under [ChoiceSlot.CHOSEN_NUMBER] — once as it enters (a Triggers.EntersBattlefield
- * ability) and again each upkeep (an optional Triggers.YourUpkeep ability, the "you may"). The P/T
- * is a [SetBasePowerToughnessDynamicStatic] characteristic-defining ability reading that last
- * choice: power = CHOSEN_NUMBER, toughness = 7 − CHOSEN_NUMBER, so they always sum to 7. Until any
- * number is chosen the slot reads 0, so it would be a 0/7 (it never sits there — a number is chosen
- * as it enters).
+ * permanent under [ChoiceSlot.CHOSEN_NUMBER] — once as it enters (a true as-enters replacement,
+ * [EntersWithChoice]`(ChoiceType.NUMBER)`, CR 614.1c — chosen before it is on the battlefield, so
+ * there is no priority window where it sits at its default) and again each upkeep (an optional
+ * Triggers.YourUpkeep ability, the "you may", via [Effects.ChooseNumberForSource] into the same
+ * slot). The P/T is a [SetBasePowerToughnessDynamicStatic] characteristic-defining ability reading
+ * that last choice: power = CHOSEN_NUMBER, toughness = 7 − CHOSEN_NUMBER, so they always sum to 7.
  */
 val Shapeshifter = card("Shapeshifter") {
     manaCost = "{6}"
@@ -40,11 +42,9 @@ val Shapeshifter = card("Shapeshifter") {
         "Shapeshifter's power is equal to the last chosen number and its toughness is equal to 7 " +
         "minus that number."
 
-    // As it enters, choose a number (mandatory).
-    triggeredAbility {
-        trigger = Triggers.EntersBattlefield
-        effect = Effects.ChooseNumberForSource(minValue = 0, maxValue = 7, prompt = "Choose a number between 0 and 7")
-    }
+    // As it enters, choose a number (mandatory) — a true "As ~ enters" replacement (CR 614.1c),
+    // resolved before the permanent is on the battlefield.
+    replacementEffect(EntersWithChoice(choiceType = ChoiceType.NUMBER, minValue = 0, maxValue = 7))
 
     // At the beginning of your upkeep, you MAY choose a number (declining keeps the last choice).
     triggeredAbility {

@@ -47,8 +47,10 @@ class ChooseNumberForSourceExecutor(
             phase = DecisionPhase.RESOLUTION
         )
 
+        val decision = decisionResult.pendingDecision!!
+
         val continuation = ChooseNumberForSourceContinuation(
-            decisionId = decisionResult.pendingDecision!!.id,
+            decisionId = decision.id,
             sourceId = sourceId,
             controllerId = context.controllerId,
             slot = effect.slot
@@ -56,7 +58,7 @@ class ChooseNumberForSourceExecutor(
 
         return EffectResult.paused(
             decisionResult.state.pushContinuation(continuation),
-            decisionResult.pendingDecision!!,
+            decision,
             decisionResult.events
         )
     }

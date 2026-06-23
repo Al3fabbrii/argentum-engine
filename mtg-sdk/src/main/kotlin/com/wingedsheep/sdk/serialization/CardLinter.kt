@@ -294,6 +294,7 @@ object CardLinter {
         "MODE" to "MODE",
         "CREATURE_ON_BATTLEFIELD" to "CREATURE",
         "OPPONENT" to "OPPONENT",
+        "NUMBER" to "CHOSEN_NUMBER",
     )
 
     /** Node types that read a slot without naming it in a field. */

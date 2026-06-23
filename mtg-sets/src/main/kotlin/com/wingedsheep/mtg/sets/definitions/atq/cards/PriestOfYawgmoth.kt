@@ -18,8 +18,9 @@ import com.wingedsheep.sdk.scripting.values.EntityReference
  * {T}, Sacrifice an artifact: Add an amount of {B} equal to the sacrificed artifact's mana value.
  *
  * Composes from existing primitives — no engine work. The sacrifice cost binds the sacrificed
- * artifact to [EntityReference.Sacrificed] (its last-known snapshot is captured at cost payment,
- * CR 112.7a), and the mana ability adds {B} times that artifact's mana value via
+ * artifact to [EntityReference.Sacrificed] (its last-known information is captured at cost payment,
+ * the same template as the rules' Bosh, Iron Golem example), and the mana ability adds {B} times
+ * that artifact's mana value via
  * [DynamicAmount.EntityProperty] reading [EntityNumericProperty.ManaValue]. Mana value is a printed
  * characteristic, so it reads correctly even after the artifact has been sacrificed to the
  * graveyard — including {0} (adds no mana) and high-MV artifacts. Same shape as Metamorphosis (ARN).

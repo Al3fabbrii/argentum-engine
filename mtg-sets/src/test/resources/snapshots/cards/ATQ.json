@@ -2339,17 +2339,6 @@
             {
                 "id": "ability_1",
                 "trigger": {
-                    "type": "ZoneChangeEvent",
-                    "to": "Battlefield"
-                },
-                "effect": {
-                    "type": "ChooseNumberForSource",
-                    "prompt": "Choose a number between 0 and 7"
-                }
-            },
-            {
-                "id": "ability_2",
-                "trigger": {
                     "type": "StepEvent",
                     "step": "UPKEEP"
                 },
@@ -2379,6 +2368,13 @@
                         "slot": "CHOSEN_NUMBER"
                     }
                 }
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "EntersWithChoice",
+                "choiceType": "NUMBER",
+                "maxValue": 7
             }
         ]
     },

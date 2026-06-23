@@ -1160,10 +1160,13 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   `[minValue, maxValue]` and **store it durably on the source permanent** under `slot` (a `ChoiceValue.NumberChoice`
   in its `CastChoicesComponent`, replacing any prior value). Unlike `ChooseNumberThen` (transient X for one inner
   effect), the number persists so a characteristic-defining ability can read it for the permanent's whole life via
-  `DynamicAmount.CastChoice(slot)`. Re-callable — the **last** chosen value wins. Use it both at entry (from a
-  `Triggers.EntersBattlefield` triggered ability) and from an upkeep trigger; for a "you **may** choose" clause mark
-  the running triggered ability `optional = true` (declining keeps the prior value). Powers Shapeshifter, whose P/T is
-  a `SetBasePowerToughnessDynamicStatic(power = CastChoice(CHOSEN_NUMBER), toughness = Subtract(Fixed(7),
+  `DynamicAmount.CastChoice(slot)`. Re-callable — the **last** chosen value wins. This is the *on-resolution* form
+  (run from a triggered/activated ability, e.g. an upkeep re-choice); for the *as-enters* "As ~ enters, choose a
+  number" choice use the replacement `EntersWithChoice(ChoiceType.NUMBER, minValue, maxValue)` (§ replacement effects),
+  which writes the same `CHOSEN_NUMBER` slot before the permanent is on the battlefield. For a "you **may** choose"
+  clause mark the running triggered ability `optional = true` (declining keeps the prior value). Powers Shapeshifter
+  (replacement at entry + this effect each upkeep), whose P/T is a
+  `SetBasePowerToughnessDynamicStatic(power = CastChoice(CHOSEN_NUMBER), toughness = Subtract(Fixed(7),
   CastChoice(CHOSEN_NUMBER)))` CDA — power = last chosen number, toughness = 7 − it.
 - `GrantHexproofFromChosenColorEffect(target)` — hexproof from chosen color.
 - `GrantProtectionFromChosenColorEffect(target)` — protection from chosen color. Must run inside `ChooseColorThen`; wrap in `ForEachInGroup` for the group case (Akroma's Blessing: "Creatures you control gain protection from the chosen color").
@@ -4718,7 +4721,16 @@ a searchable option list) into the `CastChoicesComponent` under `ChoiceSlot.CARD
 filters, `GameObjectFilter.namedFromChosenComponent()` (→ `CardPredicate.NameEqualsChosenComponent`,
 see §7). Used by Petrified Hamlet ("When this land enters, choose a land card name", then two
 statics — `PreventActivatedAbilities(nonManaAbilitiesOnly = true)` and `GrantActivatedAbility` of a
-`{T}: Add {C}` mana ability — both filtered by `namedFromChosenComponent()`). Example — Phantasmal Terrain
+`{T}: Add {C}` mana ability — both filtered by `namedFromChosenComponent()`), and
+`ChoiceType.NUMBER` (set `minValue` / `maxValue`) writes a chosen number into the
+`CastChoicesComponent` under `ChoiceSlot.CHOSEN_NUMBER` as a `ChoiceValue.NumberChoice` — read back
+by a CDA via `DynamicAmount.CastChoice(CHOSEN_NUMBER)`. This is the *as-enters replacement* (CR
+614.1c) form of a number choice — chosen before the permanent is on the battlefield, no priority
+window at the default — versus `Effects.ChooseNumberForSource` (on resolution, e.g. from an upkeep
+trigger) writing the same slot. Shapeshifter uses the replacement at entry and the effect each
+upkeep: `replacementEffect(EntersWithChoice(ChoiceType.NUMBER, minValue = 0, maxValue = 7))` +
+`SetBasePowerToughnessDynamicStatic(power = CastChoice(CHOSEN_NUMBER), toughness = Subtract(Fixed(7),
+CastChoice(CHOSEN_NUMBER)))`. Example — Phantasmal Terrain
 ("As this Aura enters, choose a basic land type. Enchanted land is the chosen type."):
 
 ```kotlin

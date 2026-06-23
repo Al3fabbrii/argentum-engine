@@ -82,6 +82,37 @@ class ShapeshifterScenarioTest : ScenarioTestBase() {
                 withClue("toughness = 7") { p.getToughness(shifter) shouldBe 7 }
                 ((p.getPower(shifter) ?: 0) + (p.getToughness(shifter) ?: 0)) shouldBe 7
             }
+
+            // The number is chosen as a true "As ~ enters" replacement (CR 614.1c), not an ETB
+            // trigger: the choice is presented while the spell resolves, BEFORE the permanent is on
+            // the battlefield — so it never briefly sits at its default P/T as a real permanent.
+            test("the number choice is an as-enters replacement: prompted before the creature is on the battlefield") {
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardInHand(1, "Shapeshifter")
+                    .withLandsOnBattlefield(1, "Mountain", 6)
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                game.castSpell(1, "Shapeshifter").error shouldBe null
+                game.resolveStack()
+
+                withClue("the number choice is pending") { (game.getPendingDecision() != null) shouldBe true }
+                withClue("the creature has NOT entered yet — the choice precedes entry") {
+                    game.findPermanent("Shapeshifter") shouldBe null
+                }
+
+                game.chooseNumber(4)
+                game.resolveStack()
+
+                val shifter = game.findPermanent("Shapeshifter")!!
+                val p = stateProjector.project(game.state)
+                withClue("once it enters it is already 4/3") {
+                    p.getPower(shifter) shouldBe 4
+                    p.getToughness(shifter) shouldBe 3
+                }
+            }
         }
     }
 }
