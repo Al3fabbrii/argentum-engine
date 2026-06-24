@@ -5268,6 +5268,56 @@
     ]
 }
 
+// Mutagen Man, Living Ooze
+{
+    "name": "Mutagen Man, Living Ooze",
+    "manaCost": "{X}{G}{G}",
+    "typeLine": "Legendary Creature — Ooze Mutant",
+    "oracleText": "Trample\nActivated abilities of artifact tokens you control cost {1} less to activate.\nWhen Mutagen Man enters, create X Mutagen tokens. (They're artifacts with \"{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature. Activate only as a sorcery.\")",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 3
+    },
+    "keywords": [
+        "TRAMPLE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreatePredefinedToken",
+                    "tokenType": "Mutagen",
+                    "dynamicCount": "CastX"
+                },
+                "descriptionOverride": "When Mutagen Man enters, create X Mutagen tokens."
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "ReduceActivatedAbilityCost",
+                "filter": {
+                    "baseFilter": "artifact token ctrl:you"
+                },
+                "amount": 1
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "124",
+        "rarity": "RARE",
+        "artist": "Ignatius Budi",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/f/9f9085f0-3702-462c-8c81-b4576236792d.jpg?1769006218"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Mutant Chain Reaction
 {
     "name": "Mutant Chain Reaction",
