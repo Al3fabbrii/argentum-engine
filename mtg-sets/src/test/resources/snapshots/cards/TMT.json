@@ -3929,6 +3929,99 @@
     }
 }
 
+// Leader's Talent
+{
+    "name": "Leader's Talent",
+    "manaCost": "{1}{W}",
+    "typeLine": "Enchantment — Class",
+    "oracleText": "(Gain the next level as a sorcery to add its ability.)\nWhenever you attack, put a +1/+1 counter on target attacking creature.\n{2}{W}: Level 2 — Whenever a creature you control leaves the battlefield, if it had a counter on it, you gain 2 life.\n{3}{W}: Level 3 — Whenever you cast a spell, put a +1/+1 counter on each creature you control.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "YouAttackEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "+1/+1",
+                    "count": 1,
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target attacking creature"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature attacking"
+                    },
+                    "id": "target attacking creature"
+                }
+            }
+        ],
+        "classLevels": [
+            {
+                "level": 2,
+                "cost": "{2}{W}",
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_2",
+                        "trigger": {
+                            "type": "ZoneChangeEvent",
+                            "filter": "creature ctrl:you",
+                            "from": "Battlefield"
+                        },
+                        "binding": "ANY",
+                        "effect": {
+                            "type": "GainLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            }
+                        },
+                        "triggerCondition": "TriggeringEntityHadCounters"
+                    }
+                ]
+            },
+            {
+                "level": 3,
+                "cost": "{3}{W}",
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_3",
+                        "trigger": "SpellCastEvent",
+                        "binding": "ANY",
+                        "effect": {
+                            "type": "ForEach",
+                            "space": {
+                                "type": "IterationSpace.Group",
+                                "filter": {
+                                    "baseFilter": "creature ctrl:you"
+                                }
+                            },
+                            "body": {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 1,
+                                "target": "Self"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "13",
+        "rarity": "RARE",
+        "artist": "Manuel Castañón",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/c/4cbcb622-1aff-460f-b8fa-4502d991e0ad.jpg?1777939766"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Leonardo's Technique
 {
     "name": "Leonardo's Technique",
