@@ -1946,6 +1946,24 @@ object Effects {
         CreatePredefinedTokenEffect("Munitions", count)
 
     /**
+     * Create Mutagen artifact tokens (Teenage Mutant Ninja Turtles).
+     * "{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature.
+     *  Activate only as a sorcery."
+     *
+     * @param count Number of tokens to create
+     */
+    fun CreateMutagenToken(count: Int = 1): Effect =
+        CreatePredefinedTokenEffect("Mutagen", count)
+
+    /**
+     * Create a dynamic number of Mutagen artifact tokens — the count is evaluated at
+     * resolution time. Used for X-cost makers like Mutagen Man, Living Ooze
+     * ("create X Mutagen tokens").
+     */
+    fun CreateMutagenToken(count: DynamicAmount): Effect =
+        CreatePredefinedTokenEffect("Mutagen", dynamicCount = count)
+
+    /**
      * Create Everywhere land tokens (Overlord of the Hauntwoods).
      * "A colorless land token named Everywhere that is every basic land type."
      * The token has all five basic land subtypes and taps for any color (the mana

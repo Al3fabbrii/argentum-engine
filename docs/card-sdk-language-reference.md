@@ -773,6 +773,11 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `CreateMunitionsToken(count?)` — Munitions noncreature artifact tokens (Weapons Manufacturing); the LTB damage
   trigger lives on the predefined `Munitions` `CardDefinition` and is picked up automatically by the engine's
   `TriggerAbilityResolver`.
+- `CreateMutagenToken(count?)` / `CreateMutagenToken(amount: DynamicAmount)` — Mutagen noncreature artifact tokens
+  (Teenage Mutant Ninja Turtles). The token is `"Artifact — Mutagen"` with the sorcery-speed activated ability
+  `"{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature."`, defined on the predefined `Mutagen`
+  `CardDefinition` (so the ability is resolved automatically). The `DynamicAmount` overload serves X-count makers
+  (Mutagen Man, Living Ooze — "create X Mutagen tokens").
 - `CreatePermanentEmblem(name, abilities)` — planeswalker emblem with static abilities.
 
 ### Ability granting
