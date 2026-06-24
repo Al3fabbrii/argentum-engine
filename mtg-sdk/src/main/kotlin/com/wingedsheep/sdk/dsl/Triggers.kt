@@ -547,6 +547,23 @@ object Triggers {
     )
 
     /**
+     * At end of combat (CR 511.1), on any player's turn. Fires once per combat phase. Pair with an
+     * intervening-if for "if this creature attacked or blocked this combat" (Clockwork Avian).
+     */
+    val EachEndOfCombat: TriggerSpec = TriggerSpec(
+        event = StepEvent(Step.END_COMBAT, Player.Each),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
+     * At end of combat on your turn (CR 511.1).
+     */
+    val YourEndOfCombat: TriggerSpec = TriggerSpec(
+        event = StepEvent(Step.END_COMBAT, Player.You),
+        binding = TriggerBinding.ANY
+    )
+
+    /**
      * At the beginning of your first main phase.
      */
     val FirstMainPhase: TriggerSpec = TriggerSpec(

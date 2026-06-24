@@ -224,6 +224,10 @@ object EntersWithCountersHelper {
             is CounterTypeFilter.Any -> CounterType.PLUS_ONE_PLUS_ONE
             is CounterTypeFilter.PlusOnePlusOne -> CounterType.PLUS_ONE_PLUS_ONE
             is CounterTypeFilter.MinusOneMinusOne -> CounterType.MINUS_ONE_MINUS_ONE
+            is CounterTypeFilter.PlusOnePlusZero -> CounterType.PLUS_ONE_PLUS_ZERO
+            is CounterTypeFilter.PlusZeroPlusOne -> CounterType.PLUS_ZERO_PLUS_ONE
+            is CounterTypeFilter.MinusOneMinusZero -> CounterType.MINUS_ONE_MINUS_ZERO
+            is CounterTypeFilter.MinusZeroMinusOne -> CounterType.MINUS_ZERO_MINUS_ONE
             is CounterTypeFilter.Loyalty -> CounterType.LOYALTY
             is CounterTypeFilter.Named -> {
                 try {

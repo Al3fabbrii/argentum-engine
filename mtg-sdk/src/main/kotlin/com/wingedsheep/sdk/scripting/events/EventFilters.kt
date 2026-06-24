@@ -284,6 +284,30 @@ sealed interface CounterTypeFilter {
         override val description = "-1/-1"
     }
 
+    @SerialName("PlusOnePlusZero")
+    @Serializable
+    data object PlusOnePlusZero : CounterTypeFilter {
+        override val description = "+1/+0"
+    }
+
+    @SerialName("PlusZeroPlusOne")
+    @Serializable
+    data object PlusZeroPlusOne : CounterTypeFilter {
+        override val description = "+0/+1"
+    }
+
+    @SerialName("MinusOneMinusZero")
+    @Serializable
+    data object MinusOneMinusZero : CounterTypeFilter {
+        override val description = "-1/-0"
+    }
+
+    @SerialName("MinusZeroMinusOne")
+    @Serializable
+    data object MinusZeroMinusOne : CounterTypeFilter {
+        override val description = "-0/-1"
+    }
+
     @SerialName("Loyalty")
     @Serializable
     data object Loyalty : CounterTypeFilter {

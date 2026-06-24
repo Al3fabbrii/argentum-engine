@@ -703,6 +703,63 @@
     ]
 }
 
+// Battering Ram
+{
+    "name": "Battering Ram",
+    "manaCost": "{2}",
+    "typeLine": "Artifact Creature — Construct",
+    "oracleText": "At the beginning of combat on your turn, this creature gains banding until end of combat.\nWhenever this creature becomes blocked by a Wall, destroy that Wall at end of combat.",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "BEGIN_COMBAT"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "GrantKeyword",
+                    "keyword": "BANDING",
+                    "target": "Self",
+                    "duration": "EndOfCombat"
+                },
+                "descriptionOverride": "At the beginning of combat on your turn, this creature gains banding until end of combat."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "BecomesBlockedEvent",
+                    "filter": "creature Wall"
+                },
+                "effect": {
+                    "type": "CreateDelayedTrigger",
+                    "step": "END_COMBAT",
+                    "effect": {
+                        "type": "MoveToZone",
+                        "target": "TriggeringEntity",
+                        "destination": "Graveyard",
+                        "byDestruction": true
+                    }
+                },
+                "descriptionOverride": "Whenever this creature becomes blocked by a Wall, destroy that Wall at end of combat."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "41",
+        "artist": "Jeff A. Menges",
+        "flavorText": "By the time Mishra was defeated, no mage was foolish enough to rely heavily on walls.",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/7/f7a69e35-d209-41c0-aa3c-c78414617075.jpg?1562947317"
+    },
+    "colorIdentityOverride": []
+}
+
 // Candelabra of Tawnos
 {
     "name": "Candelabra of Tawnos",
@@ -842,6 +899,133 @@
         "artist": "Jesper Myrfors",
         "flavorText": "Tawnos won fame as Urza's greatest assistant. After he created these warriors, Urza ended his apprenticeship, promoting him directly to the rank of master.",
         "imageUri": "https://cards.scryfall.io/normal/front/6/4/64975352-8d35-4d02-94ac-fa0c6ee12409.jpg?1562916020"
+    },
+    "colorIdentityOverride": []
+}
+
+// Clockwork Avian
+{
+    "name": "Clockwork Avian",
+    "manaCost": "{5}",
+    "typeLine": "Artifact Creature — Bird",
+    "oracleText": "Flying\nThis creature enters with four +1/+0 counters on it.\nAt end of combat, if this creature attacked or blocked this combat, remove a +1/+0 counter from it.\n{X}, {T}: Put up to X +1/+0 counters on this creature. This ability can't cause the total number of +1/+0 counters on this creature to be greater than four. Activate only during your upkeep.",
+    "creatureStats": {
+        "power": 0,
+        "toughness": 4
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "END_COMBAT",
+                    "player": "Each"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "RemoveCounters",
+                    "counterType": "+1/+0",
+                    "count": 1,
+                    "target": "Self"
+                },
+                "triggerCondition": {
+                    "type": "Any",
+                    "conditions": [
+                        {
+                            "type": "EntityMatches",
+                            "entity": "Self",
+                            "filter": {
+                                "statePredicates": [
+                                    "AttackedThisCombat"
+                                ]
+                            }
+                        },
+                        {
+                            "type": "EntityMatches",
+                            "entity": "Self",
+                            "filter": {
+                                "statePredicates": [
+                                    "BlockedThisCombat"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "At end of combat, if this creature attacked or blocked this combat, remove a +1/+0 counter from it."
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{X}"
+                            }
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "AddDynamicCounters",
+                    "counterType": "+1/+0",
+                    "amount": {
+                        "type": "IfPositive",
+                        "amount": {
+                            "type": "Min",
+                            "left": "XValue",
+                            "right": {
+                                "type": "Subtract",
+                                "left": {
+                                    "type": "Fixed",
+                                    "amount": 4
+                                },
+                                "right": {
+                                    "type": "EntityProperty",
+                                    "entity": "Source",
+                                    "numericProperty": {
+                                        "type": "CounterCount",
+                                        "counterType": "PlusOnePlusZero"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "target": "Self"
+                },
+                "restrictions": [
+                    {
+                        "type": "DuringStep",
+                        "step": "UPKEEP"
+                    },
+                    "OnlyDuringYourTurn"
+                ],
+                "descriptionOverride": "{X}, {T}: Put up to X +1/+0 counters on this creature (max four total). Activate only during your upkeep."
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "EntersWithCounters",
+                "counterType": "PlusOnePlusZero",
+                "count": 4,
+                "selfOnly": true
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "45",
+        "rarity": "RARE",
+        "artist": "Randy Asplund-Faith",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/d/1dea8c2f-4aea-478d-aee7-cba1f74edd6c.jpg?1562901278"
     },
     "colorIdentityOverride": []
 }
@@ -1949,6 +2133,159 @@
         "artist": "Kaja Foglio",
         "flavorText": "More than one mage was driven insane by the sound of the Millstone relentlessly grinding away.",
         "imageUri": "https://cards.scryfall.io/normal/front/1/0/107646bc-2181-49f4-8821-1eaa46291855.jpg?1562898439"
+    },
+    "colorIdentityOverride": []
+}
+
+// Mishra's Factory
+{
+    "name": "Mishra's Factory",
+    "manaCost": "",
+    "typeLine": "Land",
+    "oracleText": "{T}: Add {C}.\n{1}: This land becomes a 2/2 Assembly-Worker artifact creature until end of turn. It's still a land.\n{T}: Target Assembly-Worker creature gets +1/+1 until end of turn.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddColorlessMana",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            },
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{1}"
+                    }
+                },
+                "effect": {
+                    "type": "BecomeCreature",
+                    "power": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "toughness": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "creatureTypes": [
+                        "Assembly-Worker"
+                    ],
+                    "addTypes": [
+                        "ARTIFACT"
+                    ]
+                },
+                "descriptionOverride": "{1}: This land becomes a 2/2 Assembly-Worker artifact creature until end of turn. It's still a land."
+            },
+            {
+                "id": "ability_3",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "ModifyStats",
+                    "powerModifier": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "toughnessModifier": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target Assembly-Worker creature"
+                    }
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "creature Assembly-Worker"
+                        },
+                        "id": "target Assembly-Worker creature"
+                    }
+                ],
+                "descriptionOverride": "{T}: Target Assembly-Worker creature gets +1/+1 until end of turn."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "80a",
+        "rarity": "UNCOMMON",
+        "artist": "Kaja Foglio & Phil Foglio",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/6/a696c5b6-f216-454d-8029-74e84bbd1428.jpg?1562930097"
+    },
+    "colorIdentityOverride": []
+}
+
+// Mishra's War Machine
+{
+    "name": "Mishra's War Machine",
+    "manaCost": "{7}",
+    "typeLine": "Artifact Creature — Juggernaut",
+    "oracleText": "Banding\nAt the beginning of your upkeep, this creature deals 3 damage to you unless you discard a card. If it deals damage to you this way, tap it.",
+    "creatureStats": {
+        "power": 5,
+        "toughness": 5
+    },
+    "keywords": [
+        "BANDING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "UPKEEP"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.DoAction",
+                        "action": {
+                            "type": "PayOrSuffer",
+                            "cost": {
+                                "type": "PayAtom",
+                                "atom": "AtomDiscard"
+                            },
+                            "suffer": {
+                                "type": "DealDamage",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 3
+                                },
+                                "target": "Controller",
+                                "damageSource": "Self"
+                            }
+                        },
+                        "successCriterion": "SuccessCriterion.DamageDealt"
+                    },
+                    "then": {
+                        "type": "TapUntap",
+                        "target": "Self"
+                    }
+                },
+                "descriptionOverride": "At the beginning of your upkeep, this creature deals 3 damage to you unless you discard a card. If it deals damage to you this way, tap it."
+            }
+        ]
+    },
+    "setCode": "ATQ",
+    "metadata": {
+        "collectorNumber": "57",
+        "rarity": "RARE",
+        "artist": "Amy Weber",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/f/8f6b4652-a1d4-418f-a89b-6a977a920a9e.jpg?1562925240"
     },
     "colorIdentityOverride": []
 }

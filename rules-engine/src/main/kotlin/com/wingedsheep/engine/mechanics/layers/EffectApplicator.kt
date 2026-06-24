@@ -296,11 +296,21 @@ internal class EffectApplicator(
             val plusOneCounters = counters.getCount(CounterType.PLUS_ONE_PLUS_ONE)
             val minusOneCounters = counters.getCount(CounterType.MINUS_ONE_MINUS_ONE)
 
-            val netCounters = plusOneCounters - minusOneCounters
+            // Asymmetric P/T counters (CR 122.1a — a +X/+Y counter adds X to power and Y to
+            // toughness; see rule 613.4c for the layer) — +1/+0, +0/+1, -1/-0, -0/-1.
+            val plusOnePlusZero = counters.getCount(CounterType.PLUS_ONE_PLUS_ZERO)
+            val plusZeroPlusOne = counters.getCount(CounterType.PLUS_ZERO_PLUS_ONE)
+            val minusOneMinusZero = counters.getCount(CounterType.MINUS_ONE_MINUS_ZERO)
+            val minusZeroMinusOne = counters.getCount(CounterType.MINUS_ZERO_MINUS_ONE)
 
-            if (netCounters != 0) {
-                values.power = (values.power ?: 0) + netCounters
-                values.toughness = (values.toughness ?: 0) + netCounters
+            val powerMod = (plusOneCounters - minusOneCounters) + plusOnePlusZero - minusOneMinusZero
+            val toughnessMod = (plusOneCounters - minusOneCounters) + plusZeroPlusOne - minusZeroMinusOne
+
+            if (powerMod != 0) {
+                values.power = (values.power ?: 0) + powerMod
+            }
+            if (toughnessMod != 0) {
+                values.toughness = (values.toughness ?: 0) + toughnessMod
             }
         }
     }

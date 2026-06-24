@@ -543,6 +543,24 @@ data class GameObjectFilter(
     )
 
     /**
+     * Was declared as an attacker at least once during the current combat (CR 508.1). Backed by a
+     * per-entity marker stamped at attacker-declaration time; cleared when the combat phase ends.
+     * Survives removal from combat. Pair with [blockedThisCombat] for "attacked or blocked this combat".
+     */
+    fun attackedThisCombat() = copy(
+        statePredicates = statePredicates + StatePredicate.AttackedThisCombat
+    )
+
+    /**
+     * Was declared as a blocker at least once during the current combat (CR 509.1). Backed by a
+     * per-entity marker stamped at blocker-declaration time; cleared when the combat phase ends.
+     * Survives the blocked attacker dying (which clears the live `BlockingComponent`).
+     */
+    fun blockedThisCombat() = copy(
+        statePredicates = statePredicates + StatePredicate.BlockedThisCombat
+    )
+
+    /**
      * Must have been dealt damage this turn (marked-damage *history*, not current marked damage).
      * Survives damage removal / leaving combat; cleared at end-of-turn cleanup. Used by
      * "...that was dealt damage this turn" (Rooftop Assassin, Unsparing Boltcaster).

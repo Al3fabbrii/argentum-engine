@@ -329,6 +329,10 @@ export function isSharedZone(zoneType: ZoneType): boolean {
 export enum CounterType {
   PLUS_ONE_PLUS_ONE = 'PLUS_ONE_PLUS_ONE',
   MINUS_ONE_MINUS_ONE = 'MINUS_ONE_MINUS_ONE',
+  PLUS_ONE_PLUS_ZERO = 'PLUS_ONE_PLUS_ZERO',
+  PLUS_ZERO_PLUS_ONE = 'PLUS_ZERO_PLUS_ONE',
+  MINUS_ONE_MINUS_ZERO = 'MINUS_ONE_MINUS_ZERO',
+  MINUS_ZERO_MINUS_ONE = 'MINUS_ZERO_MINUS_ONE',
   LOYALTY = 'LOYALTY',
   CHARGE = 'CHARGE',
   GEM = 'GEM',
@@ -377,6 +381,10 @@ export enum CounterType {
 export const CounterTypeDisplayNames: Record<CounterType, string> = {
   [CounterType.PLUS_ONE_PLUS_ONE]: '+1/+1',
   [CounterType.MINUS_ONE_MINUS_ONE]: '-1/-1',
+  [CounterType.PLUS_ONE_PLUS_ZERO]: '+1/+0',
+  [CounterType.PLUS_ZERO_PLUS_ONE]: '+0/+1',
+  [CounterType.MINUS_ONE_MINUS_ZERO]: '-1/-0',
+  [CounterType.MINUS_ZERO_MINUS_ONE]: '-0/-1',
   [CounterType.LOYALTY]: 'Loyalty',
   [CounterType.CHARGE]: 'Charge',
   [CounterType.GEM]: 'Gem',

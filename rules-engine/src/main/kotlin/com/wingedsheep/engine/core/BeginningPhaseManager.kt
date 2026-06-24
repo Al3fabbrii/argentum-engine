@@ -446,6 +446,8 @@ class BeginningPhaseManager(
         StatePredicate.HasDealtCombatDamageToPlayer,
         StatePredicate.DealtCombatDamageToSourceControllerThisTurn,
         StatePredicate.AttackedThisTurn,
+        StatePredicate.AttackedThisCombat,
+        StatePredicate.BlockedThisCombat,
         StatePredicate.BlockedOrWasBlockedByLegendaryThisTurn,
         StatePredicate.IsFaceDown,
         StatePredicate.IsFaceUp,

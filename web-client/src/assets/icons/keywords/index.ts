@@ -70,6 +70,10 @@ export const displayableKeywords = new Set([
 export const counterManaClass: Record<string, string> = {
   PLUS_ONE_PLUS_ONE: 'counter-plus',
   MINUS_ONE_MINUS_ONE: 'counter-minus',
+  PLUS_ONE_PLUS_ZERO: 'counter-plus',
+  PLUS_ZERO_PLUS_ONE: 'counter-plus',
+  MINUS_ONE_MINUS_ZERO: 'counter-minus',
+  MINUS_ZERO_MINUS_ONE: 'counter-minus',
   LOYALTY: 'counter-loyalty',
   CHARGE: 'counter-charge',
   GEM: 'counter-charge',

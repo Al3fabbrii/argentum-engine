@@ -540,6 +540,14 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 
 - `AddCounters(type, count, target)` — add N counters of `type`.
 - `AddDynamicCounters(type, amount, target)` — count is computed at resolution.
+- **Stat counters and the layer system.** Counters whose `type` is a P/T stat counter modify power/toughness in
+  layer 7c (CR 613.4c) via `EffectApplicator.applyCounters`. The symmetric pair is `Counters.PLUS_ONE_PLUS_ONE` /
+  `Counters.MINUS_ONE_MINUS_ONE`; the asymmetric counters `Counters.PLUS_ONE_PLUS_ZERO` (`+1/+0`),
+  `Counters.PLUS_ZERO_PLUS_ONE` (`+0/+1`), `Counters.MINUS_ONE_MINUS_ZERO` (`-1/-0`) and
+  `Counters.MINUS_ZERO_MINUS_ONE` (`-0/-1`) modify only the indicated stat (Clockwork Avian's four `+1/+0`
+  counters). Each has a matching `CounterTypeFilter` (`PlusOnePlusZero`, etc.) for `EntersWithCounters`,
+  counter-count dynamic amounts, and counter triggers. Only `+1/+1` and `-1/-1` annihilate each other as a
+  state-based action (CR 122.3); the asymmetric counters never cancel.
 - `DoubleCounters(type?, target?)` — one-shot doubling of the `type` counters (default `+1/+1`) already on the
   target: reads the current count and places that many more (so the total doubles). Distinct from the
   `DoubleCounterPlacement` replacement (which doubles *future* placements); the added counters still trigger
@@ -924,11 +932,13 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 
 ### Combat-shape & misc
 
-- `PreventDamageEffect(amount, direction, scope, sourceFilter, onPrevented, gainLifeFromColors, duration)` — prevention shield. `amount = null` prevents all. `sourceFilter` can be `ChosenSource` (player picks any source on resolution) or `ChosenColoredSource` (player picks a source on resolution, but only colored sources are offered — "a source of your choice that shares a color with the mana spent"; a colorless source qualifies for nothing, so it's never offered — Protective Sphere). `onPrevented: Effect?` is an **arbitrary follow-up effect** run when a single-instance `ChosenSource` shield prevents an instance of damage (see below). `gainLifeFromColors: Set<Color>` makes the shield's controller gain that much life whenever it prevents damage from a source of one of those colors (Samite Ministration). Facades: `Effects.PreventNextDamage`, `Effects.PreventNextDamageFromChosenSource(amount, target)`, `Effects.PreventNextDamageFromChosenSource(onPrevented)`, `Effects.PreventAllDamageFromChosenSource(target, gainLifeFromColors)`, `Effects.PreventAllDamageFromChosenColoredSource(target)`, `Effects.DeflectNextDamageFromChosenSource()`, `Effects.ReflectNextDamageFromChosenSourceToController()`. The `preventDamage` flag (default true) — when **false**, the chosen-source shield does NOT prevent the damage (it still hits in full) but still fires its `onPrevented` reaction with the captured amount; this is the "instead it still deals that damage to you AND deals that much to its controller" shape (Eye for an Eye), as opposed to the deflect/prevent shape (Deflecting Palm).
+- `PreventDamageEffect(amount, direction, scope, sourceFilter, onPrevented, gainLifeFromColors, duration)` — prevention shield. `amount = null` prevents all. `sourceFilter` can be `ChosenSource` (player picks any source on resolution), `ChosenColoredSource` (player picks a source on resolution, but only colored sources are offered — "a source of your choice that shares a color with the mana spent"; a colorless source qualifies for nothing, so it's never offered — Protective Sphere), or `ChosenArtifactSource` (only artifact sources are offered, and the next *whole damage instance* from the chosen source is prevented then the shield is consumed — the Circle of Protection family; Circle of Protection: Artifacts. Facade `Effects.PreventNextDamageFromChosenArtifactSource(target)`). `onPrevented: Effect?` is an **arbitrary follow-up effect** run when a single-instance `ChosenSource` shield prevents an instance of damage (see below). `gainLifeFromColors: Set<Color>` makes the shield's controller gain that much life whenever it prevents damage from a source of one of those colors (Samite Ministration). Facades: `Effects.PreventNextDamage`, `Effects.PreventNextDamageFromChosenSource(amount, target)`, `Effects.PreventNextDamageFromChosenSource(onPrevented)`, `Effects.PreventAllDamageFromChosenSource(target, gainLifeFromColors)`, `Effects.PreventAllDamageFromChosenColoredSource(target)`, `Effects.DeflectNextDamageFromChosenSource()`, `Effects.ReflectNextDamageFromChosenSourceToController()`. The `preventDamage` flag (default true) — when **false**, the chosen-source shield does NOT prevent the damage (it still hits in full) but still fires its `onPrevented` reaction with the captured amount; this is the "instead it still deals that damage to you AND deals that much to its controller" shape (Eye for an Eye), as opposed to the deflect/prevent shape (Deflecting Palm).
   - **Prevent-and-react (`onPrevented`)** — instead of a bespoke reaction type, the chosen-source shield runs **any composed effect** when it fires, as a real triggered ability on the stack ("When damage is prevented this way, …", CR-faithful — opponents get priority and can respond). Mechanically: on resolution the shield is created **and** a linked event-based delayed triggered ability (`CreateDelayedTriggerEffect`-style) whose `effect` is `onPrevented`; when the shield prevents an instance it emits an internal `DamagePreventedEvent` that fires only that delayed trigger (matched by id). Inside the trigger the prevented amount is `DynamicAmounts.preventedDamage()` ("that much"/"that many") and the prevented source's controller is `EffectTarget.ControllerOfTriggeringEntity` ("that source's controller") — the same pair Tephraderm uses. So Deflecting Palm's `onPrevented` = `DealDamage(ControllerOfTriggeringEntity, preventedDamage())`; New Way Forward's = `Composite(DealDamage(ControllerOfTriggeringEntity, preventedDamage()), DrawCards(preventedDamage()))`. Because the payoff is a normal stack ability, it may be interactive (targets, replacements) like any other.
-- `Effects.BecomeCreature(target, power, toughness, keywords, creatureTypes, removeTypes, colors, imageUri, duration)`
-  (`BecomeCreatureEffect`) — animate / "becomes a creature." Adds CREATURE (Layer 4), *sets* creature
-  subtypes to `creatureTypes` (replacing all others), removes `removeTypes`, *sets* `colors` (Layer 5,
+- `Effects.BecomeCreature(target, power, toughness, keywords, creatureTypes, removeTypes, addTypes, colors, imageUri, duration)`
+  (`BecomeCreatureEffect`) — animate / "becomes a creature." Adds CREATURE (Layer 4, keeping the permanent's
+  existing types — so "it's still a land"), *sets* creature subtypes to `creatureTypes` (replacing all others),
+  removes `removeTypes`, grants additional card types via `addTypes` (e.g. `setOf("ARTIFACT")` for **Mishra's
+  Factory** — "becomes a 2/2 Assembly-Worker artifact creature. It's still a land"), *sets* `colors` (Layer 5,
   replacing all others; `null` = keep), grants `keywords` (Layer 6), and sets base P/T (Layer 7b set
   values). **`power`/`toughness` are `DynamicAmount`** (evaluated once at resolution, CR 613.4c, then
   stamped as a fixed set-P/T floating effect); an `Int` convenience overload wraps them in
@@ -1015,9 +1025,17 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
     single `MoveToZone` of the source itself) growing its destination zone. **Auto is only legal on
     shapes it can infer** (`SuccessCriterion.Auto.canInfer`): card-load validation (`CardValidator`,
     enforced corpus-wide by `SuccessCriterionValidationTest`) rejects an Auto criterion on any other
-    action — non-zone-move actions (deal damage, gain life, …) must state `SuccessCriterion.Always`
-    or `CollectionNonEmpty(name, min)` explicitly instead of silently inheriting a fail-open
-    "it happened". `CollectionNonEmpty` gates on the action's actual pipeline collection
+    action — non-zone-move actions (deal damage, gain life, …) must state `SuccessCriterion.Always`,
+    `CollectionNonEmpty(name, min)`, or `DamageDealt(recipient)` explicitly instead of silently
+    inheriting a fail-open "it happened". `SuccessCriterion.DamageDealt(recipient = Controller|Any)`
+    gates on whether the action **actually dealt damage** from the effect's source (a positive-amount
+    `DamageDealtEvent` sourced from it) — damage that was fully prevented or replaced (a Circle of
+    Protection, a prevention shield, redirection) emits no such event and counts as "didn't happen".
+    `DamageRecipient.Controller` (the default) requires the damage to have reached *you*; `.Any`
+    accepts any recipient. Mishra's War Machine: "deals 3 damage to you unless you discard a card. If
+    it deals damage to you this way, tap it" → `IfYouDoEffect(PayOrSuffer(discard, DealDamage(3,
+    Controller, source=Self)), Tap(Self), successCriterion = DamageDealt(Controller))`.
+    `CollectionNonEmpty` gates on the action's actual pipeline collection
     (`storedCollections[name].size >= min` after the action runs) — the collections propagate onto
     the gate frame via `exposeCollectionsToNextFrame`, in both the synchronous and the
     paused/continuation-drain paths. The executor pre-pushes a `GatedActionContinuation` so a paused
@@ -2165,6 +2183,9 @@ for anything else (the ATTACHED-binding aura shapes, custom step/player combinat
 - `EachEndStep` — beginning of each end step.
 - `BeginCombat` — start of combat on your turn.
 - `EachCombat` — beginning of each combat (any player's turn).
+- `EachEndOfCombat` — at end of combat (CR 511.1), on any player's turn. `YourEndOfCombat` for your
+  turn only. Pair with `triggerCondition = Conditions.SourceAttackedOrBlockedThisCombat` for "at end of
+  combat, if this creature attacked or blocked this combat, …" (Clockwork Avian).
 - `FirstMainPhase` — start of pre-combat main.
 - `YourPostcombatMain` — start of post-combat main.
 
@@ -3301,6 +3322,8 @@ activatedAbility {
 - `MaxPerTurn(n)` — at most N activations per turn.
 - `OnlyOnce` — once per game.
 - `OnlyIfCondition(c)` — condition gate.
+- `OnlyDuringYourTurn` / `DuringPhase(p)` / `DuringStep(s)` / `BeforeStep(s)` — timing gates (compose
+  via `All(...)`, e.g. `All(DuringStep(UPKEEP), OnlyDuringYourTurn)` for "only during your upkeep").
 
 **Loyalty abilities**
 
@@ -3861,6 +3884,15 @@ that works in both resolution and static-ability (projection) contexts.
 - `SourceAttackedThisTurn` — source was declared as an attacker at least once during the
   current turn (per-creature, derived from the controller's `PlayerAttackersThisTurnComponent`).
   Negate via `Conditions.Not(...)` for Erg Raiders-style "if it didn't attack this turn".
+- `SourceAttackedThisCombat` / `SourceBlockedThisCombat` — source was declared as an attacker /
+  blocker at least once during the current combat (per-creature `AttackedThisCombatComponent` /
+  `BlockedThisCombatComponent`, stamped at declaration time, cleared when the combat phase ends;
+  filter helpers `.attackedThisCombat()` / `.blockedThisCombat()`). Unlike the live
+  `AttackingComponent`/`BlockingComponent` these survive the creature (or its blocked attacker)
+  leaving combat, so they still read true at end of combat; unlike `SourceAttackedThisTurn` they
+  reset between multiple combats in one turn.
+- `SourceAttackedOrBlockedThisCombat` — `Any(SourceAttackedThisCombat, SourceBlockedThisCombat)`.
+  Used as the intervening-if on Clockwork Avian's `EachEndOfCombat` counter-shed trigger.
 - `SourceHasDealtDamage` — source has dealt damage since entering the battlefield.
 - `SourceHasDealtCombatDamageToPlayer` — saboteur-style payoff gate.
 - `SourceIsModified` — has counters, attached Equipment, or controller-owned Aura

@@ -122,6 +122,10 @@ object ReplacementEffectUtils {
             is CounterTypeFilter.Any -> true
             is CounterTypeFilter.PlusOnePlusOne -> counterType == CounterType.PLUS_ONE_PLUS_ONE
             is CounterTypeFilter.MinusOneMinusOne -> counterType == CounterType.MINUS_ONE_MINUS_ONE
+            is CounterTypeFilter.PlusOnePlusZero -> counterType == CounterType.PLUS_ONE_PLUS_ZERO
+            is CounterTypeFilter.PlusZeroPlusOne -> counterType == CounterType.PLUS_ZERO_PLUS_ONE
+            is CounterTypeFilter.MinusOneMinusZero -> counterType == CounterType.MINUS_ONE_MINUS_ZERO
+            is CounterTypeFilter.MinusZeroMinusOne -> counterType == CounterType.MINUS_ZERO_MINUS_ONE
             is CounterTypeFilter.Loyalty -> counterType == CounterType.LOYALTY
             is CounterTypeFilter.Named -> {
                 try {
