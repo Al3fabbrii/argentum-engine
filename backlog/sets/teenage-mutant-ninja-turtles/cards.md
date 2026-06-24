@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 140 / 190
+**Implemented:** 141 / 190
 ---
 
 - [x] Action News Crew
@@ -24,7 +24,7 @@
 - [x] Casey Jones, Vigilante
 - [ ] Chrome Dome
 - [ ] Cool but Rude
-- [ ] Courier of Comestibles
+- [x] Courier of Comestibles
 - [x] Cowabunga!
 - [x] Crustacean Commando
 - [x] Dark Leo & Shredder
