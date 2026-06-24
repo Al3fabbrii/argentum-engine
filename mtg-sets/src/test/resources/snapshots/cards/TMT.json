@@ -2057,6 +2057,71 @@
     ]
 }
 
+// General Traag, Heart of Stone
+{
+    "name": "General Traag, Heart of Stone",
+    "manaCost": "{3}{R}{R}",
+    "typeLine": "Legendary Artifact Creature — Elemental Soldier",
+    "oracleText": "Trample\nWhen General Traag enters, you may sacrifice another artifact. When you do, General Traag deals 4 damage to target creature.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 3
+    },
+    "keywords": [
+        "TRAMPLE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "ReflexiveTrigger",
+                    "action": {
+                        "type": "Sacrifice",
+                        "filter": "artifact",
+                        "excludeSource": true
+                    },
+                    "reflexiveEffect": {
+                        "type": "DealDamage",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 4
+                        },
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        },
+                        "damageSource": "Self"
+                    },
+                    "reflexiveTargetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "When General Traag enters, you may sacrifice another artifact. When you do, General Traag deals 4 damage to target creature."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "90",
+        "rarity": "UNCOMMON",
+        "artist": "Kevin Sidharta",
+        "flavorText": "\"Lord Krang, we arrive. We obey. We conquer.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/0/e02e971f-6008-4c82-acd2-2aed13009ccb.jpg?1771502622"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Genghis Frog
 {
     "name": "Genghis Frog",
