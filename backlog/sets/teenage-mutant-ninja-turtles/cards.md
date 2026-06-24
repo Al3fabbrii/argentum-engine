@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 160 / 190
+**Implemented:** 161 / 190
 ---
 
 - [x] Action News Crew
@@ -43,7 +43,7 @@
 - [x] East Wind Avatar
 - [x] EPF Point Squad
 - [x] Escape Tunnel
-- [ ] Everything Pizza
+- [x] Everything Pizza
 - [x] Featherbrained Filcher
 - [x] Foot Elite
 - [x] Foot Headquarters
