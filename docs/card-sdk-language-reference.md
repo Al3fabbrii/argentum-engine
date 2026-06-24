@@ -949,7 +949,7 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   the rest of the animate at cleanup; `null` keeps the permanent's own art. The optional
   `dynamicPower`/`dynamicToughness` (`DynamicAmount`, supplied together) instead make the Layer 7b base-P/T a
   *dynamic* `SetPowerToughnessDynamic` recomputed at projection rather than locked in at resolution — the
-  single-target companion to `MassAnimateByManaValueEffect`. Facade
+  single-target companion to `MassAnimateEffect`. Facade
   `Effects.BecomeCreatureWithManaValueStats(target, addTypes, keywords, creatureTypes, duration)` wires P/T = the
   animated permanent's own mana value (`EntityProperty(AffectedEntity, ManaValue)`) for **Xenic Poltergeist**
   ("Until your next upkeep, target noncreature artifact becomes an artifact creature with power and toughness

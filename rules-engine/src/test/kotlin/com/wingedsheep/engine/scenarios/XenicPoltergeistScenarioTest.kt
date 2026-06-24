@@ -78,7 +78,7 @@ class XenicPoltergeistScenarioTest : ScenarioTestBase() {
                     animated.getToughness(millstone) shouldBe 2
                 }
                 withClue("Millstone is still an artifact") {
-                    animated.isArtifact(millstone) shouldBe true
+                    animated.hasType(millstone, "ARTIFACT") shouldBe true
                 }
 
                 // Advance through the opponent's turn — the effect is "until YOUR next upkeep", so it
@@ -104,7 +104,7 @@ class XenicPoltergeistScenarioTest : ScenarioTestBase() {
                     reverted.isCreature(millstone) shouldBe false
                 }
                 withClue("Millstone is still an artifact after reverting") {
-                    reverted.isArtifact(millstone) shouldBe true
+                    reverted.hasType(millstone, "ARTIFACT") shouldBe true
                 }
             }
         }

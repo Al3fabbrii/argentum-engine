@@ -127,6 +127,10 @@ sealed interface StatePredicate {
      * you control **that isn't the target of an ability from another creature named Goblin Artisans**"
      * — so two Goblin Artisans can't both lock onto the same artifact spell. Inert (always true) with
      * no source context.
+     *
+     * Name comparison reads the base `CardComponent.name`, not the Layer-1 projected name, so a
+     * permanent that *copies* the source's name (Clone, Spy Kit) is not recognized as same-named —
+     * an accepted edge for these self-referential restrictions.
      */
     @SerialName("NotTargetedByAbilityFromSameNamedSource")
     @Serializable

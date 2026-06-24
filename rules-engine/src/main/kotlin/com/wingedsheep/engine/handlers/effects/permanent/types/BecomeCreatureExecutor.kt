@@ -105,12 +105,12 @@ class BecomeCreatureExecutor : EffectExecutor<BecomeCreatureEffect> {
             )
         }
 
-        // Layer 7b (POWER_TOUGHNESS, SET_VALUES): Set base P/T. When dynamic amounts are supplied
-        // (Xenic Poltergeist: P/T each equal to the animated permanent's own mana value), use a
-        // dynamic modification recomputed per affected entity at projection. Otherwise the fixed
-        // [power]/[toughness] amounts are evaluated once, now, and stamped as a fixed set-value
-        // floating effect (CR 613.4c — the value is locked in when the effect begins to apply; it
-        // does not keep recomputing).
+        // Layer 7b (POWER_TOUGHNESS, SET_VALUES, CR 613.4b — effects that set P/T to a value): Set
+        // base P/T. When dynamic amounts are supplied (Xenic Poltergeist: P/T each equal to the
+        // animated permanent's own mana value), use a dynamic modification recomputed per affected
+        // entity at projection. Otherwise the fixed [power]/[toughness] amounts are evaluated once,
+        // now, and stamped as a fixed set-value floating effect (CR 608.2h — game information is
+        // determined once when the effect is applied; it does not keep recomputing).
         val dynamicPower = effect.dynamicPower
         val dynamicToughness = effect.dynamicToughness
         val ptModification = if (dynamicPower != null && dynamicToughness != null) {

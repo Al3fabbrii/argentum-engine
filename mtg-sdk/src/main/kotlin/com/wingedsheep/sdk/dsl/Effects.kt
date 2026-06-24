@@ -3382,7 +3382,7 @@ object Effects {
     /**
      * [target] becomes a creature whose base power and toughness are each equal to **its own mana
      * value**, recomputed continuously at projection (Layer 7b dynamic). The single-target,
-     * configurable-duration companion to [MassAnimateByManaValue].
+     * configurable-duration companion to [MassAnimate].
      *
      * Used by Xenic Poltergeist: "Until your next upkeep, target noncreature artifact becomes an
      * artifact creature with power and toughness each equal to its mana value" —
