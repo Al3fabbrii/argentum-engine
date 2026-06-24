@@ -5145,6 +5145,99 @@
     ]
 }
 
+// Paramecia Coloniex
+{
+    "name": "Paramecia Coloniex",
+    "manaCost": "{1}{B}",
+    "typeLine": "Creature — Zombie Worm",
+    "oracleText": "When this creature enters, mill three cards. (Put the top three cards of your library into your graveyard.)\nWhen this creature dies, you may exile it. When you do, put target creature card from your graveyard on top of your library.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 3
+                                }
+                            },
+                            "storeAs": "milled"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "milled",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard"
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "When this creature enters, mill three cards."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "ReflexiveTrigger",
+                    "action": {
+                        "type": "MoveToZone",
+                        "target": "Self",
+                        "destination": "Exile"
+                    },
+                    "reflexiveEffect": {
+                        "type": "MoveToZone",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        },
+                        "destination": "Library",
+                        "placement": "Top"
+                    },
+                    "reflexiveTargetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature own:you",
+                                "zone": "Graveyard"
+                            }
+                        }
+                    ]
+                },
+                "activeZone": "Graveyard",
+                "descriptionOverride": "When this creature dies, you may exile it. When you do, put target creature card from your graveyard on top of your library."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "70",
+        "rarity": "UNCOMMON",
+        "artist": "Brian Valeza",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/5/654e2646-78ac-4b08-bed1-3c71355d55fc.jpg?1771586897"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Pizza Face, Gastromancer
 {
     "name": "Pizza Face, Gastromancer",
