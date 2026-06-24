@@ -5567,6 +5567,83 @@
     ]
 }
 
+// Prehistoric Pet
+{
+    "name": "Prehistoric Pet",
+    "manaCost": "{W}",
+    "typeLine": "Creature — Dinosaur Ninja",
+    "oracleText": "This creature can't be blocked by creatures with greater power.\n{1}{W}, {T}: Return another target creature you control to its owner's hand. Activate only during your turn.",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 2
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{1}{W}"
+                            }
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "another target creature you control"
+                    },
+                    "destination": "Hand"
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "creature ctrl:you",
+                            "excludeSelf": true
+                        },
+                        "id": "another target creature you control"
+                    }
+                ],
+                "restrictions": [
+                    "OnlyDuringYourTurn"
+                ]
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "CantBeBlockedBy",
+                "blockerFilter": {
+                    "cardPredicates": [
+                        "IsCreature",
+                        {
+                            "type": "PowerGreaterThanEntity",
+                            "reference": "Source"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "22",
+        "rarity": "RARE",
+        "artist": "Jakob Eirich",
+        "flavorText": "\"As far as I'm concerned, Pepperoni's one of us!\"\n—Raphael",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/4/148e6acd-a96a-4bea-8cfe-a129cd8d1003.jpg?1769005558"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Primordial Pachyderm
 {
     "name": "Primordial Pachyderm",
