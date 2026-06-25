@@ -2193,6 +2193,41 @@
     ]
 }
 
+// Don & Raph, Hard Science
+{
+    "name": "Don & Raph, Hard Science",
+    "manaCost": "{1}{U/R}{U/R}",
+    "typeLine": "Legendary Creature — Mutant Ninja Turtle",
+    "oracleText": "Menace\nWhenever Don & Raph attack, the next noncreature spell you cast this turn has affinity for artifacts. (It costs {1} less to cast for each artifact you control.)",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 4
+    },
+    "keywords": [
+        "MENACE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": "GrantNextSpellAffinity",
+                "descriptionOverride": "Whenever Don & Raph attack, the next noncreature spell you cast this turn has affinity for artifacts."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "144",
+        "rarity": "RARE",
+        "artist": "Anthony Devine",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/f/4f38126c-26a9-4447-801f-4f19e84c4aa5.jpg?1769006276"
+    },
+    "colorIdentityOverride": [
+        "BLUE",
+        "RED"
+    ]
+}
+
 // Donatello's Technique
 {
     "name": "Donatello's Technique",
@@ -8002,6 +8037,108 @@
     },
     "colorIdentityOverride": [
         "BLACK"
+    ]
+}
+
+// Party Dude
+{
+    "name": "Party Dude",
+    "manaCost": "{G}",
+    "typeLine": "Enchantment — Class",
+    "oracleText": "(Gain the next level as a sorcery to add its ability.)\nWhen this Class enters, each player creates a Food token.\n{1}{G}: Level 2\nWhenever an artifact an opponent controls is put into a graveyard from the battlefield, draw a card.\n{4}{G}: Level 3\nWhenever one or more of your opponents are attacked, up to one target attacking creature gets +X/+X until end of turn, where X is the number of cards in your hand.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "ForEach",
+                    "space": {
+                        "type": "IterationSpace.Players",
+                        "players": "Each"
+                    },
+                    "body": {
+                        "type": "CreatePredefinedToken",
+                        "tokenType": "Food"
+                    }
+                },
+                "descriptionOverride": "When this Class enters, each player creates a Food token."
+            }
+        ],
+        "classLevels": [
+            {
+                "level": 2,
+                "cost": "{1}{G}",
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_2",
+                        "trigger": {
+                            "type": "ZoneChangeEvent",
+                            "filter": "artifact ctrl:opponent",
+                            "from": "Battlefield",
+                            "to": "Graveyard"
+                        },
+                        "effect": {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        },
+                        "descriptionOverride": "Whenever an artifact an opponent controls is put into a graveyard from the battlefield, draw a card."
+                    }
+                ]
+            },
+            {
+                "level": 3,
+                "cost": "{4}{G}",
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_3",
+                        "trigger": "CreaturesAttackYourOpponentEvent",
+                        "binding": "ANY",
+                        "effect": {
+                            "type": "ModifyStats",
+                            "powerModifier": {
+                                "type": "Count",
+                                "player": "You",
+                                "zone": "Hand"
+                            },
+                            "toughnessModifier": {
+                                "type": "Count",
+                                "player": "You",
+                                "zone": "Hand"
+                            },
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "up to one target attacking creature"
+                            }
+                        },
+                        "targetRequirement": {
+                            "type": "TargetObject",
+                            "optional": true,
+                            "filter": {
+                                "baseFilter": "creature attacking"
+                            },
+                            "id": "up to one target attacking creature"
+                        },
+                        "descriptionOverride": "Whenever one or more of your opponents are attacked, up to one target attacking creature gets +X/+X until end of turn, where X is the number of cards in your hand."
+                    }
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "128",
+        "rarity": "RARE",
+        "artist": "Gabriel Rubio",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/2/d27b6f2a-84df-4097-a66a-8e463db47f58.jpg?1777939778"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
     ]
 }
 

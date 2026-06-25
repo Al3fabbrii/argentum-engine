@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 186 / 190
+**Implemented:** 187 / 190
 ---
 
 - [x] Action News Crew
@@ -122,7 +122,7 @@
 - [x] Oroku Saki, Shredder Rising
 - [x] Pain 101
 - [x] Paramecia Coloniex
-- [ ] Party Dude
+- [x] Party Dude
 - [x] Pizza Face, Gastromancer
 - [x] Prehistoric Pet
 - [x] Primordial Pachyderm
