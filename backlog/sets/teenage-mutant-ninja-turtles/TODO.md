@@ -10,7 +10,7 @@ Verify status anytime with: `scripts/card-status --set TMT` (and `--list --set T
 
 ## Status
 
-163 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
+167 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
 `cards.md` for the full checklist (the authoritative status); the per-card
 commits all carry `flavorText` in metadata.
 
