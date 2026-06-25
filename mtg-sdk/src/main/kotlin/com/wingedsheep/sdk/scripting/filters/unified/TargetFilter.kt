@@ -332,6 +332,9 @@ data class TargetFilter(
     /** Must be untapped */
     fun untapped() = copy(baseFilter = baseFilter.untapped())
 
+    /** Must be a Room with at least one locked door (CR 709.5c). */
+    fun hasLockedDoor() = copy(baseFilter = baseFilter.hasLockedDoor())
+
     /** Must be attacking */
     fun attacking() = copy(baseFilter = baseFilter.attacking())
 

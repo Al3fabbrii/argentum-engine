@@ -4895,6 +4895,68 @@
     "colorIdentityOverride": []
 }
 
+// Ghostly Keybearer
+{
+    "name": "Ghostly Keybearer",
+    "manaCost": "{3}{U}",
+    "typeLine": "Creature — Spirit",
+    "oracleText": "Flying\nWhenever this creature deals combat damage to a player, unlock a locked door of up to one target Room you control.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "DealsDamageEvent",
+                    "damageType": "DamageCombat",
+                    "recipient": "AnyPlayer"
+                },
+                "effect": {
+                    "type": "UnlockDoor",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "room"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": {
+                            "cardPredicates": [
+                                {
+                                    "type": "HasSubtype",
+                                    "subtype": "Room"
+                                }
+                            ],
+                            "statePredicates": [
+                                "HasLockedDoor"
+                            ],
+                            "controllerPredicate": "ControlledByYou"
+                        }
+                    },
+                    "id": "room"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "61",
+        "rarity": "UNCOMMON",
+        "artist": "Marco Gorlei",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/1/11d04a98-6997-4653-9719-e6b215567599.jpg?1726286080"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Give In to Violence
 {
     "name": "Give In to Violence",

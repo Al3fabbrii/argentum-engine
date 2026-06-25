@@ -24,6 +24,7 @@ import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnCom
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
+import com.wingedsheep.engine.state.components.identity.RoomComponent
 import com.wingedsheep.engine.state.components.identity.HasMorphAbilityComponent
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.engine.state.components.identity.MorphDataComponent
@@ -1087,6 +1088,11 @@ class PredicateEvaluator {
                     ?: return false
                 entityPower <= minPower
             }
+
+            // Rooms: has at least one locked door (CR 709.5c). The unlock-a-door targeting
+            // restriction — a fully-unlocked Room (or any non-Room) has no door to unlock.
+            StatePredicate.HasLockedDoor ->
+                container.get<RoomComponent>()?.lockedFaces?.isNotEmpty() == true
 
             // Composite / logical combinators
             is StatePredicate.Or -> predicate.predicates.any { matchesStatePredicate(state, entityId, it, context) }

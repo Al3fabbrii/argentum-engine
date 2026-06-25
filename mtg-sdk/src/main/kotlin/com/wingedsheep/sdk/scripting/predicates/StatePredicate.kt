@@ -389,6 +389,26 @@ sealed interface StatePredicate {
     }
 
     // =============================================================================
+    // Rooms (Entity)
+    // =============================================================================
+
+    /**
+     * A Room permanent (CR 709.5) that currently has at least one locked door — i.e. at least
+     * one half without its "unlocked" designation (CR 709.5c). Reads the engine's
+     * `RoomComponent.lockedFaces`; false for any permanent that isn't a Room or whose doors are
+     * all unlocked.
+     *
+     * Used as a targeting restriction for "unlock a locked door of target Room you control"
+     * (Ghostly Keybearer): a fully-unlocked Room has no door left to unlock, so it isn't a legal
+     * target.
+     */
+    @SerialName("HasLockedDoor")
+    @Serializable
+    data object HasLockedDoor : Entity {
+        override val description: String = "with a locked door"
+    }
+
+    // =============================================================================
     // Saddle (Entity)
     // =============================================================================
 
