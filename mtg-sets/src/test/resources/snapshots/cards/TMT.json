@@ -8532,6 +8532,47 @@
     ]
 }
 
+// Raphael, Ninja Destroyer
+{
+    "name": "Raphael, Ninja Destroyer",
+    "manaCost": "{2}{R}{R}",
+    "typeLine": "Legendary Creature — Mutant Ninja Turtle",
+    "oracleText": "Raphael must be blocked if able.\nEnrage — Whenever Raphael is dealt damage, add that much {R}. Until end of turn, you don't lose this mana as steps and phases end.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 4
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "DamageReceivedEvent",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "RED",
+                    "amount": {
+                        "type": "ContextProperty",
+                        "key": "TRIGGER_DAMAGE_AMOUNT"
+                    }
+                },
+                "descriptionOverride": "Enrage — Whenever Raphael is dealt damage, add that much {R}. Until end of turn, you don't lose this mana as steps and phases end."
+            }
+        ],
+        "staticAbilities": [
+            "MustBeBlockedStatic"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "102",
+        "rarity": "MYTHIC",
+        "artist": "Fajareka Setiawan",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/e/eeffadda-cb71-4434-89bf-36db1a36da0b.jpg?1769006156"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Raphael, Tough Turtle
 {
     "name": "Raphael, Tough Turtle",
