@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 119 / 190
+**Implemented:** 137 / 190
 ---
 
 - [x] Action News Crew
@@ -26,7 +26,7 @@
 - [ ] Cool but Rude
 - [ ] Courier of Comestibles
 - [x] Cowabunga!
-- [ ] Crustacean Commando
+- [x] Crustacean Commando
 - [x] Dark Leo & Shredder
 - [x] Death in the Family
 - [x] Dimension X
@@ -47,13 +47,13 @@
 - [x] Featherbrained Filcher
 - [x] Foot Elite
 - [x] Foot Headquarters
-- [ ] Foot Mystic
+- [x] Foot Mystic
 - [x] Foot Ninjas
 - [x] Frog Butler
 - [ ] Fugitive Droid
-- [ ] General Traag, Heart of Stone
-- [ ] Genghis Frog
-- [ ] Go Ninja Go
+- [x] General Traag, Heart of Stone
+- [x] Genghis Frog
+- [x] Go Ninja Go
 - [ ] Groundchuck & Dirtbag
 - [ ] Grounded for Life
 - [x] Guac & Marshmallow Pizza
@@ -64,7 +64,7 @@
 - [x] Ice Cream Kitty
 - [x] Illegitimate Business
 - [x] Improvised Arsenal
-- [ ] Insectoid Exterminator
+- [x] Insectoid Exterminator
 - [x] Jennika's Technique
 - [x] Jennika, Bad Apple Big Sister
 - [x] Karai's Technique
@@ -84,14 +84,14 @@
 - [ ] Leonardo, Sewer Samurai
 - [x] Lessons from Life
 - [ ] Lita, Little Orphan Amphibian
-- [ ] Lord Dregg, Insect Invader
+- [x] Lord Dregg, Insect Invader
 - [ ] Madame Null, Power Broker
 - [x] Make Your Move
 - [x] Manhole Missile
 - [x] Mechanized Ninja Cavalry
 - [x] Metalhead
 - [ ] Michelangelo's Technique
-- [ ] Michelangelo, Game Master
+- [x] Michelangelo, Game Master
 - [x] Michelangelo, Improviser
 - [ ] Michelangelo, Mutant BFF
 - [ ] Michelangelo, Weirdness to 11
@@ -105,7 +105,7 @@
 - [x] Mouser Foundry
 - [x] Mouser Mark III
 - [ ] Mutagen Man, Living Ooze
-- [ ] Mutant Chain Reaction
+- [x] Mutant Chain Reaction
 - [x] Mutant Town
 - [x] Mutant Town Musicians
 - [x] Negate
@@ -114,21 +114,21 @@
 - [x] Nobody
 - [ ] North Wind Avatar
 - [ ] Northampton Farm
-- [ ] Novel Nunchaku
+- [x] Novel Nunchaku
 - [x] Null Group Biological Assets
 - [x] Old Hob, Alleycat Blues
 - [x] Omni-Cheese Pizza
-- [ ] Ooze Spill
+- [x] Ooze Spill
 - [x] Oroku Saki, Shredder Rising
 - [x] Pain 101
-- [ ] Paramecia Coloniex
+- [x] Paramecia Coloniex
 - [ ] Party Dude
-- [ ] Pizza Face, Gastromancer
+- [x] Pizza Face, Gastromancer
 - [ ] Prehistoric Pet
 - [x] Primordial Pachyderm
 - [x] Punk Frogs
 - [ ] Purple Dragon Punks
-- [ ] Putrid Pals
+- [x] Putrid Pals
 - [x] Quintessential Katana
 - [x] Ragamuffin Raptor
 - [x] Raph & Leo, Sibling Rivals
@@ -157,7 +157,7 @@
 - [x] Shredder, Unrelenting
 - [x] Skateboard
 - [x] Slash, Reptile Rampager
-- [ ] Slithering Cryptid
+- [x] Slithering Cryptid
 - [x] South Wind Avatar
 - [x] Spicy Oatmeal Pizza
 - [x] Splinter's Technique
@@ -169,7 +169,7 @@
 - [x] Super Shredder
 - [x] Tainted Treats
 - [x] TCRI Building
-- [ ] Technodrome
+- [x] Technodrome
 - [x] Tenderize
 - [ ] The Cloning of Shredder
 - [ ] The Last Ronin
@@ -191,7 +191,7 @@
 - [x] Utrom Scientists
 - [ ] Venus, Torn Between Worlds
 - [x] Weather Maker
-- [ ] West Wind Avatar
+- [x] West Wind Avatar
 - [x] Wingnut, Bat on the Belfry
 - [x] Zog, Triceraton Castaway
-- [ ] Zoo Escapees
+- [x] Zoo Escapees

@@ -1,5 +1,6 @@
 package com.wingedsheep.mtg.sets.tokens
 
+import com.wingedsheep.sdk.core.Counters
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.dsl.Costs
 import com.wingedsheep.sdk.dsl.Effects
@@ -439,6 +440,29 @@ object PredefinedTokens {
     }
 
     /**
+     * Mutagen token — a colorless artifact (Teenage Mutant Ninja Turtles) with:
+     * "{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature.
+     *  Activate only as a sorcery."
+     *
+     * Same shape as the [Map] token (mana + tap + sacrifice-self, sorcery-speed,
+     * single creature target), but places a +1/+1 counter instead of an explore.
+     */
+    val Mutagen = card("Mutagen") {
+        typeLine = "Artifact — Mutagen"
+
+        activatedAbility {
+            val creature = target("target creature", Targets.Creature)
+            cost = Costs.Composite(
+                Costs.Mana("{1}"),
+                Costs.Tap,
+                Costs.SacrificeSelf
+            )
+            effect = Effects.AddCounters(Counters.PLUS_ONE_PLUS_ONE, 1, creature)
+            timing = TimingRule.SorcerySpeed
+        }
+    }
+
+    /**
      * All predefined token definitions.
      * Register these in the CardRegistry so token abilities are resolved.
      */
@@ -458,6 +482,7 @@ object PredefinedTokens {
         Incubator,
         Drone,
         Everywhere,
-        Munitions
+        Munitions,
+        Mutagen
     )
 }
