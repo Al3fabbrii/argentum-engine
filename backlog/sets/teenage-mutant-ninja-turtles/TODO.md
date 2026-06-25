@@ -10,9 +10,60 @@ Verify status anytime with: `scripts/card-status --set TMT` (and `--list --set T
 
 ## Status
 
-119 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
+157 / 190 implemented (basics excluded — handled by `basicLandsFallback`). See
 `cards.md` for the full checklist (the authoritative status); the per-card
 commits all carry `flavorText` in metadata.
+
+> **2026-06-24 run — the gap list below was badly overestimated.** A sweep added
+> 38 cards by discovering that most "blocking gaps" were *already supported* and
+> the cards just needed authoring. Additional debunked gaps from the continued
+> sweep: **Gap P** (sacrifice-unless-discard = `PayOrSufferEffect`, Bebop &
+> Rocksteady), **Gap R** (mass gain-control = `ForEachInGroup(GainControl)`,
+> Insurrection shape, Broadcast Takeover), **Gap FF** (becomes-artifact-creature =
+> `BecomeCreature` + `AddCardTypeEffect("ARTIFACT")`, Mind Transfer Protocol),
+> **Gap CC** (tap-land-for-mana = `Triggers.landTappedForMana`, Groundchuck &
+> Dirtbag), **Gap JJ** (multi-subtype mana = `SubtypeSpellsOnly(set)`, Turtle Lair),
+> plus the Mutagen cost-reduction static (`ReduceActivatedAbilityCost`), `+1`
+> counter rider (`ModifyCounterPlacement`), Chrome Dome
+> (`CreateTokenCopyOfTarget(addedKeywords, sacrificeAtStep)`), and the three Class
+> cards (Does Machines, Cool but Rude, Leader's Talent). Debunked gaps (now shipped composably):
+> - **Gap B (Disappear)** — `Conditions.YouHadPermanentLeaveBattlefieldThisTurn`
+>   + the per-controller all-permanent leave tracker already existed (LTR Shortcut
+>   to Mushrooms). NO engine change. Shipped Foot Mystic, Insectoid Exterminator,
+>   Michelangelo Game Master, Putrid Pals, Lord Dregg, Pizza Face, West Wind Avatar.
+> - **Gap U (Class)** — the `classLevel(N, cost){}` DSL + the "becomes level N"
+>   = `EntersBattlefield`-trigger-in-level-block idiom (Caretaker's Talent) already
+>   existed. Shipped Does Machines, Cool but Rude, Leader's Talent.
+> - **Gap AA (when-you-do reflexive trigger)** — `ReflexiveTriggerEffect` /
+>   `MayEffect(IfYouDoEffect(...))` already existed. Shipped General Traag,
+>   Paramecia Coloniex, Novel Nunchaku.
+> - **Gap BB (greatest power among)** — `AggregateBattlefield(MAX, POWER)`. Go Ninja Go.
+> - **Gap HH (can't be blocked by greater power)** — `powerGreaterThanEntity(Source)`.
+>   Prehistoric Pet.
+> - **Gap V (search-or-fail token)** — `IfYouDoEffect(search, ifYouDont=token)`.
+>   Courier of Comestibles.
+> - **Gap X (paired flicker)** — sequential `Move` over two targets. Don & Leo.
+> - **"No multi-target zone selector"** — wrong: `TargetObject(count=2)` +
+>   `ForEachTargetEffect` (INV Restock). Shipped Does Machines L2, Leonardo's Technique.
+> - **Gap O-on-self (Technodrome)** — `CantAttack/BlockUnless(Compare(source power))`.
+> - **Mutagen token (the one real feature built)** — unlocked the 7 pure cards +
+>   Mutant Chain Reaction, Mutagen Man, The Ooze, Return to the Sewers,
+>   Michelangelo Mutant BFF/Weirdness to 11. The Weirdness "+1 counter" rider is
+>   `ModifyCounterPlacement(modifier=1)`; the cost-reduction static is
+>   `ReduceActivatedAbilityCost`; owner-top-or-bottom is `PutOnTopOrBottomOfLibrary`.
+> - **Flicker tapped-and-attacking (The Neutrinos)** — `ZonePlacement.TappedAndAttacking`.
+> - **Chrome Dome** — `CreateTokenCopyOfTarget(addedKeywords=HASTE, sacrificeAtStep=END)`.
+>
+> The genuinely-remaining 38 cards each need a *real* feature (verify before
+> assuming the gap is real — this list has cried wolf): dynamic pay-life (Gap GG,
+> Madame Null), BecomeCreature-adds-Artifact (Gap FF, Mind Transfer Protocol),
+> target-state cost reduction (Gap DD), tap-or-untap choice (Gap II), card-types-
+> cast dynamic (Gap N), sacrifice-unless-discard (Gap P), counter-typed remove
+> cost (Ray Fillet), cast-from-GY/top with a counter rider (Leonardo Sewer Samurai,
+> Mikey & Don, Ninja Teen L3), counter-transfer-on-death (Donatello Mutant
+> Mechanic), total-MV-budget select (Michelangelo's Technique), linked-exile copy
+> across Saga chapters (The Cloning of Shredder), wishboard (North Wind, Turtles
+> Forever), and assorted bespoke one-offs.
 
 The remaining 71 cards mostly cluster on a handful of unresolved gaps:
 - **Sneak** — RESOLVED (Gap A). The keyword, alt-cost plumbing, and

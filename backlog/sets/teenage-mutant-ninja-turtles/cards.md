@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 137 / 190
+**Implemented:** 156 / 190
 ---
 
 - [x] Action News Crew
@@ -13,26 +13,26 @@
 - [x] April, Reporter of the Weird
 - [x] Armaggon, Future Shark
 - [x] Baxter Stockman
-- [ ] Bebop & Rocksteady
+- [x] Bebop & Rocksteady
 - [x] Bebop, Warthog Warrior
 - [x] Bespoke Bō
 - [x] Bot Bashing Time
 - [x] Brilliance Unleashed
-- [ ] Broadcast Takeover
+- [x] Broadcast Takeover
 - [x] Buzz Bots
 - [x] Casey Jones, Jury-Rig Justiciar
 - [x] Casey Jones, Vigilante
-- [ ] Chrome Dome
-- [ ] Cool but Rude
-- [ ] Courier of Comestibles
+- [x] Chrome Dome
+- [x] Cool but Rude
+- [x] Courier of Comestibles
 - [x] Cowabunga!
 - [x] Crustacean Commando
 - [x] Dark Leo & Shredder
 - [x] Death in the Family
 - [x] Dimension X
 - [x] Dimensional Exile
-- [ ] Does Machines
-- [ ] Don & Leo, Problem Solvers
+- [x] Does Machines
+- [x] Don & Leo, Problem Solvers
 - [ ] Don & Raph, Hard Science
 - [x] Donatello's Technique
 - [x] Donatello, Gadget Master
@@ -54,7 +54,7 @@
 - [x] General Traag, Heart of Stone
 - [x] Genghis Frog
 - [x] Go Ninja Go
-- [ ] Groundchuck & Dirtbag
+- [x] Groundchuck & Dirtbag
 - [ ] Grounded for Life
 - [x] Guac & Marshmallow Pizza
 - [x] Hamato Guardian Stance
@@ -75,9 +75,9 @@
 - [ ] Krang & Shredder
 - [x] Krang, Master Mind
 - [x] Krang, Utrom Warlord
-- [ ] Leader's Talent
+- [x] Leader's Talent
 - [ ] Leatherhead, Swamp Stalker
-- [ ] Leonardo's Technique
+- [x] Leonardo's Technique
 - [x] Leonardo, Big Brother
 - [x] Leonardo, Cutting Edge
 - [x] Leonardo, Leader in Blue
@@ -93,18 +93,18 @@
 - [ ] Michelangelo's Technique
 - [x] Michelangelo, Game Master
 - [x] Michelangelo, Improviser
-- [ ] Michelangelo, Mutant BFF
-- [ ] Michelangelo, Weirdness to 11
+- [x] Michelangelo, Mutant BFF
+- [x] Michelangelo, Weirdness to 11
 - [x] Mighty Mutanimals
 - [ ] Mikey & Don, Party Planners
 - [x] Mikey & Leo, Chaos & Order
-- [ ] Mind Transfer Protocol
+- [x] Mind Transfer Protocol
 - [x] Mona Lisa, Science Geek
 - [ ] Mondo Gecko
 - [x] Mouser Attack!
 - [x] Mouser Foundry
 - [x] Mouser Mark III
-- [ ] Mutagen Man, Living Ooze
+- [x] Mutagen Man, Living Ooze
 - [x] Mutant Chain Reaction
 - [x] Mutant Town
 - [x] Mutant Town Musicians
@@ -124,7 +124,7 @@
 - [x] Paramecia Coloniex
 - [ ] Party Dude
 - [x] Pizza Face, Gastromancer
-- [ ] Prehistoric Pet
+- [x] Prehistoric Pet
 - [x] Primordial Pachyderm
 - [x] Punk Frogs
 - [ ] Purple Dragon Punks
@@ -143,7 +143,7 @@
 - [ ] Ray Fillet, Man Ray
 - [x] Renet, Temporal Apprentice
 - [ ] Retro-Mutation
-- [ ] Return to the Sewers
+- [x] Return to the Sewers
 - [x] Rock Soldiers
 - [x] Rocksteady, Crash Courser
 - [x] Sally Pride, Lioness Leader
@@ -174,15 +174,15 @@
 - [ ] The Cloning of Shredder
 - [ ] The Last Ronin
 - [x] The Last Ronin's Technique
-- [ ] The Neutrinos
-- [ ] The Ooze
+- [x] The Neutrinos
+- [x] The Ooze
 - [ ] Tokka & Rahzar, Terrible Twos
 - [x] Transdimensional Bovine
 - [x] Triceraton Commander
 - [x] Tunnel Rats
 - [x] Turncoat Kunoichi
 - [x] Turtle Blimp
-- [ ] Turtle Lair
+- [x] Turtle Lair
 - [x] Turtle Power!
 - [ ] Turtle Van
 - [ ] Turtles Forever
