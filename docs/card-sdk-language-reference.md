@@ -490,6 +490,11 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   back to the legend), or `BACK`. The front face's activated ability is sorcery-speed
   (`timing = TimingRule.SorcerySpeed`); Jecht uses it from a "may" combat-damage trigger instead.
 - `ReturnCreaturesPutInGraveyardThisTurn(player)` — Patriarch's Bidding shape.
+- `ReturnSameNamedFromGraveyard(target = ContextTarget(0))` — return the target graveyard card and
+  **every other card with the same name** in the controller's graveyard to the battlefield **tapped**
+  under the controller's control (each moved through `ZoneTransitionService`, so enters-with-counters
+  still apply). Rat King, Verminister: "Return target creature card and all other cards with the same
+  name as that card from your graveyard to the battlefield tapped."
 
 ### Hand reveal
 

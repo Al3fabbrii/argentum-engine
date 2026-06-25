@@ -724,6 +724,13 @@ object Effects {
         ReturnCreaturesPutInGraveyardThisTurnEffect(player)
 
     /**
+     * Return the target graveyard card and every other card with the same name in your graveyard
+     * to the battlefield tapped (Rat King, Verminister).
+     */
+    fun ReturnSameNamedFromGraveyard(target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        com.wingedsheep.sdk.scripting.effects.ReturnSameNamedFromGraveyardEffect(target)
+
+    /**
      * Create a global triggered ability that is not attached to any specific permanent, lasting for
      * the given [duration].
      *
