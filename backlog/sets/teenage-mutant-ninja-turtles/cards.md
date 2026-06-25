@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 181 / 190
+**Implemented:** 182 / 190
 ---
 
 - [x] Action News Crew
@@ -96,7 +96,7 @@
 - [x] Michelangelo, Mutant BFF
 - [x] Michelangelo, Weirdness to 11
 - [x] Mighty Mutanimals
-- [ ] Mikey & Don, Party Planners
+- [x] Mikey & Don, Party Planners
 - [x] Mikey & Leo, Chaos & Order
 - [x] Mind Transfer Protocol
 - [x] Mona Lisa, Science Geek

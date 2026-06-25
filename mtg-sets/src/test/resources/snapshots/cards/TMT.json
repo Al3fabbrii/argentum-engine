@@ -6391,6 +6391,70 @@
     ]
 }
 
+// Mikey & Don, Party Planners
+{
+    "name": "Mikey & Don, Party Planners",
+    "manaCost": "{2}{G/U}{G/U}",
+    "typeLine": "Legendary Creature — Mutant Ninja Turtle",
+    "oracleText": "Ward {2}\nYou may look at the top card of your library any time.\nYou may play lands and cast Mutant, Ninja, or Turtle spells from the top of your library. If you cast a creature spell this way, that creature enters with an additional +1/+1 counter on it.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "WARD"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Ward",
+            "cost": {
+                "type": "WardCost.Mana",
+                "manaCost": "{2}"
+            }
+        }
+    ],
+    "script": {
+        "staticAbilities": [
+            "LookAtTopOfLibrary",
+            {
+                "type": "PlayLandsAndCastFilteredFromTopOfLibrary",
+                "spellFilter": {
+                    "cardPredicates": [
+                        {
+                            "type": "HasAnyOfSubtypes",
+                            "subtypes": [
+                                "Mutant",
+                                "Ninja",
+                                "Turtle"
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "EntersWithCounters",
+                "count": 1,
+                "condition": {
+                    "type": "WasCastFromZone",
+                    "zone": "Library"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "157",
+        "rarity": "RARE",
+        "artist": "Gabriel Rubio",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/3/6353df1a-9a1b-41fd-985b-8c8acba36c23.jpg?1769006263"
+    },
+    "colorIdentityOverride": [
+        "GREEN",
+        "BLUE"
+    ]
+}
+
 // Mikey & Leo, Chaos & Order
 {
     "name": "Mikey & Leo, Chaos & Order",
