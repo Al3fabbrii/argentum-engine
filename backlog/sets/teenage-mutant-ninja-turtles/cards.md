@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 169 / 190
+**Implemented:** 170 / 190
 ---
 
 - [x] Action News Crew
@@ -134,7 +134,7 @@
 - [x] Raph & Leo, Sibling Rivals
 - [x] Raph & Mikey, Troublemakers
 - [x] Raphael's Technique
-- [ ] Raphael, Most Attitude
+- [x] Raphael, Most Attitude
 - [ ] Raphael, Ninja Destroyer
 - [x] Raphael, the Nightwatcher
 - [x] Raphael, Tough Turtle

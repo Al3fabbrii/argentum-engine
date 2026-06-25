@@ -8019,6 +8019,92 @@
     ]
 }
 
+// Raphael, Most Attitude
+{
+    "name": "Raphael, Most Attitude",
+    "manaCost": "{3}{R}",
+    "typeLine": "Legendary Creature — Mutant Ninja Turtle",
+    "oracleText": "Menace\nAlliance — Whenever another creature you control enters, you may exile the top card of your library.\nWhenever Raphael attacks, until end of turn, you may play a card exiled with Raphael.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 3
+    },
+    "keywords": [
+        "MENACE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "filter": "creature ctrl:you",
+                    "to": "Battlefield"
+                },
+                "binding": "OTHER",
+                "effect": {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "TopOfLibrary",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeAs": "raphaelTop"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "raphaelTop",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Exile"
+                                },
+                                "linkToSource": true
+                            }
+                        ]
+                    }
+                },
+                "descriptionOverride": "Alliance — Whenever another creature you control enters, you may exile the top card of your library."
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": "FromLinkedExile",
+                            "storeAs": "raphaelExile"
+                        },
+                        {
+                            "type": "GrantMayPlayFromExile",
+                            "from": "raphaelExile"
+                        }
+                    ]
+                },
+                "descriptionOverride": "Whenever Raphael attacks, until end of turn, you may play a card exiled with Raphael."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "101",
+        "rarity": "UNCOMMON",
+        "artist": "Thomas Chamberlain-Keen",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/8/88385a87-f931-409f-8a21-250f0866d63d.jpg?1771502673"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Raphael, Tough Turtle
 {
     "name": "Raphael, Tough Turtle",
