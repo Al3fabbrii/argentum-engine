@@ -460,6 +460,7 @@ class BeginningPhaseManager(
         StatePredicate.IsEquipped,
         StatePredicate.IsModified,
         StatePredicate.IsSaddled,
+        StatePredicate.HasLockedDoor,
         StatePredicate.CrewedOrSaddledSourceThisTurn,
         StatePredicate.IsWarpExiled,
         StatePredicate.NotTargetedByAbilityFromSameNamedSource,

@@ -2745,6 +2745,15 @@ object Effects {
         TapUntapEffect(target, tap = false)
 
     /**
+     * Unlock a locked door of a target Room (CR 709.5f) — the resolution-time "unlock" instruction.
+     * Pairs with an "up to one target Room you control with a locked door" `TargetObject`
+     * (`TargetFilter.…hasLockedDoor()`). Emits the same door-unlock events as the unlock-cost
+     * special action, so "When you unlock this door" triggers fire. Used by Ghostly Keybearer.
+     */
+    fun UnlockDoor(target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        com.wingedsheep.sdk.scripting.effects.UnlockDoorEffect(target)
+
+    /**
      * Tap every creature/permanent chosen as a target ("tap up to N target creatures").
      *
      * Composes [ForEachTargetEffect] over [Effects.Tap], so the number of targets is owned

@@ -1002,6 +1002,17 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `Effects.UntapEachTarget()` — the untap twin of `TapEachTarget`: untaps every object chosen as a
   target ("untap each of those creatures"). Composes `ForEachTargetEffect` over
   `Effects.Untap(ContextTarget(0))`, with the count owned by the spell's target requirement.
+- `UnlockDoorEffect(target = ContextTarget(0))` — facade `Effects.UnlockDoor(target)`. The resolution-time
+  **"unlock a door"** instruction (CR 709.5f): gives a locked half of the targeted Room the "unlocked"
+  designation. Distinct from the *unlock cost* special action (CR 709.5e, `ModifyUnlockCost` below) — the
+  resolving controller pays nothing. Routes through the same shared `RoomDoorUnlocker` the special action uses,
+  so it emits the identical `DoorUnlockedEvent`/`RoomFullyUnlockedEvent` and a face's "When you unlock this
+  door" trigger (`Triggers.OnDoorUnlocked`, CR 709.5h) fires either way. Pair with an **up-to-one** target
+  Room restricted to one with a locked door —
+  `TargetObject(optional = true, filter = TargetFilter(GameObjectFilter.Any.withSubtype(Subtype.ROOM).youControl()).hasLockedDoor())`
+  — so a fully-unlocked Room is never a legal target and the controller may choose no target. If the Room has
+  more than one locked door (it entered without being cast, CR 709.5d), its first locked door is unlocked.
+  Used by Ghostly Keybearer.
 - `PhaseOutEffect(target = Self)` — phase the target permanent out (Rule 702.26); facade `Effects.PhaseOut(target)`. While phased out it's treated as though it doesn't exist (excluded from `getBattlefield`, so from projection, triggers, combat, targeting, and SBAs) and phases back in before its controller's next untap step. Indirect phasing (attached Auras/Equipment) is handled automatically. Used as the `suffer` branch of a pay-or-phase trigger (Vaporous Djinn: "phases out unless you pay {U}{U}" = `PayOrSufferEffect(Costs.pay.Mana(...), Effects.PhaseOut())`), or as the reaction of a "becomes the target of a spell, it phases out" trigger (King of the Oathbreakers = `Triggers.BecomesTargetOfSpell(...)` + `Effects.PhaseOut(EffectTarget.TriggeringEntity)`). The matching phase-in moment is the `Triggers.PhasesIn(filter?)` trigger (see Triggers below).
 - `PhaseOutUntilLeavesEffect(target, tapOnPhaseIn)` / `Effects.PhaseOutUntilLeaves(target, tapOnPhaseIn)` — phase the target out **indefinitely, linked to the effect's source** (the phasing analogue of `ExileUntilLeaves`): it skips its untap-step phase-in and stays out until the source leaves the battlefield. Pair with `Effects.PhaseInLinkedToSource()` on the source's `LeavesBattlefield` trigger, which phases everything the source phased out this way back in (tapping those flagged `tapOnPhaseIn`). The link lives on the phased-out permanent (`PhasedOutComponent.phaseInOnSourceLeaves`); indirect phasing carries Auras/Equipment out with the creature. This is Oubliette (ETB phase-out + leaves-trigger phase-in, tapped).
 - `MarkExileOnDeathEffect(target)` — replace next "to graveyard" with "to exile".
@@ -1967,6 +1978,11 @@ work for abilities-on-stack (which carry no `CardComponent`).
 - `IsUntapped` — currently untapped.
 - `IsAttacking` — declared as attacker this combat.
 - `IsBlocking` — declared as blocker this combat.
+- `HasLockedDoor` (filter builder `hasLockedDoor()`) — a Room permanent (CR 709.5) with at least one locked
+  door, i.e. a half lacking its "unlocked" designation (CR 709.5c). Reads the engine's
+  `RoomComponent.lockedFaces`; false for non-Rooms and fully-unlocked Rooms. The targeting restriction for
+  "unlock a locked door of target Room you control" (Ghostly Keybearer) — a Room with nothing to unlock isn't a
+  legal target. Pairs with `UnlockDoorEffect`/`Effects.UnlockDoor`.
 - `InSameBandAsSource` (filter builder `inSameBandAsSource()`) — source-relative (CR 702.22):
   matches the effect's source creature itself and any creature sharing its combat band id.
   Resolves against `PredicateContext.sourceId`, so it only matches while that source is attacking

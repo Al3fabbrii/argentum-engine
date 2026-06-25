@@ -20,6 +20,7 @@ import com.wingedsheep.engine.state.components.combat.PlayerAttackersThisTurnCom
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
+import com.wingedsheep.engine.state.components.identity.RoomComponent
 import com.wingedsheep.engine.state.components.identity.HasMorphAbilityComponent
 import com.wingedsheep.engine.state.components.identity.MorphDataComponent
 import com.wingedsheep.sdk.core.CounterType
@@ -460,6 +461,8 @@ internal class AffectsFilterResolver {
             val counterType = parseCounterType(predicate.counterType)
             counters != null && counterType != null && counters.getCount(counterType) > 0
         }
+        StatePredicate.HasLockedDoor ->
+            container.get<RoomComponent>()?.lockedFaces?.isNotEmpty() == true
         is StatePredicate.Or -> predicate.predicates.any {
             matchesStatePredicateForProjection(state, entityId, it, container, isFaceDown, projectedValues)
         }

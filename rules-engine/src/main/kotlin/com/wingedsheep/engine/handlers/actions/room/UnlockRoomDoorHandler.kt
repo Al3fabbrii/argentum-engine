@@ -20,7 +20,6 @@ import com.wingedsheep.engine.mechanics.mana.SpellPaymentContext
 import com.wingedsheep.engine.mechanics.mana.UnlockCostReducer
 import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.components.battlefield.TappedComponent
-import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.RoomComponent
 import com.wingedsheep.engine.state.components.player.ManaPoolComponent
@@ -274,34 +273,13 @@ class UnlockRoomDoorHandler(
             }
         }
 
-        // Apply the unlock to the RoomComponent.
-        val roomName = state.getEntity(action.roomId)?.get<CardComponent>()?.name ?: face.name
-        val newUnlocked = room.unlocked + action.faceId
-        val updatedRoom = room.copy(unlocked = newUnlocked)
-        currentState = currentState.updateEntity(action.roomId) { c ->
-            c.with(updatedRoom)
-        }
-
-        val nowFullyUnlocked = updatedRoom.isFullyUnlocked
-        events.add(
-            DoorUnlockedEvent(
-                roomId = action.roomId,
-                roomName = roomName,
-                faceId = action.faceId,
-                faceName = face.name,
-                controllerId = action.playerId,
-                becameFullyUnlocked = nowFullyUnlocked
-            )
+        // Apply the unlock to the RoomComponent via the shared primitive, so the unlock-cost
+        // special action and the resolution-time "unlock a door" effect emit identical events.
+        val (stateAfterUnlock, unlockEvents) = RoomDoorUnlocker.unlock(
+            currentState, action.roomId, action.faceId, action.playerId
         )
-        if (nowFullyUnlocked) {
-            events.add(
-                RoomFullyUnlockedEvent(
-                    roomId = action.roomId,
-                    roomName = roomName,
-                    controllerId = action.playerId
-                )
-            )
-        }
+        currentState = stateAfterUnlock
+        events.addAll(unlockEvents)
 
         // Detect and process triggers from the door-unlock events.
         val triggers = triggerDetector.detectTriggers(currentState, events)

@@ -1598,6 +1598,7 @@ class TriggerMatcher(
         // *trigger-gating* filters (those evaluate the triggering entity, not the source
         // state). Returning true preserves the prior "don't gate" behavior, but listing
         // every variant forces a compile-time choice when a new predicate is added.
+        com.wingedsheep.sdk.scripting.predicates.StatePredicate.HasLockedDoor,
         com.wingedsheep.sdk.scripting.predicates.StatePredicate.IsTapped,
         com.wingedsheep.sdk.scripting.predicates.StatePredicate.IsUntapped,
         com.wingedsheep.sdk.scripting.predicates.StatePredicate.IsAttacking,

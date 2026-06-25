@@ -540,6 +540,11 @@ data class GameObjectFilter(
         statePredicates = statePredicates + StatePredicate.IsUntapped
     )
 
+    /** Must be a Room with at least one locked door (CR 709.5c). */
+    fun hasLockedDoor() = copy(
+        statePredicates = statePredicates + StatePredicate.HasLockedDoor
+    )
+
     /** Must be attacking */
     fun attacking() = copy(
         statePredicates = statePredicates + StatePredicate.IsAttacking
