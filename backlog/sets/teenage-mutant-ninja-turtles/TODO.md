@@ -33,8 +33,15 @@ commits all carry `flavorText` in metadata.
 > - **The Last Ronin** — delayed *attack* trigger must bind the attacker (root-caused
 >   above: `fromEvent(AttackersDeclaredEvent)` is empty + no per-attacker fan-out). Card
 >   .kt + combat test ready to restore once fixed.
-> - **Leonardo, Sewer Samurai** — `MayCastFromGraveyard` needs an "enters with a finality
->   counter" rider (the static has no counter param; the Forage variant has the wiring).
+> - **Leonardo, Sewer Samurai** — needs an engine fix (verified). `MayCastFromGraveyard` +
+>   double strike + sneak all compose, BUT "creatures you cast from your graveyard enter with a
+>   finality counter" does not: a `selfOnly = false` `EntersWithCounters(FINALITY, condition =
+>   WasCastFromGraveyard)` (and the `TriggeringEntityEnteredOrWasCastFromGraveyard` variant) on
+>   Leonardo leaves the cast creature with 0 counters — the condition is evaluated against the
+>   replacement's source (Leonardo), not the entering creature, so the finality idiom only works
+>   `selfOnly = true` (a card's own replacement, Hundred-Battle Veteran). Fix: make non-self
+>   `EntersWithCounters` evaluate its `condition` against the affected/entering entity, OR add an
+>   `entersWithCounter` field to `MayCastFromGraveyard` wired through the graveyard-cast path.
 > - **Ninja Teen L3** — grant Sneak to graveyard creature cards + cast them from GY via Sneak.
 > - **Mikey & Don** — cast Mutant/Ninja/Turtle from top of library; creatures cast this way
 >   enter with a +1/+1 counter (no cast-from-top counter rider).
