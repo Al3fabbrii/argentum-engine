@@ -2,7 +2,7 @@
 
 **Set Size:** 190 cards (excluding basic lands)
 **Release Date:** March 6, 2026
-**Implemented:** 165 / 190
+**Implemented:** 166 / 190
 ---
 
 - [x] Action News Crew
@@ -184,7 +184,7 @@
 - [x] Turtle Blimp
 - [x] Turtle Lair
 - [x] Turtle Power!
-- [ ] Turtle Van
+- [x] Turtle Van
 - [ ] Turtles Forever
 - [ ] Turtles in Time
 - [x] Uneasy Alliance
