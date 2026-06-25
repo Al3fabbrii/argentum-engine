@@ -2735,6 +2735,15 @@ object Effects {
         spellFilter: GameObjectFilter = GameObjectFilter.Any
     ): Effect = com.wingedsheep.sdk.scripting.effects.MakeNextSpellUncounterableEffect(spellFilter)
 
+    /**
+     * Grant the next [spellFilter] spell you cast this turn affinity for [forType] (Don & Raph).
+     * The matched spell costs {1} less per [forType] permanent you control at cast time.
+     */
+    fun GrantNextSpellAffinity(
+        spellFilter: GameObjectFilter = GameObjectFilter.Noncreature,
+        forType: com.wingedsheep.sdk.core.CardType = com.wingedsheep.sdk.core.CardType.ARTIFACT
+    ): Effect = com.wingedsheep.sdk.scripting.effects.GrantNextSpellAffinityEffect(spellFilter, forType)
+
     // =========================================================================
     // Sacrifice Effects
     // =========================================================================

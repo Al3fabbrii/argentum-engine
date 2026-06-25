@@ -2866,6 +2866,25 @@ class CastSpellHandler(
             }
         }
 
+        // Consume any matching "next spell has affinity for X" riders (Don & Raph). The cost
+        // reduction was already applied by the cost calculator while these riders were present;
+        // here we just remove the riders that matched the spell just cast, so only the *next*
+        // matching spell is affected.
+        run {
+            val affinityEvalContext = PredicateContext(controllerId = action.playerId)
+            val matchingAffinityRiders = currentCastState.pendingNextSpellAffinities.filter { pending ->
+                pending.controllerId == action.playerId &&
+                    predicateEvaluator.matches(
+                        currentCastState, currentCastState.projectedState, action.cardId, pending.spellFilter, affinityEvalContext
+                    )
+            }
+            if (matchingAffinityRiders.isNotEmpty()) {
+                currentCastState = currentCastState.copy(
+                    pendingNextSpellAffinities = currentCastState.pendingNextSpellAffinities.filter { it !in matchingAffinityRiders }
+                )
+            }
+        }
+
         // Detect and process triggers from casting (including additional cost events like sacrifice).
         // Storm pending triggers (built above) are prepended so they go on the stack just above the
         // spell itself — per CR 603.3b Storm goes on top of the spell that caused it to trigger.
