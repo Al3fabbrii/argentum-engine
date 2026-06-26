@@ -332,6 +332,22 @@ class DynamicAmountEvaluator(
                     }
                     return resolveNumericProperty(state, entityId, amount.numericProperty, context, useProjected = false)
                 }
+                // The source sacrificing/exiling itself as a cost has already left the battlefield
+                // by resolution — consult the P/T snapshot captured at cost-payment time (CR 112.7a /
+                // 608.2h) so "Sacrifice this creature: it deals damage equal to its power" reads the
+                // pre-sacrifice power rather than zero (Ghitu Fire-Eater, Cinder Shade, Blazing Bomb's
+                // Blow Up). Mirrors LastKnownSourceCounters. Only intercepts when a snapshot exists,
+                // so live on-battlefield Source reads are unaffected.
+                if (amount.entity is EntityReference.Source &&
+                    entityId !in state.getBattlefield()
+                ) {
+                    val snapshot = context.lastKnownSourceSnapshot?.takeIf { it.entityId == entityId }
+                    when (amount.numericProperty) {
+                        is EntityNumericProperty.Power -> snapshot?.power?.let { return it }
+                        is EntityNumericProperty.Toughness -> snapshot?.toughness?.let { return it }
+                        else -> { /* fall through */ }
+                    }
+                }
                 // Cost-storage reads of Power/Toughness mirror the Sacrificed path — the
                 // chosen entity may have left the battlefield (or never been on it, for an
                 // exile-zone pick) between cost payment and resolution (Rule 112.7a).

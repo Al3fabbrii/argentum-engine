@@ -199,6 +199,14 @@ data class ActivatedAbilityOnStackComponent(
      * [com.wingedsheep.sdk.scripting.values.DynamicAmount.LastKnownSourceCounters] (Lost Isle Calling).
      */
     val lastKnownSourceCounters: Map<String, Int> = emptyMap(),
+    /**
+     * Frozen projected P/T of the source captured before a self-exile / self-sacrifice cost moved
+     * it off the battlefield (CR 112.7a). Mirrors [lastKnownSourceCounters]; read at resolution via
+     * [com.wingedsheep.engine.handlers.EffectContext.lastKnownSourceSnapshot] so an
+     * `EntityProperty(Source, Power)` read (Ghitu Fire-Eater / Blazing Bomb's Blow Up) sees the
+     * pre-sacrifice power. Null when the cost did not sacrifice/exile the source.
+     */
+    val lastKnownSourceSnapshot: PermanentSnapshot? = null,
     /** Optional human-readable description from `ActivatedAbility.descriptionOverride`,
      *  used when displaying the ability on the stack instead of the auto-generated effect text. */
     val descriptionOverride: String? = null,

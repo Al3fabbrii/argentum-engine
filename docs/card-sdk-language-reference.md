@@ -4581,6 +4581,17 @@ Numbers computed at resolution time.
   `EntityProperty(Source, CounterCount(filter))`, which reads counters on the still-present source (zero after a
   self-exile cost).
 
+- **Last-known source P/T (self-exile / self-sacrifice cost)** — the P/T analogue of
+  `LastKnownSourceCounters`, applied automatically to `EntityProperty(EntityReference.Source, Power|Toughness)`
+  (i.e. `DynamicAmounts.sourcePower()` / `sourceToughness()`). When an activated ability's cost sacrifices or
+  exiles its own source, the source is off the battlefield by resolution, so `ActivateAbilityHandler` snapshots
+  its projected P/T at cost-payment time (CR 112.7a / 608.2h, mirroring the counter snapshot) and
+  `DynamicAmountEvaluator` reads the snapshot back when the source is no longer on the battlefield. This makes
+  "{T}, Sacrifice this creature: it deals damage equal to its power" (Ghitu Fire-Eater, Cinder Shade, Blazing
+  Bomb's Blow Up) read the pre-sacrifice power including counters/buffs rather than zero. No DSL change: existing
+  `sourcePower()` reads simply become correct after a self-sacrifice. Live on-battlefield `Source` reads are
+  unaffected (the snapshot is only consulted when the source has left).
+
 ### Station
 
 - `StationCharge` — the number of charge counters a Station ability puts on its permanent: the power of the creature
