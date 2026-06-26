@@ -133,6 +133,16 @@ data class EffectContext(
      */
     val lastKnownSourceCounters: Map<String, Int> = emptyMap(),
     /**
+     * Frozen projected P/T (and subtypes/supertypes) the source had the moment a self-exile /
+     * self-sacrifice cost moved it off the battlefield (CR 112.7a / 608.2h — "as it last existed
+     * on the battlefield"). Mirrors [lastKnownSourceCounters]. Read by [DynamicAmountEvaluator]
+     * when an `EntityProperty(EntityReference.Source, …)` power/toughness read resolves after the
+     * source is gone, so "Sacrifice this creature: it deals damage equal to its power" reads the
+     * pre-sacrifice power rather than zero (Blazing Bomb's Blow Up, Cinder Shade, Ghitu Fire-Eater).
+     * Null when the cost did not sacrifice/exile the source.
+     */
+    val lastKnownSourceSnapshot: PermanentSnapshot? = null,
+    /**
      * LKI snapshots (Rule 112.7a) for entities chosen via an additional cost
      * step like [com.wingedsheep.sdk.scripting.AdditionalCost.ChooseEntity]
      * with `captureSnapshot = true`. Indexed by entity id via

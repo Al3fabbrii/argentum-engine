@@ -844,6 +844,16 @@ class ActivateAbilityHandler(
                     } ?: emptyMap()
             } else emptyMap()
 
+        // Snapshot the source's projected P/T before a self-exile / self-sacrifice cost moves it
+        // off the battlefield (CR 112.7a / 608.2h), so an effect that reads its own power — e.g.
+        // "Sacrifice this creature: it deals damage equal to its power" (Ghitu Fire-Eater, Cinder
+        // Shade, Blazing Bomb's Blow Up) — sees the pre-sacrifice power rather than zero. Mirrors
+        // lastKnownSourceCounters above.
+        val lastKnownSourceSnapshot: com.wingedsheep.engine.state.components.stack.PermanentSnapshot? =
+            if (costExilesOrSacrificesSelf(effectiveCost)) {
+                capturePermanentSnapshots(listOf(action.sourceId), currentState.projectedState).firstOrNull()
+            } else null
+
         // When using Explicit payment, mana sources were already tapped above —
         // strip the Mana portion so payAbilityCost doesn't try to deduct from the pool.
         // When convoke was applied, replace the mana portion with the reduced cost.
@@ -1297,6 +1307,7 @@ class ActivateAbilityHandler(
             tappedPermanents = firstTapSlice,
             tappedPermanentSnapshots = tappedSnapshots,
             lastKnownSourceCounters = lastKnownSourceCounters,
+            lastKnownSourceSnapshot = lastKnownSourceSnapshot,
             descriptionOverride = ability.descriptionOverride,
             abilityIdentity = com.wingedsheep.sdk.scripting.AbilityIdentity(
                 cardComponent.cardDefinitionId, ability.id
