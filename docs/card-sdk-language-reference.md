@@ -3257,7 +3257,8 @@ staticAbility {
   the battlefield" wording. `TriggerDetector.duplicateETBOrLTBTriggers`; additive across copies.
 - `AdditionalSourceTriggers(sourceFilter, excludeSelf = true)` — Twinflame Travelers: all triggered
   abilities of permanents matching `sourceFilter` you control trigger an additional time (not just ETB).
-  `TriggerDetector.duplicateSourceTriggers`.
+  Set `excludeSelf = false` for "a permanent you control" wording that includes the source itself
+  (Fractured Realm). `TriggerDetector.duplicateSourceTriggers`.
 - `AdditionalAttackTriggers(attackerFilter = GameObjectFilter.Any)` — Windcrag Siege (Mardu): the
   attack-cause analogue of `AdditionalETBOrLTBTriggers`. If a creature matching `attackerFilter`
   being declared as an attacker causes an attack-related triggered ability ("whenever a creature

@@ -10767,6 +10767,72 @@
     ]
 }
 
+// Mirror Room // Fractured Realm
+{
+    "name": "Mirror Room // Fractured Realm",
+    "manaCost": "",
+    "typeLine": "Enchantment — Room",
+    "oracleText": "When you unlock this door, create a token that's a copy of target creature you control, except it's a Reflection in addition to its other creature types.\n//\nIf a triggered ability of a permanent you control triggers, that ability triggers an additional time.",
+    "metadata": {
+        "collectorNumber": "67",
+        "rarity": "MYTHIC",
+        "artist": "Helge C. Balzer",
+        "imageUri": "https://cards.scryfall.io/normal/front/c/2/c2e085dd-a448-4f5a-9cfa-5c2034234e7c.jpg?1726867728"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ],
+    "layout": "SPLIT",
+    "cardFaces": [
+        {
+            "name": "Mirror Room",
+            "manaCost": "{2}{U}",
+            "typeLine": "Enchantment — Room",
+            "oracleText": "When you unlock this door, create a token that's a copy of target creature you control, except it's a Reflection in addition to its other creature types.",
+            "script": {
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_1",
+                        "trigger": "DoorUnlockedEvent",
+                        "effect": {
+                            "type": "CreateTokenCopyOfTarget",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target creature you control"
+                            },
+                            "addedSubtypes": [
+                                "Reflection"
+                            ]
+                        },
+                        "targetRequirement": {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature ctrl:you"
+                            },
+                            "id": "target creature you control"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Fractured Realm",
+            "manaCost": "{5}{U}{U}",
+            "typeLine": "Enchantment — Room",
+            "oracleText": "If a triggered ability of a permanent you control triggers, that ability triggers an additional time.",
+            "script": {
+                "staticAbilities": [
+                    {
+                        "type": "AdditionalSourceTriggers",
+                        "sourceFilter": "permanent ctrl:you",
+                        "excludeSelf": false
+                    }
+                ]
+            }
+        }
+    ]
+}
+
 // Moldering Gym // Weight Room
 {
     "name": "Moldering Gym // Weight Room",
