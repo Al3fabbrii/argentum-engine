@@ -10289,6 +10289,116 @@
     ]
 }
 
+// Marina Vendrell's Grimoire
+{
+    "name": "Marina Vendrell's Grimoire",
+    "manaCost": "{5}{U}",
+    "typeLine": "Legendary Artifact — Book",
+    "oracleText": "When Marina Vendrell's Grimoire enters, if you cast it, draw five cards.\nYou have no maximum hand size and don't lose the game for having 0 or less life.\nWhenever you gain life, draw that many cards.\nWhenever you lose life, discard that many cards. Then if you have no cards in hand, you lose the game.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 5
+                    }
+                },
+                "triggerCondition": "WasCast"
+            },
+            {
+                "id": "ability_2",
+                "trigger": "LifeGainEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "ContextProperty",
+                        "key": "TRIGGER_LIFE_GAINED"
+                    }
+                }
+            },
+            {
+                "id": "ability_3",
+                "trigger": "LifeLossEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "FromZone",
+                                        "zone": "Hand"
+                                    },
+                                    "storeAs": "hand"
+                                },
+                                {
+                                    "type": "SelectFromCollection",
+                                    "from": "hand",
+                                    "selection": {
+                                        "type": "ChooseExactly",
+                                        "count": {
+                                            "type": "ContextProperty",
+                                            "key": "TRIGGER_LIFE_LOST"
+                                        }
+                                    },
+                                    "storeSelected": "discarded",
+                                    "prompt": "Choose cards to discard"
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "discarded",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard"
+                                    },
+                                    "moveType": "Discard"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "Exists",
+                                    "player": "You",
+                                    "zone": "Hand",
+                                    "negate": true
+                                }
+                            },
+                            "then": "LoseGame"
+                        }
+                    ]
+                }
+            }
+        ],
+        "staticAbilities": [
+            "NoMaximumHandSize",
+            "GrantCantLoseGameFromLife"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "64",
+        "rarity": "RARE",
+        "artist": "Denys Tsiperko",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/a/1ab1aef7-4171-4869-8eb5-fe42e3ca9e45.jpg?1726286094"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Marvin, Murderous Mimic
 {
     "name": "Marvin, Murderous Mimic",
@@ -10764,6 +10874,72 @@
     "colorIdentityOverride": [
         "WHITE",
         "RED"
+    ]
+}
+
+// Mirror Room // Fractured Realm
+{
+    "name": "Mirror Room // Fractured Realm",
+    "manaCost": "",
+    "typeLine": "Enchantment — Room",
+    "oracleText": "When you unlock this door, create a token that's a copy of target creature you control, except it's a Reflection in addition to its other creature types.\n//\nIf a triggered ability of a permanent you control triggers, that ability triggers an additional time.",
+    "metadata": {
+        "collectorNumber": "67",
+        "rarity": "MYTHIC",
+        "artist": "Helge C. Balzer",
+        "imageUri": "https://cards.scryfall.io/normal/front/c/2/c2e085dd-a448-4f5a-9cfa-5c2034234e7c.jpg?1726867728"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ],
+    "layout": "SPLIT",
+    "cardFaces": [
+        {
+            "name": "Mirror Room",
+            "manaCost": "{2}{U}",
+            "typeLine": "Enchantment — Room",
+            "oracleText": "When you unlock this door, create a token that's a copy of target creature you control, except it's a Reflection in addition to its other creature types.",
+            "script": {
+                "triggeredAbilities": [
+                    {
+                        "id": "ability_1",
+                        "trigger": "DoorUnlockedEvent",
+                        "effect": {
+                            "type": "CreateTokenCopyOfTarget",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target creature you control"
+                            },
+                            "addedSubtypes": [
+                                "Reflection"
+                            ]
+                        },
+                        "targetRequirement": {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature ctrl:you"
+                            },
+                            "id": "target creature you control"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Fractured Realm",
+            "manaCost": "{5}{U}{U}",
+            "typeLine": "Enchantment — Room",
+            "oracleText": "If a triggered ability of a permanent you control triggers, that ability triggers an additional time.",
+            "script": {
+                "staticAbilities": [
+                    {
+                        "type": "AdditionalSourceTriggers",
+                        "sourceFilter": "permanent ctrl:you",
+                        "excludeSelf": false
+                    }
+                ]
+            }
+        }
     ]
 }
 
@@ -16450,6 +16626,46 @@
     "colorIdentityOverride": [
         "WHITE",
         "RED"
+    ]
+}
+
+// The Mindskinner
+{
+    "name": "The Mindskinner",
+    "manaCost": "{U}{U}{U}",
+    "typeLine": "Legendary Enchantment Creature — Nightmare",
+    "oracleText": "The Mindskinner can't be blocked.\nIf a source you control would deal damage to an opponent, prevent that damage and each opponent mills that many cards.",
+    "creatureStats": {
+        "power": 10,
+        "toughness": 1
+    },
+    "flags": [
+        "CANT_BE_BLOCKED"
+    ],
+    "script": {
+        "replacementEffects": [
+            {
+                "type": "ReplaceDamageWithMill",
+                "appliesTo": {
+                    "type": "DamageEvent",
+                    "recipient": "RecipientOpponent",
+                    "source": {
+                        "type": "SourceMatching",
+                        "filter": "ctrl:you"
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "66",
+        "rarity": "RARE",
+        "artist": "Abz J Harding",
+        "flavorText": "It slices away the most precious memories first, then the mundane, until all that remains is blank, formless fear.",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/f/7f1bb4c5-99be-46cc-ad54-7affb5f0144c.jpg?1726286101"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
     ]
 }
 

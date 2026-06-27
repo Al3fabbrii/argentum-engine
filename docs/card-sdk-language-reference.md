@@ -3257,7 +3257,8 @@ staticAbility {
   the battlefield" wording. `TriggerDetector.duplicateETBOrLTBTriggers`; additive across copies.
 - `AdditionalSourceTriggers(sourceFilter, excludeSelf = true)` — Twinflame Travelers: all triggered
   abilities of permanents matching `sourceFilter` you control trigger an additional time (not just ETB).
-  `TriggerDetector.duplicateSourceTriggers`.
+  Set `excludeSelf = false` for "a permanent you control" wording that includes the source itself
+  (Fractured Realm). `TriggerDetector.duplicateSourceTriggers`.
 - `AdditionalAttackTriggers(attackerFilter = GameObjectFilter.Any)` — Windcrag Siege (Mardu): the
   attack-cause analogue of `AdditionalETBOrLTBTriggers`. If a creature matching `attackerFilter`
   being declared as an attacker causes an attack-related triggered ability ("whenever a creature
@@ -3415,6 +3416,16 @@ staticAbility {
   battlefield*. (Thought Vessel, Reliquary Tower) For a one-shot resolution effect that confers a
   *permanent, player-scoped* "no maximum hand size for the rest of the game" (survives the source
   leaving play), use the effect `Effects.RemoveMaximumHandSize(target)` instead — see §4. (Wisdom of Ages)
+- `GrantCantLoseGame` — controller "can't lose the game" while this permanent is on the battlefield
+  (Lich's Mastery, Platinum Angel). Suppresses *all* loss conditions for that player (0-or-less life,
+  poison, empty-library draw, effect losses); opponents can still win via "you win the game" effects.
+  Projected to `GrantsCantLoseGameComponent`, read by every player-loss SBA via `playerCantLoseGame`.
+- `GrantCantLoseGameFromLife` — the narrow sibling: controller "doesn't lose the game for having 0 or
+  less life" (CR 704.5a) only. Poison, empty-library, and effect-based losses still apply — including a
+  card's own `Effects.LoseGame`. Marina Vendrell's Grimoire ("…and don't lose the game for having 0 or
+  less life" alongside its "if you have no cards in hand, you lose the game" clause, which still fires).
+  Projected to `GrantsCantLoseGameFromLifeComponent`, read only by `PlayerLifeLossCheck` (controller-
+  scoped, not a team-wide grant).
 - `SetMaximumHandSize(player, amount)` — sets the maximum hand size of a `player` scope (`You` /
   `EachOpponent` / `Each`, resolved relative to the source's controller) to a `DynamicAmount`, read at
   cleanup. Most restrictive (smallest) value wins when several apply; a `NoMaximumHandSize` controlled
@@ -5300,6 +5311,13 @@ replacementEffect {
   Martyrs of Korlis uses `Conditions.SourceIsUntapped` for "As long as this creature is untapped, all
   damage that would be dealt to you by artifacts is dealt to this creature instead" (`redirectTo =
   EffectTarget.Self`, `source = SourceFilter.Matching(GameObjectFilter.Artifact)`).
+- `ReplaceDamageWithMill(appliesTo = DamageEvent(recipient = Opponent))` — replace matching damage
+  (CR 615, neither dealt nor prevented): each opponent of the replacement's controller mills that many
+  cards instead. The Mindskinner: `DamageEvent(recipient = RecipientFilter.Opponent, source =
+  SourceFilter.Matching(GameObjectFilter.Any.youControl()))` covers both the unblockable creature's
+  combat damage and noncombat damage from any source you control. Mirrors `ReplaceDamageWithCounters`;
+  wired in both damage paths (`DamageUtils.applyReplaceDamageWithMill` for the general path,
+  `CombatDamageManager` for combat). Damage-type filtering is not applied (matches any type).
 - **DamageEvent filters (gap #7):** `EventPattern.DamageEvent(recipient, source, damageType, amount)`.
   `amount: AmountFilter` (`Any` / `AtMost(n)` / `AtLeast(n)` / `Exactly(n)`) gates on the would-be
   amount (Callous Giant: `AtMost(3)`). `source = SourceFilter.Matching(filter)` can carry relational

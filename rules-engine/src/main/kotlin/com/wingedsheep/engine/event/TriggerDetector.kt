@@ -33,6 +33,7 @@ import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.SuppressEntersTriggers
 import com.wingedsheep.engine.state.components.identity.RoomComponent
 import com.wingedsheep.engine.state.components.identity.RoomFaceId
+import com.wingedsheep.engine.state.components.identity.RoomFaceStatics
 import com.wingedsheep.engine.state.components.identity.TokenComponent
 import com.wingedsheep.engine.state.components.identity.OwnerComponent
 import com.wingedsheep.engine.mechanics.layers.ProjectedState
@@ -2435,8 +2436,9 @@ class TriggerDetector(
             val controllerId = projected.getController(permanentId) ?: continue
             val cardDef = registry.getCard(card.cardDefinitionId) ?: continue
 
-            val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-            for (ability in cardDef.script.effectiveStaticAbilities(classLevel)) {
+            // Route through RoomFaceStatics so a doubler printed on an *unlocked* Room face
+            // (CR 709.5) is honoured, not just one in the card's top-level script.
+            for (ability in RoomFaceStatics.activeStaticAbilities(container, cardDef)) {
                 if (ability is AdditionalETBOrLTBTriggers) {
                     doublers.add(
                         Doubler(
@@ -2688,8 +2690,9 @@ class TriggerDetector(
             if (container.has<FaceDownComponent>()) continue
             val controllerId = projected.getController(permanentId) ?: continue
             val cardDef = registry.getCard(card.cardDefinitionId) ?: continue
-            val classLevel = container.get<ClassLevelComponent>()?.currentLevel
-            for (ability in cardDef.script.effectiveStaticAbilities(classLevel)) {
+            // Route through RoomFaceStatics so a doubler printed on an *unlocked* Room face
+            // (CR 709.5) is honoured, not just one in the card's top-level script.
+            for (ability in RoomFaceStatics.activeStaticAbilities(container, cardDef)) {
                 if (ability is AdditionalSourceTriggers) {
                     doublers.add(
                         SourceDoubler(
