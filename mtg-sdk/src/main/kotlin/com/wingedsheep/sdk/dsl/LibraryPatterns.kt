@@ -9,8 +9,10 @@ import com.wingedsheep.sdk.scripting.effects.ChoosePileEffect
 import com.wingedsheep.sdk.scripting.effects.Chooser
 import com.wingedsheep.sdk.scripting.effects.CompositeEffect
 import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
+import com.wingedsheep.sdk.scripting.effects.CollectionFilter
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.FaceDownMode
+import com.wingedsheep.sdk.scripting.effects.FilterCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.EmitManifestedDreadEventEffect
 import com.wingedsheep.sdk.scripting.effects.EmitScriedEventEffect
 import com.wingedsheep.sdk.scripting.effects.EmitSurveiledEventEffect
@@ -212,6 +214,46 @@ object LibraryPatterns {
                 from = "kept",
                 destination = CardDestination.ToZone(Zone.HAND),
                 revealed = true
+            ),
+            MoveCollectionEffect(
+                from = "rest",
+                destination = restDestination,
+                order = restOrder
+            )
+        )
+    )
+
+    /**
+     * "Reveal the top [count] cards of your library. Put all cards matching [filter] from among them
+     * into your hand and the rest [restDestination] (defaults to the bottom of your library)
+     * [restOrder] (defaults to a random order)." — Marina Vendrell's enters-the-battlefield shape.
+     *
+     * Unlike [lookAtTopRevealMatchingToHand] (which lets the player keep *up to one* matching card),
+     * this is a mandatory full reveal that automatically routes *every* matching card to hand via a
+     * choice-free [FilterCollectionEffect] partition. The remainder keeps its original gather order
+     * unless [restOrder] reshuffles it.
+     */
+    fun revealTopPutAllMatchingToHand(
+        count: DynamicAmount,
+        filter: GameObjectFilter,
+        restDestination: CardDestination = CardDestination.ToZone(Zone.LIBRARY, placement = ZonePlacement.Bottom),
+        restOrder: CardOrder = CardOrder.Random
+    ): CompositeEffect = CompositeEffect(
+        listOf(
+            GatherCardsEffect(
+                source = CardSource.TopOfLibrary(count),
+                storeAs = "looked"
+            ),
+            RevealCollectionEffect(from = "looked"),
+            FilterCollectionEffect(
+                from = "looked",
+                filter = CollectionFilter.MatchesFilter(filter),
+                storeMatching = "kept",
+                storeNonMatching = "rest"
+            ),
+            MoveCollectionEffect(
+                from = "kept",
+                destination = CardDestination.ToZone(Zone.HAND)
             ),
             MoveCollectionEffect(
                 from = "rest",

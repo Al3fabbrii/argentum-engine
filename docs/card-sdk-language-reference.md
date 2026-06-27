@@ -1392,6 +1392,11 @@ one-off pipeline belongs inline in the card file via `Effects.Pipeline { }` (§5
   Brown / Star Charter shape: look at top `count`, **optionally** reveal one card matching `filter` to
   hand, rest to `restDestination` (default bottom of library) in `restOrder` (default
   `CardOrder.Random`). `count` is a `DynamicAmount` (e.g. `DynamicAmounts.triggeringManaValue()`).
+- `revealTopPutAllMatchingToHand(count, filter, restDestination?, restOrder?)` — Marina Vendrell shape:
+  **mandatorily** reveal the top `count`, auto-route *every* card matching `filter` to hand (a
+  choice-free `FilterCollection` partition, not a "keep up to one" choice), rest to `restDestination`
+  (default bottom of library) in `restOrder` (default `CardOrder.Random`). Use this for "reveal the top
+  N, put all [type] cards into your hand and the rest on the bottom" wording.
 - `lookAtTopAndReorder(count)` — reorder top N.
 - `manifest(count = 1)` — manifest the top N cards (CR 701.40): each is put onto the battlefield
   face down as a 2/2 creature (one at a time). A manifested creature card can be turned face up for
