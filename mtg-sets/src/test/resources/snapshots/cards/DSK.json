@@ -10173,6 +10173,122 @@
     ]
 }
 
+// Marina Vendrell
+{
+    "name": "Marina Vendrell",
+    "manaCost": "{W}{U}{B}{R}{G}",
+    "typeLine": "Legendary Creature — Human Warlock",
+    "oracleText": "When Marina Vendrell enters, reveal the top seven cards of your library. Put all enchantment cards from among them into your hand and the rest on the bottom of your library in a random order.\n{T}: Lock or unlock a door of target Room you control. Activate only as a sorcery.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 5
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 7
+                                }
+                            },
+                            "storeAs": "looked"
+                        },
+                        {
+                            "type": "RevealCollection",
+                            "from": "looked"
+                        },
+                        {
+                            "type": "FilterCollection",
+                            "from": "looked",
+                            "filter": {
+                                "type": "MatchesFilter",
+                                "filter": "enchantment"
+                            },
+                            "storeMatching": "kept",
+                            "storeNonMatching": "rest"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "kept",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Hand"
+                            }
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "rest",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Library",
+                                "placement": "Bottom"
+                            },
+                            "order": "Random"
+                        }
+                    ]
+                },
+                "descriptionOverride": "When Marina Vendrell enters, reveal the top seven cards of your library. Put all enchantment cards from among them into your hand and the rest on the bottom of your library in a random order."
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "Modal",
+                    "modes": [
+                        {
+                            "effect": "LockDoor",
+                            "description": "Lock a door"
+                        },
+                        {
+                            "effect": "UnlockDoor",
+                            "description": "Unlock a door"
+                        }
+                    ],
+                    "countsAsModalSpell": false
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "Room ctrl:you"
+                        },
+                        "id": "target Room"
+                    }
+                ],
+                "timing": "SorcerySpeed",
+                "descriptionOverride": "{T}: Lock or unlock a door of target Room you control. Activate only as a sorcery."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "221",
+        "rarity": "RARE",
+        "artist": "Magali Villeneuve",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/4/6428cddc-2fb6-41af-a643-e83c81dc04f5.jpg?1726298170"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "BLUE",
+        "BLACK",
+        "RED",
+        "GREEN"
+    ]
+}
+
 // Marvin, Murderous Mimic
 {
     "name": "Marvin, Murderous Mimic",
@@ -16228,6 +16344,95 @@
     ]
 }
 
+// The Rollercrusher Ride
+{
+    "name": "The Rollercrusher Ride",
+    "manaCost": "{X}{2}{R}",
+    "typeLine": "Legendary Enchantment",
+    "oracleText": "Delirium — If a source you control would deal noncombat damage to a permanent or player while there are four or more card types among cards in your graveyard, it deals double that damage instead.\nWhen The Rollercrusher Ride enters, it deals X damage to each of up to X target creatures.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "ForEach",
+                    "space": "IterationSpace.Targets",
+                    "body": {
+                        "type": "DealDamage",
+                        "amount": "CastX",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        }
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature"
+                    },
+                    "id": "up to X target creatures",
+                    "dynamicMaxCount": "CastX"
+                },
+                "descriptionOverride": "When The Rollercrusher Ride enters, it deals X damage to each of up to X target creatures."
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "DoubleDamage",
+                "restrictions": [
+                    {
+                        "type": "Compare",
+                        "left": {
+                            "type": "AggregateZone",
+                            "player": "You",
+                            "zone": "Graveyard",
+                            "aggregation": "DISTINCT_TYPES"
+                        },
+                        "operator": "GTE",
+                        "right": {
+                            "type": "Fixed",
+                            "amount": 4
+                        }
+                    }
+                ],
+                "appliesTo": {
+                    "type": "DamageEvent",
+                    "source": {
+                        "type": "SourceMatching",
+                        "filter": "ctrl:you"
+                    },
+                    "damageType": "DamageNonCombat"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "155",
+        "rarity": "MYTHIC",
+        "artist": "Deruchenko Alexander",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/0/70019956-fca1-4090-b3b6-6a963528e05b.jpg?1726286431",
+        "rulings": [
+            {
+                "date": "2024-09-20",
+                "text": "The damage is dealt by the same source as the original source of damage. The doubled damage isn't dealt by The Rollercrusher Ride unless it was the original source of damage."
+            },
+            {
+                "date": "2024-09-20",
+                "text": "If damage dealt by a source you control is being divided among multiple permanents and/or players while you have delirium, that damage is divided before doubling."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // The Swarmweaver
 {
     "name": "The Swarmweaver",
@@ -18999,6 +19204,287 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Victor, Valgavoth's Seneschal
+{
+    "name": "Victor, Valgavoth's Seneschal",
+    "manaCost": "{1}{W}{B}",
+    "typeLine": "Legendary Creature — Human Warlock",
+    "oracleText": "Eerie — Whenever an enchantment you control enters and whenever you fully unlock a Room, surveil 2 if this is the first time this ability has resolved this turn. If it's the second time, each opponent discards a card. If it's the third time, put a creature card from a graveyard onto the battlefield under your control.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "EERIE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "filter": "enchantment ctrl:you",
+                    "to": "Battlefield"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "IncrementAbilityResolutionCount",
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 1
+                                }
+                            },
+                            "then": {
+                                "type": "Surveil",
+                                "count": 2
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 2
+                                }
+                            },
+                            "then": {
+                                "type": "ForEach",
+                                "space": {
+                                    "type": "IterationSpace.Players",
+                                    "players": "EachOpponent"
+                                },
+                                "body": {
+                                    "type": "Composite",
+                                    "effects": [
+                                        {
+                                            "type": "GatherCards",
+                                            "source": {
+                                                "type": "FromZone",
+                                                "zone": "Hand"
+                                            },
+                                            "storeAs": "hand"
+                                        },
+                                        {
+                                            "type": "SelectFromCollection",
+                                            "from": "hand",
+                                            "selection": {
+                                                "type": "ChooseExactly",
+                                                "count": {
+                                                    "type": "Fixed",
+                                                    "amount": 1
+                                                }
+                                            },
+                                            "storeSelected": "discarded"
+                                        },
+                                        {
+                                            "type": "MoveCollection",
+                                            "from": "discarded",
+                                            "destination": {
+                                                "type": "ToZone",
+                                                "zone": "Graveyard"
+                                            },
+                                            "moveType": "Discard"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 3
+                                }
+                            },
+                            "then": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "FromZone",
+                                            "zone": "Graveyard",
+                                            "player": "Each",
+                                            "filter": "creature"
+                                        },
+                                        "storeAs": "victorReanimatable"
+                                    },
+                                    {
+                                        "type": "SelectFromCollection",
+                                        "from": "victorReanimatable",
+                                        "selection": {
+                                            "type": "ChooseExactly",
+                                            "count": {
+                                                "type": "Fixed",
+                                                "amount": 1
+                                            }
+                                        },
+                                        "storeSelected": "victorReanimated",
+                                        "prompt": "Put a creature card from a graveyard onto the battlefield under your control",
+                                        "showAllCards": true
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "victorReanimated",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Battlefield"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "Eerie — Whenever an enchantment you control enters, surveil 2 if this is the first time this ability has resolved this turn. If it's the second time, each opponent discards a card. If it's the third time, put a creature card from a graveyard onto the battlefield under your control."
+            },
+            {
+                "id": "ability_2",
+                "trigger": "RoomFullyUnlockedEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "IncrementAbilityResolutionCount",
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 1
+                                }
+                            },
+                            "then": {
+                                "type": "Surveil",
+                                "count": 2
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 2
+                                }
+                            },
+                            "then": {
+                                "type": "ForEach",
+                                "space": {
+                                    "type": "IterationSpace.Players",
+                                    "players": "EachOpponent"
+                                },
+                                "body": {
+                                    "type": "Composite",
+                                    "effects": [
+                                        {
+                                            "type": "GatherCards",
+                                            "source": {
+                                                "type": "FromZone",
+                                                "zone": "Hand"
+                                            },
+                                            "storeAs": "hand"
+                                        },
+                                        {
+                                            "type": "SelectFromCollection",
+                                            "from": "hand",
+                                            "selection": {
+                                                "type": "ChooseExactly",
+                                                "count": {
+                                                    "type": "Fixed",
+                                                    "amount": 1
+                                                }
+                                            },
+                                            "storeSelected": "discarded"
+                                        },
+                                        {
+                                            "type": "MoveCollection",
+                                            "from": "discarded",
+                                            "destination": {
+                                                "type": "ToZone",
+                                                "zone": "Graveyard"
+                                            },
+                                            "moveType": "Discard"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 3
+                                }
+                            },
+                            "then": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "FromZone",
+                                            "zone": "Graveyard",
+                                            "player": "Each",
+                                            "filter": "creature"
+                                        },
+                                        "storeAs": "victorReanimatable"
+                                    },
+                                    {
+                                        "type": "SelectFromCollection",
+                                        "from": "victorReanimatable",
+                                        "selection": {
+                                            "type": "ChooseExactly",
+                                            "count": {
+                                                "type": "Fixed",
+                                                "amount": 1
+                                            }
+                                        },
+                                        "storeSelected": "victorReanimated",
+                                        "prompt": "Put a creature card from a graveyard onto the battlefield under your control",
+                                        "showAllCards": true
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "victorReanimated",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Battlefield"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "Eerie — Whenever you fully unlock a Room, surveil 2 if this is the first time this ability has resolved this turn. If it's the second time, each opponent discards a card. If it's the third time, put a creature card from a graveyard onto the battlefield under your control."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "238",
+        "rarity": "RARE",
+        "artist": "Jeremy Wilson",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/1/51392ece-c9f5-46b0-9dce-0a1a0343a536.jpg?1726286757"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "BLACK"
     ]
 }
 

@@ -1392,6 +1392,11 @@ one-off pipeline belongs inline in the card file via `Effects.Pipeline { }` (§5
   Brown / Star Charter shape: look at top `count`, **optionally** reveal one card matching `filter` to
   hand, rest to `restDestination` (default bottom of library) in `restOrder` (default
   `CardOrder.Random`). `count` is a `DynamicAmount` (e.g. `DynamicAmounts.triggeringManaValue()`).
+- `revealTopPutAllMatchingToHand(count, filter, restDestination?, restOrder?)` — Marina Vendrell shape:
+  **mandatorily** reveal the top `count`, auto-route *every* card matching `filter` to hand (a
+  choice-free `FilterCollection` partition, not a "keep up to one" choice), rest to `restDestination`
+  (default bottom of library) in `restOrder` (default `CardOrder.Random`). Use this for "reveal the top
+  N, put all [type] cards into your hand and the rest on the bottom" wording.
 - `lookAtTopAndReorder(count)` — reorder top N.
 - `manifest(count = 1)` — manifest the top N cards (CR 701.40): each is put onto the battlefield
   face down as a 2/2 creature (one at a time). A manifested creature card can be turned face up for
@@ -5274,6 +5279,16 @@ replacementEffect {
   "as long as …, prevent …" statics (Spirit of Resistance: a five-distinct-colors `Compare` gate).
 - `CapDamage(maxAmount, appliesTo)` — clamp matching damage to `maxAmount` (a *replacement* distinct
   from prevent/modify; applied after all amplification). Divine Presence: `CapDamage(3, DamageEvent(recipient = Any))`.
+- `DoubleDamage(restrictions?, appliesTo)` — double matching damage (Gratuitous Violence, Furnace of
+  Rath). `restrictions: List<Condition>` (default empty) gates the doubling on extra conditions
+  evaluated against the source's controller — the same pattern as `PreventDamage.restrictions`. The
+  doubling also honours `appliesTo.damageType` (`Combat` / `NonCombat` / `Any`). The Rollercrusher
+  Ride: `DoubleDamage(restrictions = listOf(Conditions.Delirium(4)), appliesTo = DamageEvent(source =
+  SourceFilter.Matching(GameObjectFilter.Any.youControl()), damageType = DamageType.NonCombat))` — a
+  delirium-gated "double all noncombat damage from sources you control". The doubled damage stays
+  attributed to the original source (the engine scales the amount in place).
+- `ModifyDamageAmount(modifier, appliesTo)` — add a flat `modifier` to matching damage (Valley
+  Flamecaller: "deals that much damage plus 1").
 - `RedirectDamage(redirectTo, appliesTo, condition = null)` — redirect matching damage to another
   recipient. Now wired as a continuous static replacement (each source applies at most once per damage
   event). `redirectTo` supports `EffectTarget.ControllerOfDamageSource` (the controller of the damaging
