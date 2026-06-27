@@ -17,7 +17,7 @@ import com.wingedsheep.sdk.scripting.targets.TargetPermanent
  * Leatherhead, Swamp Stalker
  * {2}{G}{G}
  * Legendary Creature — Crocodile Mutant Rogue
- * 4/4
+ * 5/4
  *
  * Trample
  * Leatherhead enters with a hexproof counter on her.
@@ -29,7 +29,7 @@ val LeatherheadSwampStalker = card("Leatherhead, Swamp Stalker") {
     colorIdentity = "G"
     typeLine = "Legendary Creature — Crocodile Mutant Rogue"
     oracleText = "Trample\nLeatherhead enters with a hexproof counter on her.\nWhenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls."
-    power = 4
+    power = 5
     toughness = 4
 
     keywords(Keyword.TRAMPLE)
