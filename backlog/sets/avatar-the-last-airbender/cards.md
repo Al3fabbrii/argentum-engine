@@ -293,7 +293,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Swamp
 - [x] Swampsnare Trap
 - [x] Team Avatar
-- [ ] Teo, Spirited Glider
+- [x] Teo, Spirited Glider
 - [ ] The Boulder, Ready to Rumble
 - [ ] The Cave of Two Lovers
 - [ ] The Earth King
