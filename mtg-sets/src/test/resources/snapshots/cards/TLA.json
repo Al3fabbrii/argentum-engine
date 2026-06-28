@@ -10837,6 +10837,72 @@
     ]
 }
 
+// Wolfbat
+{
+    "name": "Wolfbat",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Wolf Bat",
+    "oracleText": "Flying\nWhenever you draw your second card each turn, you may pay {B}. If you do, return this card from your graveyard to the battlefield with a finality counter on it. (If a creature with a finality counter on it would die, exile it instead.)",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "NthCardDrawnEvent",
+                    "nthCard": 2
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.MayPay",
+                        "cost": {
+                            "type": "PayManaCost",
+                            "cost": "{B}"
+                        }
+                    },
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "MoveToZone",
+                                "target": "Self",
+                                "destination": "Battlefield",
+                                "fromZone": "Graveyard"
+                            },
+                            {
+                                "type": "AddCounters",
+                                "counterType": "finality",
+                                "count": 1,
+                                "target": "Self"
+                            }
+                        ]
+                    }
+                },
+                "activeZone": "Graveyard",
+                "descriptionOverride": "Whenever you draw your second card each turn, you may pay {B}. If you do, return this card from your graveyard to the battlefield with a finality counter on it."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "122",
+        "rarity": "UNCOMMON",
+        "artist": "Daniel Romanovsky",
+        "flavorText": "Wolfbats nest in tunnels carved out by badgermoles and hunt for prey in the dark caverns.",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/a/2ae83b4e-e5a4-4c98-8d16-eef3c71b8ff2.jpg?1764120843"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Yip Yip!
 {
     "name": "Yip Yip!",

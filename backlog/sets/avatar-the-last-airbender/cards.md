@@ -342,7 +342,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] White Lotus Hideout
 - [x] White Lotus Reinforcements
 - [ ] White Lotus Tile
-- [ ] Wolfbat
+- [x] Wolfbat
 - [x] Yip Yip!
 - [ ] Yue, the Moon Spirit
 - [x] Yuyan Archers
