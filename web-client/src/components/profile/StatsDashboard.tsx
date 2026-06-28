@@ -140,26 +140,24 @@ export function StatsDashboard(props: StatsDashboardData) {
 
         {cardTypes.length > 0 && (
           <Panel title="Card types">
-            <div style={styles.pieRow}>
-              <ResponsiveContainer width="55%" height={Math.max(150, cardTypes.length * 26)}>
-                <PieChart>
-                  <Pie data={cardTypes} dataKey="count" nameKey="label" outerRadius={68} stroke="none">
-                    {cardTypes.map((t, i) => (
-                      <Cell key={t.label} fill={TYPE_COLORS[t.label] ?? PALETTE[i % PALETTE.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={tooltipStyle} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={styles.legend}>
-                {cardTypes.map((t, i) => (
-                  <span key={t.label} style={styles.legendItem}>
-                    <span style={{ ...styles.legendSwatch, backgroundColor: TYPE_COLORS[t.label] ?? PALETTE[i % PALETTE.length] }} />
-                    <span style={styles.legendName}>{t.label}</span>
-                    <span style={styles.legendCount}>{t.count}</span>
-                  </span>
-                ))}
-              </div>
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie data={cardTypes} dataKey="count" nameKey="label" cx="50%" cy="50%" outerRadius={78} stroke="none">
+                  {cardTypes.map((t, i) => (
+                    <Cell key={t.label} fill={TYPE_COLORS[t.label] ?? PALETTE[i % PALETTE.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div style={styles.legend}>
+              {cardTypes.map((t, i) => (
+                <span key={t.label} style={styles.legendItem}>
+                  <span style={{ ...styles.legendSwatch, backgroundColor: TYPE_COLORS[t.label] ?? PALETTE[i % PALETTE.length] }} />
+                  <span style={styles.legendName}>{t.label}</span>
+                  <span style={styles.legendCount}>{t.count}</span>
+                </span>
+              ))}
             </div>
           </Panel>
         )}
@@ -530,7 +528,6 @@ const styles: Record<string, React.CSSProperties> = {
   colorBarTrack: { flex: 1, height: 10, backgroundColor: '#1d1d2e', borderRadius: 999, overflow: 'hidden' },
   colorBarFill: { display: 'block', height: '100%', borderRadius: 999 },
   colorCount: { color: '#aab', fontSize: 12, width: 28, textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
-  pieRow: { display: 'flex', alignItems: 'center', gap: 8 },
   legend: { display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 8, justifyContent: 'center' },
   legendItem: { display: 'inline-flex', alignItems: 'center', gap: 6, color: '#bbc', fontSize: 12 },
   legendSwatch: { width: 10, height: 10, borderRadius: 3, display: 'inline-block' },
