@@ -196,7 +196,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Iroh, Grand Lotus
 - [ ] Iroh, Tea Master
 - [x] Island
-- [ ] It'll Quench Ya!
+- [x] It'll Quench Ya!
 - [x] Jasmine Dragon Tea Shop
 - [x] Jeong Jeong's Deserters
 - [ ] Jeong Jeong, the Deserter
