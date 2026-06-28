@@ -92,6 +92,30 @@ data class MatchCardRow(
     val copies: Int,
 )
 
+/**
+ * A durable, compact replay of a finished game — the reproducible setup plus the input stream,
+ * gzip+base64-encoded in [data] (see [com.wingedsheep.gameserver.replay.ReplayCodec]). Keyed by
+ * [gameId] (the same id the live in-memory cache and the spectator/share links use). The metadata
+ * columns mirror [com.wingedsheep.gameserver.replay.CompactReplay] so a history list never has to
+ * decode + re-simulate just to render a row.
+ */
+@Table("game_replays")
+data class GameReplayRow(
+    @Id val id: Long? = null,
+    val gameId: String,
+    val format: String? = null,
+    val winnerName: String? = null,
+    val tournamentName: String? = null,
+    val startedAt: Instant? = null,
+    val endedAt: Instant = Instant.now(),
+    /** Reconstructable frames (initial + one per action) — the activity measure for the UI. */
+    val frameCount: Int = 0,
+    /** Player display names in seat order, comma-joined — enough for a summary row. */
+    val playerNames: String = "",
+    /** gzip+base64-encoded CompactReplay JSON. */
+    val data: String,
+)
+
 @Table("tournaments")
 data class TournamentRow(
     @Id val id: Long? = null,

@@ -130,6 +130,17 @@ placement is done — Bronze `<1000`, Silver `1000–1199`, Gold `1200–1399`, 
 `1600–1999`, **Mythic** `≥2000` (open-ended) — and is shown as **Provisional** during placement. The
 profile page shows a card per queue (rating + tier + record) and a rating-over-time line chart.
 
+Flyway migration `V5__game_replays.sql` adds durable replays:
+
+| Table | Purpose |
+|-------|---------|
+| `game_replays` | one row per finished game keyed by `game_id`: a gzip+base64 `CompactReplay` (RNG seed + decks + ordered action stream) in `data`, plus summary columns. A few KB each — the engine is deterministic, so the whole game is reconstructed from its inputs rather than stored frame-by-frame (see [data-contracts.md](data-contracts.md) → *Compact replays*). |
+
+A signed-in player's history (`/api/stats/me/history`) `LEFT JOIN`s `game_replays` on `game_id` to
+flag which past games can be watched/shared (`hasReplay`). Stored replays survive server restarts and
+the 100-game in-memory cache; the unguessable `game_id` doubles as the share token via the public
+`/replay/{gameId}` page.
+
 ## Auth flow (magic link)
 
 1. `POST /api/auth/request-login { email }` → upsert account, email a single-use link (logged to
@@ -232,8 +243,10 @@ called from the admin `geo` endpoint, never the hot recording path.
 - **Display name:** editable on the profile page (`PUT /api/auth/me`); the email stays the identity.
 - Profile page at `/profile` shows the win/loss summary plus colors played (a Recharts bar chart),
   sets, game modes, head-to-head, most-played cards, tournament finishes, and a recent-games list — all
-  from `/api/stats/me/*` via `api/account.ts`. It also has a small **Manage my decks** launcher that
-  opens the deckbuilder's deck browser (`/deckbuilder?decks=open`).
+  from `/api/stats/me/*` via `api/account.ts`. Each recent game with a stored replay (`hasReplay`)
+  gets **Watch** (opens the public `/replay/{gameId}` viewer) and **Share** (copies that link)
+  buttons, so a signed-in player can rewatch and share their own past games. It also has a small
+  **Manage my decks** launcher that opens the deckbuilder's deck browser (`/deckbuilder?decks=open`).
 - Admin page at `/admin` is a **hub** (`AdminPage` → `AdminHub`) that routes to three areas, each its
   own self-scrolling screen (`AdminScreen` in `adminUi.tsx` — the whole app runs in
   `#root { overflow: hidden }`, so admin screens scroll themselves rather than the document):
