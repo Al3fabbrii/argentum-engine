@@ -220,6 +220,40 @@ object SetArchetypes {
                     "Deploy big threats early with Impending time counters, then ramp into the format's largest creatures. A midrange-ramp deck that overpowers opponents once its haymakers come online."),
             )
         ),
+        "STX" to SetSynergies(
+            setCode = "STX",
+            setName = "Strixhaven: School of Mages",
+            archetypes = listOf(
+                Archetype("Silverquill", listOf(Color.WHITE, Color.BLACK),
+                    "Build a wide board of Inkling tokens, then pile on +1/+1 counters and push through with evasion and lifegain. An aggressive counters-and-tokens deck that closes the game fast."),
+                Archetype("Prismari", listOf(Color.BLUE, Color.RED),
+                    "Cast a high volume of instants and sorceries to trigger magecraft, churning out Treasure and big Elemental payoffs. A spell-slinging tempo deck that snowballs with every cast."),
+                Archetype("Witherbloom", listOf(Color.BLACK, Color.GREEN),
+                    "Drain the opponent with Pests and lifeloss payoffs, sacrificing tokens for value while recurring threats from the graveyard. A grindy attrition deck that bleeds the table dry."),
+                Archetype("Lorehold", listOf(Color.RED, Color.WHITE),
+                    "Recur instants and sorceries from your graveyard and reward casting historic spells, turning Spirit tokens and value loops into relentless pressure. A spells-matter midrange deck."),
+                Archetype("Quandrix", listOf(Color.GREEN, Color.BLUE),
+                    "Ramp into extra mana and pile +1/+1 counters onto Fractal tokens, scaling your board with the size of your mana. A go-big ramp-and-counters deck that overwhelms in the late game."),
+            )
+        ),
+        "TMT" to SetSynergies(
+            setCode = "TMT",
+            setName = "Teenage Mutant Ninja Turtles",
+            archetypes = listOf(
+                Archetype("Blink Tempo", listOf(Color.WHITE, Color.BLUE),
+                    "Bounce and blink your artifacts and creatures to re-trigger their enter-the-battlefield abilities, grinding out value while evasive Turtles and Robots seize the tempo. A patient value-control deck."),
+                Archetype("Mill Control", listOf(Color.BLUE, Color.BLACK),
+                    "Mill your opponents and steal their best cards, leaning on removal and evasion to control the game. A grindy control deck that wins by turning the opponent's own library against them."),
+                Archetype("Graveyard Value", listOf(Color.BLACK, Color.GREEN),
+                    "Fill your graveyard, then reanimate fallen creatures and pile on +1/+1 counters. A grindy recursion deck that out-attritions the table and simply refuses to stay dead."),
+                Archetype("Mutant Beatdown", listOf(Color.RED, Color.GREEN),
+                    "Deploy hasty, trampling threats and flood the board with 2/2 Mutant tokens, then swing with overwhelming force. A fast midrange-aggro deck that wins through raw board presence."),
+                Archetype("Alliance Aggro", listOf(Color.RED, Color.WHITE),
+                    "Go wide so every creature that enters triggers Alliance, then take extra combat phases to swing again and again. An aggressive go-wide deck built on relentless attacks."),
+                Archetype("Mutant Ramp", listOf(Color.GREEN, Color.BLUE),
+                    "Ramp and dig to cast Mutant, Ninja, and Turtle creatures from the top of your library, each entering with a bonus +1/+1 counter. A creature-type value deck that snowballs card advantage."),
+            )
+        ),
     )
 
     /** Get archetypes for a specific set code, or null if not found. */

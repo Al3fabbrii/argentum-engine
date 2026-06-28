@@ -118,7 +118,7 @@ class SetsController(
             archetypes = synergies.archetypes.map { arch ->
                 ArchetypeDTO(
                     name = arch.name,
-                    colors = arch.colors.map { it.name.first().uppercase() },
+                    colors = arch.colors.map { it.symbol.toString() },
                     description = arch.description,
                     creatureTypes = arch.creatureTypes
                 )
