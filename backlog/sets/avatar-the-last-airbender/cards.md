@@ -137,7 +137,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Earth Rumble
 - [ ] Earth Rumble Wrestlers
 - [x] Earth Village Ruffians
-- [ ] Earthbender Ascension
+- [x] Earthbender Ascension
 - [x] Earthbending Lesson
 - [ ] Earthen Ally
 - [ ] Elemental Teachings
