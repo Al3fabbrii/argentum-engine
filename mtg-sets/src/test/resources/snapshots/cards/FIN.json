@@ -4837,7 +4837,8 @@
                                         "count": {
                                             "type": "Fixed",
                                             "amount": 2
-                                        }
+                                        },
+                                        "isMill": true
                                     },
                                     "storeAs": "milled"
                                 },
@@ -6950,7 +6951,8 @@
                                     "player": "You",
                                     "tracker": "LIFE_GAINED"
                                 },
-                                "player": "EachOpponent"
+                                "player": "EachOpponent",
+                                "isMill": true
                             },
                             "storeAs": "milled"
                         },
@@ -7914,7 +7916,8 @@
                                 "player": {
                                     "type": "ContextPlayer",
                                     "index": 0
-                                }
+                                },
+                                "isMill": true
                             },
                             "storeAs": "milled"
                         },
@@ -11223,6 +11226,66 @@
     ]
 }
 
+// Quina, Qu Gourmet
+{
+    "name": "Quina, Qu Gourmet",
+    "manaCost": "{2}{G}",
+    "typeLine": "Legendary Creature — Qu",
+    "oracleText": "If one or more tokens would be created under your control, those tokens plus a 1/1 green Frog creature token are created instead.\n{2}, Sacrifice a Frog: Put a +1/+1 counter on Quina.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 3
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{2}"
+                            }
+                        },
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomSacrifice",
+                                "filter": "creature Frog"
+                            }
+                        }
+                    ]
+                },
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "+1/+1",
+                    "count": 1,
+                    "target": "Self"
+                }
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "CreateAdditionalToken",
+                "additionalTokenType": "Frog"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "194",
+        "rarity": "UNCOMMON",
+        "artist": "Fajareka Setiawan",
+        "flavorText": "\"World only have two things: Things you can eat and things you no can eat.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/f/4f352b5e-9731-4a8e-b872-db5d3bf32211.jpg?1748706489"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Quistis Trepe
 {
     "name": "Quistis Trepe",
@@ -11509,6 +11572,80 @@
         "rarity": "UNCOMMON",
         "artist": "Ben Wootten",
         "imageUri": "https://cards.scryfall.io/normal/front/3/6/3618e283-2df9-4eb9-97b0-96b55ee31cc0.jpg?1748706320"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
+// Raubahn, Bull of Ala Mhigo
+{
+    "name": "Raubahn, Bull of Ala Mhigo",
+    "manaCost": "{1}{R}",
+    "typeLine": "Legendary Creature — Human Warrior",
+    "oracleText": "Ward—Pay life equal to Raubahn's power.\nWhenever Raubahn attacks, attach up to one target Equipment you control to target attacking creature.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "keywords": [
+        "WARD"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Ward",
+            "cost": {
+                "type": "WardCost.DynamicLife",
+                "amount": {
+                    "type": "EntityProperty",
+                    "entity": "Source",
+                    "numericProperty": "Power"
+                }
+            }
+        }
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "AttachTargetEquipmentToCreature",
+                    "equipmentTarget": {
+                        "type": "BoundVariable",
+                        "name": "up to one target Equipment you control"
+                    },
+                    "creatureTarget": {
+                        "type": "BoundVariable",
+                        "name": "target attacking creature"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "artifact Equipment ctrl:you"
+                    },
+                    "id": "up to one target Equipment you control"
+                },
+                "additionalTargetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "creature attacking"
+                        },
+                        "id": "target attacking creature"
+                    }
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "151",
+        "rarity": "RARE",
+        "artist": "Julia Vasilyeva",
+        "flavorText": "\"Come, then! Who will be next to die on my steel!?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/0/7035d11b-525f-4120-8dcb-610095196681.jpg?1748706327"
     },
     "colorIdentityOverride": [
         "RED"
@@ -13888,7 +14025,8 @@
                                         "count": {
                                             "type": "Fixed",
                                             "amount": 3
-                                        }
+                                        },
+                                        "isMill": true
                                     },
                                     "storeAs": "milled"
                                 },
@@ -15045,6 +15183,139 @@
     ]
 }
 
+// Summon: Fenrir
+{
+    "name": "Summon: Fenrir",
+    "manaCost": "{2}{G}",
+    "typeLine": "Enchantment Creature — Saga Wolf",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Crescent Fang — Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nII — Heavenward Howl — When you next cast a creature spell this turn, that creature enters with an additional +1/+1 counter on it.\nIII — Ecliptic Growl — Draw a card if you control the creature with the greatest power or tied for the greatest power.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 2
+    },
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "FromZone",
+                                "zone": "Library",
+                                "filter": "basicland"
+                            },
+                            "storeAs": "searchable"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "searchable",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "storeSelected": "found"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "found",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Battlefield",
+                                "placement": "Tapped"
+                            }
+                        },
+                        "ShuffleLibrary"
+                    ]
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "CreateDelayedTrigger",
+                    "effect": {
+                        "type": "AddCounters",
+                        "counterType": "+1/+1",
+                        "count": 1,
+                        "target": "TriggeringEntity"
+                    },
+                    "trigger": {
+                        "event": {
+                            "type": "SpellCastEvent",
+                            "spellFilter": {
+                                "cardPredicates": [
+                                    "IsCreature"
+                                ]
+                            }
+                        }
+                    },
+                    "fireOnce": true
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "All",
+                            "conditions": [
+                                {
+                                    "type": "Exists",
+                                    "player": "You",
+                                    "zone": "Battlefield",
+                                    "filter": "creature"
+                                },
+                                {
+                                    "type": "Compare",
+                                    "left": {
+                                        "type": "AggregateBattlefield",
+                                        "player": "You",
+                                        "filter": "creature",
+                                        "aggregation": "MAX",
+                                        "property": "POWER"
+                                    },
+                                    "operator": "GTE",
+                                    "right": {
+                                        "type": "AggregateBattlefield",
+                                        "player": "Each",
+                                        "filter": "creature",
+                                        "aggregation": "MAX",
+                                        "property": "POWER"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "then": {
+                        "type": "DrawCards",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "203",
+        "rarity": "UNCOMMON",
+        "artist": "Chun Lo",
+        "flavorText": "\"Who dares summon me from the darkness?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/3/93feb9d5-d004-4598-a448-b3488c869c05.jpg?1748706522"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Summon: G.F. Ifrit
 {
     "name": "Summon: G.F. Ifrit",
@@ -15680,7 +15951,8 @@
                                 "count": {
                                     "type": "Fixed",
                                     "amount": 5
-                                }
+                                },
+                                "isMill": true
                             },
                             "storeAs": "milled"
                         },
@@ -16590,6 +16862,95 @@
     "colorIdentityOverride": []
 }
 
+// The Water Crystal
+{
+    "name": "The Water Crystal",
+    "manaCost": "{2}{U}{U}",
+    "typeLine": "Legendary Artifact",
+    "oracleText": "Blue spells you cast cost {1} less to cast.\nIf an opponent would mill one or more cards, they mill that many cards plus four instead.\n{4}{U}{U}, {T}: Each opponent mills cards equal to the number of cards in your hand.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{4}{U}{U}"
+                            }
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Count",
+                                    "player": "You",
+                                    "zone": "Hand"
+                                },
+                                "player": "EachOpponent",
+                                "isMill": true
+                            },
+                            "storeAs": "milled"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "milled",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard",
+                                "player": "EachOpponent"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "ModifySpellCost",
+                "target": {
+                    "type": "YouCast",
+                    "filter": "blue"
+                },
+                "modification": {
+                    "type": "ReduceGeneric",
+                    "amount": 1
+                }
+            }
+        ],
+        "replacementEffects": [
+            {
+                "type": "ModifyMillAmount",
+                "modifier": 4,
+                "appliesTo": {
+                    "type": "MillEvent",
+                    "player": "EachOpponent"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "85",
+        "rarity": "RARE",
+        "artist": "Pablo Mendoza",
+        "flavorText": "\"Crystal of water, may you regain your light.\"\n—Aria Benett",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/0/e0af8436-797b-4e1f-b21a-d8e93701c3c9.jpg?1748706080"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // The Wind Crystal
 {
     "name": "The Wind Crystal",
@@ -17166,6 +17527,67 @@
     },
     "colorIdentityOverride": [
         "BLACK"
+    ]
+}
+
+// Torgal, A Fine Hound
+{
+    "name": "Torgal, A Fine Hound",
+    "manaCost": "{1}{G}",
+    "typeLine": "Legendary Creature — Wolf",
+    "oracleText": "Whenever you cast your first Human creature spell each turn, that creature enters with an additional +1/+1 counter on it for each Dog and/or Wolf you control.\n{T}: Add one mana of any color.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "SpellCastEvent",
+                    "spellFilter": {
+                        "cardPredicates": [
+                            "IsCreature",
+                            {
+                                "type": "HasSubtype",
+                                "subtype": "Human"
+                            }
+                        ]
+                    }
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddDynamicCounters",
+                    "counterType": "+1/+1",
+                    "amount": {
+                        "type": "AggregateBattlefield",
+                        "player": "You",
+                        "filter": "creature Dog|Wolf"
+                    },
+                    "target": "TriggeringEntity"
+                },
+                "oncePerTurn": true
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": "CostTap",
+                "effect": "AddManaOfChoice",
+                "isManaAbility": true
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "208",
+        "rarity": "UNCOMMON",
+        "artist": "Narendra Bintara Adi",
+        "flavorText": "\"Thank you, Torgal. For never giving up.\"\n—Clive Rosfield",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/f/0f5725aa-42bb-4dfd-9c15-135b38b33da3.jpg?1748706543"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
     ]
 }
 

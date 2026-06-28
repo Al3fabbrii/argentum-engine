@@ -727,6 +727,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   resolution rather than a fixed integer, pass `dynamicCount = <DynamicAmount>` instead of `count` — the executor
   evaluates it (coerced to ≥ 0) and creates that many tokens (Lobelia Sackville-Baggins, LTR: "create X Treasure
   tokens, where X is the exiled card's power", via `DynamicAmount.EntityProperty(Target(0), Power)`).
+  **Colored** predefined tokens (a token has no mana cost, so its printed color is a color indicator, CR 204):
+  set `colorIdentity = "<symbols>"` on the token's `CardDefinition` — both predefined-token executors read
+  `colorIdentityOverride ?: colors` for the token's color (a bare `colors` is mana-cost-derived and would be
+  colorless). Example: the `Frog` token (`PredefinedTokens.Frog`, a 1/1 green Frog created by Quina, Qu Gourmet).
   For an *inline* token (not a registered `CardDefinition`) that has its own abilities, the raw
   `CreateTokenEffect` constructor exposes `staticAbilities`, `triggeredAbilities`, **and**
   `activatedAbilities` — each list is granted to every created token at resolution (permanent
@@ -3856,7 +3860,8 @@ composite abilities).
 **Parameterized `KeywordAbility.*`**
 
 - `Ward(amount)` — opponent pays a mana cost to target this (CR 702.21). Non-mana costs use
-  `KeywordAbility.Ward(WardCost.X)`: `WardCost.Mana`, `WardCost.Life(n)`, `WardCost.Discard(n, random, filter)`,
+  `KeywordAbility.Ward(WardCost.X)`: `WardCost.Mana`, `WardCost.Life(n)`, `WardCost.DynamicLife(amount)`,
+  `WardCost.Discard(n, random, filter)`,
   and `WardCost.Sacrifice(filter, count = 1)` ("Ward—Sacrifice a Food", Ygra; "Ward—Sacrifice three
   nonland permanents" with `count = 3`, Valgavoth, Terror Eater, via `KeywordAbility.wardSacrifice(filter, count)`).
   For sacrifice ward, the opponent chooses which `count` matching permanent(s) they control to sacrifice
@@ -3872,6 +3877,13 @@ composite abilities).
   `GameObjectFilter`: when set, only matching hand cards count toward the can-pay check and only matching
   cards are offered for discard — e.g. Saruman of Many Colors' "Ward—Discard an enchantment, instant, or
   sorcery card" (`wardDiscard(filter = Enchantment or Instant or Sorcery)`).
+  `WardCost.DynamicLife(amount)` (built via `KeywordAbility.wardLife(amount: DynamicAmount)`) is a life
+  cost whose amount is a `DynamicAmount` read when the ward trigger *resolves* (CR 702.21b) — e.g.
+  Raubahn, Bull of Ala Mhigo's "Ward—Pay life equal to Raubahn's power"
+  (`wardLife(DynamicAmounts.sourcePower())`), which reads the source's projected power then, or its
+  last-known power if the source has left the battlefield (CR 112.7a, via `EntityReference.Source`'s
+  last-known-information policy). It resolves down to a fixed `WardCost.Life` in the executor, so it
+  composes inside `WardCost.Composite` and uses the same pay-or-counter prompt.
 - `Protection(color)` — protection from a single color.
 - `ProtectionFrom(set)` — protection from a set of colors/types.
 - `Protection(ProtectionScope.Supertype("Legendary"))` / `KeywordAbility.protectionFromSupertype("Legendary")` — protection from a supertype, e.g. "protection from legendary creatures" (Tsabo Tavoc). Enforced across targeting, blocking, and combat damage via projected `PROTECTION_FROM_SUPERTYPE_<X>` keywords.
@@ -5536,7 +5548,8 @@ replacementEffect {
   creation event, and the extra tokens are added once per qualifying event, not once per token. The added
   tokens bypass the same replacement pass so a Map added for an artifact-token event does not recursively
   trigger itself. Used by Worldwalker Helm (`TokenCreationEvent(You, Artifact)`, add `Map`, `inheritTapped = true`)
-  and Peregrin Took (`additionalTokenType = "Food"`, "those tokens plus an additional Food token are created instead").
+  and Peregrin Took (`additionalTokenType = "Food"`, "those tokens plus an additional Food token are created instead")
+  and Quina, Qu Gourmet (`additionalTokenType = "Frog"`, default `appliesTo` = any token you create, adds a 1/1 green Frog).
 - `EntersAsCopy(optional, copyFilter, copyFromZone, filterByTotalManaSpent, additionalSubtypes, additionalKeywords, nameOverride, powerOverride, toughnessOverride, exileCopiedCard)` —
   "enter as a copy of …". As the permanent resolves, the controller picks an object matching
   `copyFilter` and the permanent enters as a copy (Rule 707 copiable values), with any overrides
@@ -5561,6 +5574,19 @@ replacementEffect {
   use a source-relative condition instead. Use for "if you would draw one or more cards, you draw
   that many cards plus N instead" (Quantum Riddler:
   `ModifyDrawAmount(modifier = 1, restrictions = listOf(Conditions.CardsInHandAtMost(1)), appliesTo = DrawEvent(player = Player.You))`).
+- `ModifyMillAmount(modifier, restrictions, appliesTo)` — modify the number of cards a *mill* announces
+  by a fixed amount (the mill twin of `ModifyDrawAmount`): a player who would mill N instead mills
+  `N + modifier`, clamped to ≥ 0. `appliesTo` is an `EventPattern.MillEvent` whose `player` filter
+  (`Player.You` / `Player.EachOpponent` / `Player.Each`) gates which players' mills are affected,
+  relative to the source's controller. `restrictions` (a `List<Condition>`, ALL must hold, evaluated
+  against the milling player as controller) gates *when* it applies. Applied **once** per mill
+  instruction at the announcement site (`GatherCardsExecutor`'s `CardSource.TopOfLibrary(isMill = true)`
+  branch, which only the `Patterns.Library.mill(...)` pipeline sets — scry / surveil / exile-top /
+  look-at-top gathers leave `isMill = false` and are never affected), so a paused-and-resumed mill
+  never double-modifies. A base mill of 0 is left untouched ("would mill one or more cards"). Multiple
+  instances sum. Use for "if an opponent would mill one or more cards, they mill that many cards plus
+  four instead" (The Water Crystal:
+  `ModifyMillAmount(modifier = 4, appliesTo = EventPattern.MillEvent(player = Player.EachOpponent))`).
 - `ModifyLifeGain(multiplier, modifier, appliesTo, restrictions)` — modify life gain by a multiplicative *and/or*
   additive factor: `gained = (original * multiplier) + modifier`, clamped to ≥ 0. `appliesTo` is a `LifeGainEvent`
   whose `player` filter (default `Player.Each`) gates which players the replacement applies to. `restrictions`
