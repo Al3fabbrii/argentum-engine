@@ -239,7 +239,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Omashu City
 - [x] Origin of Metalbending
 - [ ] Ostrich-Horse
-- [ ] Otter-Penguin
+- [x] Otter-Penguin
 - [x] Ozai's Cruelty
 - [ ] Ozai, the Phoenix King
 - [ ] Path to Redemption

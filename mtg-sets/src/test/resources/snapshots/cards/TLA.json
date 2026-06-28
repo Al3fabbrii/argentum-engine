@@ -5587,6 +5587,62 @@
     ]
 }
 
+// Otter-Penguin
+{
+    "name": "Otter-Penguin",
+    "manaCost": "{1}{U}",
+    "typeLine": "Creature — Otter Bird",
+    "oracleText": "Whenever you draw your second card each turn, this creature gets +1/+2 until end of turn and can't be blocked this turn.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 1
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "NthCardDrawnEvent",
+                    "nthCard": 2
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "ModifyStats",
+                            "powerModifier": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "toughnessModifier": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "target": "Self"
+                        },
+                        {
+                            "type": "GrantKeyword",
+                            "keyword": "CANT_BE_BLOCKED",
+                            "target": "Self"
+                        }
+                    ]
+                },
+                "descriptionOverride": "Whenever you draw your second card each turn, this creature gets +1/+2 until end of turn and can't be blocked this turn."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "67",
+        "artist": "Eilene Cherie",
+        "flavorText": "\"Will you go penguin sledding with me?\"\n—Aang",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/8/480b6279-bb34-4b3f-a639-868b52af92b9.jpg?1764120406"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Ozai's Cruelty
 {
     "name": "Ozai's Cruelty",
