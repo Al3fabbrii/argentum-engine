@@ -6970,6 +6970,71 @@
     ]
 }
 
+// South Pole Voyager
+{
+    "name": "South Pole Voyager",
+    "manaCost": "{1}{W}",
+    "typeLine": "Creature — Human Scout Ally",
+    "oracleText": "Whenever this creature or another Ally you control enters, you gain 1 life. If this is the second time this ability has resolved this turn, draw a card.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "filter": "creature Ally ctrl:you",
+                    "to": "Battlefield"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GainLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        },
+                        "IncrementAbilityResolutionCount",
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 2
+                                }
+                            },
+                            "then": {
+                                "type": "DrawCards",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "35",
+        "rarity": "RARE",
+        "artist": "Tition",
+        "flavorText": "\"The winds can be brutal, so be brave.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/b/4b5ad895-be8d-476b-91ca-22fad7a3cc58.jpg?1764120126"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Sun-Blessed Peak
 {
     "name": "Sun-Blessed Peak",

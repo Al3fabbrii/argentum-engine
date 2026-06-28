@@ -281,7 +281,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Sokka, Tenacious Tactician
 - [ ] Sold Out
 - [ ] Solstice Revelations
-- [ ] South Pole Voyager
+- [x] South Pole Voyager
 - [ ] Southern Air Temple
 - [ ] Sozin's Comet
 - [ ] Sparring Dummy
