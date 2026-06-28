@@ -12692,11 +12692,11 @@
                             ]
                         }
                     },
-                    "storeAs": "tfPool"
+                    "storeAs": "gathered0"
                 },
                 {
                     "type": "SelectFromCollection",
-                    "from": "tfPool",
+                    "from": "gathered0",
                     "selection": {
                         "type": "ChooseExactly",
                         "count": {
@@ -12704,7 +12704,7 @@
                             "amount": 4
                         }
                     },
-                    "storeSelected": "tfFound",
+                    "storeSelected": "selected1",
                     "prompt": "Search for exactly four legendary creature cards with different names",
                     "restrictions": [
                         "OnePerCardName"
@@ -12712,11 +12712,11 @@
                 },
                 {
                     "type": "RevealCollection",
-                    "from": "tfFound"
+                    "from": "selected1"
                 },
                 {
                     "type": "SelectFromCollection",
-                    "from": "tfFound",
+                    "from": "selected1",
                     "selection": {
                         "type": "ChooseExactly",
                         "count": {
@@ -12725,14 +12725,14 @@
                         }
                     },
                     "chooser": "Opponent",
-                    "storeSelected": "tfChosen",
-                    "storeRemainder": "tfRest",
+                    "storeSelected": "selected3",
+                    "storeRemainder": "remainder3",
                     "prompt": "Choose two of those cards to put into their hand",
                     "alwaysPrompt": true
                 },
                 {
                     "type": "MoveCollection",
-                    "from": "tfChosen",
+                    "from": "selected3",
                     "destination": {
                         "type": "ToZone",
                         "zone": "Hand"
@@ -12740,7 +12740,7 @@
                 },
                 {
                     "type": "MoveCollection",
-                    "from": "tfRest",
+                    "from": "remainder3",
                     "destination": {
                         "type": "ToZone",
                         "zone": "Library"

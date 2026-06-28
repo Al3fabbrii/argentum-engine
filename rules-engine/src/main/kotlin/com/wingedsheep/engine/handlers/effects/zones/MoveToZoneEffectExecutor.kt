@@ -138,8 +138,9 @@ class MoveToZoneEffectExecutor(
         // The "revealer" is the controller performing the move, not the card's owner: a
         // reanimation can put an opponent's graveyard card onto *your* battlefield under
         // *your* control (Shark Shredder), and the overlay must read as you doing it, not
-        // as the opponent. For hand/library returns there is no control change, so
-        // controllerId == ownerId and behaviour is unchanged.
+        // as the opponent. controllerId only diverges from ownerId for a controller-override
+        // move onto the battlefield (see above); returns to hand/library never carry an
+        // override, so controllerId == ownerId there and behaviour is unchanged.
         val revealEvents = autoRevealForReturn(
             fromZone = currentZone.zoneType,
             toZone = effect.destination,
