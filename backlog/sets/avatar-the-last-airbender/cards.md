@@ -125,7 +125,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Dai Li Indoctrination
 - [x] Day of Black Sun
 - [x] Deadly Precision
-- [ ] Deserter's Disciple
+- [x] Deserter's Disciple
 - [ ] Destined Confrontation
 - [x] Diligent Zookeeper
 - [ ] Dragonfly Swarm

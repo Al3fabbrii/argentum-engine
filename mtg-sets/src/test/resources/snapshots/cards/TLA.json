@@ -2155,6 +2155,53 @@
     ]
 }
 
+// Deserter's Disciple
+{
+    "name": "Deserter's Disciple",
+    "manaCost": "{1}{R}",
+    "typeLine": "Creature — Human Rebel Ally",
+    "oracleText": "{T}: Another target creature you control with power 2 or less can't be blocked this turn.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "GrantKeyword",
+                    "keyword": "CANT_BE_BLOCKED",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "creature pow<=2 ctrl:you",
+                            "excludeSelf": true
+                        },
+                        "id": "target"
+                    }
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "131",
+        "artist": "HAIKEI",
+        "flavorText": "\"Follow me! I can get you outta here!\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/4/14f2ed5a-042b-4cce-82ad-cfb4bd511d98.jpg?1764120901"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Diligent Zookeeper
 {
     "name": "Diligent Zookeeper",
