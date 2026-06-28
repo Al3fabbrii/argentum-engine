@@ -4021,6 +4021,67 @@
     ]
 }
 
+// Joo Dee, One of Many
+{
+    "name": "Joo Dee, One of Many",
+    "manaCost": "{1}{B}",
+    "typeLine": "Creature — Human Advisor",
+    "oracleText": "{B}, {T}: Surveil 1. Create a token that's a copy of this creature, then sacrifice an artifact or creature. Activate only as a sorcery. (To surveil 1, look at the top card of your library. You may put it into your graveyard.)",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{B}"
+                            }
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Surveil",
+                            "count": 1
+                        },
+                        {
+                            "type": "CreateTokenCopyOfTarget",
+                            "target": "Self"
+                        },
+                        {
+                            "type": "ForceSacrifice",
+                            "filter": "artifact|creature",
+                            "target": "Controller"
+                        }
+                    ]
+                },
+                "timing": "SorcerySpeed"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "105",
+        "rarity": "UNCOMMON",
+        "artist": "Olena Richards",
+        "flavorText": "\"Hello! My name is Joo Dee. You're in Ba Sing Se now. Everyone is safe here.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/a/7ae1439f-a0c4-42c2-a4f3-8851defa981e.jpg?1764120729"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Kyoshi Village
 {
     "name": "Kyoshi Village",

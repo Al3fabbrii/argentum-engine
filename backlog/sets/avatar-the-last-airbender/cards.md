@@ -202,7 +202,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Jeong Jeong, the Deserter
 - [x] Jet's Brainwashing
 - [ ] Jet, Freedom Fighter
-- [ ] Joo Dee, One of Many
+- [x] Joo Dee, One of Many
 - [ ] June, Bounty Hunter
 - [ ] Katara, Bending Prodigy
 - [ ] Katara, Water Tribe's Hope
