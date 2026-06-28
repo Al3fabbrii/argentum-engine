@@ -143,7 +143,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Elemental Teachings
 - [ ] Ember Island Production
 - [ ] Energybending
-- [ ] Enter the Avatar State
+- [x] Enter the Avatar State
 - [ ] Epic Downfall
 - [ ] Fancy Footwork
 - [ ] Fatal Fissure
