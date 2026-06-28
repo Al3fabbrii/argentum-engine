@@ -130,7 +130,7 @@ class FlywayMigrationTest : FunSpec({
         }
     }
 
-    test("V4 migration adds game_replays and supports the history replay join").config(enabled = dockerAvailable) {
+    test("V5 migration adds game_replays and supports the history replay join").config(enabled = dockerAvailable) {
         val postgres = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgres:16-alpine"))
         postgres.start()
         try {
