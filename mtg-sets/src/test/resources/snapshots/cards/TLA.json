@@ -5770,6 +5770,121 @@
     ]
 }
 
+// Hei Bai, Spirit of Balance
+{
+    "name": "Hei Bai, Spirit of Balance",
+    "manaCost": "{2}{W/B}{W/B}",
+    "typeLine": "Legendary Creature — Bear Spirit",
+    "oracleText": "Whenever Hei Bai enters or attacks, you may sacrifice another creature or artifact. If you do, put two +1/+1 counters on Hei Bai.\nWhen Hei Bai leaves the battlefield, put its counters on target creature you control.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "SacrificeTarget",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "another creature or artifact"
+                                }
+                            },
+                            {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 2,
+                                "target": "Self"
+                            }
+                        ]
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature|artifact ctrl:you",
+                        "excludeSelf": true
+                    },
+                    "id": "another creature or artifact"
+                },
+                "descriptionOverride": "Whenever Hei Bai enters, you may sacrifice another creature or artifact. If you do, put two +1/+1 counters on Hei Bai."
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "SacrificeTarget",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "another creature or artifact"
+                                }
+                            },
+                            {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 2,
+                                "target": "Self"
+                            }
+                        ]
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature|artifact ctrl:you",
+                        "excludeSelf": true
+                    },
+                    "id": "another creature or artifact"
+                },
+                "descriptionOverride": "Whenever Hei Bai attacks, you may sacrifice another creature or artifact. If you do, put two +1/+1 counters on Hei Bai."
+            },
+            {
+                "id": "ability_3",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield"
+                },
+                "effect": "MoveAllLastKnownCounters",
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature ctrl:you"
+                    }
+                },
+                "descriptionOverride": "When Hei Bai leaves the battlefield, put its counters on target creature you control."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "225",
+        "rarity": "UNCOMMON",
+        "artist": "Tyler Smith",
+        "flavorText": "\"My friend gave me hope that the forest would grow back.\"\n—Aang",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/6/060d24e0-1567-41f1-ae8c-2d3b1834df3c.jpg?1764121643"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "BLACK"
+    ]
+}
+
 // Hermitic Herbalist
 {
     "name": "Hermitic Herbalist",

@@ -183,7 +183,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Hama, the Bloodbender
 - [x] Haru, Hidden Talent
 - [ ] Heartless Act
-- [ ] Hei Bai, Spirit of Balance
+- [x] Hei Bai, Spirit of Balance
 - [x] Hermitic Herbalist
 - [ ] Hog-Monkey
 - [ ] Honest Work
