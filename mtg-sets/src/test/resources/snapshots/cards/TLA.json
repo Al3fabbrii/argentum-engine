@@ -4763,3 +4763,62 @@
         "RED"
     ]
 }
+
+// Zuko's Conviction
+{
+    "name": "Zuko's Conviction",
+    "manaCost": "{B}",
+    "typeLine": "Instant",
+    "oracleText": "Kicker {4} (You may pay an additional {4} as you cast this spell.)\nReturn target creature card from your graveyard to your hand. If this spell was kicked, instead put that card onto the battlefield tapped.",
+    "keywordAbilities": [
+        {
+            "type": "Kicker",
+            "manaCost": "{4}"
+        }
+    ],
+    "script": {
+        "spellEffect": {
+            "type": "Gated",
+            "gate": {
+                "type": "Gate.WhenCondition",
+                "condition": "WasKicked"
+            },
+            "then": {
+                "type": "MoveToZone",
+                "target": {
+                    "type": "ContextTarget",
+                    "index": 0
+                },
+                "destination": "Battlefield",
+                "placement": "Tapped"
+            },
+            "otherwise": {
+                "type": "MoveToZone",
+                "target": {
+                    "type": "ContextTarget",
+                    "index": 0
+                },
+                "destination": "Hand"
+            }
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature own:you",
+                    "zone": "Graveyard"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "123",
+        "rarity": "UNCOMMON",
+        "artist": "Kieran Yanner",
+        "flavorText": "\"I've always had to struggle and fight, and that's made me strong.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/d/ad8933d6-cdc7-4d60-a78e-b43ffecfb136.jpg?1764120849"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}

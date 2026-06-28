@@ -348,7 +348,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Yuyan Archers
 - [ ] Zhao, Ruthless Admiral
 - [ ] Zhao, the Moon Slayer
-- [ ] Zuko's Conviction
+- [x] Zuko's Conviction
 - [ ] Zuko's Exile
 - [ ] Zuko, Conflicted
 - [ ] Zuko, Exiled Prince
