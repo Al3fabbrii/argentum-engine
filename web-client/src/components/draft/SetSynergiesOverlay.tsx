@@ -994,7 +994,7 @@ function ArchetypeCard({
         position: 'relative',
         borderRadius: 10,
         overflow: 'hidden',
-        minHeight: 120,
+        minHeight: 148,
         border: `1px solid ${hovered && clickable ? 'rgba(124, 58, 237, 0.65)' : borderColor}`,
         boxShadow: hovered
           ? '0 12px 28px rgba(0, 0, 0, 0.55)'
@@ -1055,7 +1055,7 @@ function ArchetypeCard({
         style={{
           position: 'relative',
           zIndex: 2,
-          minHeight: 120,
+          minHeight: 148,
           boxSizing: 'border-box',
           padding: '13px 16px',
           display: 'flex',
