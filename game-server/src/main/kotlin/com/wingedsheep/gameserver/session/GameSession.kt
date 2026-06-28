@@ -1397,6 +1397,24 @@ class GameSession(
     }
 
     /**
+     * Restore the compact-replay recording (setup + action log) after a server restart, so a game
+     * interrupted mid-play is still saved as a replay when it finishes. Null setup leaves the game
+     * unrecorded (a pre-feature game or an injected scenario).
+     */
+    internal fun restoreReplayRecording(
+        setup: com.wingedsheep.gameserver.replay.ReplaySetup?,
+        actions: List<GameAction>,
+        startedAtIso: String?,
+    ) {
+        synchronized(stateLock) {
+            replaySetup = setup
+            recordedActions.clear()
+            recordedActions.addAll(actions)
+            replayStartedAt = startedAtIso?.let { runCatching { Instant.parse(it) }.getOrNull() }
+        }
+    }
+
+    /**
      * Associate a player identity with this session (for reconnection after restore).
      */
     fun associatePlayer(playerSession: PlayerSession) {

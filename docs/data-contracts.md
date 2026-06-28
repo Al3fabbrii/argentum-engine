@@ -447,8 +447,11 @@ from a state-threaded counter (never a UUID), `ReplayReconstructor` rebuilds the
 deltas}` stream the viewer consumes. This is kilobytes per game instead of a masked snapshot + a
 per-frame delta + a full unmasked `GameState` per frame.
 
-Storage: an in-memory cache (`GameHistoryRepository`, last 100 games) for just-finished games, and
-a durable Postgres table (`game_replays`, gzip+base64 `CompactReplay`) when accounts are enabled.
+The in-progress recording (setup + action log) is part of the persisted `GameSession` snapshot
+(`PersistentGameSession`), so a game interrupted by a server restart is still saved as a replay when
+it later finishes. Storage: an in-memory cache (`GameHistoryRepository`, last 100 games) for
+just-finished games, and a durable Postgres table (`game_replays`, gzip+base64 `CompactReplay`) when
+accounts are enabled.
 `ReplayService` resolves a game id cache-first, then the store; all replay endpoints reconstruct on
 demand. Decision ids are minted afresh each run (they are not part of the deterministic state), so a
 recorded `SubmitDecision` is re-bound to the freshly created decision's id during reconstruction;
