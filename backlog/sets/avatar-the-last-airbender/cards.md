@@ -87,7 +87,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Avatar Destiny
 - [x] Avatar Enthusiasts
 - [ ] Avatar's Wrath
-- [ ] Azula Always Lies
+- [x] Azula Always Lies
 - [ ] Azula, Cunning Usurper
 - [ ] Azula, On the Hunt
 - [x] Ba Sing Se

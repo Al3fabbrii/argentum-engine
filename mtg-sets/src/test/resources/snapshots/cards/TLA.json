@@ -685,6 +685,80 @@
     ]
 }
 
+// Azula Always Lies
+{
+    "name": "Azula Always Lies",
+    "manaCost": "{1}{B}",
+    "typeLine": "Instant — Lesson",
+    "oracleText": "Choose one or both —\n• Target creature gets -1/-1 until end of turn.\n• Put a +1/+1 counter on target creature.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "ModifyStats",
+                        "powerModifier": {
+                            "type": "Fixed",
+                            "amount": -1
+                        },
+                        "toughnessModifier": {
+                            "type": "Fixed",
+                            "amount": -1
+                        },
+                        "target": {
+                            "type": "BoundVariable",
+                            "name": "target creature"
+                        }
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            },
+                            "id": "target creature"
+                        }
+                    ],
+                    "description": "Target creature gets -1/-1 until end of turn"
+                },
+                {
+                    "effect": {
+                        "type": "AddCounters",
+                        "counterType": "+1/+1",
+                        "count": 1,
+                        "target": {
+                            "type": "BoundVariable",
+                            "name": "target creature"
+                        }
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            },
+                            "id": "target creature"
+                        }
+                    ],
+                    "description": "Put a +1/+1 counter on target creature"
+                }
+            ],
+            "chooseCount": 2,
+            "minChooseCount": 1
+        }
+    },
+    "metadata": {
+        "collectorNumber": "84",
+        "artist": "Robin Har",
+        "flavorText": "Azula is a skilled and deadly warrior, but her true passion is emotional torment.",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/1/416b9207-a2af-44d1-9b87-4943f6e46d42.jpg?1764120582"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Ba Sing Se
 {
     "name": "Ba Sing Se",
