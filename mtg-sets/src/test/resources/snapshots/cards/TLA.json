@@ -3711,6 +3711,74 @@
     ]
 }
 
+// Iroh's Demonstration
+{
+    "name": "Iroh's Demonstration",
+    "manaCost": "{1}{R}",
+    "typeLine": "Sorcery — Lesson",
+    "oracleText": "Choose one —\n• Iroh's Demonstration deals 1 damage to each creature your opponents control.\n• Iroh's Demonstration deals 4 damage to target creature.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "ForEach",
+                        "space": {
+                            "type": "IterationSpace.Group",
+                            "filter": {
+                                "baseFilter": "creature ctrl:opponent"
+                            }
+                        },
+                        "body": {
+                            "type": "DealDamage",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "target": "Self"
+                        }
+                    },
+                    "description": "Iroh's Demonstration deals 1 damage to each creature your opponents control."
+                },
+                {
+                    "effect": {
+                        "type": "DealDamage",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 4
+                        },
+                        "target": {
+                            "type": "BoundVariable",
+                            "name": "target creature"
+                        }
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            },
+                            "id": "target creature"
+                        }
+                    ],
+                    "description": "Iroh's Demonstration deals 4 damage to target creature."
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "141",
+        "rarity": "UNCOMMON",
+        "artist": "Song Qijin",
+        "flavorText": "\"Did I ever tell you how I got the nickname 'The Dragon of the West?'\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/8/18d15fed-1f8f-4407-a221-a47ce75001a8.jpg?1764120967"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Jasmine Dragon Tea Shop
 {
     "name": "Jasmine Dragon Tea Shop",

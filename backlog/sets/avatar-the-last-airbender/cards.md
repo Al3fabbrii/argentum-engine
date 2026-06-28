@@ -192,7 +192,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Invasion Reinforcements
 - [ ] Invasion Submersible
 - [ ] Invasion Tactics
-- [ ] Iroh's Demonstration
+- [x] Iroh's Demonstration
 - [ ] Iroh, Grand Lotus
 - [ ] Iroh, Tea Master
 - [x] Island
