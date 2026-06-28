@@ -152,7 +152,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Fire Lord Zuko
 - [ ] Fire Nation Attacks
 - [ ] Fire Nation Cadets
-- [ ] Fire Nation Engineer
+- [x] Fire Nation Engineer
 - [ ] Fire Nation Palace
 - [ ] Fire Nation Raider
 - [ ] Fire Nation Warship

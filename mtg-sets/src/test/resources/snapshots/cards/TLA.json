@@ -3607,6 +3607,71 @@
     ]
 }
 
+// Fire Nation Engineer
+{
+    "name": "Fire Nation Engineer",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Human Artificer",
+    "oracleText": "Raid — At the beginning of your end step, if you attacked this turn, put a +1/+1 counter on another target creature or Vehicle you control.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "END"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "+1/+1",
+                    "count": 1,
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "another target creature or Vehicle you control"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature|Vehicle ctrl:you",
+                        "excludeSelf": true
+                    },
+                    "id": "another target creature or Vehicle you control"
+                },
+                "triggerCondition": {
+                    "type": "Compare",
+                    "left": {
+                        "type": "TurnTracking",
+                        "player": "You",
+                        "tracker": "PLAYER_ATTACKED"
+                    },
+                    "operator": "GTE",
+                    "right": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                },
+                "descriptionOverride": "Raid — At the beginning of your end step, if you attacked this turn, put a +1/+1 counter on another target creature or Vehicle you control."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "99",
+        "rarity": "UNCOMMON",
+        "artist": "Norikatsu Miyoshi",
+        "flavorText": "A lonely worker can find trouble making friends on an airship so massive.",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/d/5daba108-277d-46c8-ac35-7610f4786813.jpg?1764120684"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Fire Sages
 {
     "name": "Fire Sages",
