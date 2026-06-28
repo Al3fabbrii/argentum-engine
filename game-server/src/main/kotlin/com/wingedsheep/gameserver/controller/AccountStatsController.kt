@@ -8,6 +8,7 @@ import com.wingedsheep.gameserver.ranking.Elo
 import com.wingedsheep.gameserver.ranking.RankedMode
 import com.wingedsheep.gameserver.ranking.RatingTier
 import com.wingedsheep.gameserver.stats.CardStat
+import com.wingedsheep.gameserver.stats.GameDecks
 import com.wingedsheep.gameserver.stats.GameHistoryEntry
 import com.wingedsheep.gameserver.stats.HeadToHead
 import com.wingedsheep.gameserver.stats.StatBucket
@@ -15,7 +16,9 @@ import com.wingedsheep.gameserver.stats.StatsQueryService
 import com.wingedsheep.gameserver.stats.UserTournamentEntry
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -139,13 +142,47 @@ class AccountStatsController(
     fun opponents(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<HeadToHead> =
         statsQuery.headToHead(authSupport.requireUser(auth).userId)
 
+    /** One page of game history. The total count (for the pager) is returned in `X-Total-Count`. */
     @GetMapping("/me/history")
     fun history(
         @RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?,
         @RequestParam(defaultValue = "25") limit: Int,
         @RequestParam(defaultValue = "0") offset: Int,
-    ): List<GameHistoryEntry> =
-        statsQuery.recentGames(authSupport.requireUser(auth).userId, limit.coerceIn(1, 100), offset.coerceAtLeast(0))
+    ): ResponseEntity<List<GameHistoryEntry>> {
+        val userId = authSupport.requireUser(auth).userId
+        val page = statsQuery.recentGames(userId, limit.coerceIn(1, 100), offset.coerceAtLeast(0))
+        return ResponseEntity.ok()
+            .header("X-Total-Count", statsQuery.recentGamesCount(userId).toString())
+            .body(page)
+    }
+
+    /** Both seats' decklists for one of the user's finished games, for the recent-games deck viewer. */
+    @GetMapping("/me/history/{gameId}/decks")
+    fun gameDecks(
+        @RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?,
+        @PathVariable gameId: String,
+    ): ResponseEntity<GameDecks> {
+        val decks = statsQuery.decksForGame(authSupport.requireUser(auth).userId, gameId)
+        return if (decks == null) ResponseEntity.notFound().build() else ResponseEntity.ok(decks)
+    }
+
+    /** Creature subtypes the user plays most, by total copies across all recorded decks. */
+    @GetMapping("/me/creature-types")
+    fun creatureTypes(
+        @RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?,
+        @RequestParam(defaultValue = "15") limit: Int,
+    ): List<StatBucket> =
+        statsQuery.creatureTypeBreakdown(authSupport.requireUser(auth).userId, limit.coerceIn(1, 50))
+
+    /** Distribution of the user's cards across primary card types (Creature, Instant, Land, …). */
+    @GetMapping("/me/card-types")
+    fun cardTypes(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<StatBucket> =
+        statsQuery.cardTypeBreakdown(authSupport.requireUser(auth).userId)
+
+    /** Mana-value curve of the user's nonland cards (buckets 0..6 then "7+"). */
+    @GetMapping("/me/curve")
+    fun curve(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<StatBucket> =
+        statsQuery.manaCurve(authSupport.requireUser(auth).userId)
 
     @GetMapping("/me/cards")
     fun cards(
