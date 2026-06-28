@@ -2,7 +2,7 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 47 / 286  (16%)
+**Implemented:** 48 / 286  (17%)
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
 ## Mechanics needed to complete the set
@@ -319,7 +319,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] True Ancestry
 - [ ] Trusty Boomerang
 - [x] Tundra Tank
-- [ ] Turtle-Duck
+- [x] Turtle-Duck
 - [ ] Twin Blades
 - [ ] Ty Lee, Artful Acrobat
 - [ ] Ty Lee, Chi Blocker
