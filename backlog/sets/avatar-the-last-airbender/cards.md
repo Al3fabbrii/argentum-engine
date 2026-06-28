@@ -72,7 +72,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Aang, at the Crossroads
 - [ ] Aang, the Last Airbender
 - [ ] Abandon Attachments
-- [ ] Abandoned Air Temple
+- [x] Abandoned Air Temple
 - [ ] Accumulate Wisdom
 - [ ] Agna Qel'a
 - [ ] Air Nomad Legacy
