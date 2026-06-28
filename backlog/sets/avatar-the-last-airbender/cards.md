@@ -223,7 +223,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Master Pakku
 - [ ] Master Piandao
 - [x] Meditation Pools
-- [ ] Merchant of Many Hats
+- [x] Merchant of Many Hats
 - [ ] Messenger Hawk
 - [x] Meteor Sword
 - [x] Misty Palms Oasis

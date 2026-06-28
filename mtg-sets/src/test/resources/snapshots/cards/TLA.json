@@ -4724,6 +4724,47 @@
     ]
 }
 
+// Merchant of Many Hats
+{
+    "name": "Merchant of Many Hats",
+    "manaCost": "{1}{B}",
+    "typeLine": "Creature — Human Peasant Ally",
+    "oracleText": "{2}{B}: Return this card from your graveyard to your hand.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{2}{B}"
+                    }
+                },
+                "effect": {
+                    "type": "MoveToZone",
+                    "target": "Self",
+                    "destination": "Hand"
+                },
+                "activateFromZone": "Graveyard"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "110",
+        "artist": "Boell Oyino",
+        "flavorText": "Also known as Dock the ferryman, Xu the fishmonger, and Bushi the river cleaner, depending on what job needed to be done in Jang Hui village.",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/5/752ffa24-93b6-4b33-bf10-7222357ac472.jpg?1764120760"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Meteor Sword
 {
     "name": "Meteor Sword",
