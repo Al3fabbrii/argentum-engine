@@ -122,7 +122,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Curious Farm Animals
 - [x] Cycle of Renewal
 - [ ] Dai Li Agents
-- [ ] Dai Li Indoctrination
+- [x] Dai Li Indoctrination
 - [ ] Day of Black Sun
 - [x] Deadly Precision
 - [ ] Deserter's Disciple

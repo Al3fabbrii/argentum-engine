@@ -1844,6 +1844,172 @@
     ]
 }
 
+// Dai Li Indoctrination
+{
+    "name": "Dai Li Indoctrination",
+    "manaCost": "{1}{B}",
+    "typeLine": "Sorcery — Lesson",
+    "oracleText": "Choose one —\n• Target opponent reveals their hand. You choose a nonland permanent card from it. That player discards that card.\n• Earthbend 2. (Target land you control becomes a 0/0 creature with haste that's still a land. Put two +1/+1 counters on it. When it dies or is exiled, return it to the battlefield tapped.)",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "RevealHand",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "target opponent"
+                                }
+                            },
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Hand",
+                                    "player": {
+                                        "type": "ContextPlayer",
+                                        "index": 0
+                                    }
+                                },
+                                "storeAs": "opponentHand"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "opponentHand",
+                                "selection": {
+                                    "type": "ChooseExactly",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "filter": "nonland permanent",
+                                "storeSelected": "toDiscard",
+                                "prompt": "Choose a nonland permanent card to discard",
+                                "showAllCards": true,
+                                "alwaysPrompt": true
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "toDiscard",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Graveyard",
+                                    "player": {
+                                        "type": "ContextPlayer",
+                                        "index": 0
+                                    }
+                                },
+                                "moveType": "Discard"
+                            }
+                        ]
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetOpponent",
+                            "id": "target opponent"
+                        }
+                    ],
+                    "description": "Target opponent reveals their hand. You choose a nonland permanent card from it. That player discards that card"
+                },
+                {
+                    "effect": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "AnimateLand",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "target land you control"
+                                },
+                                "power": 0,
+                                "toughness": 0,
+                                "duration": "Permanent"
+                            },
+                            {
+                                "type": "GrantKeyword",
+                                "keyword": "HASTE",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "target land you control"
+                                },
+                                "duration": "Permanent"
+                            },
+                            {
+                                "type": "AddCounters",
+                                "counterType": "+1/+1",
+                                "count": 2,
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "target land you control"
+                                }
+                            },
+                            {
+                                "type": "GrantTriggeredAbility",
+                                "ability": {
+                                    "id": "ability_1",
+                                    "trigger": {
+                                        "type": "ZoneChangeEvent",
+                                        "from": "Battlefield"
+                                    },
+                                    "effect": {
+                                        "type": "Composite",
+                                        "effects": [
+                                            {
+                                                "type": "MoveToZone",
+                                                "target": "Self",
+                                                "destination": "Battlefield",
+                                                "placement": "Tapped",
+                                                "fromZone": "Graveyard"
+                                            },
+                                            {
+                                                "type": "MoveToZone",
+                                                "target": "Self",
+                                                "destination": "Battlefield",
+                                                "placement": "Tapped",
+                                                "fromZone": "Exile"
+                                            }
+                                        ]
+                                    },
+                                    "descriptionOverride": "When this dies or is exiled, return it to the battlefield tapped."
+                                },
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "target land you control"
+                                },
+                                "duration": "Permanent"
+                            }
+                        ]
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "land ctrl:you"
+                            },
+                            "id": "target land you control"
+                        }
+                    ],
+                    "description": "Earthbend 2"
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "93",
+        "artist": "Lius Lasahido",
+        "flavorText": "\"There is no war in Ba Sing Se.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/c/eca652b8-44f1-4bd9-b4bf-036eeead13aa.jpg?1764120643"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Deadly Precision
 {
     "name": "Deadly Precision",
