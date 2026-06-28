@@ -311,7 +311,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] The Walls of Ba Sing Se
 - [x] Tiger-Dillo
 - [x] Tiger-Seal
-- [ ] Tolls of War
+- [x] Tolls of War
 - [ ] Toph, Hardheaded Teacher
 - [ ] Toph, the Blind Bandit
 - [ ] Toph, the First Metalbender
