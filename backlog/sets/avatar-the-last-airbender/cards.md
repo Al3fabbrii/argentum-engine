@@ -179,7 +179,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Gran-Gran
 - [x] Great Divide Guide
 - [x] Guru Pathik
-- [ ] Hakoda, Selfless Commander
+- [x] Hakoda, Selfless Commander
 - [ ] Hama, the Bloodbender
 - [x] Haru, Hidden Talent
 - [ ] Heartless Act
