@@ -851,6 +851,77 @@
     ]
 }
 
+// Boomerang Basics
+{
+    "name": "Boomerang Basics",
+    "manaCost": "{U}",
+    "typeLine": "Sorcery — Lesson",
+    "oracleText": "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card.",
+    "script": {
+        "spellEffect": {
+            "type": "Gated",
+            "gate": {
+                "type": "Gate.WhenCondition",
+                "condition": {
+                    "type": "EntityMatches",
+                    "entity": {
+                        "type": "ContextTarget",
+                        "index": 0
+                    },
+                    "filter": "nonland permanent ctrl:you"
+                }
+            },
+            "then": {
+                "type": "Composite",
+                "effects": [
+                    {
+                        "type": "MoveToZone",
+                        "target": {
+                            "type": "BoundVariable",
+                            "name": "target nonland permanent"
+                        },
+                        "destination": "Hand"
+                    },
+                    {
+                        "type": "DrawCards",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 1
+                        }
+                    }
+                ]
+            },
+            "otherwise": {
+                "type": "MoveToZone",
+                "target": {
+                    "type": "BoundVariable",
+                    "name": "target nonland permanent"
+                },
+                "destination": "Hand"
+            }
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "nonland permanent"
+                },
+                "id": "target nonland permanent"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "46",
+        "rarity": "UNCOMMON",
+        "artist": "Tubaki Halsame",
+        "flavorText": "\"All right buddy, don't fail me now!\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/7/17ab958a-abc6-472e-ad6a-97c731d89c74.jpg?1764120201"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Cat-Gator
 {
     "name": "Cat-Gator",
