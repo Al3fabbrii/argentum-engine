@@ -234,7 +234,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] North Pole Gates
 - [ ] North Pole Patrol
 - [x] Northern Air Temple
-- [ ] Obsessive Pursuit
+- [x] Obsessive Pursuit
 - [x] Octopus Form
 - [x] Omashu City
 - [ ] Origin of Metalbending

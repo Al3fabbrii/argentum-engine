@@ -5248,6 +5248,133 @@
     ]
 }
 
+// Obsessive Pursuit
+{
+    "name": "Obsessive Pursuit",
+    "manaCost": "{1}{B}",
+    "typeLine": "Enchantment",
+    "oracleText": "When this enchantment enters and at the beginning of your upkeep, you lose 1 life and create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nWhenever you attack, put X +1/+1 counters on target attacking creature, where X is the number of permanents you've sacrificed this turn. If X is three or more, that creature gains lifelink until end of turn.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "LoseLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "target": "Controller"
+                        },
+                        {
+                            "type": "CreatePredefinedToken",
+                            "tokenType": "Clue"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "UPKEEP"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "LoseLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "target": "Controller"
+                        },
+                        {
+                            "type": "CreatePredefinedToken",
+                            "tokenType": "Clue"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "ability_3",
+                "trigger": "YouAttackEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddDynamicCounters",
+                            "counterType": "+1/+1",
+                            "amount": {
+                                "type": "TurnTracking",
+                                "player": "You",
+                                "tracker": "PERMANENTS_SACRIFICED"
+                            },
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "attacking creature"
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "Compare",
+                                    "left": {
+                                        "type": "TurnTracking",
+                                        "player": "You",
+                                        "tracker": "PERMANENTS_SACRIFICED"
+                                    },
+                                    "operator": "GTE",
+                                    "right": {
+                                        "type": "Fixed",
+                                        "amount": 3
+                                    }
+                                }
+                            },
+                            "then": {
+                                "type": "GrantKeyword",
+                                "keyword": "LIFELINK",
+                                "target": {
+                                    "type": "BoundVariable",
+                                    "name": "attacking creature"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature attacking"
+                    },
+                    "id": "attacking creature"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "112",
+        "rarity": "RARE",
+        "artist": "Ichiko Milk Tei",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/8/e837e29c-d241-43c8-8f45-05056e082b60.jpg?1764120772"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Octopus Form
 {
     "name": "Octopus Form",
