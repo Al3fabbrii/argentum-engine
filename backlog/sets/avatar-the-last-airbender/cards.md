@@ -112,7 +112,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Cat-Gator
 - [x] Cat-Owl
 - [ ] Combustion Man
-- [ ] Combustion Technique
+- [x] Combustion Technique
 - [ ] Compassionate Healer
 - [x] Corrupt Court Official
 - [ ] Crashing Wave

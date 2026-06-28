@@ -1545,6 +1545,67 @@
     ]
 }
 
+// Combustion Technique
+{
+    "name": "Combustion Technique",
+    "manaCost": "{1}{R}",
+    "typeLine": "Instant — Lesson",
+    "oracleText": "Combustion Technique deals damage equal to 2 plus the number of Lesson cards in your graveyard to target creature. If that creature would die this turn, exile it instead.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Add",
+                        "left": {
+                            "type": "Fixed",
+                            "amount": 2
+                        },
+                        "right": {
+                            "type": "Count",
+                            "player": "You",
+                            "zone": "Graveyard",
+                            "filter": "Lesson"
+                        }
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature"
+                    }
+                },
+                {
+                    "type": "MarkExileOnDeath",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature"
+                },
+                "id": "target creature"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "128",
+        "rarity": "UNCOMMON",
+        "artist": "Devin Elle Kurtz",
+        "flavorText": "\"Sokka, watch out! It's Sparky-Sparky Boom Man!\"\n—Aang",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/d/fdcca576-2ef2-44cc-9944-a92bd146444a.jpg?1774088518"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Curious Farm Animals
 {
     "name": "Curious Farm Animals",
