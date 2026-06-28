@@ -5991,6 +5991,107 @@
     ]
 }
 
+// Price of Freedom
+{
+    "name": "Price of Freedom",
+    "manaCost": "{1}{R}",
+    "typeLine": "Sorcery — Lesson",
+    "oracleText": "Destroy target artifact or land an opponent controls. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.\nDraw a card.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "ContextTarget",
+                        "index": 0
+                    },
+                    "destination": "Graveyard",
+                    "byDestruction": true
+                },
+                {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Library",
+                                    "player": {
+                                        "type": "ControllerOf",
+                                        "targetDescription": "target"
+                                    },
+                                    "filter": "basicland"
+                                },
+                                "storeAs": "searchable"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "searchable",
+                                "selection": {
+                                    "type": "ChooseUpTo",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "found"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "found",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Battlefield",
+                                    "player": {
+                                        "type": "ControllerOf",
+                                        "targetDescription": "target"
+                                    },
+                                    "placement": "Tapped"
+                                }
+                            },
+                            {
+                                "type": "ShuffleLibrary",
+                                "target": "TargetController"
+                            }
+                        ]
+                    },
+                    "decisionMaker": "TargetController"
+                },
+                {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "artifact|land ctrl:opponent"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "149",
+        "rarity": "UNCOMMON",
+        "artist": "Kotakan",
+        "flavorText": "\"We're going to win a great victory against the Fire Nation today.\"\n—Jet",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/f/9fbe94e9-a71d-4a31-9210-c599abe08e3f.jpg?1764121025"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Realm of Koh
 {
     "name": "Realm of Koh",

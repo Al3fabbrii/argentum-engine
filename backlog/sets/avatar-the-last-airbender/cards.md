@@ -250,7 +250,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Planetarium of Wan Shi Tong
 - [x] Platypus-Bear
 - [x] Pretending Poxbearers
-- [ ] Price of Freedom
+- [x] Price of Freedom
 - [ ] Professor Zei, Anthropologist
 - [ ] Rabaroo Troop
 - [ ] Ran and Shaw
