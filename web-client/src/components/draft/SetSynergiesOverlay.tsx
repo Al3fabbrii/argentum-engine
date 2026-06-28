@@ -534,6 +534,84 @@ const SET_SYNERGIES: Record<string, SetSynergies> = {
       },
     ],
   },
+  STX: {
+    setCode: 'STX',
+    setName: 'Strixhaven: School of Mages',
+    archetypes: [
+      {
+        name: 'Silverquill',
+        colors: ['W', 'B'],
+        keyCard: 'Silverquill Pledgemage',
+        description: 'Build a wide board of Inkling tokens, then pile on +1/+1 counters and push through with evasion and lifegain. An aggressive counters-and-tokens deck that closes the game fast.',
+      },
+      {
+        name: 'Prismari',
+        colors: ['U', 'R'],
+        keyCard: 'Prismari Pledgemage',
+        description: 'Cast a high volume of instants and sorceries to trigger magecraft, churning out Treasure and big Elemental payoffs. A spell-slinging tempo deck that snowballs with every cast.',
+      },
+      {
+        name: 'Witherbloom',
+        colors: ['B', 'G'],
+        keyCard: 'Witherbloom Pledgemage',
+        description: 'Drain the opponent with Pests and lifeloss payoffs, sacrificing tokens for value while recurring threats from the graveyard. A grindy attrition deck that bleeds the table dry.',
+      },
+      {
+        name: 'Lorehold',
+        colors: ['R', 'W'],
+        keyCard: 'Lorehold Pledgemage',
+        description: 'Recur instants and sorceries from your graveyard and reward casting historic spells, turning Spirit tokens and value loops into relentless pressure. A spells-matter midrange deck.',
+      },
+      {
+        name: 'Quandrix',
+        colors: ['G', 'U'],
+        keyCard: 'Quandrix Pledgemage',
+        description: 'Ramp into extra mana and pile +1/+1 counters onto Fractal tokens, scaling your board with the size of your mana. A go-big ramp-and-counters deck that overwhelms in the late game.',
+      },
+    ],
+  },
+  TMT: {
+    setCode: 'TMT',
+    setName: 'Teenage Mutant Ninja Turtles',
+    archetypes: [
+      {
+        name: 'Blink Tempo',
+        colors: ['W', 'U'],
+        keyCard: 'Don & Leo, Problem Solvers',
+        description: 'Bounce and blink your artifacts and creatures to re-trigger their enter-the-battlefield abilities, grinding out value while evasive Turtles and Robots seize the tempo. A patient value-control deck.',
+      },
+      {
+        name: 'Mill Control',
+        colors: ['U', 'B'],
+        keyCard: 'Krang & Shredder',
+        description: "Mill your opponents and steal their best cards, leaning on removal and evasion to control the game. A grindy control deck that wins by turning the opponent's own library against them.",
+      },
+      {
+        name: 'Graveyard Value',
+        colors: ['B', 'G'],
+        keyCard: 'The Last Ronin',
+        description: 'Fill your graveyard, then reanimate fallen creatures and pile on +1/+1 counters. A grindy recursion deck that out-attritions the table and simply refuses to stay dead.',
+      },
+      {
+        name: 'Mutant Beatdown',
+        colors: ['R', 'G'],
+        keyCard: 'Raph & Mikey, Troublemakers',
+        description: 'Deploy hasty, trampling threats and flood the board with 2/2 Mutant tokens, then swing with overwhelming force. A fast midrange-aggro deck that wins through raw board presence.',
+      },
+      {
+        name: 'Alliance Aggro',
+        colors: ['R', 'W'],
+        keyCard: 'Raph & Leo, Sibling Rivals',
+        description: 'Go wide so every creature that enters triggers Alliance, then take extra combat phases to swing again and again. An aggressive go-wide deck built on relentless attacks.',
+      },
+      {
+        name: 'Mutant Ramp',
+        colors: ['G', 'U'],
+        keyCard: 'Mikey & Don, Party Planners',
+        description: 'Ramp and dig to cast Mutant, Ninja, and Turtle creatures from the top of your library, each entering with a bonus +1/+1 counter. A creature-type value deck that snowballs card advantage.',
+      },
+    ],
+  },
 }
 
 /**
@@ -1110,6 +1188,10 @@ function ArchetypeCard({
                 display: 'flex',
                 gap: 8,
                 alignItems: 'center',
+                backgroundColor: 'rgba(6, 6, 10, 0.62)',
+                borderRadius: 6,
+                padding: '2px 8px',
+                backdropFilter: 'blur(3px)',
                 textShadow: '0 1px 2px rgba(0, 0, 0, 0.95)',
               }}
             >
