@@ -9344,6 +9344,59 @@
     ]
 }
 
+// The Spirit Oasis
+{
+    "name": "The Spirit Oasis",
+    "manaCost": "{2}{U}",
+    "typeLine": "Legendary Enchantment — Shrine",
+    "oracleText": "When The Spirit Oasis enters, draw a card for each Shrine you control.\nWhenever another Shrine you control enters, draw a card.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "AggregateBattlefield",
+                        "player": "You",
+                        "filter": "Shrine"
+                    }
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "filter": "Shrine ctrl:you",
+                    "to": "Battlefield"
+                },
+                "binding": "OTHER",
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "72",
+        "rarity": "UNCOMMON",
+        "artist": "Slawek Fedorczuk",
+        "flavorText": "\"It's the center of all spiritual energy in our land.\"\n—Princess Yue",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/a/3a1b1329-531c-47ed-9802-c505501f8fd9.jpg?1764120455"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // The Walls of Ba Sing Se
 {
     "name": "The Walls of Ba Sing Se",

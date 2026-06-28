@@ -306,7 +306,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] The Lion-Turtle
 - [x] The Mechanist, Aerial Artisan
 - [ ] The Rise of Sozin
-- [ ] The Spirit Oasis
+- [x] The Spirit Oasis
 - [ ] The Unagi of Kyoshi Island
 - [x] The Walls of Ba Sing Se
 - [x] Tiger-Dillo
