@@ -53,6 +53,18 @@ export function ProfilePage() {
   const [nameDraft, setNameDraft] = useState('')
   const [nameError, setNameError] = useState<string | null>(null)
   const [savingName, setSavingName] = useState(false)
+  const [copiedReplay, setCopiedReplay] = useState<string | null>(null)
+
+  const shareReplay = (gameId: string) => {
+    const url = `${window.location.origin}/replay/${gameId}`
+    void navigator.clipboard.writeText(url).then(
+      () => {
+        setCopiedReplay(gameId)
+        setTimeout(() => setCopiedReplay((c) => (c === gameId ? null : c)), 2000)
+      },
+      () => window.prompt('Copy this replay link', url),
+    )
+  }
 
   useEffect(() => {
     if (status === 'idle') void init()
@@ -238,15 +250,29 @@ export function ProfilePage() {
 
           {history.length > 0 && (
             <Section title="Recent games">
-              <SimpleTable head={['Date', 'Mode', 'Colors', 'Opponent', 'Result']}>
+              <SimpleTable head={['Date', 'Mode', 'Colors', 'Opponent', 'Result', 'Replay']}>
                 {history.map((g, i) => (
-                  <tr key={`${g.endedAt}-${i}`}>
+                  <tr key={`${g.gameId}-${i}`}>
                     <td style={styles.td}>{g.endedAt.slice(0, 10)}</td>
                     <td style={styles.td}>{prettyMode(g.gameMode)}</td>
                     <td style={styles.td}>{g.colors ? colorLabel(g.colors) : '—'}</td>
                     <td style={styles.td}>{g.opponents ?? '—'}</td>
                     <td style={{ ...styles.tdNum, color: g.won ? '#5bd16e' : '#e15b6e' }}>
                       {g.won ? 'Win' : 'Loss'}
+                    </td>
+                    <td style={styles.tdNum}>
+                      {g.hasReplay ? (
+                        <span style={{ display: 'inline-flex', gap: 10, justifyContent: 'flex-end' }}>
+                          <button type="button" style={styles.link} onClick={() => navigate(`/replay/${g.gameId}`)}>
+                            Watch
+                          </button>
+                          <button type="button" style={styles.link} onClick={() => shareReplay(g.gameId)}>
+                            {copiedReplay === g.gameId ? 'Copied!' : 'Share'}
+                          </button>
+                        </span>
+                      ) : (
+                        '—'
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -220,6 +220,9 @@ export interface GameHistoryEntry {
   readonly colors: string | null
   readonly opponents: string | null
   readonly won: boolean
+  readonly gameId: string
+  /** True when a compact replay was stored for this game and can be watched/shared. */
+  readonly hasReplay: boolean
 }
 
 export interface CardStat {

@@ -32,3 +32,7 @@ interface MatchResultRepository : CrudRepository<MatchResultRow, Long> {
 }
 
 interface TournamentRepository : CrudRepository<TournamentRow, Long>
+
+interface GameReplayRepository : CrudRepository<GameReplayRow, Long> {
+    fun findByGameId(gameId: String): GameReplayRow?
+}

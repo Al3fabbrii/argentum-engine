@@ -129,4 +129,54 @@ class FlywayMigrationTest : FunSpec({
             postgres.stop()
         }
     }
+
+    test("V4 migration adds game_replays and supports the history replay join").config(enabled = dockerAvailable) {
+        val postgres = PostgreSQLContainer<Nothing>(DockerImageName.parse("postgres:16-alpine"))
+        postgres.start()
+        try {
+            Flyway.configure()
+                .dataSource(postgres.jdbcUrl, postgres.username, postgres.password)
+                .locations("classpath:db/migration")
+                .load()
+                .migrate()
+
+            DriverManager.getConnection(postgres.jdbcUrl, postgres.username, postgres.password).use { conn ->
+                conn.createStatement().use { st ->
+                    st.executeQuery(
+                        "SELECT count(*) FROM information_schema.tables WHERE table_name = 'game_replays'"
+                    ).use { rs -> rs.next(); rs.getInt(1) shouldBe 1 }
+
+                    // One user with two games; only one has a stored replay.
+                    st.execute("INSERT INTO users(id, email, display_name) VALUES (1, 'a@test.com', 'Alice')")
+                    st.execute("INSERT INTO match_results(id, game_id) VALUES (10, 'g-with-replay')")
+                    st.execute("INSERT INTO match_results(id, game_id) VALUES (11, 'g-no-replay')")
+                    st.execute("INSERT INTO match_participants(match_id, user_id, player_name, won) VALUES (10, 1, 'Alice', true)")
+                    st.execute("INSERT INTO match_participants(match_id, user_id, player_name, won) VALUES (11, 1, 'Alice', false)")
+                    st.execute("INSERT INTO game_replays(game_id, data) VALUES ('g-with-replay', 'GZIPPED')")
+
+                    // game_id is unique (upsert depends on it).
+                    runCatching {
+                        st.execute("INSERT INTO game_replays(game_id, data) VALUES ('g-with-replay', 'DUP')")
+                    }.isFailure shouldBe true
+
+                    // The history LEFT JOIN flags exactly the game that has a stored replay.
+                    st.executeQuery(
+                        """
+                        SELECT r.game_id, (gr.id IS NOT NULL) AS has_replay
+                        FROM match_participants me
+                        JOIN match_results r ON r.id = me.match_id
+                        LEFT JOIN game_replays gr ON gr.game_id = r.game_id
+                        WHERE me.user_id = 1
+                        ORDER BY r.game_id
+                        """.trimIndent()
+                    ).use { rs ->
+                        rs.next(); rs.getString("game_id") shouldBe "g-no-replay"; rs.getBoolean("has_replay") shouldBe false
+                        rs.next(); rs.getString("game_id") shouldBe "g-with-replay"; rs.getBoolean("has_replay") shouldBe true
+                    }
+                }
+            }
+        } finally {
+            postgres.stop()
+        }
+    }
 })
