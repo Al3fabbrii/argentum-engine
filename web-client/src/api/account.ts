@@ -322,6 +322,36 @@ export const fetchCreatureTypes = (limit = 15) =>
 export const fetchCardTypes = () => getStats<StatBucket[]>('/me/card-types')
 export const fetchManaCurve = () => getStats<StatBucket[]>('/me/curve')
 
+/** Everything a read-only public profile shows for another player, bundled into one response. */
+export interface PublicProfile {
+  readonly userId: string
+  readonly displayName: string
+  readonly stats: AccountStats
+  readonly ratings: RatingEntry[]
+  readonly ratingHistory: RatingPoint[]
+  readonly colors: StatBucket[]
+  readonly cardTypes: StatBucket[]
+  readonly curve: StatBucket[]
+  readonly creatureTypes: StatBucket[]
+  readonly modes: StatBucket[]
+  readonly sets: StatBucket[]
+  readonly topCards: CardStat[]
+  readonly opponents: HeadToHead[]
+  readonly tournaments: UserTournamentEntry[]
+  readonly recentGames: GameHistoryEntry[]
+}
+
+/** Thrown when a requested public profile doesn't exist. */
+export class ProfileNotFoundError extends Error {}
+
+/** Fetch another player's public, read-only profile by user id. */
+export async function fetchPublicProfile(userId: string): Promise<PublicProfile> {
+  const res = await fetch(`/api/stats/users/${encodeURIComponent(userId)}`, { headers: authHeaders() })
+  if (res.status === 404) throw new ProfileNotFoundError()
+  if (!res.ok) throw new Error(`Failed to load profile (${res.status})`)
+  return (await res.json()) as PublicProfile
+}
+
 /** One page of recent games, with the total count read from `X-Total-Count` for the pager. */
 export async function fetchHistoryPage(limit: number, offset: number): Promise<HistoryPage> {
   const res = await fetch(`/api/stats/me/history?limit=${limit}&offset=${offset}`, {

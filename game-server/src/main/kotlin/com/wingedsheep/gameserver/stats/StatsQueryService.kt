@@ -427,7 +427,12 @@ class StatsQueryService(
         return order.firstOrNull { it in types }?.displayName ?: "Other"
     }
 
-    /** The user's most-played cards across all their recorded decks. */
+    /**
+     * The user's most-played cards across all their recorded decks. Basic lands are excluded — every
+     * deck runs a pile of them, so they'd otherwise crowd out the cards that actually characterize how
+     * the player builds. Filtering is done after the group-by (the registry knows which names are
+     * basics), so [limit] applies to the non-basic results.
+     */
     fun topCardsForUser(userId: UUID, limit: Int): List<CardStat> = jdbc.query(
         """
         SELECT c.card_name AS card_name, sum(c.copies) AS copies, count(*) AS decks
@@ -436,11 +441,10 @@ class StatsQueryService(
         WHERE p.user_id = ?
         GROUP BY c.card_name
         ORDER BY copies DESC, decks DESC
-        LIMIT ?
         """.trimIndent(),
         { rs, _ -> CardStat(rs.getString("card_name"), rs.getLong("copies"), rs.getLong("decks")) },
-        userId, limit,
-    )
+        userId,
+    ).filterNot { lookupCard(it.cardName)?.typeLine?.isBasicLand == true }.take(limit)
 
     /** The user's tournament finishes, newest first. */
     fun tournamentHistory(userId: UUID, limit: Int): List<UserTournamentEntry> = jdbc.query(

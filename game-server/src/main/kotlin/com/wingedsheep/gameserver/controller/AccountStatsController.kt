@@ -4,6 +4,7 @@ import com.wingedsheep.gameserver.auth.AuthSupport
 import com.wingedsheep.gameserver.persistence.MatchResultRepository
 import com.wingedsheep.gameserver.persistence.RatingHistoryRepository
 import com.wingedsheep.gameserver.persistence.UserRatingRepository
+import com.wingedsheep.gameserver.persistence.UserRepository
 import com.wingedsheep.gameserver.ranking.Elo
 import com.wingedsheep.gameserver.ranking.RankedMode
 import com.wingedsheep.gameserver.ranking.RatingTier
@@ -37,6 +38,7 @@ class AccountStatsController(
     private val statsQuery: StatsQueryService,
     private val userRatings: UserRatingRepository,
     private val ratingHistory: RatingHistoryRepository,
+    private val users: UserRepository,
     private val authSupport: AuthSupport,
 ) {
     data class StatsDto(val games: Long, val wins: Long, val losses: Long, val winRate: Double)
@@ -63,10 +65,8 @@ class AccountStatsController(
         val result: String,
     )
 
-    /** All three ranked queues for the signed-in user, unplayed ones shown at the starting rating. */
-    @GetMapping("/me/ratings")
-    fun ratings(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<RatingDto> {
-        val userId = authSupport.requireUser(auth).userId
+    /** Ranked standings for [userId], every queue present (unplayed ones at the starting rating). */
+    private fun ratingsFor(userId: java.util.UUID): List<RatingDto> {
         val byMode = userRatings.findByUserId(userId).associateBy { it.mode }
         return RankedMode.entries.map { mode ->
             val row = byMode[mode.name]
@@ -87,6 +87,37 @@ class AccountStatsController(
         }
     }
 
+    /** Rating-over-time points for [userId] across the given [modes], oldest first. */
+    private fun ratingHistoryFor(userId: java.util.UUID, modes: List<RankedMode>): List<RatingPointDto> =
+        modes.flatMap { m ->
+            ratingHistory.findByUserIdAndModeOrderByCreatedAtAsc(userId, m.name).map { row ->
+                RatingPointDto(
+                    mode = m.name,
+                    endedAt = row.createdAt.toString(),
+                    ratingAfter = Math.round(row.ratingAfter).toInt(),
+                    delta = Math.round(row.delta).toInt(),
+                    result = row.result,
+                )
+            }
+        }
+
+    /** Overall win/loss record for [userId]. */
+    private fun statsFor(userId: java.util.UUID): StatsDto {
+        val games = matchResults.countGamesForUser(userId)
+        val wins = matchResults.countWinsForUser(userId)
+        return StatsDto(
+            games = games,
+            wins = wins,
+            losses = games - wins,
+            winRate = if (games > 0) wins.toDouble() / games else 0.0,
+        )
+    }
+
+    /** All three ranked queues for the signed-in user, unplayed ones shown at the starting rating. */
+    @GetMapping("/me/ratings")
+    fun ratings(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<RatingDto> =
+        ratingsFor(authSupport.requireUser(auth).userId)
+
     /**
      * Rating-over-time points for the chart. Without [mode], returns every mode's history (the client
      * draws one line per mode); with [mode], just that queue. Oldest first.
@@ -100,31 +131,12 @@ class AccountStatsController(
         val modes = mode
             ?.let { listOfNotNull(runCatching { RankedMode.valueOf(it.uppercase()) }.getOrNull()) }
             ?: RankedMode.entries
-        return modes.flatMap { m ->
-            ratingHistory.findByUserIdAndModeOrderByCreatedAtAsc(userId, m.name).map { row ->
-                RatingPointDto(
-                    mode = m.name,
-                    endedAt = row.createdAt.toString(),
-                    ratingAfter = Math.round(row.ratingAfter).toInt(),
-                    delta = Math.round(row.delta).toInt(),
-                    result = row.result,
-                )
-            }
-        }
+        return ratingHistoryFor(userId, modes)
     }
 
     @GetMapping("/me")
-    fun me(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): StatsDto {
-        val userId = authSupport.requireUser(auth).userId
-        val games = matchResults.countGamesForUser(userId)
-        val wins = matchResults.countWinsForUser(userId)
-        return StatsDto(
-            games = games,
-            wins = wins,
-            losses = games - wins,
-            winRate = if (games > 0) wins.toDouble() / games else 0.0,
-        )
-    }
+    fun me(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): StatsDto =
+        statsFor(authSupport.requireUser(auth).userId)
 
     @GetMapping("/me/colors")
     fun colors(@RequestHeader(HttpHeaders.AUTHORIZATION, required = false) auth: String?): List<StatBucket> =
@@ -197,4 +209,55 @@ class AccountStatsController(
         @RequestParam(defaultValue = "25") limit: Int,
     ): List<UserTournamentEntry> =
         statsQuery.tournamentHistory(authSupport.requireUser(auth).userId, limit.coerceIn(1, 100))
+
+    // ---- Public profiles --------------------------------------------------------------------
+
+    /** Everything a read-only public profile shows for another player, in one request. */
+    data class PublicProfileDto(
+        val userId: String,
+        val displayName: String,
+        val stats: StatsDto,
+        val ratings: List<RatingDto>,
+        val ratingHistory: List<RatingPointDto>,
+        val colors: List<StatBucket>,
+        val cardTypes: List<StatBucket>,
+        val curve: List<StatBucket>,
+        val creatureTypes: List<StatBucket>,
+        val modes: List<StatBucket>,
+        val sets: List<StatBucket>,
+        val topCards: List<CardStat>,
+        val opponents: List<HeadToHead>,
+        val tournaments: List<UserTournamentEntry>,
+        val recentGames: List<GameHistoryEntry>,
+    )
+
+    /**
+     * A public, read-only profile for any account, bundled into one response so a visitor's page is a
+     * single round-trip. No auth required — profiles are public — but the account must exist (404
+     * otherwise). The deck viewer stays `/me`-only, so this never exposes another player's decklists.
+     */
+    @GetMapping("/users/{userId}")
+    fun publicProfile(@PathVariable userId: java.util.UUID): ResponseEntity<PublicProfileDto> {
+        val user = users.findById(userId).orElse(null) ?: return ResponseEntity.notFound().build()
+        val id = user.id ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(
+            PublicProfileDto(
+                userId = id.toString(),
+                displayName = user.displayName,
+                stats = statsFor(id),
+                ratings = ratingsFor(id),
+                ratingHistory = ratingHistoryFor(id, RankedMode.entries),
+                colors = statsQuery.colorBreakdown(id),
+                cardTypes = statsQuery.cardTypeBreakdown(id),
+                curve = statsQuery.manaCurve(id),
+                creatureTypes = statsQuery.creatureTypeBreakdown(id, 12),
+                modes = statsQuery.modeBreakdown(id),
+                sets = statsQuery.setBreakdown(id),
+                topCards = statsQuery.topCardsForUser(id, 24),
+                opponents = statsQuery.headToHead(id),
+                tournaments = statsQuery.tournamentHistory(id, 15),
+                recentGames = statsQuery.recentGames(id, 10, 0),
+            ),
+        )
+    }
 }

@@ -44,6 +44,9 @@ const FriendsPage = lazy(() =>
 const StatsPage = lazy(() =>
   import('./pages/StatsPage').then(({ StatsPage }) => ({ default: StatsPage }))
 )
+const PublicProfilePage = lazy(() =>
+  import('./pages/PublicProfilePage').then(({ PublicProfilePage }) => ({ default: PublicProfilePage }))
+)
 
 initAnalytics()
 
@@ -68,6 +71,7 @@ createRoot(rootElement).render(
           <Route path="/login/verify" element={<LoginVerifyPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/u/:userId" element={<PublicProfilePage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/llm-tournament" element={<LlmTournamentPage />} />
           <Route path="/llm-tournament/:id" element={<LlmTournamentPage />} />
