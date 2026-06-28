@@ -2596,6 +2596,80 @@
     ]
 }
 
+// Earth Kingdom Jailer
+{
+    "name": "Earth Kingdom Jailer",
+    "manaCost": "{2}{W}",
+    "typeLine": "Creature — Human Soldier Ally",
+    "oracleText": "When this creature enters, exile up to one target artifact, creature, or enchantment an opponent controls with mana value 3 or greater until this creature leaves the battlefield.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "ExileUntilLeaves",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "up to one target artifact, creature, or enchantment an opponent controls with mana value 3 or greater"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "artifact|creature|enchantment mv>=3 ctrl:opponent"
+                    },
+                    "id": "up to one target artifact, creature, or enchantment an opponent controls with mana value 3 or greater"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": "FromLinkedExile",
+                            "storeAs": "linked_return"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "linked_return",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Battlefield"
+                            },
+                            "underOwnersControl": true
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "16",
+        "rarity": "UNCOMMON",
+        "artist": "Danciao",
+        "flavorText": "\"Go ahead and run. My ostrich-horse loves a good chase.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/2/9207362c-3605-4794-803f-ad1d0175fcca.jpg?1764119978"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Earth Kingdom Protectors
 {
     "name": "Earth Kingdom Protectors",

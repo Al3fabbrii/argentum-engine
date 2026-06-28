@@ -131,7 +131,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Dragonfly Swarm
 - [x] Earth King's Lieutenant
 - [ ] Earth Kingdom General
-- [ ] Earth Kingdom Jailer
+- [x] Earth Kingdom Jailer
 - [x] Earth Kingdom Protectors
 - [ ] Earth Kingdom Soldier
 - [ ] Earth Rumble
