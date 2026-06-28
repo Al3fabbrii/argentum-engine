@@ -220,7 +220,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Lost Days
 - [ ] Mai, Jaded Edge
 - [x] Mai, Scornful Striker
-- [ ] Master Pakku
+- [x] Master Pakku
 - [ ] Master Piandao
 - [x] Meditation Pools
 - [ ] Merchant of Many Hats
