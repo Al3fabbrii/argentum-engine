@@ -284,7 +284,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] South Pole Voyager
 - [ ] Southern Air Temple
 - [ ] Sozin's Comet
-- [ ] Sparring Dummy
+- [x] Sparring Dummy
 - [ ] Spirit Water Revival
 - [ ] Suki, Courageous Rescuer
 - [ ] Suki, Kyoshi Warrior

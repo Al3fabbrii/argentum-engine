@@ -7035,6 +7035,111 @@
     ]
 }
 
+// Sparring Dummy
+{
+    "name": "Sparring Dummy",
+    "manaCost": "{1}{G}",
+    "typeLine": "Artifact Creature — Scarecrow",
+    "oracleText": "Defender\n{T}: Mill a card. You may put a land card milled this way into your hand. You gain 2 life if a Lesson card is milled this way. (To mill a card, put the top card of your library into your graveyard.)",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 3
+    },
+    "keywords": [
+        "DEFENDER"
+    ],
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "TopOfLibrary",
+                                        "count": {
+                                            "type": "Fixed",
+                                            "amount": 1
+                                        }
+                                    },
+                                    "storeAs": "milled"
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "milled",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "milled",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "filter": "land",
+                            "storeSelected": "toHand",
+                            "prompt": "You may put a land card into your hand",
+                            "selectedLabel": "Put in hand",
+                            "remainderLabel": "Leave in graveyard",
+                            "showAllCards": true
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "toHand",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Hand"
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "milled",
+                                    "filter": "Lesson"
+                                }
+                            },
+                            "then": {
+                                "type": "GainLife",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "197",
+        "rarity": "UNCOMMON",
+        "artist": "Gemi",
+        "flavorText": "\"I am Melon Lord! Mwahaha!\"\n—Toph, Melon Lord",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/2/520f5a03-ff5a-43ed-8f15-cf24596d60cd.jpg?1768338009"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Sun-Blessed Peak
 {
     "name": "Sun-Blessed Peak",
