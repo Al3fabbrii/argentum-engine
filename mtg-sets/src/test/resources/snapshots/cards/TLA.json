@@ -2174,6 +2174,59 @@
     ]
 }
 
+// Canyon Crawler
+{
+    "name": "Canyon Crawler",
+    "manaCost": "{4}{B}{B}",
+    "typeLine": "Creature — Spider Beast",
+    "oracleText": "Deathtouch\nWhen this creature enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nSwampcycling {2} ({2}, Discard this card: Search your library for a Swamp card, reveal it, put it into your hand, then shuffle.)",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 6
+    },
+    "keywords": [
+        "DEATHTOUCH"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Cycling",
+            "cost": "{2}",
+            "searchFilter": {
+                "cardPredicates": [
+                    {
+                        "type": "HasSubtype",
+                        "subtype": "Swamp"
+                    }
+                ]
+            },
+            "displayPrefix": "Swampcycling"
+        }
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreatePredefinedToken",
+                    "tokenType": "Food"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "90",
+        "artist": "Kohei Hayama",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/0/30a30bfb-f0f3-425b-b37d-20079ee27046.jpg?1764120621"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Cat-Gator
 {
     "name": "Cat-Gator",

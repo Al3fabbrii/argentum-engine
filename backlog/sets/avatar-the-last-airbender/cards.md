@@ -108,7 +108,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Bumi, Unleashed
 - [x] Buzzard-Wasp Colony
 - [x] Callous Inspector
-- [ ] Canyon Crawler
+- [x] Canyon Crawler
 - [x] Cat-Gator
 - [x] Cat-Owl
 - [ ] Combustion Man
