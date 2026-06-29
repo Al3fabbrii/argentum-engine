@@ -2,7 +2,7 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 51 / 286  (18%)
+**Implemented:** 52 / 286  (18%)
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
 ## Mechanics needed to complete the set
@@ -69,7 +69,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Aang's Iceberg
 - [x] Aang's Journey
 - [ ] Aang, Swift Savior
-- [ ] Aang, at the Crossroads
+- [x] Aang, at the Crossroads
 - [ ] Aang, the Last Airbender
 - [x] Abandon Attachments
 - [x] Abandoned Air Temple
