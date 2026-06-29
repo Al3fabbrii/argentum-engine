@@ -6,6 +6,7 @@ import com.wingedsheep.engine.legalactions.EnumerationMode
 import com.wingedsheep.engine.legalactions.LegalAction
 import com.wingedsheep.engine.legalactions.LegalActionEnumerator
 import com.wingedsheep.engine.state.ZoneKey
+import com.wingedsheep.engine.state.components.identity.PlayWithCostIncreaseComponent
 import com.wingedsheep.engine.state.components.identity.PlayWithFixedAlternativeManaCostComponent
 import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.engine.support.GameTestDriver
@@ -189,6 +190,34 @@ class AirbendScenarioTest : FunSpec({
         // Back on the battlefield; the fixed-cost stamp is cleaned up so a later exile is unaffected.
         driver.state.getZone(ZoneKey(me, Zone.BATTLEFIELD)) shouldContain bears
         driver.state.getEntity(bears)?.get<PlayWithFixedAlternativeManaCostComponent>().shouldBeNull()
+    }
+
+    test("a cost increase still applies on top of the fixed airbend cost (alt cost replaces, tax stacks)") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Plains" to 40), skipMulligans = true, startingLife = 20)
+        val me = driver.activePlayer!!
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        val bears = driver.putCreatureOnBattlefield(me, "Grizzly Bears")
+        val spell = driver.putCardInHand(me, "Airbend Tester")
+        driver.putLandOnBattlefield(me, "Plains")
+
+        driver.submitSuccess(
+            CastSpell(
+                playerId = me,
+                cardId = spell,
+                targets = listOf(ChosenTarget.Permanent(bears)),
+                paymentStrategy = PaymentStrategy.AutoPay
+            )
+        )
+        driver.bothPass()
+
+        // The fixed-{2} airbend recast is in place; now layer a Soul Partition-style {1} tax on the
+        // same exiled card. A cost increase isn't part of the cost the alternative replaces, so it
+        // applies on top: {2} + {1} = {3}, not {2}.
+        driver.state.getEntity(bears)?.get<PlayWithFixedAlternativeManaCostComponent>().shouldNotBeNull()
+        driver.addComponent(bears, PlayWithCostIncreaseComponent(controllerId = me, amount = 1))
+        castAction(driver, me, bears)?.manaCostString shouldBe "{3}"
     }
 
     test("airbending a spell exiles it from the stack, and its owner may recast it for {2}") {

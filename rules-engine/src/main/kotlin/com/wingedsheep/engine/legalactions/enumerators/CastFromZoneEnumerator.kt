@@ -409,7 +409,8 @@ class CastFromZoneEnumerator : ActionEnumerator {
                         cardComponent.manaCost
                     }
                     // Airbend: a fixed alternative cost ({2}) is paid *instead of* the printed
-                    // cost — it replaces the base entirely (and never stacks with a generic tax).
+                    // cost — it replaces the base. A generic tax (Soul Partition / Thalia-style
+                    // cost increase) is not part of what it replaces, so it still applies on top.
                     val runtimeFixedAltCost = container.get<PlayWithFixedAlternativeManaCostComponent>()
                         ?.takeIf { it.controllerId == playerId }
                     val baseCost = if (!playForFree && runtimeFixedAltCost != null) {
@@ -422,7 +423,7 @@ class CastFromZoneEnumerator : ActionEnumerator {
                     } else {
                         baseCost
                     }
-                    if (!playForFree && runtimeFixedAltCost == null && runtimeCostIncrease != null) {
+                    if (!playForFree && runtimeCostIncrease != null) {
                         effectiveCost = effectiveCost + ManaCost.parse("{${runtimeCostIncrease.amount}}")
                     }
                     val costString = if (playForFree) "{0}" else effectiveCost.toString()
