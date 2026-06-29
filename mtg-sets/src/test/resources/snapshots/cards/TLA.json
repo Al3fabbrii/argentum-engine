@@ -13013,6 +13013,87 @@
     ]
 }
 
+// Rough Rhino Cavalry
+{
+    "name": "Rough Rhino Cavalry",
+    "manaCost": "{4}{R}",
+    "typeLine": "Creature — Human Mercenary",
+    "oracleText": "Firebending 2 (Whenever this creature attacks, add {R}{R}. This mana lasts until end of combat.)\nExhaust — {8}: Put two +1/+1 counters on this creature. It gains trample until end of turn. (Activate each exhaust ability only once.)",
+    "creatureStats": {
+        "power": 5,
+        "toughness": 5
+    },
+    "keywords": [
+        "FIREBENDING"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Numeric",
+            "keyword": "FIREBENDING",
+            "n": 2
+        }
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "AddMana",
+                    "color": "RED",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "expiry": "END_OF_COMBAT"
+                },
+                "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{8}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddCounters",
+                            "counterType": "+1/+1",
+                            "count": 2,
+                            "target": "Self"
+                        },
+                        {
+                            "type": "GrantKeyword",
+                            "keyword": "TRAMPLE",
+                            "target": "Self"
+                        }
+                    ]
+                },
+                "restrictions": [
+                    "Once"
+                ],
+                "isExhaust": true
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "152",
+        "artist": "Yuhong Ding",
+        "flavorText": "\"Each one is a different kind of weapons specialist. They are also a very capable singing group.\"\n—Iroh",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/8/a8bc29cf-f6f8-4bb8-b722-f016b58b6d2d.jpg?1764121046"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Rowdy Snowballers
 {
     "name": "Rowdy Snowballers",

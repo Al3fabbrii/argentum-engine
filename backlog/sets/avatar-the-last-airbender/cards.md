@@ -2,7 +2,7 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 243 / 286
+**Implemented:** 244 / 286
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
 > **Status (June 2026):** 240/286 implemented. The **Airbend** keyword (permanent form) is now built —
@@ -39,7 +39,7 @@ up by Airbend, not Firebending).
 | Waterbend | 25 | 10 | Convoke+improvise-style alt cost (tap artifacts/creatures to help pay). ✅ **activated-ability** cost (`hasWaterbend = true`) and **spell-level additional cost** (incl. **waterbend {X}**) both built. ❌ still needed: **Ward—Waterbend**, **Exhaust—Waterbend**, and **waterbend-as-alternative-cast** (Hama). |
 | Firebending | 28 | 14 | Attack-triggered combat-duration red mana. ✅ built — `firebending(n)` keyword + dynamic versions hand-wired via `AddManaEffect(…, ManaExpiry.END_OF_COMBAT)`. ❌ still missing: **granting** firebending to others / **conditional** "has firebending as long as …" / "gains firebending until EOT". |
 | Airbend | 11 | 3 | Exile target permanent; owner may recast it for {2}. ✅ built — `Effects.Airbend` / `Effects.AirbendAll` (fixed-alternative-cost may-play from exile) + the spell stack branch (`Effects.ExileTargetSpell(fixedAlternativeManaCost)` + `Conditions.TargetIsSpellOnStack` — *exile* from the stack, not a counter, so it bypasses can't-be-countered). ❌ remaining 3 blocked by *other* gaps: cast-zone restriction (Avatar's Wrath), each-player-choose Saga chapter (Yangchen), four-bend events + {WUBRG} reduction (Avatar Aang). |
-| Exhaust | 8 | 8 | Activated ability usable only once per game. ❌ keyword **not built**. |
+| Exhaust | 8 | 4 | Activated ability usable only once (per object, CR 702.177). ✅ built — `isExhaust = true` on `activatedAbility` desugars to `ActivationRestriction.Once` (the existing per-object tracker is rules-correct; **not** once-per-game) and renders the "Exhaust — " prefix. Unlocked Hog-Monkey, Rough Rhino Cavalry, Rebellious Captives, Bitter Work. ❌ remaining 4 blocked by *other* gaps: Mai (double strike counter), Jeong Jeong (copy next Lesson this turn), Invasion Submersible (becomes-artifact-creature + Exhaust—Waterbend), The Legend of Kuruk (Saga DFC). |
 
 ### Other keywords present (evergreen + returning)
 
@@ -284,7 +284,7 @@ up by Airbend, not Firebending).
 - [x] Redirect Lightning
 - [x] Rockalanche
 - [x] Rocky Rebuke
-- [ ] Rough Rhino Cavalry
+- [x] Rough Rhino Cavalry
 - [x] Rowdy Snowballers
 - [x] Ruinous Waterbending
 - [x] Rumble Arena
