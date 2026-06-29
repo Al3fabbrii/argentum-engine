@@ -2,7 +2,7 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 241 / 286
+**Implemented:** 242 / 286
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
 > **Status (June 2026):** 240/286 implemented. The **Airbend** keyword (permanent form) is now built —
@@ -207,7 +207,7 @@ up by Airbend, not Firebending).
 - [ ] Heartless Act
 - [x] Hei Bai, Spirit of Balance
 - [x] Hermitic Herbalist
-- [ ] Hog-Monkey
+- [x] Hog-Monkey
 - [ ] Honest Work
 - [x] How to Start a Riot
 - [x] Iguana Parrot
