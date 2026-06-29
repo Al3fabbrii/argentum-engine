@@ -272,7 +272,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Secret Tunnel
 - [ ] Secret of Bloodbending
 - [x] Seismic Sense
-- [ ] Serpent of the Pass
+- [x] Serpent of the Pass
 - [x] Serpent's Pass
 - [x] Shared Roots
 - [x] Sokka's Haiku

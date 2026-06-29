@@ -11410,6 +11410,57 @@
     ]
 }
 
+// Serpent of the Pass
+{
+    "name": "Serpent of the Pass",
+    "manaCost": "{5}{U}{U}",
+    "typeLine": "Creature — Serpent",
+    "oracleText": "If there are three or more Lesson cards in your graveyard, you may cast this spell as though it had flash.\nThis spell costs {1} less to cast for each noncreature, nonland card in your graveyard.",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 5
+    },
+    "script": {
+        "staticAbilities": [
+            {
+                "type": "ModifySpellCost",
+                "target": "SelfCast",
+                "modification": {
+                    "type": "ReduceGenericBy",
+                    "source": {
+                        "type": "CardsInGraveyardMatchingFilter",
+                        "filter": "noncreature nonland"
+                    }
+                }
+            }
+        ],
+        "conditionalFlash": {
+            "type": "Compare",
+            "left": {
+                "type": "Count",
+                "player": "You",
+                "zone": "Graveyard",
+                "filter": "Lesson"
+            },
+            "operator": "GTE",
+            "right": {
+                "type": "Fixed",
+                "amount": 3
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "70",
+        "rarity": "UNCOMMON",
+        "artist": "Eiji Kaneda",
+        "flavorText": "Those who walk the Serpent's Pass quickly discover the origin of its name.",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/7/87595843-15bc-48bb-8a81-3e6ad924ed44.jpg?1764120436"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Serpent's Pass
 {
     "name": "Serpent's Pass",
