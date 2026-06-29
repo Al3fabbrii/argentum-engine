@@ -109,7 +109,7 @@ up by Airbend, not Firebending).
 - [x] Beetle-Headed Merchants
 - [x] Beifong's Bounty Hunters
 - [ ] Bender's Waterskin
-- [ ] Benevolent River Spirit
+- [x] Benevolent River Spirit
 - [ ] Bitter Work
 - [x] Boar-q-pine
 - [x] Boiling Rock Prison
