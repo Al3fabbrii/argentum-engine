@@ -1448,6 +1448,32 @@ class CastFromZoneEnumerator : ActionEnumerator {
             val castRestrictions = cardDef.script.castRestrictions
             if (!context.castPermissionUtils.checkCastRestrictions(state, playerId, castRestrictions)) continue
 
+            // A warp card can always be cast two ways — its normal cost or its warp cost — and
+            // which to use is the caster's choice (CR 118.9a). Surface both in the action window
+            // even when only one is payable, mirroring how morph (MorphCastEnumerator) shows the
+            // normal cast alongside the face-down cast. The normal cast is otherwise legal here
+            // (timing, cast restrictions, and the no-cast lock have all been checked above); when
+            // it's affordable, CastSpellEnumerator emits the full-featured action, so we only add a
+            // greyed-out placeholder when the player can't pay the normal cost. Hand-only: there is
+            // no normal cast from the graveyard.
+            if (zone == Zone.HAND) {
+                val normalCost = context.costCalculator.calculateEffectiveCost(state, cardDef, playerId)
+                val canAffordNormal = context.manaSolver.canPay(
+                    state, playerId, normalCost, precomputedSources = context.availableManaSources
+                )
+                if (!canAffordNormal) {
+                    result.add(
+                        LegalAction(
+                            actionType = "CastSpell",
+                            description = "Cast ${cardComponent.name}",
+                            action = CastSpell(playerId, cardId),
+                            affordable = false,
+                            manaCostString = normalCost.toString()
+                        )
+                    )
+                }
+            }
+
             val effectiveCost = context.costCalculator.calculateEffectiveCostWithAlternativeBase(
                 state, cardDef, warpAbility.cost, playerId
             )
