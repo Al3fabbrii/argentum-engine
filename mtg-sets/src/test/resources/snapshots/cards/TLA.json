@@ -15774,6 +15774,153 @@
     ]
 }
 
+// The Legend of Kuruk
+{
+    "name": "The Legend of Kuruk",
+    "manaCost": "{2}{U}{U}",
+    "typeLine": "Enchantment — Saga",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI, II — Scry 2, then draw a card.\nIII — Exile this Saga, then return it to the battlefield transformed under your control.",
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Scry",
+                            "count": 2
+                        },
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Scry",
+                            "count": 2
+                        },
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": "ExileAndReturnTransformed"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Avatar Kuruk",
+        "manaCost": "",
+        "typeLine": "Legendary Creature — Avatar",
+        "oracleText": "Whenever you cast a spell, create a 1/1 colorless Spirit creature token with \"This token can't block or be blocked by non-Spirit creatures.\"\nExhaust — Waterbend {20}: Take an extra turn after this one. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}. Activate each exhaust ability only once.)",
+        "creatureStats": {
+            "power": 4,
+            "toughness": 3
+        },
+        "script": {
+            "triggeredAbilities": [
+                {
+                    "id": "ability_1",
+                    "trigger": "SpellCastEvent",
+                    "binding": "ANY",
+                    "effect": {
+                        "type": "CreateToken",
+                        "power": 1,
+                        "toughness": 1,
+                        "colors": [],
+                        "creatureTypes": [
+                            "Spirit"
+                        ],
+                        "name": "Spirit",
+                        "imageUri": "https://cards.scryfall.io/normal/front/f/5/f59eba51-458a-40e0-b754-999f91d5d839.jpg?1764117653",
+                        "staticAbilities": [
+                            {
+                                "type": "CantBeBlockedExceptBy",
+                                "blockerFilter": {
+                                    "cardPredicates": [
+                                        "IsCreature",
+                                        {
+                                            "type": "HasSubtype",
+                                            "subtype": "Spirit"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "CanOnlyBlockCreaturesWith",
+                                "blockerFilter": {
+                                    "cardPredicates": [
+                                        "IsCreature",
+                                        {
+                                            "type": "HasSubtype",
+                                            "subtype": "Spirit"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "descriptionOverride": "Whenever you cast a spell, create a 1/1 colorless Spirit creature token with \"This token can't block or be blocked by non-Spirit creatures.\""
+                }
+            ],
+            "activatedAbilities": [
+                {
+                    "id": "ability_2",
+                    "cost": {
+                        "type": "CostAtomWrapper",
+                        "atom": {
+                            "type": "AtomMana",
+                            "cost": "{20}"
+                        }
+                    },
+                    "effect": "TakeExtraTurn",
+                    "restrictions": [
+                        "Once"
+                    ],
+                    "hasWaterbend": true,
+                    "isExhaust": true
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "61",
+            "rarity": "MYTHIC",
+            "artist": "Takayama Toshiaki",
+            "imageUri": "https://cards.scryfall.io/normal/back/5/e/5e9a53d3-7f2f-4a9c-9516-0713da740478.jpg?1770463831"
+        },
+        "colorIdentityOverride": [
+            "BLUE"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "61",
+        "rarity": "MYTHIC",
+        "artist": "Takayama Toshiaki",
+        "imageUri": "https://cards.scryfall.io/normal/front/5/e/5e9a53d3-7f2f-4a9c-9516-0713da740478.jpg?1770463831"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // The Legend of Kyoshi
 {
     "name": "The Legend of Kyoshi",
