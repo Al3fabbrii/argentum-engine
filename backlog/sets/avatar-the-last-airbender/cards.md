@@ -140,7 +140,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [x] Earthbender Ascension
 - [x] Earthbending Lesson
 - [ ] Earthen Ally
-- [ ] Elemental Teachings
+- [x] Elemental Teachings
 - [ ] Ember Island Production
 - [x] Energybending
 - [x] Enter the Avatar State

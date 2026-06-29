@@ -4486,6 +4486,96 @@
     ]
 }
 
+// Elemental Teachings
+{
+    "name": "Elemental Teachings",
+    "manaCost": "{4}{G}",
+    "typeLine": "Instant — Lesson",
+    "oracleText": "Search your library for up to four land cards with different names and reveal them. An opponent chooses two of those cards. Put the chosen cards into your graveyard and the rest onto the battlefield tapped, then shuffle.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "FromZone",
+                        "zone": "Library",
+                        "filter": "land"
+                    },
+                    "storeAs": "searchable"
+                },
+                {
+                    "type": "SelectFromCollection",
+                    "from": "searchable",
+                    "selection": {
+                        "type": "ChooseUpTo",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 4
+                        }
+                    },
+                    "storeSelected": "found",
+                    "prompt": "Search for up to four land cards with different names",
+                    "restrictions": [
+                        "OnePerCardName"
+                    ]
+                },
+                {
+                    "type": "RevealCollection",
+                    "from": "found"
+                },
+                {
+                    "type": "SelectFromCollection",
+                    "from": "found",
+                    "selection": {
+                        "type": "ChooseExactly",
+                        "count": {
+                            "type": "Fixed",
+                            "amount": 2
+                        }
+                    },
+                    "chooser": "Opponent",
+                    "storeSelected": "toGraveyard",
+                    "storeRemainder": "toBattlefield",
+                    "prompt": "Choose two of the revealed cards. Those go into the controller's graveyard; the rest enter the battlefield tapped.",
+                    "selectedLabel": "Graveyard",
+                    "remainderLabel": "Battlefield",
+                    "alwaysPrompt": true
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "toGraveyard",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Graveyard"
+                    }
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "toBattlefield",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Battlefield",
+                        "placement": "Tapped"
+                    }
+                },
+                "ShuffleLibrary"
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "178",
+        "rarity": "RARE",
+        "artist": "Yoshioka",
+        "flavorText": "\"Understanding others, the other elements, and the other nations will help you become whole.\"\n—Iroh",
+        "imageUri": "https://cards.scryfall.io/normal/front/c/a/cac8ac35-6860-4839-ab85-93d409206c08.jpg?1764121209"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Energybending
 {
     "name": "Energybending",
