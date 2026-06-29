@@ -2,353 +2,365 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 49 / 286  (17%)
+**Implemented:** 226 / 286
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
+
+> **Status (June 2026):** 226/286 implemented. Every card buildable on the *current* engine has been
+> added — the 60 remaining all need new engine/SDK work first (see the gap analysis). Since the
+> original gap doc was written, **Firebending**, the **Vigilance keyword counter**, the
+> **Nth-card-drawn** and **Surveil** triggers, **`PERMANENTS_SACRIFICED`**, and **dynamic Earthbend**
+> all landed, which unlocked the bulk of the set. The headline holdouts are now **Airbend**,
+> **Exhaust**, **Foretell**, the **Fire counter** type, **spell-level Waterbend** costs,
+> **granting/conditional Firebending**, and a handful of Tier-3 one-offs.
 
 ## Mechanics needed to complete the set
 
-The set is built around four **"bending" keyword families** plus a returning **Exhaust** keyword. Counts below are over all 286 cards — *total* with the mechanic / *remaining* still unimplemented.
+The set is built around four **"bending" keyword families** plus a returning **Exhaust** keyword.
+Counts below are over the 286 draft cards — *total* with the mechanic / *remaining* still
+unimplemented. Remaining counts overlap: a still-missing card may be blocked by a *different*
+mechanic than the row it appears under (e.g. a Firebending creature that also uses Airbend is held
+up by Airbend, not Firebending).
 
 ### Signature / set-defining mechanics
 
 | Mechanic | Total | Remaining | Notes |
 |----------|------:|----------:|-------|
-| Earthbend | 27 | 22 | Target land you control becomes a 0/0 haste creature-land; put N +1/+1 counters on it. ✅ engine-supported (`Effects.Earthbend`). |
-| Waterbend | 24 | 23 | Alternative cost: tap your artifacts/creatures to help pay a waterbend cost. 🟡 activated abilities done; spell/ETB shapes pending. |
-| Firebending | 21 | 19 | Whenever this creature attacks, add N red mana lasting until end of combat. ❌ new keyword. |
-| Airbend | 10 | 10 | Exile target nonland permanent; owner may recast it for {2}. ❌ new keyword. |
-| Exhaust | 8 | 8 | Activated ability usable only once per game. ❌ returning keyword, not yet built. |
+| Earthbend | 28 | 6 | Target land you control becomes a 0/0 haste creature-land; put N +1/+1 counters on it. ✅ built (`Effects.Earthbend`, incl. dynamic X). |
+| Waterbend | 25 | 15 | Convoke+improvise-style alt cost (tap artifacts/creatures to help pay). 🟡 **activated-ability** cost ✅ (`hasWaterbend = true`); **spell / ETB additional-cost** shapes ❌ still needed. |
+| Firebending | 28 | 14 | Attack-triggered combat-duration red mana. ✅ built — `firebending(n)` keyword + dynamic versions hand-wired via `AddManaEffect(…, ManaExpiry.END_OF_COMBAT)`. ❌ still missing: **granting** firebending to others / **conditional** "has firebending as long as …" / "gains firebending until EOT". |
+| Airbend | 11 | 11 | Exile target nonland permanent; owner may recast it for {2}. ❌ keyword **not built**. |
+| Exhaust | 8 | 8 | Activated ability usable only once per game. ❌ keyword **not built**. |
 
 ### Other keywords present (evergreen + returning)
 
 | Keyword | Total | Remaining |
 |---------|------:|----------:|
-| Flying | 26 | 22 |
-| Vigilance | 15 | 12 |
-| Scry | 10 | 8 |
-| Flash | 9 | 8 |
-| Transform | 8 | 8 |
-| Mill | 8 | 8 |
-| Reach | 8 | 8 |
-| Prowess | 7 | 6 |
-| Menace | 6 | 6 |
-| Equip | 5 | 4 |
-| Food | 5 | 5 |
-| Enchant | 5 | 5 |
-| Landcycling | 5 | 5 |
-| Typecycling | 5 | 5 |
-| Cycling | 5 | 5 |
-| Crew | 5 | 4 |
-| Trample | 5 | 5 |
-| Kicker | 4 | 4 |
-| Defender | 4 | 3 |
-| Ward | 3 | 3 |
-| Deathtouch | 3 | 3 |
-| Raid | 3 | 3 |
-| Flashback | 3 | 3 |
+| Flying | 26 | 11 |
+| Vigilance | 15 | 2 |
+| Scry | 10 | 3 |
+| Flash | 9 | 5 |
+| Transform | 8 | 5 |
+| Mill | 8 | 1 |
+| Reach | 8 | 1 |
+| Prowess | 7 | 2 |
+| Menace | 6 | 2 |
+| Equip | 5 | 2 |
+| Food | 5 | 1 |
+| Enchant | 5 | 1 |
+| Landcycling | 5 | 0 |
+| Typecycling | 5 | 0 |
+| Cycling | 5 | 0 |
+| Crew | 5 | 1 |
+| Trample | 5 | 3 |
+| Kicker | 4 | 0 |
+| Defender | 4 | 0 |
+| Ward | 3 | 2 |
+| Deathtouch | 3 | 0 |
+| Raid | 3 | 0 |
+| Flashback | 3 | 0 |
 | Haste | 3 | 1 |
-| First strike | 2 | 1 |
-| Landfall | 2 | 2 |
-| Lifelink | 2 | 1 |
-| Fight | 2 | 2 |
-| Plainscycling | 1 | 1 |
-| Islandcycling | 1 | 1 |
-| Swampcycling | 1 | 1 |
-| Surveil | 1 | 1 |
-| Mountaincycling | 1 | 1 |
+| First strike | 2 | 0 |
+| Landfall | 2 | 0 |
+| Lifelink | 2 | 0 |
+| Fight | 2 | 1 |
+| Plainscycling | 1 | 0 |
+| Islandcycling | 1 | 0 |
+| Swampcycling | 1 | 0 |
+| Surveil | 1 | 0 |
+| Mountaincycling | 1 | 0 |
 | Foretell | 1 | 1 |
-| Affinity | 1 | 1 |
-| Forestcycling | 1 | 1 |
+| Affinity | 1 | 0 |
+| Forestcycling | 1 | 0 |
 
-**Sagas:** 7 total / 7 remaining (chapter abilities — engine-supported).
+**Sagas:** 7 total / 3 remaining (chapter abilities + final-chapter transform — ✅ engine-supported).
 
 ---
 
 ## Card checklist
 
-- [ ] Aang's Iceberg
-- [ ] Aang's Journey
+- [x] Aang's Iceberg
+- [x] Aang's Journey
 - [ ] Aang, Swift Savior
-- [ ] Aang, at the Crossroads
+- [x] Aang, at the Crossroads
 - [ ] Aang, the Last Airbender
-- [ ] Abandon Attachments
-- [ ] Abandoned Air Temple
-- [ ] Accumulate Wisdom
-- [ ] Agna Qel'a
-- [ ] Air Nomad Legacy
+- [x] Abandon Attachments
+- [x] Abandoned Air Temple
+- [x] Accumulate Wisdom
+- [x] Agna Qel'a
+- [x] Air Nomad Legacy
 - [ ] Airbender Ascension
 - [ ] Airbender's Reversal
 - [ ] Airbending Lesson
 - [x] Airship Engine Room
-- [ ] Allies at Last
+- [x] Allies at Last
 - [ ] Appa, Loyal Sky Bison
 - [ ] Appa, Steadfast Guardian
 - [ ] Avatar Aang
-- [ ] Avatar Destiny
+- [x] Avatar Destiny
 - [x] Avatar Enthusiasts
 - [ ] Avatar's Wrath
-- [ ] Azula Always Lies
+- [x] Azula Always Lies
 - [ ] Azula, Cunning Usurper
-- [ ] Azula, On the Hunt
+- [x] Azula, On the Hunt
 - [x] Ba Sing Se
 - [x] Badgermole
 - [x] Badgermole Cub
-- [ ] Barrels of Blasting Jelly
-- [ ] Beetle-Headed Merchants
-- [ ] Beifong's Bounty Hunters
+- [x] Barrels of Blasting Jelly
+- [x] Beetle-Headed Merchants
+- [x] Beifong's Bounty Hunters
 - [ ] Bender's Waterskin
 - [ ] Benevolent River Spirit
 - [ ] Bitter Work
 - [x] Boar-q-pine
 - [x] Boiling Rock Prison
-- [ ] Boiling Rock Rioter
-- [ ] Boomerang Basics
-- [ ] Bumi Bash
+- [x] Boiling Rock Rioter
+- [x] Boomerang Basics
+- [x] Bumi Bash
 - [ ] Bumi, King of Three Trials
 - [ ] Bumi, Unleashed
-- [ ] Buzzard-Wasp Colony
-- [ ] Callous Inspector
-- [ ] Canyon Crawler
+- [x] Buzzard-Wasp Colony
+- [x] Callous Inspector
+- [x] Canyon Crawler
 - [x] Cat-Gator
 - [x] Cat-Owl
 - [ ] Combustion Man
-- [ ] Combustion Technique
-- [ ] Compassionate Healer
+- [x] Combustion Technique
+- [x] Compassionate Healer
 - [x] Corrupt Court Official
 - [ ] Crashing Wave
-- [ ] Crescent Island Temple
-- [ ] Cruel Administrator
-- [ ] Cunning Maneuver
-- [ ] Curious Farm Animals
+- [x] Crescent Island Temple
+- [x] Cruel Administrator
+- [x] Cunning Maneuver
+- [x] Curious Farm Animals
 - [x] Cycle of Renewal
-- [ ] Dai Li Agents
-- [ ] Dai Li Indoctrination
-- [ ] Day of Black Sun
-- [ ] Deadly Precision
-- [ ] Deserter's Disciple
+- [x] Dai Li Agents
+- [x] Dai Li Indoctrination
+- [x] Day of Black Sun
+- [x] Deadly Precision
+- [x] Deserter's Disciple
 - [ ] Destined Confrontation
 - [x] Diligent Zookeeper
-- [ ] Dragonfly Swarm
-- [ ] Earth King's Lieutenant
-- [ ] Earth Kingdom General
-- [ ] Earth Kingdom Jailer
-- [ ] Earth Kingdom Protectors
-- [ ] Earth Kingdom Soldier
-- [ ] Earth Rumble
-- [ ] Earth Rumble Wrestlers
+- [x] Dragonfly Swarm
+- [x] Earth King's Lieutenant
+- [x] Earth Kingdom General
+- [x] Earth Kingdom Jailer
+- [x] Earth Kingdom Protectors
+- [x] Earth Kingdom Soldier
+- [x] Earth Rumble
+- [x] Earth Rumble Wrestlers
 - [x] Earth Village Ruffians
-- [ ] Earthbender Ascension
+- [x] Earthbender Ascension
 - [x] Earthbending Lesson
 - [ ] Earthen Ally
-- [ ] Elemental Teachings
-- [ ] Ember Island Production
-- [ ] Energybending
-- [ ] Enter the Avatar State
-- [ ] Epic Downfall
-- [ ] Fancy Footwork
-- [ ] Fatal Fissure
+- [x] Elemental Teachings
+- [x] Ember Island Production
+- [x] Energybending
+- [x] Enter the Avatar State
+- [x] Epic Downfall
+- [x] Fancy Footwork
+- [x] Fatal Fissure
 - [ ] Fated Firepower
-- [ ] Fire Lord Azula
-- [ ] Fire Lord Zuko
-- [ ] Fire Nation Attacks
+- [x] Fire Lord Azula
+- [x] Fire Lord Zuko
+- [x] Fire Nation Attacks
 - [ ] Fire Nation Cadets
-- [ ] Fire Nation Engineer
+- [x] Fire Nation Engineer
 - [ ] Fire Nation Palace
-- [ ] Fire Nation Raider
-- [ ] Fire Nation Warship
-- [ ] Fire Navy Trebuchet
+- [x] Fire Nation Raider
+- [x] Fire Nation Warship
+- [x] Fire Navy Trebuchet
 - [x] Fire Sages
 - [ ] Firebender Ascension
-- [ ] Firebending Lesson
+- [x] Firebending Lesson
 - [ ] Firebending Student
-- [ ] First-Time Flyer
-- [ ] Flexible Waterbender
-- [ ] Flopsie, Bumi's Buddy
+- [x] First-Time Flyer
+- [x] Flexible Waterbender
+- [x] Flopsie, Bumi's Buddy
 - [x] Foggy Bottom Swamp
-- [ ] Foggy Swamp Hunters
-- [ ] Foggy Swamp Spirit Keeper
-- [ ] Foggy Swamp Vinebender
+- [x] Foggy Swamp Hunters
+- [x] Foggy Swamp Spirit Keeper
+- [x] Foggy Swamp Vinebender
 - [ ] Foggy Swamp Visions
-- [ ] Forecasting Fortune Teller
-- [ ] Forest
-- [ ] Gather the White Lotus
+- [x] Forecasting Fortune Teller
+- [x] Forest
+- [x] Gather the White Lotus
 - [x] Geyser Leaper
-- [ ] Giant Koi
+- [x] Giant Koi
 - [x] Glider Kids
 - [ ] Glider Staff
-- [ ] Gran-Gran
-- [ ] Great Divide Guide
-- [ ] Guru Pathik
-- [ ] Hakoda, Selfless Commander
+- [x] Gran-Gran
+- [x] Great Divide Guide
+- [x] Guru Pathik
+- [x] Hakoda, Selfless Commander
 - [ ] Hama, the Bloodbender
 - [x] Haru, Hidden Talent
 - [ ] Heartless Act
-- [ ] Hei Bai, Spirit of Balance
-- [ ] Hermitic Herbalist
+- [x] Hei Bai, Spirit of Balance
+- [x] Hermitic Herbalist
 - [ ] Hog-Monkey
 - [ ] Honest Work
-- [ ] How to Start a Riot
+- [x] How to Start a Riot
 - [x] Iguana Parrot
 - [x] Invasion Reinforcements
 - [ ] Invasion Submersible
-- [ ] Invasion Tactics
-- [ ] Iroh's Demonstration
+- [x] Invasion Tactics
+- [x] Iroh's Demonstration
 - [ ] Iroh, Grand Lotus
 - [ ] Iroh, Tea Master
-- [ ] Island
-- [ ] It'll Quench Ya!
-- [ ] Jasmine Dragon Tea Shop
+- [x] Island
+- [x] It'll Quench Ya!
+- [x] Jasmine Dragon Tea Shop
 - [x] Jeong Jeong's Deserters
 - [ ] Jeong Jeong, the Deserter
-- [ ] Jet's Brainwashing
-- [ ] Jet, Freedom Fighter
-- [ ] Joo Dee, One of Many
-- [ ] June, Bounty Hunter
-- [ ] Katara, Bending Prodigy
-- [ ] Katara, Water Tribe's Hope
-- [ ] Katara, the Fearless
-- [ ] Knowledge Seeker
+- [x] Jet's Brainwashing
+- [x] Jet, Freedom Fighter
+- [x] Joo Dee, One of Many
+- [x] June, Bounty Hunter
+- [x] Katara, Bending Prodigy
+- [x] Katara, Water Tribe's Hope
+- [x] Katara, the Fearless
+- [x] Knowledge Seeker
 - [ ] Koh, the Face Stealer
-- [ ] Kyoshi Battle Fan
-- [ ] Kyoshi Island Plaza
+- [x] Kyoshi Battle Fan
+- [x] Kyoshi Island Plaza
 - [x] Kyoshi Village
 - [x] Kyoshi Warriors
-- [ ] Leaves from the Vine
+- [x] Leaves from the Vine
 - [x] Lightning Strike
 - [ ] Lo and Li, Twin Tutors
-- [ ] Long Feng, Grand Secretariat
-- [ ] Lost Days
+- [x] Long Feng, Grand Secretariat
+- [x] Lost Days
 - [ ] Mai, Jaded Edge
 - [x] Mai, Scornful Striker
-- [ ] Master Pakku
-- [ ] Master Piandao
+- [x] Master Pakku
+- [x] Master Piandao
 - [x] Meditation Pools
-- [ ] Merchant of Many Hats
-- [ ] Messenger Hawk
+- [x] Merchant of Many Hats
+- [x] Messenger Hawk
 - [x] Meteor Sword
 - [x] Misty Palms Oasis
-- [ ] Momo, Friendly Flier
-- [ ] Momo, Playful Pet
-- [ ] Mongoose Lizard
-- [ ] Mountain
+- [x] Momo, Friendly Flier
+- [x] Momo, Playful Pet
+- [x] Mongoose Lizard
+- [x] Mountain
 - [x] North Pole Gates
 - [ ] North Pole Patrol
-- [ ] Northern Air Temple
-- [ ] Obsessive Pursuit
+- [x] Northern Air Temple
+- [x] Obsessive Pursuit
 - [x] Octopus Form
 - [x] Omashu City
-- [ ] Origin of Metalbending
-- [ ] Ostrich-Horse
-- [ ] Otter-Penguin
+- [x] Origin of Metalbending
+- [x] Ostrich-Horse
+- [x] Otter-Penguin
 - [x] Ozai's Cruelty
 - [ ] Ozai, the Phoenix King
-- [ ] Path to Redemption
-- [ ] Phoenix Fleet Airship
+- [x] Path to Redemption
+- [x] Phoenix Fleet Airship
 - [x] Pillar Launch
-- [ ] Pirate Peddlers
-- [ ] Plains
-- [ ] Planetarium of Wan Shi Tong
-- [ ] Platypus-Bear
+- [x] Pirate Peddlers
+- [x] Plains
+- [x] Planetarium of Wan Shi Tong
+- [x] Platypus-Bear
 - [x] Pretending Poxbearers
-- [ ] Price of Freedom
-- [ ] Professor Zei, Anthropologist
-- [ ] Rabaroo Troop
+- [x] Price of Freedom
+- [x] Professor Zei, Anthropologist
+- [x] Rabaroo Troop
 - [ ] Ran and Shaw
-- [ ] Raucous Audience
-- [ ] Raven Eagle
-- [ ] Razor Rings
+- [x] Raucous Audience
+- [x] Raven Eagle
+- [x] Razor Rings
 - [x] Realm of Koh
 - [ ] Rebellious Captives
-- [ ] Redirect Lightning
-- [ ] Rockalanche
-- [ ] Rocky Rebuke
+- [x] Redirect Lightning
+- [x] Rockalanche
+- [x] Rocky Rebuke
 - [ ] Rough Rhino Cavalry
-- [ ] Rowdy Snowballers
+- [x] Rowdy Snowballers
 - [ ] Ruinous Waterbending
 - [x] Rumble Arena
-- [ ] Saber-Tooth Moose-Lion
-- [ ] Sandbender Scavengers
-- [ ] Sandbenders' Storm
+- [x] Saber-Tooth Moose-Lion
+- [x] Sandbender Scavengers
+- [x] Sandbenders' Storm
 - [ ] Secret Tunnel
 - [ ] Secret of Bloodbending
-- [ ] Seismic Sense
-- [ ] Serpent of the Pass
+- [x] Seismic Sense
+- [x] Serpent of the Pass
 - [x] Serpent's Pass
 - [x] Shared Roots
-- [ ] Sokka's Haiku
-- [ ] Sokka, Bold Boomeranger
-- [ ] Sokka, Lateral Strategist
-- [ ] Sokka, Tenacious Tactician
-- [ ] Sold Out
-- [ ] Solstice Revelations
-- [ ] South Pole Voyager
-- [ ] Southern Air Temple
+- [x] Sokka's Haiku
+- [x] Sokka, Bold Boomeranger
+- [x] Sokka, Lateral Strategist
+- [x] Sokka, Tenacious Tactician
+- [x] Sold Out
+- [x] Solstice Revelations
+- [x] South Pole Voyager
+- [x] Southern Air Temple
 - [ ] Sozin's Comet
-- [ ] Sparring Dummy
+- [x] Sparring Dummy
 - [ ] Spirit Water Revival
-- [ ] Suki, Courageous Rescuer
-- [ ] Suki, Kyoshi Warrior
-- [ ] Sun Warriors
+- [x] Suki, Courageous Rescuer
+- [x] Suki, Kyoshi Warrior
+- [x] Sun Warriors
 - [x] Sun-Blessed Peak
-- [ ] Swamp
-- [ ] Swampsnare Trap
-- [ ] Team Avatar
-- [ ] Teo, Spirited Glider
-- [ ] The Boulder, Ready to Rumble
-- [ ] The Cave of Two Lovers
-- [ ] The Earth King
-- [ ] The Fire Nation Drill
+- [x] Swamp
+- [x] Swampsnare Trap
+- [x] Team Avatar
+- [x] Teo, Spirited Glider
+- [x] The Boulder, Ready to Rumble
+- [x] The Cave of Two Lovers
+- [x] The Earth King
+- [x] The Fire Nation Drill
 - [ ] The Last Agni Kai
 - [ ] The Legend of Kuruk
-- [ ] The Legend of Kyoshi
-- [ ] The Legend of Roku
+- [x] The Legend of Kyoshi
+- [x] The Legend of Roku
 - [ ] The Legend of Yangchen
-- [ ] The Lion-Turtle
-- [ ] The Mechanist, Aerial Artisan
+- [x] The Lion-Turtle
+- [x] The Mechanist, Aerial Artisan
 - [ ] The Rise of Sozin
-- [ ] The Spirit Oasis
+- [x] The Spirit Oasis
 - [ ] The Unagi of Kyoshi Island
 - [x] The Walls of Ba Sing Se
-- [ ] Tiger-Dillo
-- [ ] Tiger-Seal
-- [ ] Tolls of War
-- [ ] Toph, Hardheaded Teacher
-- [ ] Toph, the Blind Bandit
-- [ ] Toph, the First Metalbender
+- [x] Tiger-Dillo
+- [x] Tiger-Seal
+- [x] Tolls of War
+- [x] Toph, Hardheaded Teacher
+- [x] Toph, the Blind Bandit
+- [x] Toph, the First Metalbender
 - [x] Treetop Freedom Fighters
-- [ ] True Ancestry
+- [x] True Ancestry
 - [ ] Trusty Boomerang
 - [x] Tundra Tank
 - [x] Turtle-Duck
-- [ ] Twin Blades
-- [ ] Ty Lee, Artful Acrobat
-- [ ] Ty Lee, Chi Blocker
-- [ ] Uncle Iroh
-- [ ] United Front
-- [ ] Unlucky Cabbage Merchant
-- [ ] Vengeful Villagers
-- [ ] Vindictive Warden
-- [ ] Walltop Sentries
+- [x] Twin Blades
+- [x] Ty Lee, Artful Acrobat
+- [x] Ty Lee, Chi Blocker
+- [x] Uncle Iroh
+- [x] United Front
+- [x] Unlucky Cabbage Merchant
+- [x] Vengeful Villagers
+- [x] Vindictive Warden
+- [x] Walltop Sentries
 - [ ] Wan Shi Tong, Librarian
 - [x] Wandering Musicians
 - [ ] War Balloon
 - [x] Wartime Protestors
 - [x] Water Tribe Captain
-- [ ] Water Tribe Rallier
-- [ ] Waterbender Ascension
+- [x] Water Tribe Rallier
+- [x] Waterbender Ascension
 - [ ] Waterbending Lesson
-- [ ] Waterbending Scroll
-- [ ] Watery Grasp
-- [ ] White Lotus Hideout
+- [x] Waterbending Scroll
+- [x] Watery Grasp
+- [x] White Lotus Hideout
 - [x] White Lotus Reinforcements
 - [ ] White Lotus Tile
-- [ ] Wolfbat
-- [ ] Yip Yip!
+- [x] Wolfbat
+- [x] Yip Yip!
 - [ ] Yue, the Moon Spirit
 - [x] Yuyan Archers
 - [ ] Zhao, Ruthless Admiral
 - [ ] Zhao, the Moon Slayer
-- [ ] Zuko's Conviction
-- [ ] Zuko's Exile
-- [ ] Zuko, Conflicted
-- [ ] Zuko, Exiled Prince
+- [x] Zuko's Conviction
+- [x] Zuko's Exile
+- [x] Zuko, Conflicted
+- [x] Zuko, Exiled Prince
