@@ -221,7 +221,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Mai, Jaded Edge
 - [x] Mai, Scornful Striker
 - [x] Master Pakku
-- [ ] Master Piandao
+- [x] Master Piandao
 - [x] Meditation Pools
 - [x] Merchant of Many Hats
 - [x] Messenger Hawk
