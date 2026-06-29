@@ -95,12 +95,15 @@ internal fun BridgeBuilder.manaCountersAndState() {
         composes = listOf("GatherCards", "MoveCollection", "GrantMayPlayFromExile"))
 
     // Airbend the spell-on-stack form (Aang, Swift Savior — "airbend … target creature or spell"):
-    // counter the spell to its owner's exile and grant the owner the same fixed-{2} recast, via
-    // CounterDestination.Exile(ownerControls, fixedAlternativeManaCost). The full card pairs this with
-    // a cross-zone "creature or spell" target + a TargetIsSpellOnStack branch; the emitter leaves the
-    // combined shape to scaffold, but the capability is supported, so score it coverable.
-    composed("AirbendSpell", "CounterEffect(Exile(ownerControls, fixedAlternativeManaCost {2})) — counter the spell to owner's exile, owner may recast for {2}",
-        composes = listOf("CounterEffect", "GrantMayPlayFromExile"))
+    // *exile* the spell from the stack to its owner's exile and grant the owner the same fixed-{2}
+    // recast, via Effects.ExileTargetSpell(fixedAlternativeManaCost). This is NOT a counter — airbend
+    // says "exile it", so it bypasses can't-be-countered and fires no "spell was countered" trigger
+    // (the Aven Interrupter exileSpell primitive, reusing PlayWithFixedAlternativeManaCostComponent).
+    // The full card pairs this with a cross-zone "creature or spell" target + a TargetIsSpellOnStack
+    // branch; the emitter leaves the combined shape to scaffold, but the capability is supported, so
+    // score it coverable.
+    composed("AirbendSpell", "Effects.ExileTargetSpell(fixedAlternativeManaCost {2}) — exile the spell from the stack to owner's exile (not a counter), owner may recast for {2}",
+        composes = listOf("ExileSpell", "GrantMayPlayFromExile"))
 
     effect("RegeneratePermanent", "Regenerate", UNIVERSAL)
     // "<permanent> becomes prepared" (Secrets of Strixhaven — Leech Collector's trigger). Maps to the
