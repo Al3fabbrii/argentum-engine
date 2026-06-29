@@ -2847,6 +2847,146 @@
     ]
 }
 
+// Bitter Work
+{
+    "name": "Bitter Work",
+    "manaCost": "{1}{R}{G}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever you attack a player with one or more creatures with power 4 or greater, draw a card.\nExhaust — {4}: Earthbend 4. Activate only during your turn. (Target land you control becomes a 0/0 creature with haste that's still a land. Put four +1/+1 counters on it. When it dies or is exiled, return it to the battlefield tapped. Activate each exhaust ability only once.)",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "YouAttackEvent",
+                    "attackerFilter": {
+                        "cardPredicates": [
+                            "IsCreature",
+                            {
+                                "type": "PowerAtLeast",
+                                "min": 4
+                            }
+                        ]
+                    }
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                },
+                "descriptionOverride": "Whenever you attack a player with one or more creatures with power 4 or greater, draw a card."
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{4}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AnimateLand",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "power": 0,
+                            "toughness": 0,
+                            "duration": "Permanent"
+                        },
+                        {
+                            "type": "GrantKeyword",
+                            "keyword": "HASTE",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "duration": "Permanent"
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "+1/+1",
+                            "count": 4,
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            }
+                        },
+                        {
+                            "type": "GrantTriggeredAbility",
+                            "ability": {
+                                "id": "ability_3",
+                                "trigger": {
+                                    "type": "ZoneChangeEvent",
+                                    "from": "Battlefield"
+                                },
+                                "effect": {
+                                    "type": "Composite",
+                                    "effects": [
+                                        {
+                                            "type": "MoveToZone",
+                                            "target": "Self",
+                                            "destination": "Battlefield",
+                                            "placement": "Tapped",
+                                            "fromZone": "Graveyard"
+                                        },
+                                        {
+                                            "type": "MoveToZone",
+                                            "target": "Self",
+                                            "destination": "Battlefield",
+                                            "placement": "Tapped",
+                                            "fromZone": "Exile"
+                                        }
+                                    ]
+                                },
+                                "descriptionOverride": "When this dies or is exiled, return it to the battlefield tapped."
+                            },
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "duration": "Permanent"
+                        }
+                    ]
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "land ctrl:you"
+                        },
+                        "id": "target land you control"
+                    }
+                ],
+                "restrictions": [
+                    "OnlyDuringYourTurn",
+                    "Once"
+                ],
+                "isExhaust": true
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "210",
+        "rarity": "UNCOMMON",
+        "artist": "Bun Toujo",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/e/3e8de6a9-9859-4ed2-8ece-ef80a7209be9.jpg?1764121491"
+    },
+    "colorIdentityOverride": [
+        "RED",
+        "GREEN"
+    ]
+}
+
 // Boar-q-pine
 {
     "name": "Boar-q-pine",

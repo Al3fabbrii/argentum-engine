@@ -2,7 +2,7 @@
 
 **Set Size:** 286 draft/booster cards (excluding basic lands beyond the set's own, tokens, and special variants)
 **Release Date:** November 21, 2025
-**Implemented:** 240 / 286
+**Implemented:** 241 / 286
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
 > **Status (June 2026):** 240/286 implemented. The **Airbend** keyword (permanent form) is now built —
@@ -120,7 +120,7 @@ up by Airbend, not Firebending).
 - [x] Beifong's Bounty Hunters
 - [ ] Bender's Waterskin
 - [x] Benevolent River Spirit
-- [ ] Bitter Work
+- [x] Bitter Work
 - [x] Boar-q-pine
 - [x] Boiling Rock Prison
 - [x] Boiling Rock Rioter
