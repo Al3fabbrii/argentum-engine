@@ -1217,6 +1217,70 @@
     ]
 }
 
+// Foggy Swamp Visions
+{
+    "name": "Foggy Swamp Visions",
+    "manaCost": "{1}{B}{B}",
+    "typeLine": "Sorcery",
+    "oracleText": "As an additional cost to cast this spell, waterbend {X}. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)\nExile X target creature cards from graveyards. For each creature card exiled this way, create a token that's a copy of it. At the beginning of your next end step, sacrifice those tokens.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": "ChosenTargets",
+                    "storeAs": "exiled"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "exiled",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Exile"
+                    },
+                    "storeMovedAs": "exiled"
+                },
+                {
+                    "type": "ForEach",
+                    "space": {
+                        "type": "IterationSpace.Collection",
+                        "collection": "exiled"
+                    },
+                    "body": {
+                        "type": "CreateTokenCopyOfTarget",
+                        "target": "Self",
+                        "sacrificeAtStep": "END"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "optional": true,
+                "filter": {
+                    "baseFilter": "creature",
+                    "zone": "Graveyard"
+                },
+                "dynamicMaxCount": "XValue"
+            }
+        ],
+        "spellWaterbend": {
+            "isX": true
+        }
+    },
+    "metadata": {
+        "collectorNumber": "102",
+        "rarity": "RARE",
+        "artist": "Hori Airi",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/a/3a46deaa-88f7-4eec-aa99-b85073847918.jpg?1764120708"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Geyser Leaper
 {
     "name": "Geyser Leaper",

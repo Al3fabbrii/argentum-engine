@@ -180,7 +180,7 @@ up by Airbend, not Firebending).
 - [x] Foggy Swamp Hunters
 - [x] Foggy Swamp Spirit Keeper
 - [x] Foggy Swamp Vinebender
-- [ ] Foggy Swamp Visions
+- [x] Foggy Swamp Visions
 - [x] Forecasting Fortune Teller
 - [x] Forest
 - [x] Gather the White Lotus
