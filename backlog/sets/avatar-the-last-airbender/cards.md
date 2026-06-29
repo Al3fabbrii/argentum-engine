@@ -89,7 +89,7 @@ up by Airbend, not Firebending).
 - [x] Accumulate Wisdom
 - [x] Agna Qel'a
 - [x] Air Nomad Legacy
-- [ ] Airbender Ascension
+- [x] Airbender Ascension
 - [ ] Airbender's Reversal
 - [x] Airbending Lesson
 - [x] Airship Engine Room

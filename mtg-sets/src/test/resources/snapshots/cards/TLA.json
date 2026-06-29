@@ -981,6 +981,150 @@
     ]
 }
 
+// Airbender Ascension
+{
+    "name": "Airbender Ascension",
+    "manaCost": "{1}{W}",
+    "typeLine": "Enchantment",
+    "oracleText": "When this enchantment enters, airbend up to one target creature.\nWhenever a creature you control enters, put a quest counter on this enchantment.\nAt the beginning of your end step, if this enchantment has four or more quest counters on it, exile up to one target creature you control, then return it to the battlefield under its owner's control.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": "ChosenTargets",
+                            "storeAs": "airbendChosen"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "airbendChosen",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Exile"
+                            },
+                            "storeMovedAs": "airbendExiled"
+                        },
+                        {
+                            "type": "GrantMayPlayFromExile",
+                            "from": "airbendExiled",
+                            "expiry": "Permanent",
+                            "ownerControls": true,
+                            "fixedAlternativeManaCost": "{2}"
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature"
+                    },
+                    "id": "up to one target creature"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "filter": "creature ctrl:you",
+                    "to": "Battlefield"
+                },
+                "binding": "OTHER",
+                "effect": {
+                    "type": "AddCounters",
+                    "counterType": "quest",
+                    "count": 1,
+                    "target": "Self"
+                },
+                "descriptionOverride": "Whenever a creature you control enters, put a quest counter on this enchantment."
+            },
+            {
+                "id": "ability_3",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "END"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "Compare",
+                            "left": {
+                                "type": "EntityProperty",
+                                "entity": "Source",
+                                "numericProperty": {
+                                    "type": "CounterCount",
+                                    "counterType": {
+                                        "type": "Named",
+                                        "name": "quest"
+                                    }
+                                }
+                            },
+                            "operator": "GTE",
+                            "right": {
+                                "type": "Fixed",
+                                "amount": 4
+                            }
+                        }
+                    },
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "SelectTarget",
+                                "requirement": {
+                                    "type": "TargetObject",
+                                    "optional": true,
+                                    "filter": {
+                                        "baseFilter": "creature ctrl:you"
+                                    }
+                                },
+                                "storeAs": "flickered"
+                            },
+                            {
+                                "type": "MoveToZone",
+                                "target": {
+                                    "type": "PipelineTarget",
+                                    "collectionName": "flickered"
+                                },
+                                "destination": "Exile"
+                            },
+                            {
+                                "type": "MoveToZone",
+                                "target": {
+                                    "type": "PipelineTarget",
+                                    "collectionName": "flickered"
+                                },
+                                "destination": "Battlefield"
+                            }
+                        ]
+                    }
+                },
+                "descriptionOverride": "At the beginning of your end step, if this enchantment has four or more quest counters on it, exile up to one target creature you control, then return it to the battlefield under its owner's control."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "6",
+        "rarity": "RARE",
+        "artist": "Shiren",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/9/99a90d13-891c-45cc-b1d5-6080ebae5862.jpg?1764119907"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Airbending Lesson
 {
     "name": "Airbending Lesson",
