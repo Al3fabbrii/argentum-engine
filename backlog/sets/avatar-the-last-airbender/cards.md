@@ -171,7 +171,7 @@ The set is built around four **"bending" keyword families** plus a returning **E
 - [ ] Foggy Swamp Visions
 - [x] Forecasting Fortune Teller
 - [x] Forest
-- [ ] Gather the White Lotus
+- [x] Gather the White Lotus
 - [x] Geyser Leaper
 - [ ] Giant Koi
 - [x] Glider Kids
