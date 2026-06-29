@@ -199,11 +199,20 @@ class CastFromCollectionWithoutPayingCostExecutor(
                 castResult.state,
                 castResult.pendingDecision,
                 castResult.events,
-            ).copy(updatedCollections = castCollections)
+            ).copy(
+                updatedCollections = castCollections,
+                triggersAlreadyProcessed = castResult.triggersAlreadyProcessed,
+            )
         }
 
+        // CastSpellHandler already detected + stacked this cast's triggers; propagate the flag so a
+        // resuming caller (e.g. the gated MayEffect resumer -> SubmitDecisionHandler) doesn't re-scan
+        // the SpellCastEvent and double-fire "whenever you cast a spell" triggers.
         return EffectResult.success(castResult.state, castResult.events)
-            .copy(updatedCollections = castCollections)
+            .copy(
+                updatedCollections = castCollections,
+                triggersAlreadyProcessed = castResult.triggersAlreadyProcessed,
+            )
     }
 
     companion object {

@@ -1944,16 +1944,16 @@ class TriggerDetector(
                 val controllerId = entry.controllerId
                 val damageEvents = combatDamageByController[controllerId] ?: continue
 
-                // Check if any damage source matches the sourceFilter. Damage events are already
-                // grouped by source controller and matched to observers with the same controller,
-                // so "you control" is satisfied; we still run the full filter via the canonical
-                // evaluator so state predicates (e.g. +1/+1 counters) and any other card/controller
-                // predicates are honored — not just the handful of card predicates handled inline.
-                val firstMatchingInfo = damageEvents.firstOrNull { info ->
-                    val sourceContainer = state.getEntity(info.sourceId) ?: return@firstOrNull false
-                    sourceContainer.get<CardComponent>() ?: return@firstOrNull false
-                    if (!projected.isCreature(info.sourceId)) return@firstOrNull false
-                    if (sourceContainer.has<FaceDownComponent>()) return@firstOrNull false
+                // Find every matching damage event. Damage events are already grouped by source
+                // controller and matched to observers with the same controller, so "you control"
+                // is satisfied; we still run the full filter via the canonical evaluator so state
+                // predicates (e.g. +1/+1 counters) and any other card/controller predicates are
+                // honored — not just the handful of card predicates handled inline.
+                val matchingInfos = damageEvents.filter { info ->
+                    val sourceContainer = state.getEntity(info.sourceId) ?: return@filter false
+                    sourceContainer.get<CardComponent>() ?: return@filter false
+                    if (!projected.isCreature(info.sourceId)) return@filter false
+                    if (sourceContainer.has<FaceDownComponent>()) return@filter false
 
                     predicateEvaluator.matches(
                         state,
@@ -1964,17 +1964,24 @@ class TriggerDetector(
                     )
                 }
 
-                if (firstMatchingInfo != null) {
-                    // Batch trigger fires once regardless of how many sources dealt damage.
-                    // triggeringEntityId is an arbitrary matching source (the first one we found);
-                    // cards that need per-source dispatch must use a singular trigger event instead.
+                // "deal combat damage to a player" batches per damaged player: the ability
+                // triggers once for each player dealt combat damage by one or more matching
+                // creatures (multiple matching creatures hitting the same player still fire a
+                // single trigger). `triggeringPlayerId` is set to the damaged player so effects
+                // can reference "that player" (Vaan, Street Thief); `triggeringEntityId` is an
+                // arbitrary matching source for that player — batch triggers don't dispatch
+                // per source, so cards needing per-source dispatch use a singular trigger event.
+                for ((damagedPlayerId, infos) in matchingInfos.groupBy { it.targetPlayerId }) {
                     triggers.add(
                         PendingTrigger(
                             ability = ability,
                             sourceId = entry.entityId,
                             sourceName = entry.cardComponent.name,
                             controllerId = controllerId,
-                            triggerContext = TriggerContext(triggeringEntityId = firstMatchingInfo.sourceId)
+                            triggerContext = TriggerContext(
+                                triggeringEntityId = infos.first().sourceId,
+                                triggeringPlayerId = damagedPlayerId
+                            )
                         )
                     )
                 }

@@ -273,8 +273,11 @@ so a land // spell Adventure offers *both* "play the land" (PlayLandEnumerator) 
 - **Win/lose-the-game riders** (Zenos → Shinryu "when the chosen player loses the game, you win"; Summon: Primal Odin
   II grants "deals combat damage → that player loses the game") — confirm `Effects.WinTheGame` / `LoseTheGame` and a
   "chosen player loses → you win" linked trigger exist.
-- **"Cast a spell you don't own" matters** (Vaan, Street Thief) — needs a trigger/condition on casting a spell whose
-  owner isn't you (exiled-from-opponent cast). Verify ownership-vs-controller is tracked on cast for the trigger.
+- ~~**"Cast a spell you don't own" matters** (Vaan, Street Thief)~~ — ✅ IMPLEMENTED. `SpellCastPredicate.NotOwnedByController`
+  (owner ≠ caster) already existed; Vaan composes it with the per-damaged-player `OneOrMoreDealCombatDamageToPlayerEvent`
+  batch (now exposes `Player.TriggeringPlayer` = the damaged player) + `MayEffect(CastFromCollection(payManaCost), otherwise =
+  CreateTreasure)`. Also fixed a nested-cast double-trigger: cast-during-resolution now propagates
+  `triggersAlreadyProcessed` through `EffectResult` so "whenever you cast a spell" fires once.
 - **Two-permanent "this creature gets all abilities of a chosen card"** — not in FIN at the Koh scale, but Relm's
   Sketching (copy-token-of-target artifact/creature/**land**) — confirm copy-token supports copying a *land*.
 - **"Destroy up to one Equipment attached to that creature"** (Light of Judgment) — ❌ GAP. The damage half is

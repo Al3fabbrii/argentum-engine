@@ -496,7 +496,11 @@ class EffectAndTriggerContinuationResumer(
             return result
         }
 
+        // Preserve `triggersAlreadyProcessed` across the continuation drain: if the gated effect ran
+        // a nested cast that already stacked its cast-triggers (Vaan casting an opponent's card via
+        // MayEffect), SubmitDecisionHandler must not re-detect the same SpellCastEvent.
         return checkForMore(result.state, result.events.toList())
+            .copy(triggersAlreadyProcessed = result.triggersAlreadyProcessed)
     }
 
     private fun resumeMayRevealCardFromHand(
