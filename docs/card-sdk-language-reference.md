@@ -5898,7 +5898,12 @@ Card authors rarely reference these directly; they are created/updated by the ma
   `SourceProjectionCondition.ControllerHasCitysBlessing` + `PlayerCitysBlessingComponent`.
 - **Siege (named-mode entry)** — `EntersWithChoice(ChoiceType.MODE, modeOptions = ...)` + `SourceChosenModeIs("id")`.
 - **Morph** — `morph = "{2}{U}"` (top-level) + `morphFaceUpEffect` for "as it turns face up".
-- **Warp** — `warp = "{1}{R}"`; alt-cost that exiles end of turn.
+- **Warp** — `warp = "{1}{R}"`; alt-cost that exiles end of turn. Like morph and cycle, a warp card
+  always surfaces *both* cast options — its normal cost and its warp cost — in the action window, even
+  when only one (or neither) is payable; the unpayable side appears grayed out (CR 118.9a, the caster
+  chooses which cost to use). The warp action is enumerated by `CastFromZoneEnumerator`, which also
+  emits the grayed-out normal-cast placeholder when the normal cost is unaffordable (mirroring
+  `MorphCastEnumerator`).
 - **Evoke** — `evoke = "{U}"`; pay alt cost, sacrifice on ETB.
 - **Sneak** — `sneak("{1}{U}")`; declare-blockers-step alt cost (pay mana + return an unblocked attacker you control to hand); a resolving permanent enters tapped and attacking the same defender. `Conditions.SneakCostWasPaid` reads the rider flag.
 - **Ninjutsu** — `ninjutsu("{1}{U}{B}")`; the canonical CR 702.49 keyword that **Sneak** reflavors. Same declare-blockers alt cost and tapped-and-attacking entry, shared via `KeywordAbility.ninjutsuStyleCost`. *Kaito, Bane of Nightmares* (DSK).

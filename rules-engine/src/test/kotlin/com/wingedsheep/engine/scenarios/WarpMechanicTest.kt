@@ -1,5 +1,6 @@
 package com.wingedsheep.engine.scenarios
 
+import com.wingedsheep.engine.core.AlternativeCostType
 import com.wingedsheep.engine.core.CastSpell
 import com.wingedsheep.engine.core.PaymentStrategy
 import com.wingedsheep.engine.state.components.battlefield.WarpedComponent
@@ -17,6 +18,7 @@ import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
+import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.EntersWithDynamicCounters
 import com.wingedsheep.sdk.scripting.values.DynamicAmount
 import io.kotest.core.spec.style.FunSpec
@@ -269,6 +271,81 @@ class WarpMechanicTest : FunSpec({
             cast?.cardId == exiledCardId && cast.useAlternativeCost == true
         }
         warpCostCastFromExile shouldBe null
+    }
+
+    // A warp card in hand can be cast two ways — its normal cost or its warp cost — and which to
+    // use is the caster's choice (CR 118.9a). The action window must always surface both, even when
+    // only one is payable, mirroring how morph shows the normal cast alongside the face-down cast.
+
+    fun GameTestDriver.castOptionsFor(
+        cardId: EntityId,
+    ): Pair<com.wingedsheep.engine.legalactions.LegalAction?, com.wingedsheep.engine.legalactions.LegalAction?> {
+        val enumerator = LegalActionEnumerator.create(cardRegistry)
+        val legalActions = enumerator.enumerate(state, activePlayer!!)
+        val normalCast = legalActions.firstOrNull { action ->
+            val cast = action.action as? CastSpell
+            cast?.cardId == cardId && !cast.useAlternativeCost && !cast.castFaceDown
+        }
+        val warpCast = legalActions.firstOrNull { action ->
+            val cast = action.action as? CastSpell
+            cast?.cardId == cardId && cast.useAlternativeCost &&
+                cast.alternativeCostType == AlternativeCostType.WARP
+        }
+        return normalCast to warpCast
+    }
+
+    test("warp card shows both normal and warp cast when only the warp cost is affordable") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        driver.gotoMainPhase()
+
+        val player = driver.activePlayer!!
+        val cardId = driver.putCardInHand(player, "Warp Test Creature")
+        // Warp {1}{R} (2 mana, affordable) vs normal {3}{R}{R} (5 mana, not affordable).
+        repeat(2) { driver.putLandOnBattlefield(player, "Mountain") }
+
+        val (normalCast, warpCast) = driver.castOptionsFor(cardId)
+
+        warpCast shouldNotBe null
+        warpCast!!.affordable shouldBe true
+        normalCast shouldNotBe null
+        normalCast!!.affordable shouldBe false
+    }
+
+    test("warp card shows both normal and warp cast when neither cost is affordable") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        driver.gotoMainPhase()
+
+        val player = driver.activePlayer!!
+        val cardId = driver.putCardInHand(player, "Warp Test Creature")
+        // No mana sources — both the normal cost and the warp cost are unaffordable, but both
+        // ways to cast must still appear (greyed out) so the player sees the full action window.
+
+        val (normalCast, warpCast) = driver.castOptionsFor(cardId)
+
+        warpCast shouldNotBe null
+        warpCast!!.affordable shouldBe false
+        normalCast shouldNotBe null
+        normalCast!!.affordable shouldBe false
+    }
+
+    test("warp card shows both normal and warp cast when both costs are affordable") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        driver.gotoMainPhase()
+
+        val player = driver.activePlayer!!
+        val cardId = driver.putCardInHand(player, "Warp Test Creature")
+        // Five mana covers both the normal {3}{R}{R} and the warp {1}{R} cost.
+        repeat(5) { driver.putLandOnBattlefield(player, "Mountain") }
+
+        val (normalCast, warpCast) = driver.castOptionsFor(cardId)
+
+        warpCast shouldNotBe null
+        warpCast!!.affordable shouldBe true
+        normalCast shouldNotBe null
+        normalCast!!.affordable shouldBe true
     }
 
     test("spellWarpedThisTurn is set when a spell is warped") {
