@@ -1378,8 +1378,10 @@ class TriggerDetector(
         attachmentDetector.detectAttachmentTriggers(state, event, triggers, index)
 
         // Handle "when you gain control of this from another player" triggers (e.g., Risky Move)
+        // and "whenever an opponent gains control of a permanent from you" triggers (e.g., Zidane).
         if (event is ControlChangedEvent) {
             detectControlChangeTriggers(state, event, triggers)
+            detectOpponentGainsControlTriggers(state, event, triggers)
         }
 
         // Handle self-cast triggers on the spell currently being cast — both NthSpellCast
@@ -1942,16 +1944,16 @@ class TriggerDetector(
                 val controllerId = entry.controllerId
                 val damageEvents = combatDamageByController[controllerId] ?: continue
 
-                // Check if any damage source matches the sourceFilter. Damage events are already
-                // grouped by source controller and matched to observers with the same controller,
-                // so "you control" is satisfied; we still run the full filter via the canonical
-                // evaluator so state predicates (e.g. +1/+1 counters) and any other card/controller
-                // predicates are honored — not just the handful of card predicates handled inline.
-                val firstMatchingInfo = damageEvents.firstOrNull { info ->
-                    val sourceContainer = state.getEntity(info.sourceId) ?: return@firstOrNull false
-                    sourceContainer.get<CardComponent>() ?: return@firstOrNull false
-                    if (!projected.isCreature(info.sourceId)) return@firstOrNull false
-                    if (sourceContainer.has<FaceDownComponent>()) return@firstOrNull false
+                // Find every matching damage event. Damage events are already grouped by source
+                // controller and matched to observers with the same controller, so "you control"
+                // is satisfied; we still run the full filter via the canonical evaluator so state
+                // predicates (e.g. +1/+1 counters) and any other card/controller predicates are
+                // honored — not just the handful of card predicates handled inline.
+                val matchingInfos = damageEvents.filter { info ->
+                    val sourceContainer = state.getEntity(info.sourceId) ?: return@filter false
+                    sourceContainer.get<CardComponent>() ?: return@filter false
+                    if (!projected.isCreature(info.sourceId)) return@filter false
+                    if (sourceContainer.has<FaceDownComponent>()) return@filter false
 
                     predicateEvaluator.matches(
                         state,
@@ -1962,17 +1964,24 @@ class TriggerDetector(
                     )
                 }
 
-                if (firstMatchingInfo != null) {
-                    // Batch trigger fires once regardless of how many sources dealt damage.
-                    // triggeringEntityId is an arbitrary matching source (the first one we found);
-                    // cards that need per-source dispatch must use a singular trigger event instead.
+                // "deal combat damage to a player" batches per damaged player: the ability
+                // triggers once for each player dealt combat damage by one or more matching
+                // creatures (multiple matching creatures hitting the same player still fire a
+                // single trigger). `triggeringPlayerId` is set to the damaged player so effects
+                // can reference "that player" (Vaan, Street Thief); `triggeringEntityId` is an
+                // arbitrary matching source for that player — batch triggers don't dispatch
+                // per source, so cards needing per-source dispatch use a singular trigger event.
+                for ((damagedPlayerId, infos) in matchingInfos.groupBy { it.targetPlayerId }) {
                     triggers.add(
                         PendingTrigger(
                             ability = ability,
                             sourceId = entry.entityId,
                             sourceName = entry.cardComponent.name,
                             controllerId = controllerId,
-                            triggerContext = TriggerContext(triggeringEntityId = firstMatchingInfo.sourceId)
+                            triggerContext = TriggerContext(
+                                triggeringEntityId = infos.first().sourceId,
+                                triggeringPlayerId = damagedPlayerId
+                            )
                         )
                     )
                 }
@@ -2864,6 +2873,64 @@ class TriggerDetector(
                         triggerContext = TriggerContext(
                             triggeringEntityId = entityId,
                             triggeringPlayerId = event.newControllerId
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Detect resident "whenever an opponent gains control of a permanent from you" triggers
+     * (Zidane, Tantalus Thief) — [EventPattern.ControlChangeEvent] with
+     * [ControlChangeDirection.LOST], `requireOpponent = true`, and [TriggerBinding.ANY].
+     *
+     * Unlike [detectControlChangeTriggers], the ability does not live on the permanent whose control
+     * changed: it lives on any battlefield permanent the *old* controller controlled immediately
+     * before this event (look-back-in-time, CR 603.10), including that very permanent when it is the
+     * ability's own source. The trigger fires once per opponent-gain and belongs to the old
+     * controller (so a stolen permanent still produces its payoff for the player it was taken from).
+     */
+    private fun detectOpponentGainsControlTriggers(
+        state: GameState,
+        event: ControlChangedEvent,
+        triggers: MutableList<PendingTrigger>
+    ) {
+        val oldController = event.oldControllerId
+        val newController = event.newControllerId
+        if (oldController == newController) return
+        // "an opponent" — team-aware (CR 810): a teammate gaining control does not trigger.
+        if (newController !in state.getOpponents(oldController)) return
+
+        for (holderId in state.getBattlefield()) {
+            val container = state.getEntity(holderId) ?: continue
+            // Face-down permanents have no abilities (Rule 708.2).
+            if (container.has<FaceDownComponent>()) continue
+            val cardComponent = container.get<CardComponent>() ?: continue
+
+            // The ability's controller as of immediately before the event: for the permanent that
+            // just changed control that is the *old* controller; every other permanent is unaffected
+            // by this single-permanent control change.
+            val holderControllerBefore =
+                if (holderId == event.permanentId) oldController
+                else state.projectedState.getController(holderId)
+            if (holderControllerBefore != oldController) continue
+
+            val abilities = abilityResolver.getTriggeredAbilities(holderId, cardComponent.cardDefinitionId, state)
+            for (ability in abilities) {
+                val controlTrigger = ability.trigger as? EventPattern.ControlChangeEvent ?: continue
+                if (controlTrigger.direction != com.wingedsheep.sdk.scripting.ControlChangeDirection.LOST) continue
+                if (!controlTrigger.requireOpponent) continue
+                if (ability.binding != TriggerBinding.ANY) continue
+                triggers.add(
+                    PendingTrigger(
+                        ability = ability,
+                        sourceId = holderId,
+                        sourceName = cardComponent.name,
+                        controllerId = oldController,
+                        triggerContext = TriggerContext(
+                            triggeringEntityId = event.permanentId,
+                            triggeringPlayerId = newController
                         )
                     )
                 )

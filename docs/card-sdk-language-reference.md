@@ -623,7 +623,9 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `RemoveAllCounters(target)` — wipe every counter.
 - `RemoveAllCountersOfType(type, target)` — wipe one kind.
 - `MoveAllLastKnownCounters(target)` — Hooded Hydra / Essence Channeler — move every counter kind from source's
-  last-known state.
+  last-known state. Reads the dies/leaves trigger map (`triggerLastKnownCounters`) first, falling back to the
+  cost-sacrifice map (`lastKnownSourceCounters`) so it also works from an activated ability whose source was
+  sacrificed/exiled as a cost (Zack Fair).
 - `MoveCountersEachKindMissing(source, destination)` — Goldberry, River-Daughter (ability A) — for each counter
   kind on `source` that `destination` does not already have, move one of that kind from `source` onto
   `destination`. Deterministic, no player choice; kinds the destination already has are left untouched.
@@ -1658,6 +1660,14 @@ effect = Effects.Pipeline {
   Backs "manifest dread X times, then put X +1/+1 counters on each of those creatures" (Valgavoth's
   Onslaught): `RepeatDynamicTimes(XValue, manifestDread(markEntered = true))` →
   `gather(EnteredViaThisResolution)` → `AddCountersToCollection(+1/+1, XValue)`.
+- `CardSource.LastKnownEquipmentAttachedToSource` — the Equipment that was attached to the source the
+  moment a self-sacrifice / self-exile cost moved it off the battlefield (CR 112.7a), read off
+  `EffectContext.lastKnownSourceAttachments` (captured before the cost wiped the source's attachment
+  list) and restricted to permanents still on the battlefield that are still Equipment. The host has
+  gone by resolution, so the live attachment index is empty — only the captured snapshot identifies
+  them. Backs "attach an Equipment that was attached to it to that creature" (Zack Fair):
+  `gather(LastKnownEquipmentAttachedToSource)` → `chooseExactly(1)` (auto-resolves with one, no-op
+  with none) → `AttachTargetEquipmentToCreature(PipelineTarget(chosen), target)`.
 
 A card needing a genuinely **new step semantic** (a new capture kind, a new decision shape) still
 adds the `Effect` + executor first (`add-feature`); the builder only composes the existing
@@ -2503,6 +2513,7 @@ Named sugar for the common cases; reach for the factories for any other combinat
 - `DealsDamage` — source deals any damage (SELF binding).
 - `DealsCombatDamageToPlayer` — source deals combat damage to a player (SELF binding).
 - `DealsCombatDamageToCreature` — source deals combat damage to a creature (SELF binding).
+- `OneOrMoreDealCombatDamageToPlayerEvent(sourceFilter = Creature)` — **offensive combat-damage batch trigger** (ANY binding, via `TriggerSpec(OneOrMoreDealCombatDamageToPlayerEvent(sourceFilter = …), TriggerBinding.ANY)`): "whenever one or more [matching creatures] you control deal combat damage to a player" (Kastral, the Windcrested: `Creature.withSubtype("Bird")`; Vaan, Street Thief: `Creature.withAnySubtype("Scout", "Pirate", "Rogue")`). The `sourceFilter`'s "you control" is implied by the observer — don't add `youControl()`. Fires **once per damaged player** (a batch per recipient): multiple matching creatures hitting the same player still fire a single trigger, but two players each dealt damage fire it twice. `Player.TriggeringPlayer` resolves to the damaged player, so effects can reference "that player" (e.g. exile the top card of *that player's* library); `triggeringEntityId` is an arbitrary matching source for that player (batch triggers don't dispatch per source).
 - `OneOrMoreCreaturesDealCombatDamageToYou(filter = Creature)` — **defensive combat-damage batch trigger** (ANY binding): "whenever one or more creatures deal combat damage to *you*" (Witch-king of Angmar). Fires at most once per combat-damage batch regardless of how many creatures connected with the trigger's controller (the damaged player), unlike per-source `dealsDamage(recipient = You, …)` which fires once per connecting creature. The triggering entity is an arbitrary matching damager. Pair with the `dealtCombatDamageToSourceControllerThisTurn()` filter for "...each opponent sacrifices a creature that dealt combat damage to you this turn".
 - `TakesDamage` — source is dealt damage by any source (SELF binding).
 - `CreatureDealtDamageByThisDies` — Etali / Sengir / Soul Collector shape (SELF binding): "whenever a creature dealt damage by *this* permanent this turn dies". Uses `CreatureDealtDamageBySourceDiesEvent(sourceFilter = null)`.
@@ -2770,9 +2781,18 @@ Triggers.youCastSpell(
   (`CreateDelayedTriggerEffect(trigger = Triggers.LoseControlOfWatched, watchedTarget = …)`): "when you
   lose control of [that permanent] this turn …". It fires on any mid-turn control change of the watched
   permanent *away from* the trigger's controller (the old controller was you). Stolen Uniform pairs it
-  with `DelayedTriggerExpiry.EndOfTurn` + `fireOnce`. `EventPattern.ControlChangeEvent(direction)` is the
-  underlying primitive: `direction` (`ControlChangeDirection.GAINED` default / `LOST`) selects which side
-  of the control change — relative to the ability's controller — the ability watches.
+  with `DelayedTriggerExpiry.EndOfTurn` + `fireOnce`. `EventPattern.ControlChangeEvent(direction,
+  requireOpponent)` is the underlying primitive: `direction` (`ControlChangeDirection.GAINED` default /
+  `LOST`) selects which side of the control change — relative to the ability's controller — the ability
+  watches.
+- `OpponentGainsControlOfYourPermanent` — `ControlChangeEvent(ControlChangeDirection.LOST,
+  requireOpponent = true)` + `TriggerBinding.ANY`: "whenever an opponent gains control of a permanent from
+  you …". A resident, battlefield-wide watcher (not entity-scoped like `LoseControlOfWatched`): it fires
+  once for each permanent the ability's controller loses to an opponent (team-aware, CR 810). The trigger
+  belongs to the *old* controller via look-back-in-time (CR 603.10), so it still fires for you even when the
+  permanent being stolen is the ability's own source (Zidane, Tantalus Thief — a stolen Zidane still makes a
+  Treasure for its old controller). `requireOpponent` (LOST only) adds the "new controller is an opponent"
+  gate on top of the plain LOST direction.
 - `BecomesTarget(filter?)` — source becomes target of spell/ability. The engine emits the
   underlying `BecomesTargetEvent` for both permanent targets and spell targets on the stack, but the
   trigger matches **permanent targets only** by default — "a creature you control" is a battlefield
@@ -5481,6 +5501,20 @@ replacementEffect {
   "three or more lands total". The parallel "fast land" cycle (Blooming Marsh — "two or fewer other lands")
   uses an `LTE`-direction `Compare(AggregateBattlefield(You, Land), LTE, Fixed(3))`. `payLifeCost` renders
   the "you may pay N life; if you don't, it enters tapped" variant.
+- `EntersUntapped(appliesTo = ZoneChangeEvent(filter, to = Zone.BATTLEFIELD))` — the inverse of
+  `EntersTapped`: "[filter] enter the battlefield untapped" (The Wandering Minstrel — "Lands you
+  control enter untapped", `filter = GameObjectFilter.Land.youControl()`). Unlike `EntersTapped`,
+  which is a self-replacement consumed once as the source enters, this is a *runtime* replacement
+  stamped into the source's `ReplacementEffectSourceComponent` (`StaticAbilityHandler.isRuntimeReplacementEffect`)
+  and consulted from the battlefield against OTHER permanents as they enter — so `appliesTo.filter`
+  describes the *affected* permanents. The entry-tap paths (`PlayLandHandler`, `ZoneTransitionService`)
+  ask `EnterUntappedReplacements.entersUntapped(...)` before marking a permanent tapped and skip the
+  tap when it matches. Per CR 614 ordering this collapses "would enter tapped via another replacement"
+  (controller chooses untapped) and "simply put onto the battlefield tapped" (no replacement → untapped)
+  to the same outcome; a shock land's "pay N life or enter tapped" prompt is elided (moot when it enters
+  untapped regardless). Edge not covered: a same-event simultaneous mass-entry where the source itself is
+  among the entering permanents (the source isn't yet consulted), and a land tapped via a generic
+  `OnEnterRunEffect` self-tap (e.g. Game Trail) is not overridden.
 - `RedirectZoneChange(newDestination, appliesTo, linkToSource = false)` — redirect a zone change to a
   different destination (Rest in Peace / Leyline of the Void: graveyard → exile). `appliesTo` is an
   `EventPattern.ZoneChangeEvent(filter, from?, to?)`; the `filter`'s `controllerPredicate` scopes it

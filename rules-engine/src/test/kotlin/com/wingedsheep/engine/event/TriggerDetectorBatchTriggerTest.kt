@@ -383,6 +383,8 @@ class TriggerDetectorBatchTriggerTest : FunSpec({
             triggers[0].ability.trigger
                 .shouldBeInstanceOf<EventPattern.OneOrMoreDealCombatDamageToPlayerEvent>()
             triggers[0].controllerId shouldBe driver.player1
+            // The batch fires per damaged player: Player.TriggeringPlayer = the damaged player.
+            triggers[0].triggerContext.triggeringPlayerId shouldBe driver.player2
         }
 
         test("batches multiple Birds dealing damage into a single trigger") {

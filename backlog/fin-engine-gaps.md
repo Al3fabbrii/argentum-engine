@@ -46,9 +46,15 @@ Verified against source (file:line). These appear across the remaining FIN cards
   Shantotto, Vivi (the whole "magic-counter" sub-theme).
 - **Equip** — `equipAbility("{N}")` (`CardBuilder.kt:515`) + `AttachEquipmentExecutor`; **attach-to-target as a
   spell/triggered effect** — `Effects.AttachTargetEquipmentToCreature(...)` (`Effects.kt:3048`,
-  `AttachTargetEquipmentToCreatureExecutor`), covering Weapons Vendor, Beatrix, Gilgamesh, Zack Fair.
+  `AttachTargetEquipmentToCreatureExecutor`), covering Weapons Vendor, Beatrix, Gilgamesh.
   **Raubahn, Bull of Ala Mhigo is implemented** (attack trigger reuses that effect; "up to one target Equipment"
   is an optional target, declining/illegal attach is a no-op).
+  **Zack Fair is implemented** — its "attach an Equipment that was attached to it" needed *more* than the plain
+  attach effect: the source is sacrificed as a cost, so the Equipment is gathered via new last-known information
+  (`CardSource.LastKnownEquipmentAttachedToSource` ← `EffectContext.lastKnownSourceAttachments`, captured before
+  the cost), `chooseExactly(1)` picks one when several qualify, then `AttachTargetEquipmentToCreature` re-attaches
+  it; `MoveAllLastKnownCounters` now also reads the cost-sacrifice counter map. Also fixed a CR 704.5n ordering
+  bug where the leave-marker SBA would tear the re-attachment back off.
 - **Dynamic ward cost ("Ward—Pay life equal to ~")** — `KeywordAbility.wardLife(DynamicAmount)` →
   `WardCost.DynamicLife`, resolved at ward-trigger resolution (CR 702.21b) with last-known power if the source
   has left (CR 112.7a). Implemented for Raubahn, Bull of Ala Mhigo.
@@ -267,8 +273,11 @@ so a land // spell Adventure offers *both* "play the land" (PlayLandEnumerator) 
 - **Win/lose-the-game riders** (Zenos → Shinryu "when the chosen player loses the game, you win"; Summon: Primal Odin
   II grants "deals combat damage → that player loses the game") — confirm `Effects.WinTheGame` / `LoseTheGame` and a
   "chosen player loses → you win" linked trigger exist.
-- **"Cast a spell you don't own" matters** (Vaan, Street Thief) — needs a trigger/condition on casting a spell whose
-  owner isn't you (exiled-from-opponent cast). Verify ownership-vs-controller is tracked on cast for the trigger.
+- ~~**"Cast a spell you don't own" matters** (Vaan, Street Thief)~~ — ✅ IMPLEMENTED. `SpellCastPredicate.NotOwnedByController`
+  (owner ≠ caster) already existed; Vaan composes it with the per-damaged-player `OneOrMoreDealCombatDamageToPlayerEvent`
+  batch (now exposes `Player.TriggeringPlayer` = the damaged player) + `MayEffect(CastFromCollection(payManaCost), otherwise =
+  CreateTreasure)`. Also fixed a nested-cast double-trigger: cast-during-resolution now propagates
+  `triggersAlreadyProcessed` through `EffectResult` so "whenever you cast a spell" fires once.
 - **Two-permanent "this creature gets all abilities of a chosen card"** — not in FIN at the Koh scale, but Relm's
   Sketching (copy-token-of-target artifact/creature/**land**) — confirm copy-token supports copying a *land*.
 - **"Destroy up to one Equipment attached to that creature"** (Light of Judgment) — ❌ GAP. The damage half is
