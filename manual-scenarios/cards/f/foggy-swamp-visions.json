@@ -3,35 +3,24 @@
   "player2Name": "Bob",
   "player1": {
     "lifeTotal": 20,
-    "hand": ["Ruinous Waterbending"],
+    "hand": ["Foggy Swamp Visions"],
     "battlefield": [
-      {"name": "Swamp"},
-      {"name": "Swamp"},
-      {"name": "Swamp"},
-      {"name": "Swamp"},
-      {"name": "Swamp"},
-      {"name": "Swamp"},
       {"name": "Swamp"},
       {"name": "Swamp"},
       {"name": "Swamp"},
       {"name": "Cat-Owl"},
       {"name": "Cat-Gator"},
       {"name": "Kyoshi Warriors"},
-      {"name": "Badgermole"},
       {"name": "Meteor Sword"}
     ],
-    "graveyard": [],
+    "graveyard": ["Grizzly Bears", "Grizzly Bears", "Badgermole"],
     "library": ["Swamp", "Swamp", "Island"]
   },
   "player2": {
     "lifeTotal": 20,
     "hand": [],
-    "battlefield": [
-      {"name": "Badgermole Cub"},
-      {"name": "Iguana Parrot"},
-      {"name": "Boar-q-pine"}
-    ],
-    "graveyard": [],
+    "battlefield": [],
+    "graveyard": ["Glory Seeker", "Cat-Owl"],
     "library": ["Forest", "Forest", "Mountain"]
   },
   "phase": "PRECOMBAT_MAIN",
