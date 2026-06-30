@@ -5,7 +5,8 @@
 **Implemented:** 248 / 286
 **Engine gap analysis:** [`tla-engine-gaps.md`](tla-engine-gaps.md)
 
-> **Status (June 2026):** 240/286 implemented. The **Airbend** keyword (permanent form) is now built —
+> **Status (June 2026):** 248/286 implemented. The **Exhaust** keyword is now built (`isExhaust = true`
+> → the per-object `ActivationRestriction.Once`), and the **Airbend** keyword (permanent form) before it —
 > a fixed-alternative-cost may-play-from-exile primitive (`Effects.Airbend` / `Effects.AirbendAll`),
 > which unlocked Airbending Lesson, Glider Staff, Aang the Last Airbender, Airbender Ascension,
 > Airbender's Reversal, and both Appa. Earlier work landed **Firebending**, the **Vigilance keyword
