@@ -3,14 +3,16 @@
 Cross-reference of the remaining (unimplemented) TLA cards against the engine's actual capabilities.
 Generated to scope what must be built before the set can be completed.
 
-> ## ⚠️ Status update — June 2026: now 248 / 286 (87%)
+> ## ⚠️ Status update — June 2026: now 252 / 286 (88%)
 >
-> **Most of this document's Tier-1/Tier-2 gaps have since been closed.** Of the **38 cards still
-> missing**, the large majority need new engine/SDK work — but a handful were *unblocked* by the
-> keywords built since the original write-up (activated/spell Waterbend, dynamic Firebending, Equip)
-> and are now plain `add-card` authoring with no new engine work (e.g. North Pole Patrol,
-> Firebending Student, Trusty Boomerang, Ran and Shaw). What changed since the original write-up
-> (✅ = now built, so the cards it gated are done):
+> **Most of this document's Tier-1/Tier-2 gaps have since been closed.** Of the **34 cards still
+> missing**, the large majority need new engine/SDK work. The keyword work since the original
+> write-up (activated/spell Waterbend, dynamic Firebending, Equip) unblocked a recent batch, now
+> all implemented: **North Pole Patrol** and **Firebending Student** (plain `add-card`, no engine
+> work); **Trusty Boomerang** (needed `EffectTarget.GrantingSource` — name the Equipment that
+> granted a bearer's ability); **Ran and Shaw** (needed `removeLegendary` on the self-copy token +
+> `CardsInGraveyardMatchingAtLeast`). What changed since the original write-up (✅ = now built, so
+> the cards it gated are done):
 >
 > - ✅ **Firebending** — `firebending(n)` keyword + attack-triggered combat-duration mana
 >   (`AddManaEffect(…, ManaExpiry.END_OF_COMBAT)`); dynamic "Firebending X" hand-wired with a
@@ -374,10 +376,10 @@ activated-ability Waterbend (§1), and spell-level Waterbend additional cost inc
 spell half), plus **Airbend** (§3, keyword + stack branch) and **Exhaust** (§4). The set is now at
 **248/286**; the order below covers only what's left.
 
-0. **Now-unblocked plain authoring** (no new engine work) — a handful of cards gated only by keywords
-   already built: **North Pole Patrol** (activated Waterbend), **Firebending Student** (Firebending
-   X = power + prowess), **Trusty Boomerang** (Equipment granting a tap/bounce ability), **Ran and
-   Shaw** (copy-self ETB + graveyard type count + firebending 2). Knock these out via `add-card` first.
+0. ~~**Now-unblocked recent batch**~~ — ✅ **done**: **North Pole Patrol** (activated Waterbend) and
+   **Firebending Student** (Firebending X = power + prowess) were plain `add-card`; **Trusty Boomerang**
+   added `EffectTarget.GrantingSource` (name the granting Equipment from a granted ability); **Ran and
+   Shaw** added `removeLegendary` on the self-copy token + `CardsInGraveyardMatchingAtLeast`.
 
 1. ~~**Airbend** (§3)~~ — ✅ **done**: fixed-alternative-cost may-play (`Effects.Airbend` /
    `Effects.AirbendAll`) + stack-spell exile branch (`Effects.ExileTargetSpell`). 8 of 11 cards built;
