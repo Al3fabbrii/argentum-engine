@@ -320,6 +320,23 @@ data class ManifestedDreadEvent(
 ) : GameEvent
 
 /**
+ * A player just searched their library (CR 701.23). Fires once per search, after the found
+ * cards have been moved and the library shuffled. Drives "Whenever a player searches their
+ * library" triggers (Wan Shi, Librarian); see
+ * [com.wingedsheep.sdk.scripting.EventPattern.SearchLibraryEvent]. Per CR 701.23f any ability
+ * that triggers on a library being searched still fires even when no card was found.
+ *
+ * @property playerId The player whose library was searched (the searcher).
+ * @property sourceName The card/ability that caused the search (for display).
+ */
+@Serializable
+@SerialName("LibrarySearchedEvent")
+data class LibrarySearchedEvent(
+    val playerId: EntityId,
+    val sourceName: String
+) : GameEvent
+
+/**
  * A player chose a creature type (e.g., "Choose a creature type" for Walking Desecration).
  * This is a public announcement visible to all players.
  */

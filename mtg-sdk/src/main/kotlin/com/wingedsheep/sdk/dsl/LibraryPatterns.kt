@@ -13,6 +13,7 @@ import com.wingedsheep.sdk.scripting.effects.CollectionFilter
 import com.wingedsheep.sdk.scripting.effects.Effect
 import com.wingedsheep.sdk.scripting.effects.FaceDownMode
 import com.wingedsheep.sdk.scripting.effects.FilterCollectionEffect
+import com.wingedsheep.sdk.scripting.effects.EmitLibrarySearchedEventEffect
 import com.wingedsheep.sdk.scripting.effects.EmitManifestedDreadEventEffect
 import com.wingedsheep.sdk.scripting.effects.EmitScriedEventEffect
 import com.wingedsheep.sdk.scripting.effects.EmitSurveiledEventEffect
@@ -456,6 +457,10 @@ object LibraryPatterns {
             if (shuffleAfter) effects.add(ShuffleLibraryEffect())
         }
 
+        // Fire "Whenever a player searches their library" triggers (CR 701.23) after the search
+        // completes. Per CR 701.23f the event fires even when no card was found.
+        effects.add(EmitLibrarySearchedEventEffect)
+
         return CompositeEffect(effects)
     }
 
@@ -502,6 +507,9 @@ object LibraryPatterns {
 
         if (zones.contains(Zone.LIBRARY)) {
             effects.add(ShuffleLibraryEffect())
+            // Only a search that includes the library fires "searches their library" triggers
+            // (CR 701.23).
+            effects.add(EmitLibrarySearchedEventEffect)
         }
 
         return CompositeEffect(effects)
@@ -752,7 +760,10 @@ object LibraryPatterns {
                 destination = CardDestination.ToZone(Zone.HAND),
                 revealed = true
             ),
-            ShuffleLibraryEffect()
+            ShuffleLibraryEffect(),
+            // Each iterated player searches their own library — the emit tail's controller is
+            // rebound to that player, so the event names the correct searcher (CR 701.23).
+            EmitLibrarySearchedEventEffect
         )
     )
 }

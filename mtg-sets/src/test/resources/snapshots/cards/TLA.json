@@ -217,7 +217,8 @@
                                 },
                                 "revealed": true
                             },
-                            "ShuffleLibrary"
+                            "ShuffleLibrary",
+                            "EmitLibrarySearchedEvent"
                         ]
                     }
                 },
@@ -4148,7 +4149,8 @@
                                 "placement": "Tapped"
                             }
                         },
-                        "ShuffleLibrary"
+                        "ShuffleLibrary",
+                        "EmitLibrarySearchedEvent"
                     ]
                 }
             ]
@@ -5728,7 +5730,8 @@
                                         "placement": "Tapped"
                                     }
                                 },
-                                "ShuffleLibrary"
+                                "ShuffleLibrary",
+                                "EmitLibrarySearchedEvent"
                             ]
                         }
                     ]
@@ -10435,7 +10438,8 @@
                                 "placement": "Tapped"
                             }
                         },
-                        "ShuffleLibrary"
+                        "ShuffleLibrary",
+                        "EmitLibrarySearchedEvent"
                     ]
                 }
             },
@@ -10480,7 +10484,8 @@
                                 "placement": "Tapped"
                             }
                         },
-                        "ShuffleLibrary"
+                        "ShuffleLibrary",
+                        "EmitLibrarySearchedEvent"
                     ]
                 }
             }
@@ -14871,7 +14876,8 @@
                         "placement": "Tapped"
                     }
                 },
-                "ShuffleLibrary"
+                "ShuffleLibrary",
+                "EmitLibrarySearchedEvent"
             ]
         }
     },
@@ -16402,7 +16408,8 @@
                             },
                             "revealed": true
                         },
-                        "ShuffleLibrary"
+                        "ShuffleLibrary",
+                        "EmitLibrarySearchedEvent"
                     ]
                 }
             },
@@ -16577,7 +16584,8 @@
                                 "placement": "Tapped"
                             }
                         },
-                        "ShuffleLibrary"
+                        "ShuffleLibrary",
+                        "EmitLibrarySearchedEvent"
                     ]
                 }
             }
@@ -18806,7 +18814,8 @@
                                             "zone": "Battlefield",
                                             "placement": "Tapped"
                                         }
-                                    }
+                                    },
+                                    "EmitLibrarySearchedEvent"
                                 ]
                             },
                             {
@@ -19020,6 +19029,94 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Wan Shi Tong, Librarian
+{
+    "name": "Wan Shi Tong, Librarian",
+    "manaCost": "{X}{U}{U}",
+    "typeLine": "Legendary Creature — Bird Spirit",
+    "oracleText": "Flash\nFlying, vigilance\nWhen Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down.\nWhenever an opponent searches their library, put a +1/+1 counter on Wan Shi Tong and draw a card.",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "keywords": [
+        "FLASH",
+        "FLYING",
+        "VIGILANCE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddDynamicCounters",
+                            "counterType": "+1/+1",
+                            "amount": "XValue",
+                            "target": "Self"
+                        },
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Divide",
+                                "numerator": "XValue",
+                                "denominator": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                },
+                                "roundUp": false
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "Put X +1/+1 counters on Wan Shi Tong. Then draw half X cards, rounded down."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "SearchLibraryEvent",
+                    "player": "EachOpponent"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddCounters",
+                            "counterType": "+1/+1",
+                            "count": 1,
+                            "target": "Self"
+                        },
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "Put a +1/+1 counter on Wan Shi Tong and draw a card."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "78",
+        "rarity": "MYTHIC",
+        "artist": "Ryota Murayama",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/2/e20da6b5-1057-4a28-9e85-07de714e262f.jpg?1764120524"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
     ]
 }
 

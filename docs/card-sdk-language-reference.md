@@ -2963,6 +2963,19 @@ Triggers.youCastSpell(
 - `WheneverYouScryOrSurveil` — the combined look-at-top trigger; fires once per scry **and**
   once per surveil (Matoya, Archon Elder).
 
+### Library search (CR 701.23)
+
+- `WheneverYouSearchYourLibrary` / `WheneverAnOpponentSearchesTheirLibrary` — fire once per
+  library search (CR 701.23), after the found cards have moved and the library has shuffled.
+  Backed by the `SearchLibraryEvent(player)` pattern + the engine `LibrarySearchedEvent`, emitted
+  automatically by every search primitive (`Patterns.Library.searchLibrary` / `searchMultipleZones`
+  / `eachPlayerSearchesLibrary`) via the internal `EmitLibrarySearchedEventEffect` tail — so every
+  tutor, fetch, and basic-land search drives it; no card has to opt in. Under a `ForEachPlayer`
+  search the tail's controller is rebound to each iterated player, so the event names the correct
+  searcher. Per CR 701.23f the trigger fires even when no card was found. The opponent-scoped
+  variant is used by **Wan Shi, Librarian** ("Whenever an opponent searches their library, put a
+  +1/+1 counter on him and draw a card").
+
 ### Manifest Dread
 
 - `WheneverYouManifestDread` — fires once per manifest-dread resolution (CR 701.60), after the
