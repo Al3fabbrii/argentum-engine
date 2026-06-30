@@ -763,7 +763,9 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   Replicator: "create an X/X creature token of the chosen color and type." (Replaces the old one-off
   `CreateChosenTokenEffect`; under the hood it sets `CreateTokenEffect.colorsFromChoice` /
   `creatureTypesFromChoice`.)
-- `CreateTokenCopyOfSelf(count?, tapped?)` — token copies of source.
+- `CreateTokenCopyOfSelf(count?, overridePower?, overrideToughness?, removeLegendary?)` — token copies
+  of the source. `removeLegendary = true` applies the "except it's not legendary" copy clause (Ran and
+  Shaw), mirroring `CreateTokenCopyOfEquippedCreature`.
 - `CreateTokenCopyOfTarget(target, count?, overridePower?, overrideToughness?, tapped?, attacking?, triggeredAbilities?, addedKeywords?, addedSupertypes?, removedSupertypes?, overrideColors?, addedColors?, overrideSubtypes?, addedSubtypes?, overrideCardTypes?, activatedAbilities?, sacrificeAtStep?, sacrificeOnlyOnControllersTurn?, addCardTypes?, exileAtStep?, exileUnlessSourceIsRingBearer?, controller?)` —
   token copy of another permanent (or a card in any zone — the executor copies the target's `CardComponent`,
   so a graveyard/exile card works; pass `EffectTarget.PipelineTarget("name")` to copy a card a prior pipeline
@@ -1688,7 +1690,19 @@ can't statically prevent (cross-trigger flows, `Self`-vs-`ContextTarget` inside 
 
 - `EffectTarget.ContextTarget(i)` — i-th cast-time target.
 - `EffectTarget.Controller` — controller of the source ability.
-- `EffectTarget.Self` — the source permanent.
+- `EffectTarget.Self` — the source permanent. In a *granted* ability (Equipment/Aura "equipped
+  creature has …"), `Self` is the **host** that received the ability — its `{T}` taps the host —
+  not the granting object (CR 113.7).
+- `EffectTarget.GrantingSource` — the permanent whose static ability granted the currently-resolving
+  ability: the Equipment/Aura/permanent bearing the `GrantActivatedAbility` static, as the counterpart
+  to `Self` (the host). Use when a granted ability names the *granting object* — e.g. Trusty
+  Boomerang's "equipped creature has '{1}, {T}: Tap target creature. **Return Trusty Boomerang** to
+  its owner's hand'" (`Effects.ReturnToHand(EffectTarget.GrantingSource)`), or Cranial Plating's
+  "Attach Cranial Plating to target creature". The granter is captured when the ability is put on the
+  stack (threaded `ActivatedAbilityOnStackComponent.granterId` → `EffectContext.granterId`), so it
+  survives the granter leaving play — the referencing effect no-ops if it's gone (CR 113.7a). For an
+  ability whose source already *is* the granter (Territory Forge / Sharkey-style gains), it resolves
+  to the same entity as `Self`.
 - `EffectTarget.TriggeringEntity` — the entity that caused the trigger to fire.
 - `EffectTarget.DiscardedAsCost(index = 0)` — a card discarded to pay this spell's additional discard
   cost (`Costs.additional.DiscardCards(...)`). The discarded card is in its owner's graveyard by
@@ -4614,6 +4628,12 @@ default to "you" so card authors don't need to pass it explicitly.
   checks, e.g. `All(GraveyardContains(Filters.Instant), GraveyardContains(Filters.Sorcery))` =
   "an instant card and a sorcery card in your graveyard" (Flow State). `GraveyardContainsSubtype(subtype)`
   is the subtype-filtered sibling.
+- `CardsInGraveyardMatchingAtLeast(count, filter)` — "there are `count` or more cards matching `filter`
+  in your graveyard" (`Compare(Count(Player.You, Zone.GRAVEYARD, filter), GTE, count)`). The general
+  form behind `CreatureCardsInGraveyardAtLeast(count)`; use for "N or more <kind> cards", e.g. Ran and
+  Shaw's "three or more Dragon and/or Lesson cards" with
+  `GameObjectFilter.Any.withAnySubtype("Dragon", "Lesson")` (a card matching multiple ways is counted
+  once). `CardsInGraveyardAtLeast(count)` is the unfiltered total.
 - `Delirium(count = 4)` — the Delirium ability word: "there are `count` or more card types among
   cards in your graveyard." Composes through `Compare(DynamicAmount.AggregateZone(Player.You,
   Zone.GRAVEYARD, GameObjectFilter.Any, Aggregation.DISTINCT_TYPES), GTE, Fixed(count))` — the
