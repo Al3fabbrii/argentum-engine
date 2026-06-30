@@ -30,6 +30,7 @@ class MiscContinuationResumer(
         resumer(CopyActivatedAbilityTargetContinuation::class, ::resumeCopyActivatedAbilityTarget),
         resumer(DistributeCountersContinuation::class, ::resumeDistributeCounters),
         resumer(RemoveAnyNumberOfCountersContinuation::class, ::resumeRemoveAnyNumberOfCounters),
+        resumer(RemoveCountersUpToContinuation::class, ::resumeRemoveCountersUpTo),
         resumer(ConvertCountersToTokensContinuation::class, ::resumeConvertCountersToTokens),
         resumer(MoveChosenCountersToTargetContinuation::class, ::resumeMoveChosenCountersToTarget),
         resumer(ProliferateContinuation::class, ::resumeProliferate),
@@ -612,6 +613,107 @@ class MiscContinuationResumer(
             controllerId = continuation.controllerId,
             currentCounterType = nextType,
             currentMaxAmount = nextMax,
+            remainingCounterTypes = remainingAfter,
+            targetName = continuation.targetName,
+            sourceId = continuation.sourceId,
+            sourceName = continuation.sourceName
+        )
+        events.add(
+            DecisionRequestedEvent(
+                decisionId = decisionId,
+                playerId = continuation.controllerId,
+                decisionType = "CHOOSE_NUMBER",
+                prompt = decision.prompt
+            )
+        )
+        val pausedState = newState
+            .withPendingDecision(decision)
+            .pushContinuation(nextContinuation)
+        return ExecutionResult.paused(pausedState, decision, events)
+    }
+
+    private fun resumeRemoveCountersUpTo(
+        state: GameState,
+        continuation: RemoveCountersUpToContinuation,
+        response: DecisionResponse,
+        checkForMore: CheckForMore
+    ): ExecutionResult {
+        if (response !is NumberChosenResponse) {
+            return ExecutionResult.error(state, "Expected number response for remove-counters-up-to")
+        }
+
+        val chosen = response.number.coerceIn(0, continuation.currentMaxAmount)
+        val counterType = com.wingedsheep.engine.handlers.effects.permanent.counters
+            .resolveCounterType(continuation.currentCounterType)
+
+        var newState = state
+        val events = mutableListOf<GameEvent>()
+
+        if (chosen > 0) {
+            val current = newState.getEntity(continuation.targetId)
+                ?.get<com.wingedsheep.engine.state.components.battlefield.CountersComponent>()
+                ?: com.wingedsheep.engine.state.components.battlefield.CountersComponent()
+            newState = newState.updateEntity(continuation.targetId) { container ->
+                container.with(current.withRemoved(counterType, chosen))
+            }
+            events.add(
+                CountersRemovedEvent(
+                    continuation.targetId,
+                    continuation.currentCounterType,
+                    chosen,
+                    continuation.targetName
+                )
+            )
+        }
+
+        // Decrement the total budget; stop entirely once it is exhausted.
+        val remainingBudget = continuation.remainingBudget - chosen
+        if (remainingBudget <= 0) {
+            return checkForMore(newState, events)
+        }
+
+        // Find the next counter kind that is still present, capping each prompt at the budget.
+        // Re-read live counts so a kind removed by an interaction during this resolution is skipped.
+        val live = newState.getEntity(continuation.targetId)
+            ?.get<com.wingedsheep.engine.state.components.battlefield.CountersComponent>()
+        val nextPrompt = continuation.remainingCounterTypes
+            .map { (type, _) ->
+                type to (live?.getCount(
+                    com.wingedsheep.engine.handlers.effects.permanent.counters.resolveCounterType(type)
+                ) ?: 0)
+            }
+            .firstOrNull { it.second > 0 }
+
+        if (nextPrompt == null) {
+            return checkForMore(newState, events)
+        }
+
+        val (nextType, nextCount) = nextPrompt
+        val nextMax = minOf(nextCount, remainingBudget)
+        val remainingAfter = continuation.remainingCounterTypes
+            .dropWhile { it.first != nextType }
+            .drop(1)
+
+        val decisionId = java.util.UUID.randomUUID().toString()
+        val decision = ChooseNumberDecision(
+            id = decisionId,
+            playerId = continuation.controllerId,
+            prompt = "Remove how many $nextType counters from ${continuation.targetName}? (0-$nextMax)",
+            context = DecisionContext(
+                sourceId = continuation.sourceId,
+                sourceName = continuation.sourceName,
+                phase = DecisionPhase.RESOLUTION
+            ),
+            minValue = 0,
+            maxValue = nextMax
+        )
+        val nextContinuation = RemoveCountersUpToContinuation(
+            decisionId = decisionId,
+            targetId = continuation.targetId,
+            controllerId = continuation.controllerId,
+            currentCounterType = nextType,
+            currentMaxAmount = nextMax,
+            remainingBudget = remainingBudget,
             remainingCounterTypes = remainingAfter,
             targetName = continuation.targetName,
             sourceId = continuation.sourceId,

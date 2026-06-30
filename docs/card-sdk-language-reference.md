@@ -638,7 +638,11 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   (OTJ): "{4}{W}: Until end of turn, if you would put one or more +1/+1 counters on a creature you control, put
   that many plus one +1/+1 counters on it instead." → `GrantCounterPlacementModifier()` with all defaults.
 - `RemoveCounters(type, count, target)` — remove N counters.
-- `RemoveAnyNumberOfCounters(target)` — player removes 0 or more.
+- `RemoveAnyNumberOfCounters(target)` — player removes 0 or more (one prompt per counter kind, no total cap).
+- `RemoveCountersUpTo(maxCount, target)` — player removes **up to `maxCount` counters total across all
+  kinds**. The budget-capped sibling of `RemoveAnyNumberOfCounters`: one `ChooseNumber` prompt per kind,
+  each capped at `min(kind's count, remaining budget)`; prompting stops once the budget is spent. Used by
+  Heartless Act's "Remove up to three counters from target creature."
 - `ConvertCountersToTokensEffect(counterType = +1/+1, tokenFactory)` — "remove any number of `counterType`
   counters from this permanent; for each removed, create one token." Prompts for `0..(count on source)`,
   removes that many, then mints exactly that many tokens from `tokenFactory` (its own `count` is ignored).
@@ -2177,6 +2181,10 @@ This is the player-arm prerequisite for the planned composable mixed `TargetUnio
   filter pass (e.g. Zero Point Ballad's mass destruction). Layer projection / trigger matching
   / cost calculation report `false` (no X context).
 - `.tapped()` / `.untapped()` — tap state.
+- `.withCounter(type)` / `.withAnyCounter()` / `.withoutCounters()` — counter presence: a specific kind,
+  any kind, or none at all. `.withoutCounters()` is `StatePredicate.Not(HasAnyCounter)` for "with no
+  counters on it" (Heartless Act). All three are also on `TargetFilter`
+  (`TargetFilter.Creature.withoutCounters()`).
 - `.dealtDamageThisTurn()` — was dealt damage this turn (marked-damage *history*, not current marked
   damage); backed by `StatePredicate.WasDealtDamageThisTurn`. Survives damage removal / leaving combat;
   cleared at end-of-turn cleanup. For "...that was dealt damage this turn" (Rooftop Assassin, Unsparing

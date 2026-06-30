@@ -153,6 +153,32 @@ data class ConvertCountersToTokensEffect(
 }
 
 /**
+ * Remove up to [maxCount] counters total (across all kinds) from a target permanent. The
+ * controller chooses how many counters of each kind to remove, but no more than [maxCount]
+ * counters are removed in total.
+ *
+ * "Remove up to three counters from target creature." (Heartless Act.)
+ *
+ * The capped sibling of [RemoveAnyNumberOfCountersEffect] (which has no total cap): at
+ * resolution the executor enumerates each counter kind on the target and prompts the controller
+ * with a `ChooseNumberDecision` per kind, where each prompt's maximum is the smaller of that
+ * kind's current count and the remaining budget. Once the budget is exhausted the remaining kinds
+ * are skipped. No-op when the target is gone or has no counters.
+ *
+ * @property maxCount The total number of counters that may be removed (the budget across all kinds).
+ * @property target The permanent to remove counters from.
+ */
+@SerialName("RemoveCountersUpTo")
+@Serializable
+data class RemoveCountersUpToEffect(
+    val maxCount: Int,
+    val target: EffectTarget = EffectTarget.ContextTarget(0)
+) : Effect {
+    override val description: String =
+        "Remove up to $maxCount counter${if (maxCount != 1) "s" else ""} from ${target.description}"
+}
+
+/**
  * Remove every counter (of any kind) from a target permanent.
  *
  * "Remove all counters from target creature."

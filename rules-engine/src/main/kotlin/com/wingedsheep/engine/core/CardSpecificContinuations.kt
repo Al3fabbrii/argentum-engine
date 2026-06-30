@@ -179,6 +179,29 @@ data class RemoveAnyNumberOfCountersContinuation(
 ) : ContinuationFrame
 
 /**
+ * Resume after the controller picks how many counters of one kind to remove under a *total*
+ * budget cap (the capped sibling of [RemoveAnyNumberOfCountersContinuation]). The executor for
+ * `RemoveCountersUpToEffect` issues one decision per counter kind, each capped at
+ * `min(kindCount, remainingBudget)`. On resume, the chosen amount is removed, the budget is
+ * decremented, and the next kind is prompted only while budget remains. (Heartless Act.)
+ *
+ * @property remainingBudget Counters still removable in total after the active decision resolves.
+ */
+@Serializable
+data class RemoveCountersUpToContinuation(
+    override val decisionId: String,
+    val targetId: EntityId,
+    val controllerId: EntityId,
+    val currentCounterType: String,
+    val currentMaxAmount: Int,
+    val remainingBudget: Int,
+    val remainingCounterTypes: List<Pair<String, Int>>,
+    val targetName: String,
+    val sourceId: EntityId?,
+    val sourceName: String?
+) : ContinuationFrame
+
+/**
  * Resume after the controller picks how many counters of one kind to move from a
  * [sourceId] permanent onto a [destinationId] permanent. The executor for
  * `MoveChosenCountersToTargetEffect` issues one decision per counter kind on the source;

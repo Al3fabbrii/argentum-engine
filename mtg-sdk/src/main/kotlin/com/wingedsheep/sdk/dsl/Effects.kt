@@ -1346,6 +1346,15 @@ object Effects {
         com.wingedsheep.sdk.scripting.effects.RemoveAnyNumberOfCountersEffect(target)
 
     /**
+     * Remove up to [maxCount] counters total (across all kinds) from a target permanent. The
+     * controller chooses how many of each kind to remove, capped at [maxCount] counters in total
+     * (the budget-capped sibling of [RemoveAnyNumberOfCounters]). Used by Heartless Act's
+     * "Remove up to three counters from target creature".
+     */
+    fun RemoveCountersUpTo(maxCount: Int, target: EffectTarget = EffectTarget.ContextTarget(0)): Effect =
+        com.wingedsheep.sdk.scripting.effects.RemoveCountersUpToEffect(maxCount, target)
+
+    /**
      * Move one counter of each kind on [source] that [destination] does not already have,
      * from the source onto the destination. Deterministic (no player choice). Used by
      * Goldberry, River-Daughter's first ability.

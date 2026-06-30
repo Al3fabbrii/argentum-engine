@@ -747,6 +747,11 @@ data class GameObjectFilter(
         statePredicates = statePredicates + StatePredicate.HasAnyCounter
     )
 
+    /** Must have no counters of any type ("with no counters on it" — Heartless Act). */
+    fun withoutCounters() = copy(
+        statePredicates = statePredicates + StatePredicate.Not(StatePredicate.HasAnyCounter)
+    )
+
     /** Must have the greatest power among creatures its controller controls */
     fun hasGreatestPower() = copy(
         statePredicates = statePredicates + StatePredicate.HasGreatestPower
