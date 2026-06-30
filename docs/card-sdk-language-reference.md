@@ -3328,6 +3328,12 @@ staticAbility {
   so two same-controller permanents renamed to the same name can trigger the legend rule (Witness Protection: "named
   Legitimate Businessperson"). `ClientCard.name` and `LegendRuleCheck` both prefer the projected name over the base
   `CardComponent.name` when one is active.
+- `SetName(name, filter)` — a standalone static that overrides the matching permanents' **name** with a fixed string
+  (Layer 3 / TEXT; CR 612 / 613.1c — setting a name is a text-changing effect). Lowers to the same `Modification.SetName`
+  as `TransformPermanent.setName`, exposed by `ProjectedState.getName` and surfaced to the client by
+  `ClientStateTransformer`. The fixed-name half of the "becomes a 1/1 X **named Y**" composite — pair with
+  `TransformPermanent` + `SetBasePowerToughnessStatic` + `LoseAllAbilities` + `GrantActivatedAbility`. Honest Work:
+  "Enchanted creature ... is a Citizen with base power and toughness 1/1 and '{T}: Add {C}' named Humble Merchant."
 - `ConditionalStaticAbility` — static gated by a runtime `Condition`. A conditional wrapping a *multi-effect* ability
   (e.g. `TransformPermanent`) lowers through the plural converter and gates every resulting effect on the condition.
 - `CantBeTurnedFaceUp(filter)` — matching permanents can't be turned face up (Layer 6; projects a
