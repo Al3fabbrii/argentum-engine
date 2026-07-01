@@ -16031,6 +16031,61 @@
     ]
 }
 
+// Sozin's Comet
+{
+    "name": "Sozin's Comet",
+    "manaCost": "{3}{R}{R}",
+    "typeLine": "Sorcery",
+    "oracleText": "Each creature you control gains firebending 5 until end of turn. (Whenever it attacks, add {R}{R}{R}{R}{R}. This mana lasts until end of combat.)\nForetell {2}{R} (During your turn, you may pay {2} and exile this card from your hand face down. Cast it on a later turn for its foretell cost.)",
+    "keywords": [
+        "FORETELL"
+    ],
+    "keywordAbilities": [
+        {
+            "type": "Foretell",
+            "cost": "{2}{R}"
+        }
+    ],
+    "script": {
+        "spellEffect": {
+            "type": "ForEach",
+            "space": {
+                "type": "IterationSpace.Group",
+                "filter": {
+                    "baseFilter": "creature ctrl:you"
+                }
+            },
+            "body": {
+                "type": "GrantTriggeredAbility",
+                "ability": {
+                    "id": "ability_1",
+                    "trigger": "AttackEvent",
+                    "effect": {
+                        "type": "AddMana",
+                        "color": "RED",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 5
+                        },
+                        "expiry": "END_OF_COMBAT"
+                    },
+                    "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
+                },
+                "target": "Self"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "154",
+        "rarity": "MYTHIC",
+        "artist": "Salvatorre Zee Yazzie",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/4/649e50e5-299b-4191-87a8-36e9378795be.jpg?1764121059"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Sparring Dummy
 {
     "name": "Sparring Dummy",

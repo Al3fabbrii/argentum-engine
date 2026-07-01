@@ -44,6 +44,7 @@ val engineSerializersModule = SerializersModule {
         subclass(SaddleMount::class)
         subclass(CycleCard::class)
         subclass(PlotCard::class)
+        subclass(ForetellCard::class)
         subclass(TurnFaceUp::class)
         subclass(TypecycleCard::class)
         subclass(UnlockRoomDoor::class)
@@ -360,6 +361,7 @@ val engineSerializersModule = SerializersModule {
         subclass(PlayWithoutPayingCostComponent::class)
         subclass(WarpExiledComponent::class)
         subclass(PlottedComponent::class)
+        subclass(ForetoldComponent::class)
         subclass(MiracleWindowComponent::class)
 
         // Battlefield components
