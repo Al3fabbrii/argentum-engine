@@ -14858,6 +14858,169 @@
     ]
 }
 
+// Sin, Spira's Punishment
+{
+    "name": "Sin, Spira's Punishment",
+    "manaCost": "{4}{B}{G}{U}",
+    "typeLine": "Legendary Creature — Leviathan Avatar",
+    "oracleText": "Flying\nWhenever Sin enters or attacks, exile a permanent card from your graveyard at random, then create a tapped token that's a copy of that card. If the exiled card is a land card, repeat this process.",
+    "creatureStats": {
+        "power": 7,
+        "toughness": 7
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "RepeatWhile",
+                    "body": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Graveyard",
+                                    "filter": "permanent"
+                                },
+                                "storeAs": "sinGraveyardPool"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "sinGraveyardPool",
+                                "selection": {
+                                    "type": "Random",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "sinChosen"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "sinChosen",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Exile"
+                                },
+                                "storeMovedAs": "sinExiled"
+                            },
+                            {
+                                "type": "CreateTokenCopyOfTarget",
+                                "target": {
+                                    "type": "PipelineTarget",
+                                    "collectionName": "sinExiled"
+                                },
+                                "tapped": true
+                            }
+                        ]
+                    },
+                    "repeatCondition": {
+                        "type": "WhileCondition",
+                        "condition": {
+                            "type": "CollectionContainsMatch",
+                            "collection": "sinExiled",
+                            "filter": "land"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "RepeatWhile",
+                    "body": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "GatherCards",
+                                "source": {
+                                    "type": "FromZone",
+                                    "zone": "Graveyard",
+                                    "filter": "permanent"
+                                },
+                                "storeAs": "sinGraveyardPool"
+                            },
+                            {
+                                "type": "SelectFromCollection",
+                                "from": "sinGraveyardPool",
+                                "selection": {
+                                    "type": "Random",
+                                    "count": {
+                                        "type": "Fixed",
+                                        "amount": 1
+                                    }
+                                },
+                                "storeSelected": "sinChosen"
+                            },
+                            {
+                                "type": "MoveCollection",
+                                "from": "sinChosen",
+                                "destination": {
+                                    "type": "ToZone",
+                                    "zone": "Exile"
+                                },
+                                "storeMovedAs": "sinExiled"
+                            },
+                            {
+                                "type": "CreateTokenCopyOfTarget",
+                                "target": {
+                                    "type": "PipelineTarget",
+                                    "collectionName": "sinExiled"
+                                },
+                                "tapped": true
+                            }
+                        ]
+                    },
+                    "repeatCondition": {
+                        "type": "WhileCondition",
+                        "condition": {
+                            "type": "CollectionContainsMatch",
+                            "collection": "sinExiled",
+                            "filter": "land"
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "242",
+        "rarity": "RARE",
+        "artist": "John Tedrick",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/5/659be746-bd31-4a70-8cec-7798da78b0b5.jpg?1782686408",
+        "rulings": [
+            {
+                "date": "2025-06-06",
+                "text": "If the copied card has {X} in its mana cost, X is 0."
+            },
+            {
+                "date": "2025-06-06",
+                "text": "The token copies exactly what was printed on the original card and nothing else. It doesn't copy any information about the object the card was before it was put into your graveyard."
+            },
+            {
+                "date": "2025-06-06",
+                "text": "If a card copied by the token had any \"when [this permanent] enters\" abilities, the token also has those abilities, and they'll trigger when it's created."
+            }
+        ]
+    },
+    "colorIdentityOverride": [
+        "BLACK",
+        "GREEN",
+        "BLUE"
+    ]
+}
+
 // Slash of Light
 {
     "name": "Slash of Light",
