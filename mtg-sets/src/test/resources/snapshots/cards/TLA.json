@@ -18769,6 +18769,228 @@
     ]
 }
 
+// The Rise of Sozin
+{
+    "name": "The Rise of Sozin",
+    "manaCost": "{4}{B}{B}",
+    "typeLine": "Enchantment — Saga",
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI — Destroy all creatures.\nII — Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name and exile them. Then that player shuffles.\nIII — Exile this Saga, then return it to the battlefield transformed under your control.",
+    "script": {
+        "sagaChapters": [
+            {
+                "chapter": 1,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "BattlefieldMatching",
+                                "filter": "creature"
+                            },
+                            "storeAs": "destroyAll_gathered"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "destroyAll_gathered",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard"
+                            },
+                            "moveType": "Destroy"
+                        }
+                    ]
+                }
+            },
+            {
+                "chapter": 2,
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "ChooseOption",
+                            "optionType": "CARD_NAME",
+                            "storeAs": "sozinChosenName",
+                            "prompt": "Choose a card name"
+                        },
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "FromMultipleZones",
+                                "zones": [
+                                    "Graveyard",
+                                    "Hand",
+                                    "Library"
+                                ],
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                },
+                                "filter": {
+                                    "cardPredicates": [
+                                        {
+                                            "type": "NameEqualsChosen",
+                                            "variableName": "sozinChosenName"
+                                        }
+                                    ]
+                                }
+                            },
+                            "storeAs": "sozinMatches"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "sozinMatches",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 4
+                                }
+                            },
+                            "storeSelected": "sozinToExile",
+                            "prompt": "Choose up to four cards to exile",
+                            "selectedLabel": "Exile"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "sozinToExile",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Exile",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            }
+                        },
+                        {
+                            "type": "ShuffleLibrary",
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            }
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetOpponent",
+                    "id": "target opponent"
+                }
+            },
+            {
+                "chapter": 3,
+                "effect": "ExileAndReturnTransformed"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Fire Lord Sozin",
+        "manaCost": "",
+        "typeLine": "Legendary Creature — Human Noble",
+        "oracleText": "Menace, firebending 3 (Whenever this creature attacks, add {R}{R}{R}. This mana lasts until end of combat.)\nWhenever Fire Lord Sozin deals combat damage to a player, you may pay {X}. When you do, put any number of target creature cards with total mana value X or less from that player's graveyard onto the battlefield under your control.",
+        "creatureStats": {
+            "power": 5,
+            "toughness": 5
+        },
+        "keywords": [
+            "MENACE",
+            "FIREBENDING"
+        ],
+        "keywordAbilities": [
+            {
+                "type": "Numeric",
+                "keyword": "FIREBENDING",
+                "n": 3
+            }
+        ],
+        "script": {
+            "triggeredAbilities": [
+                {
+                    "id": "ability_1",
+                    "trigger": "AttackEvent",
+                    "effect": {
+                        "type": "AddMana",
+                        "color": "RED",
+                        "amount": {
+                            "type": "Fixed",
+                            "amount": 3
+                        },
+                        "expiry": "END_OF_COMBAT"
+                    },
+                    "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
+                },
+                {
+                    "id": "ability_2",
+                    "trigger": {
+                        "type": "DealsDamageEvent",
+                        "damageType": "DamageCombat",
+                        "recipient": "AnyPlayer"
+                    },
+                    "effect": {
+                        "type": "Gated",
+                        "gate": "Gate.MayPayX",
+                        "then": {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "FromZone",
+                                        "zone": "Graveyard",
+                                        "player": "TriggeringPlayer",
+                                        "filter": "creature"
+                                    },
+                                    "storeAs": "sozinReanimate"
+                                },
+                                {
+                                    "type": "SelectFromCollection",
+                                    "from": "sozinReanimate",
+                                    "selection": "ChooseAnyNumber",
+                                    "storeSelected": "sozinReanimated",
+                                    "prompt": "Put any number of creature cards with total mana value X or less onto the battlefield under your control",
+                                    "selectedLabel": "Put onto the battlefield",
+                                    "restrictions": [
+                                        {
+                                            "type": "TotalManaValueAtMost",
+                                            "maxAmount": "XValue"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "sozinReanimated",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Battlefield"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "117",
+            "rarity": "MYTHIC",
+            "artist": "Mitori",
+            "imageUri": "https://cards.scryfall.io/normal/back/1/4/14eadf46-90c2-4376-8183-6a922a60174d.jpg?1768466342"
+        },
+        "colorIdentityOverride": [
+            "BLACK"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "117",
+        "rarity": "MYTHIC",
+        "artist": "Mitori",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/4/14eadf46-90c2-4376-8183-6a922a60174d.jpg?1768466342"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // The Spirit Oasis
 {
     "name": "The Spirit Oasis",

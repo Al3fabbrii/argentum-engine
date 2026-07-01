@@ -6216,7 +6216,10 @@ Counter effects live in §4 (`AddCounters`, `RemoveCounters`, `Proliferate`, `Mo
   split are unaffected).
 - `SelectFromCollectionEffect(from, into, selectCount?, allowZero?, alwaysPrompt?, restrictions?)` — let a player pick
   from a collection. `restrictions` (`List<SelectionRestriction>`) cap and trim the picks server-side: `OnePerCardType`,
-  `OnePerColor(matchControllerPermanentColors?)`, `OnePerCardName`, `OnePerPower`, `TotalManaValueAtMost(max)`,
+  `OnePerColor(matchControllerPermanentColors?)`, `OnePerCardName`, `OnePerPower`, `TotalManaValueAtMost(max)` /
+  `TotalManaValueAtMost(maxAmount = <DynamicAmount>)` (the dynamic overload caps the sum at a resolved amount — e.g.
+  `DynamicAmount.XValue` for "with total mana value X or less"; the executor resolves it to a fixed cap up front so every
+  downstream consumer sees an integer — The Rise of Sozin // Fire Lord Sozin),
   `TotalPowerAtMost(max)`, `OnePerBasicLandType`, `ReducedMinimumIfMatches(reducedMinimum, filter, requiredMatches?)`, and
   `MaxAffordablePayment(manaPerSelected, payer?)`. `TotalPowerAtMost(max)` caps the sum of selected creatures'
   **projected** power at `max` (a creature with undefined power contributes 0); it is the power analogue of

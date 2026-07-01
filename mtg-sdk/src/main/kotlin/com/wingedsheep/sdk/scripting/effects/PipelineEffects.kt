@@ -507,17 +507,28 @@ sealed interface SelectionRestriction {
     }
 
     /**
-     * The sum of selected cards' mana values must not exceed [max]. {X} contributes 0
+     * The sum of selected cards' mana values must not exceed the cap. {X} contributes 0
      * (per CR 202.3e for cards not on the stack). Used for "with total mana value N or
      * less" wording like Scout for Survivors.
      *
-     * The executor enforces this server-side: any selection whose total exceeds [max]
+     * The cap is normally the fixed [max]. When [maxAmount] is non-null it supplies a
+     * *dynamic* cap instead (e.g. `DynamicAmount.XValue` for "with total mana value X or
+     * less", where X is the amount just paid) — the executor resolves it against the
+     * resolution context before building the decision and re-wraps this restriction with
+     * the concrete [max], so every downstream consumer (decision, continuation, response
+     * normalization) only ever sees a fixed integer.
+     *
+     * The executor enforces this server-side: any selection whose total exceeds the cap
      * has cards trimmed (in response order) until the cap is met.
      */
     @SerialName("TotalManaValueAtMost")
     @Serializable
-    data class TotalManaValueAtMost(val max: Int) : SelectionRestriction {
-        override val description: String = "with total mana value $max or less"
+    data class TotalManaValueAtMost(
+        val max: Int = 0,
+        val maxAmount: DynamicAmount? = null
+    ) : SelectionRestriction {
+        override val description: String =
+            "with total mana value ${maxAmount?.description ?: max} or less"
     }
 
     /**
