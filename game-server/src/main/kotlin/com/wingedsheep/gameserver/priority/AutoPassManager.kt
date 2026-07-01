@@ -527,10 +527,26 @@ class AutoPassManager(
                 }
             }
 
-            // Combat Damage / End Combat - AUTO-PASS
-            Step.COMBAT_DAMAGE, Step.END_COMBAT -> {
-                logger.debug("AUTO-PASS: Opponent's combat damage/end combat")
+            // Combat Damage - AUTO-PASS (no meaningful priority window to hold for here)
+            Step.COMBAT_DAMAGE -> {
+                logger.debug("AUTO-PASS: Opponent's combat damage")
                 true
+            }
+
+            // End Combat - STOP if we have instant-speed responses. This is a real priority
+            // window (CR 511.1) where the defending player can still act — and it's the *only*
+            // window for abilities restricted to it (e.g. Desert's "{T}: deals 1 damage to
+            // target attacking creature. Activate only during the end of combat step."), whose
+            // targets (still-attacking creatures) also vanish once the step ends (CR 511.3).
+            // Mirrors the END step / declare-attackers / first-strike handling above.
+            Step.END_COMBAT -> {
+                if (hasInstantSpeedResponses) {
+                    logger.debug("STOP: Opponent's end combat step (have instant-speed responses)")
+                    false
+                } else {
+                    logger.debug("AUTO-PASS: Opponent's end combat step (no responses)")
+                    true
+                }
             }
 
             // End Step - STOP if we have instant-speed responses
@@ -749,7 +765,8 @@ class AutoPassManager(
             Step.DECLARE_ATTACKERS -> !hasMeaningfulActions // Stop if we have responses
             Step.DECLARE_BLOCKERS -> !hasMeaningfulActions // Stop only if we have blockers/responses
             Step.FIRST_STRIKE_COMBAT_DAMAGE -> !hasMeaningfulActions // Stop if we have responses after first strike
-            Step.COMBAT_DAMAGE, Step.END_COMBAT -> true
+            Step.COMBAT_DAMAGE -> true
+            Step.END_COMBAT -> !hasMeaningfulActions // Stop if we have responses (e.g. Desert's end-of-combat ping)
             Step.END -> !hasMeaningfulActions // Stop if we have responses
             Step.CLEANUP, Step.UNTAP -> true
         }
