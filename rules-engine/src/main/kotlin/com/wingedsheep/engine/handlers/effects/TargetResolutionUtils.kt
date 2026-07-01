@@ -68,8 +68,17 @@ object TargetResolutionUtils {
         if (effectTarget is EffectTarget.ControllerOfTriggeringEntity) {
             val triggerId = context.triggeringEntityId ?: return null
             val entity = state.getEntity(triggerId) ?: return null
-            return entity.get<ControllerComponent>()?.playerId
-                ?: entity.get<CardComponent>()?.ownerId
+            entity.get<ControllerComponent>()?.playerId?.let { return it }
+            // An activated ability's stack entity is a bare container with no
+            // ControllerComponent. "That artifact's controller" (Haunting Wind, Artifact
+            // Possession) means the controller of the ability's SOURCE permanent — fall
+            // through to it, or to the ability's own controller as last-known information
+            // if the source has left the battlefield.
+            entity.get<com.wingedsheep.engine.state.components.stack.ActivatedAbilityOnStackComponent>()?.let { ability ->
+                return state.getEntity(ability.sourceId)?.get<ControllerComponent>()?.playerId
+                    ?: ability.controllerId
+            }
+            return entity.get<CardComponent>()?.ownerId
         }
         if (effectTarget is EffectTarget.AttachedToTriggeringPermanent) {
             // The triggering entity is the attachment (Aura/Equipment) that became attached; the

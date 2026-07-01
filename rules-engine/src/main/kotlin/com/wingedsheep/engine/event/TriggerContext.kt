@@ -274,12 +274,13 @@ data class TriggerContext(
                     triggeringPlayerId = event.chooserId
                 )
                 is AbilityActivatedEvent -> TriggerContext(
-                    // The permanent whose ability was activated — NOT the ability's stack entity
-                    // (a bare container with no ControllerComponent/CardComponent, so "that
-                    // artifact's controller" reads via EffectTarget.ControllerOfTriggeringEntity
-                    // would silently resolve to null; Haunting Wind / Artifact Possession).
-                    // TriggerMatcher keys its matching off event.sourceId/abilityEntityId directly.
-                    triggeringEntityId = event.sourceId,
+                    // The ability's stack entity — copy effects target it (Ertha Jo's
+                    // CopyTargetSpellOrAbility(TriggeringEntity)). "That artifact's controller"
+                    // reads resolve THROUGH it: ControllerOfTriggeringEntity falls through the
+                    // ActivatedAbilityOnStackComponent to the source permanent's controller.
+                    // A non-{T} mana ability never reaches the stack (abilityEntityId == null),
+                    // so fall back to the source permanent directly (Haunting Wind).
+                    triggeringEntityId = event.abilityEntityId ?: event.sourceId,
                     triggeringPlayerId = event.controllerId
                 )
                 is AbilityTriggeredEvent -> TriggerContext(

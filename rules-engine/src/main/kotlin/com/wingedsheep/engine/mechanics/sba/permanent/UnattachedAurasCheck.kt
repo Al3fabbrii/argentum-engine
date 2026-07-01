@@ -185,12 +185,21 @@ class UnattachedAurasCheck(
     ): Boolean {
         val colors = projected.getColors(attachmentId)
         if (colors.isEmpty()) return false
-        val selfGrantedColors: Set<Color> = cardRegistry.getCard(attachmentCard.cardDefinitionId)
+        val statics = cardRegistry.getCard(attachmentCard.cardDefinitionId)
             ?.staticAbilities
-            ?.filterIsInstance<GrantProtection>()
-            ?.map { it.color }
-            ?.toSet()
-            ?: emptySet()
+            .orEmpty()
+        // Dynamic protection grants (chosen color, colors of controlled permanents) can cover
+        // any color at any time — exempt the attachment from protection-removal entirely
+        // (Pledge of Loyalty's "This effect doesn't remove Pledge of Loyalty").
+        if (statics.any {
+                it is com.wingedsheep.sdk.scripting.GrantProtectionFromControlledColors ||
+                    it is com.wingedsheep.sdk.scripting.GrantProtectionFromChosenColorToGroup
+            }
+        ) return false
+        val selfGrantedColors: Set<Color> = statics
+            .filterIsInstance<GrantProtection>()
+            .map { it.color }
+            .toSet()
         return Color.entries.any { color ->
             color.name in colors &&
                 color !in selfGrantedColors &&
