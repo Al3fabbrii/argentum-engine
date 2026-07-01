@@ -369,6 +369,9 @@ data class TargetFilter(
     /** Power or toughness at least */
     fun powerOrToughnessAtLeast(min: Int) = copy(baseFilter = baseFilter.powerOrToughnessAtLeast(min))
 
+    /** Must have no counters of any type ("with no counters on it" — Heartless Act). */
+    fun withoutCounters() = copy(baseFilter = baseFilter.withoutCounters())
+
     /** Must be tapped */
     fun tapped() = copy(baseFilter = baseFilter.tapped())
 

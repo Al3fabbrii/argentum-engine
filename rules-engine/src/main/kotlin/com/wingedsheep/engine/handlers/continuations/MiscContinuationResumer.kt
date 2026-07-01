@@ -572,6 +572,12 @@ class MiscContinuationResumer(
             )
         }
 
+        // Decrement the total budget when one is in force; stop entirely once it is exhausted.
+        val remainingBudget = continuation.remainingBudget?.minus(chosen)
+        if (remainingBudget != null && remainingBudget <= 0) {
+            return checkForMore(newState, events)
+        }
+
         // If more counter kinds remain, prompt for the next one. Re-read live counts so a
         // counter kind that was removed by an interaction during this resolution is skipped.
         val live = newState.getEntity(continuation.targetId)
@@ -588,7 +594,9 @@ class MiscContinuationResumer(
             return checkForMore(newState, events)
         }
 
-        val (nextType, nextMax) = nextPrompt
+        val (nextType, nextCount) = nextPrompt
+        // Cap the next prompt at the remaining budget when one is in force.
+        val nextMax = remainingBudget?.let { minOf(nextCount, it) } ?: nextCount
         val remainingAfter = continuation.remainingCounterTypes
             .dropWhile { it.first != nextType }
             .drop(1)
@@ -615,7 +623,8 @@ class MiscContinuationResumer(
             remainingCounterTypes = remainingAfter,
             targetName = continuation.targetName,
             sourceId = continuation.sourceId,
-            sourceName = continuation.sourceName
+            sourceName = continuation.sourceName,
+            remainingBudget = remainingBudget
         )
         events.add(
             DecisionRequestedEvent(

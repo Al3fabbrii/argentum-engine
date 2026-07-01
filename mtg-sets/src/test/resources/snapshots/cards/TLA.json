@@ -5903,6 +5903,142 @@
     ]
 }
 
+// Earthen Ally
+{
+    "name": "Earthen Ally",
+    "manaCost": "{G}",
+    "typeLine": "Creature — Human Soldier Ally",
+    "oracleText": "This creature gets +1/+0 for each color among Allies you control.\n{2}{W}{U}{B}{R}{G}: Earthbend 5. (Target land you control becomes a 0/0 creature with haste that's still a land. Put five +1/+1 counters on it. When it dies or is exiled, return it to the battlefield tapped.)",
+    "creatureStats": {
+        "power": 0,
+        "toughness": 2
+    },
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{2}{W}{U}{B}{R}{G}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AnimateLand",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "power": 0,
+                            "toughness": 0,
+                            "duration": "Permanent"
+                        },
+                        {
+                            "type": "GrantKeyword",
+                            "keyword": "HASTE",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "duration": "Permanent"
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "+1/+1",
+                            "count": 5,
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            }
+                        },
+                        {
+                            "type": "GrantTriggeredAbility",
+                            "ability": {
+                                "id": "ability_2",
+                                "trigger": {
+                                    "type": "ZoneChangeEvent",
+                                    "from": "Battlefield"
+                                },
+                                "effect": {
+                                    "type": "Composite",
+                                    "effects": [
+                                        {
+                                            "type": "MoveToZone",
+                                            "target": "Self",
+                                            "destination": "Battlefield",
+                                            "placement": "Tapped",
+                                            "fromZone": "Graveyard"
+                                        },
+                                        {
+                                            "type": "MoveToZone",
+                                            "target": "Self",
+                                            "destination": "Battlefield",
+                                            "placement": "Tapped",
+                                            "fromZone": "Exile"
+                                        }
+                                    ]
+                                },
+                                "descriptionOverride": "When this dies or is exiled, return it to the battlefield tapped."
+                            },
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "target land you control"
+                            },
+                            "duration": "Permanent"
+                        }
+                    ]
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "land ctrl:you"
+                        },
+                        "id": "target land you control"
+                    }
+                ]
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "GrantDynamicStats",
+                "filter": {
+                    "baseFilter": "permanent",
+                    "scope": "Self"
+                },
+                "powerBonus": {
+                    "type": "AggregateBattlefield",
+                    "player": "You",
+                    "filter": "creature Ally",
+                    "aggregation": "DISTINCT_COLORS"
+                },
+                "toughnessBonus": {
+                    "type": "Fixed",
+                    "amount": 0
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "177",
+        "rarity": "RARE",
+        "artist": "Boell Oyino",
+        "flavorText": "\"Together, we are unshakable.\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/7/d7a0f2d9-efa4-4a53-a24b-36694457bd1c.jpg?1764121202"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "BLUE",
+        "BLACK",
+        "RED",
+        "GREEN"
+    ]
+}
+
 // Elemental Teachings
 {
     "name": "Elemental Teachings",
@@ -8367,6 +8503,77 @@
     ]
 }
 
+// Heartless Act
+{
+    "name": "Heartless Act",
+    "manaCost": "{1}{B}",
+    "typeLine": "Instant",
+    "oracleText": "Choose one —\n• Destroy target creature with no counters on it.\n• Remove up to three counters from target creature.",
+    "script": {
+        "spellEffect": {
+            "type": "Modal",
+            "modes": [
+                {
+                    "effect": {
+                        "type": "MoveToZone",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        },
+                        "destination": "Graveyard",
+                        "byDestruction": true
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": {
+                                    "cardPredicates": [
+                                        "IsCreature"
+                                    ],
+                                    "statePredicates": [
+                                        {
+                                            "type": "StateNot",
+                                            "predicate": "HasAnyCounter"
+                                        }
+                                    ]
+                                }
+                            },
+                            "id": "target creature with no counters on it"
+                        }
+                    ],
+                    "description": "Destroy target creature with no counters on it"
+                },
+                {
+                    "effect": {
+                        "type": "RemoveAnyNumberOfCounters",
+                        "maxTotal": 3
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature"
+                            },
+                            "id": "target creature"
+                        }
+                    ],
+                    "description": "Remove up to three counters from target creature"
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "103",
+        "rarity": "UNCOMMON",
+        "artist": "Sylvain Sarrailh",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/5/b57c57a8-d72b-4c6c-a2db-a7ef61190f42.jpg?1764120715"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Hei Bai, Spirit of Balance
 {
     "name": "Hei Bai, Spirit of Balance",
@@ -9014,6 +9221,116 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Iroh, Tea Master
+{
+    "name": "Iroh, Tea Master",
+    "manaCost": "{1}{R}{W}",
+    "typeLine": "Legendary Creature — Human Citizen Ally",
+    "oracleText": "When Iroh enters, create a Food token.\nAt the beginning of combat on your turn, you may have target opponent gain control of target permanent you control. When you do, create a 1/1 white Ally creature token. Put a +1/+1 counter on that token for each permanent you own that your opponents control.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreatePredefinedToken",
+                    "tokenType": "Food"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "BEGIN_COMBAT"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "Gated",
+                        "gate": {
+                            "type": "Gate.DoAction",
+                            "action": {
+                                "type": "GiveControlToTargetPlayer",
+                                "permanent": {
+                                    "type": "BoundVariable",
+                                    "name": "target permanent you control"
+                                },
+                                "newController": {
+                                    "type": "BoundVariable",
+                                    "name": "target opponent"
+                                }
+                            },
+                            "successCriterion": "SuccessCriterion.ControlChanged"
+                        },
+                        "then": {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "CreateToken",
+                                    "power": 1,
+                                    "toughness": 1,
+                                    "colors": [
+                                        "WHITE"
+                                    ],
+                                    "creatureTypes": [
+                                        "Ally"
+                                    ]
+                                },
+                                {
+                                    "type": "AddDynamicCounters",
+                                    "counterType": "+1/+1",
+                                    "amount": {
+                                        "type": "AggregateBattlefield",
+                                        "player": "EachOpponent",
+                                        "filter": "permanent own:you"
+                                    },
+                                    "target": {
+                                        "type": "PipelineTarget",
+                                        "collectionName": "createdTokens"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "descriptionOverride": "You may have target opponent gain control of target permanent you control. When you do, create a 1/1 white Ally creature token. Put a +1/+1 counter on that token for each permanent you own that your opponents control."
+                },
+                "targetRequirement": {
+                    "type": "TargetOpponent",
+                    "id": "target opponent"
+                },
+                "additionalTargetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "filter": {
+                            "baseFilter": "permanent ctrl:you"
+                        },
+                        "id": "target permanent you control"
+                    }
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "228",
+        "rarity": "RARE",
+        "artist": "Brian Yuen",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/1/d1f5e10d-0a89-4129-9717-a921f20d3616.jpg?1764121673"
+    },
+    "colorIdentityOverride": [
+        "RED",
+        "WHITE"
     ]
 }
 
@@ -14054,6 +14371,80 @@
     ]
 }
 
+// Secret Tunnel
+{
+    "name": "Secret Tunnel",
+    "manaCost": "",
+    "typeLine": "Land — Cave",
+    "oracleText": "This land can't be blocked.\n{T}: Add {C}.\n{4}, {T}: Two target creatures you control that share a creature type can't be blocked this turn.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddColorlessMana",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    }
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            },
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{4}"
+                            }
+                        },
+                        "CostTap"
+                    ]
+                },
+                "effect": {
+                    "type": "ForEach",
+                    "space": "IterationSpace.Targets",
+                    "body": {
+                        "type": "GrantKeyword",
+                        "keyword": "CANT_BE_BLOCKED",
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        }
+                    }
+                },
+                "targetRequirements": [
+                    {
+                        "type": "TargetObject",
+                        "count": 2,
+                        "filter": {
+                            "baseFilter": "creature ctrl:you"
+                        },
+                        "id": "two target creatures you control",
+                        "sameCreatureType": true
+                    }
+                ]
+            }
+        ],
+        "staticAbilities": [
+            "CantBeBlocked"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "278",
+        "rarity": "RARE",
+        "artist": "Alexander Forssberg",
+        "flavorText": "\"I forget the next couple of lines, but then it goes...'Secret tunnel! Secret tunnel!\"\n—Chong, nomad musician",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/d/2d39a0e1-6484-409c-ab05-5b276925a949.jpg?1764122027"
+    }
+}
+
 // Seismic Sense
 {
     "name": "Seismic Sense",
@@ -18997,6 +19388,37 @@
         "WHITE",
         "GREEN"
     ]
+}
+
+// White Lotus Tile
+{
+    "name": "White Lotus Tile",
+    "manaCost": "{4}",
+    "typeLine": "Artifact",
+    "oracleText": "This artifact enters tapped.\n{T}: Add X mana of any one color, where X is the greatest number of creatures you control that have a creature type in common.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "AddManaOfChoice",
+                    "amount": "LargestSharedCreatureTypeCount"
+                },
+                "timing": "ManaAbility",
+                "isManaAbility": true
+            }
+        ],
+        "replacementEffects": [
+            "EntersTapped"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "262",
+        "rarity": "MYTHIC",
+        "artist": "Dee Nguyen",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/d/1d70f9ec-fdc1-4219-b89b-c030d712c1fc.jpg?1764121931"
+    }
 }
 
 // Wolfbat
