@@ -631,13 +631,17 @@ class CastSpellHandler(
             effectiveCost
         }
 
-        // Account for spell-level waterbend (Avatar): tapped artifacts/creatures reduce the
-        // waterbend generic, capped at the waterbend amount.
-        val costAfterWaterbend = if (cardDef != null && !playForFree && action.alternativePayment != null &&
-            action.alternativePayment.waterbendPermanents.isNotEmpty()
+        // Account for waterbend (Avatar): tapped artifacts/creatures reduce the waterbend generic,
+        // capped at the waterbend amount. Two sources: a spell-level `waterbend {N}` additional cost
+        // (capped so taps never eat the printed generic) and Hama's fixed-alternative waterbend cost
+        // (the whole {mana value} is reducible). Only one is ever non-zero for a given cast.
+        val validateWaterbendCap = (if (cardDef != null) spellWaterbendAmount(cardDef, action) else 0) +
+            fixedAltWaterbendAmount(state, action, playForFree)
+        val costAfterWaterbend = if (!playForFree && action.alternativePayment != null &&
+            action.alternativePayment.waterbendPermanents.isNotEmpty() && validateWaterbendCap > 0
         ) {
             alternativePaymentHandler.calculateReducedCostForWaterbend(
-                costAfterAltPayment, action.alternativePayment, spellWaterbendAmount(cardDef, action)
+                costAfterAltPayment, action.alternativePayment, validateWaterbendCap
             )
         } else {
             costAfterAltPayment
@@ -791,6 +795,27 @@ class CastSpellHandler(
         val paid = !wb.optional || action.wasWaterbendPaid
         if (!paid) return 0
         return if (wb.isX) (action.xValue ?: 0) else wb.amount
+    }
+
+    /**
+     * The generic amount of a waterbend-flagged *fixed alternative* cost this cast can pay by
+     * tapping artifacts/creatures, or 0 when the cast has no such cost. Hama, the Bloodbender exiles
+     * a card and grants a `PlayWithFixedAlternativeManaCostComponent(waterbend = true)` whose whole
+     * fixed cost is `{mana value}` generic and entirely waterbend-reducible (CR 701.67). Unlike a
+     * spell-level `waterbend {N}` additional cost — which is capped so taps never eat the printed
+     * generic — the fixed alternative cost *replaces* the printed cost, so the cap is the whole cost.
+     */
+    private fun fixedAltWaterbendAmount(
+        state: GameState,
+        action: CastSpell,
+        playForFree: Boolean,
+    ): Int {
+        if (playForFree) return 0
+        val comp = state.getEntity(action.cardId)
+            ?.get<PlayWithFixedAlternativeManaCostComponent>()
+            ?.takeIf { it.controllerId == action.playerId && it.waterbend }
+            ?: return 0
+        return comp.fixedCost.genericAmount
     }
 
     private fun harmonizePaymentXValue(
@@ -2506,12 +2531,14 @@ class CastSpellHandler(
             events.addAll(altPaymentResult.events)
         }
 
-        // Apply spell-level waterbend (Avatar): tap the chosen artifacts/creatures, each paying
-        // {1} of the waterbend generic, bounded by the waterbend amount.
-        if (cardDef != null && action.alternativePayment != null &&
+        // Apply waterbend (Avatar): tap the chosen artifacts/creatures, each paying {1} of the
+        // waterbend generic, bounded by the waterbend amount. Sums the spell-level `waterbend {N}`
+        // additional cost and Hama's fixed-alternative waterbend cost (only one is ever non-zero).
+        if (action.alternativePayment != null &&
             action.alternativePayment.waterbendPermanents.isNotEmpty()
         ) {
-            val waterbendAmount = spellWaterbendAmount(cardDef, action)
+            val waterbendAmount = (if (cardDef != null) spellWaterbendAmount(cardDef, action) else 0) +
+                fixedAltWaterbendAmount(currentState, action, playForFreeInExecute)
             if (waterbendAmount > 0) {
                 val waterbendResult = alternativePaymentHandler.applyWaterbendForSpell(
                     currentState, effectiveCost, action.alternativePayment, action.playerId, waterbendAmount

@@ -1067,6 +1067,28 @@ object Effects {
     )
 
     /**
+     * Grant a "may cast from exile by waterbending {its mana value}" permission to every card in a
+     * named collection (the cards must already be in exile). The alternative cost *replaces* each
+     * card's printed cost with `{its mana value}` generic, paid as a **waterbend** (CR 701.67) — its
+     * whole generic may be paid by tapping untapped artifacts/creatures, each {1} — instead of mana.
+     * Models Hama, the Bloodbender: "For as long as you control Hama, you may cast the exiled card
+     * during your turn by waterbending {X} rather than paying its mana cost, where X is its mana
+     * value." The permission is granted to the effect's controller (not the card's owner), persists
+     * while the card stays exiled, and is gated by [condition] (e.g. `IsYourTurn AND YouControlSource`
+     * — "during your turn, for as long as you control Hama"), re-checked on every query.
+     */
+    fun WaterbendCastFromExile(
+        from: String,
+        condition: com.wingedsheep.sdk.scripting.conditions.Condition? = null,
+    ): Effect = GrantMayPlayFromExileEffect(
+        from = from,
+        expiry = com.wingedsheep.sdk.scripting.effects.MayPlayExpiry.Permanent,
+        condition = condition,
+        fixedAlternativeCostIsManaValue = true,
+        waterbend = true,
+    )
+
+    /**
      * Make every card in a named collection *plotted* (CR 718). The cards must already be in
      * exile (chain after a `MoveCollection` to `Zone.EXILE`). Each card gets the plotted
      * designation + a permanent free-cast-as-a-sorcery-on-a-later-turn permission — the Plot

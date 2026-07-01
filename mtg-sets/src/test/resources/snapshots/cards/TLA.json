@@ -9051,6 +9051,134 @@
     ]
 }
 
+// Hama, the Bloodbender
+{
+    "name": "Hama, the Bloodbender",
+    "manaCost": "{2}{U/B}{U/B}{U/B}",
+    "typeLine": "Legendary Creature — Human Warlock",
+    "oracleText": "When Hama enters, target opponent mills three cards. Exile up to one noncreature, nonland card from that player's graveyard. For as long as you control Hama, you may cast the exiled card during your turn by waterbending {X} rather than paying its mana cost, where X is its mana value. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "TopOfLibrary",
+                                        "count": {
+                                            "type": "Fixed",
+                                            "amount": 3
+                                        },
+                                        "player": {
+                                            "type": "ContextPlayer",
+                                            "index": 0
+                                        },
+                                        "isMill": true
+                                    },
+                                    "storeAs": "milled"
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "milled",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard",
+                                        "player": {
+                                            "type": "ContextPlayer",
+                                            "index": 0
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "FromZone",
+                                "zone": "Graveyard",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                },
+                                "filter": "noncreature nonland"
+                            },
+                            "storeAs": "hamaGraveyard"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "hamaGraveyard",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "storeSelected": "hamaChosen",
+                            "prompt": "Exile up to one noncreature, nonland card from that player's graveyard"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "hamaChosen",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Exile",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            },
+                            "storeMovedAs": "hamaExiled"
+                        },
+                        {
+                            "type": "GrantMayPlayFromExile",
+                            "from": "hamaExiled",
+                            "expiry": "Permanent",
+                            "condition": {
+                                "type": "All",
+                                "conditions": [
+                                    "IsYourTurn",
+                                    "YouControlSource"
+                                ]
+                            },
+                            "fixedAlternativeCostIsManaValue": true,
+                            "waterbend": true
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetOpponent",
+                    "id": "target opponent"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "224",
+        "rarity": "UNCOMMON",
+        "artist": "Le Vuong",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/f/6fa1197d-7b19-4d86-81e2-5c87de87757b.jpg?1764121634"
+    },
+    "colorIdentityOverride": [
+        "BLUE",
+        "BLACK"
+    ]
+}
+
 // Haru, Hidden Talent
 {
     "name": "Haru, Hidden Talent",

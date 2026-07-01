@@ -1306,11 +1306,31 @@ data class GrantMayPlayFromExileEffect(
      * stamps a `PlayWithFixedAlternativeManaCostComponent` honored by the cast enumerator and
      * the cast handler's cost calculation.
      */
-    val fixedAlternativeManaCost: ManaCost? = null
+    val fixedAlternativeManaCost: ManaCost? = null,
+    /**
+     * When true, the fixed alternative cost for each granted card is `{its mana value}` generic,
+     * computed per-card at grant time (a 6-drop becomes `{6}`, a 2-drop `{2}`). Mutually exclusive
+     * with a literal [fixedAlternativeManaCost]. Models "cast the exiled card … rather than paying
+     * its mana cost, where X is its mana value" (Hama, the Bloodbender). Pair with [waterbend] for
+     * the "by waterbending {X}" wording.
+     */
+    val fixedAlternativeCostIsManaValue: Boolean = false,
+    /**
+     * When true, the fixed alternative cost is paid as a **waterbend** cost (CR 701.67): its whole
+     * generic amount may be paid by tapping untapped artifacts/creatures (each {1}) in addition to
+     * mana. Only meaningful alongside [fixedAlternativeManaCost] or [fixedAlternativeCostIsManaValue];
+     * stamped onto `PlayWithFixedAlternativeManaCostComponent.waterbend`. Models Hama, the
+     * Bloodbender's "by waterbending {X}".
+     */
+    val waterbend: Boolean = false
 ) : Effect {
     override val description: String = buildString {
         val who = if (ownerControls) "its owner" else "you"
         append("${expiry.description.replaceFirstChar { it.uppercase() }}, $who may play those cards from exile")
+        if (fixedAlternativeCostIsManaValue) {
+            append(if (waterbend) " by waterbending {X} rather than paying their mana cost, where X is their mana value"
+                   else " for their mana value rather than their mana cost")
+        }
         if (fixedAlternativeManaCost != null) append(" for $fixedAlternativeManaCost rather than their mana cost")
         if (condition != null) {
             append(" ")
