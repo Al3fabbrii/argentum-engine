@@ -321,6 +321,24 @@ data class MulliganStateComponent(
 enum class ExtraPhaseKind { COMBAT, MAIN }
 
 /**
+ * One entry in the additional-phase queue ([AdditionalPhasesComponent]): a phase [kind] plus, for a
+ * COMBAT phase, an optional [attackerRestriction] filter constraining which creatures may be declared
+ * as attackers during *that* inserted phase (Bumi, Unleashed: "Only land creatures can attack during
+ * that combat phase"). Carried on the queue entry — rather than a side channel — so a restricted and
+ * an unrestricted combat phase can be queued together without any lockstep bookkeeping. MAIN entries
+ * never carry a restriction (`null`).
+ *
+ * @param kind Whether this entry inserts a combat phase or a postcombat main phase.
+ * @param attackerRestriction For a COMBAT entry, the "only these can attack" filter, or `null` for
+ *   the ordinary "any creature can attack" combat phase.
+ */
+@Serializable
+data class QueuedPhase(
+    val kind: ExtraPhaseKind,
+    val attackerRestriction: GameObjectFilter? = null
+)
+
+/**
  * Component tracking the queue of additional phases to be inserted into the current turn, in the
  * order they should occur (CR 500.8). When the postcombat main phase would advance to the end step,
  * if this component exists the game drains the queue one entry at a time — redirecting to a fresh
@@ -330,12 +348,13 @@ enum class ExtraPhaseKind { COMBAT, MAIN }
  * entry, [com.wingedsheep.sdk.scripting.effects.AddMainPhaseEffect] appends a MAIN entry. Composing
  * the two (Aggravated Assault, All-Out Assault) yields `[COMBAT, MAIN]`; the combat atom alone
  * (Great Train Heist, Raph & Leo, Éomer, Fear of Missing Out) yields `[COMBAT]` and adds no main.
+ * A COMBAT entry may carry an attacker restriction (Bumi, Unleashed) — see [QueuedPhase].
  *
  * @param phases Remaining extra phases to insert, head first.
  */
 @Serializable
 data class AdditionalPhasesComponent(
-    val phases: List<ExtraPhaseKind> = emptyList()
+    val phases: List<QueuedPhase> = emptyList()
 ) : Component
 
 /**
@@ -345,9 +364,17 @@ data class AdditionalPhasesComponent(
  * postcombat main phase — so a combat-only extra phase never grants an unwanted main phase. The
  * trailing main phase is added only when an explicit [ExtraPhaseKind.MAIN] is queued. Consumed when
  * the queue is exhausted (the game proceeds to the end step) or when a queued main phase begins.
+ *
+ * [attackerRestriction] carries the restriction of the phase currently in progress (copied from the
+ * drained [QueuedPhase]): while set, only creatures matching it may be declared as attackers this
+ * phase (Bumi, Unleashed). Because the whole marker is removed when the phase ends, the restriction
+ * is automatically scoped to exactly this inserted combat phase — the natural combat phase (which
+ * never sets this marker) and later phases are unaffected. `null` for an unrestricted extra combat.
  */
 @Serializable
-data object InAdditionalCombatPhaseComponent : Component
+data class InAdditionalCombatPhaseComponent(
+    val attackerRestriction: GameObjectFilter? = null
+) : Component
 
 /**
  * Component tracking additional upkeep steps to be inserted into the current turn

@@ -1188,12 +1188,25 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   `Effects.Composite(listOf(Effects.AddCombatPhase, Effects.AddMainPhase))` — to reproduce "an
   additional combat phase followed by an additional main phase" (Aggravated Assault, All-Out
   Assault); the combat atom alone adds *no* trailing main phase. Implemented as an ordered
-  `AdditionalPhasesComponent(phases: List<ExtraPhaseKind>)` queue on the active player (`COMBAT` /
-  `MAIN` entries), drained one at a time by `TurnManager.advanceStep` after the postcombat main phase
-  and, for an inserted combat phase, again at its end-of-combat step (marked by
-  `InAdditionalCombatPhaseComponent`) so a combat-only extra phase proceeds straight to the end step
-  instead of granting an unwanted main phase. Engine simplification: all queued phases are inserted
-  after the postcombat main phase regardless of when the effect resolved.
+  `AdditionalPhasesComponent(phases: List<QueuedPhase>)` queue on the active player (each `QueuedPhase`
+  is a `COMBAT` / `MAIN` kind plus, for a combat phase, an optional attacker-restriction filter),
+  drained one at a time by `TurnManager.advanceStep` after the postcombat main phase and, for an
+  inserted combat phase, again at its end-of-combat step (marked by `InAdditionalCombatPhaseComponent`)
+  so a combat-only extra phase proceeds straight to the end step instead of granting an unwanted main
+  phase. Engine simplification: all queued phases are inserted after the postcombat main phase
+  regardless of when the effect resolved.
+- `Effects.AddCombatPhaseRestrictedTo(attackerRestriction: GameObjectFilter)` — the same atomic extra
+  combat phase, but **only creatures matching `attackerRestriction` may be declared as attackers
+  during that inserted phase** (CR 508.1a; Bumi, Unleashed: "there is an additional combat phase. Only
+  land creatures can attack during that combat phase" ⇒
+  `AddCombatPhaseRestrictedTo(GameObjectFilter.Creature and GameObjectFilter.Land)`). The filter rides
+  on the `QueuedPhase` and is copied onto `InAdditionalCombatPhaseComponent` when the phase begins, so
+  it is scoped to exactly that phase (the natural combat phase and any unrestricted extra combat impose
+  nothing). Enforced by `AdditionalCombatPhaseAttackerRule` in `defaultAttackRestrictionRules()`,
+  matched against projected state so animated lands read as the land *creatures* they are. Reused by
+  Aang, Destined Savior and Bumi, King of Three Trials' sibling. (A Kotlin property and function can't
+  share a name, so the unrestricted atom stays the `Effects.AddCombatPhase` value and the restricted
+  variant is this factory; both build the one `AddCombatPhaseEffect(attackerRestriction: GameObjectFilter?)`.)
 - `Effects.AddAdditionalUpkeepSteps(amount)` (`amount: DynamicAmount` or `Int`) — give the
   controller `amount` additional upkeep steps after the current phase (Obeka, Splitter of Seconds:
   "you get that many additional upkeep steps after this phase"). Per CR 500.10, each added upkeep
