@@ -390,6 +390,11 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   `OptionalCostEffect` (`Gate.MayPay`) so the same amount can also feed the `ifPaid` effect. A
   non-positive evaluated amount pays nothing and still counts as paid (CR 119.4).
 - `LoseLife(amount, target)` — target loses life.
+- `DrainLife(amount, from = EachOpponent, to = Controller)` — each player in `from` loses `amount`
+  life, then `to` gains life equal to the total *actually* lost (each loss honors `ModifyLifeLoss`
+  replacements) as a single life-gain event — "Each opponent loses X life. You gain life equal to
+  the life lost this way." (Exsanguinate). Prefer this over `LoseLife + GainLife` whenever the gain
+  is worded "equal to the life lost this way".
 - `SetLifeTotal(amount, target)` — set target's life total to N.
 - `ExchangeLifeAndPower(target)` — swap target's power with controller's life total.
 - `LoseHalfLife(roundUp, target, lifePlayer?)` — lose half of life total (round up/down).
