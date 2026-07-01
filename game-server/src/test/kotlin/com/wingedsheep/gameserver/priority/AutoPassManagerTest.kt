@@ -294,6 +294,20 @@ class AutoPassManagerTest : FunSpec({
     )
 
     /**
+     * A targeted activated ability restricted to the end-of-combat step (e.g. Desert:
+     * "{T}: This land deals 1 damage to target attacking creature. Activate only during the
+     * end of combat step."). The engine only enumerates it during END_COMBAT with a legal
+     * (still-attacking) target, so its mere presence means the player can act now.
+     */
+    fun endOfCombatPingAction(playerId: EntityId, hasTargets: Boolean = true) = LegalActionInfo(
+        actionType = "ActivateAbility",
+        description = "Deal 1 damage to target attacking creature",
+        action = ActivateAbility(playerId, EntityId.generate(), AbilityId("desert-ping")),
+        requiresTargets = true,
+        validTargets = if (hasTargets) listOf(EntityId.generate()) else emptyList()
+    )
+
+    /**
      * A cast for an alternative cost (Sneak, evoke, flashback, …). The enumerators emit
      * `CastWithAlternativeCost` (and siblings) rather than `CastSpell`; the auto-pass logic must
      * still treat it as a castable spell so it stops in the window where it's legal.
@@ -537,6 +551,47 @@ class AutoPassManagerTest : FunSpec({
             val actions = listOf(
                 passPriorityAction(player2),
                 instantSpellAction(player2)
+            )
+
+            autoPassManager.shouldAutoPass(state, player2, actions) shouldBe true
+        }
+
+        test("STOP during opponent's end combat step with an end-of-combat activated ability (Desert)") {
+            // Desert's ping is only legal during END_COMBAT, and its target (a still-attacking
+            // creature) disappears when the step ends — so the defender must be stopped here or
+            // they can never use it.
+            val state = createMockState(player2, player1, Step.END_COMBAT)
+            val actions = listOf(
+                passPriorityAction(player2),
+                endOfCombatPingAction(player2)
+            )
+
+            autoPassManager.shouldAutoPass(state, player2, actions) shouldBe false
+        }
+
+        test("STOP during opponent's end combat step with an instant-speed response") {
+            val state = createMockState(player2, player1, Step.END_COMBAT)
+            val actions = listOf(
+                passPriorityAction(player2),
+                instantSpellAction(player2)
+            )
+
+            autoPassManager.shouldAutoPass(state, player2, actions) shouldBe false
+        }
+
+        test("Auto-pass during opponent's end combat step with no responses") {
+            val state = createMockState(player2, player1, Step.END_COMBAT)
+            val actions = listOf(passPriorityAction(player2))
+
+            autoPassManager.shouldAutoPass(state, player2, actions) shouldBe true
+        }
+
+        test("Auto-pass during opponent's end combat step when the end-of-combat ability has no legal target") {
+            // No attacking creatures left to target → nothing to stop for.
+            val state = createMockState(player2, player1, Step.END_COMBAT)
+            val actions = listOf(
+                passPriorityAction(player2),
+                endOfCombatPingAction(player2, hasTargets = false)
             )
 
             autoPassManager.shouldAutoPass(state, player2, actions) shouldBe true
