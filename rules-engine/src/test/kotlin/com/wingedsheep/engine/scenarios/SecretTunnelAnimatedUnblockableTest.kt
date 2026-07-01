@@ -9,22 +9,28 @@ import com.wingedsheep.mtg.sets.definitions.tla.cards.EarthenAlly
 import com.wingedsheep.mtg.sets.definitions.tla.cards.SecretTunnel
 import com.wingedsheep.sdk.core.AbilityFlag
 import com.wingedsheep.sdk.core.Color
+import com.wingedsheep.sdk.core.Phase
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.model.EntityId
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContainIgnoringCase
 
 /**
  * Secret Tunnel's printed "This land can't be blocked" must be honored once the land is animated
  * into a creature (e.g. via Earthen Ally's Earthbend 5) and attacks — the case where the static
- * actually matters. Regression coverage for the engine's projection + block-evasion enforcement:
- *  - Test A: after Earthbend animates it, the projected CANT_BE_BLOCKED keyword survives the type change.
- *  - Test B: end-to-end — declaring a blocker on the animated attacker is rejected by the engine.
+ * actually matters.
  *
- * (The engine enforces this correctly; the user-visible "I could block it" was a web-client UX gap
- * where the block-assignment UI doesn't respect attacker evasion — tracked separately.)
+ * Test C is the real-play regression: lands bypass ZoneTransitionService, and PlayLandHandler used
+ * to never bake a land's static/replacement components — so a Secret Tunnel played from hand never
+ * projected CANT_BE_BLOCKED and could be blocked (damage dealt), matching the bug report. The fix
+ * bakes those components on land entry.
+ *
+ *  - Test A: after Earthbend animates it, the projected CANT_BE_BLOCKED keyword survives the type change.
+ *  - Test B: end-to-end — declaring a blocker on the animated attacker is rejected by block-evasion rules.
+ *  - Test C: a Secret Tunnel played FROM HAND (real ETB, no fixture baking) actually projects the keyword.
  */
 class SecretTunnelAnimatedUnblockableTest : FunSpec({
 
@@ -114,6 +120,28 @@ class SecretTunnelAnimatedUnblockableTest : FunSpec({
         )
         withClue("Secret Tunnel can't be blocked, so declaring a blocker on it must be rejected") {
             result.isSuccess shouldBe false
+        }
+        withClue("the rejection must be BECAUSE it can't be blocked (not some unrelated setup reason): ${result.error}") {
+            result.error shouldContainIgnoringCase "blocked"
+        }
+    }
+
+    test("C: Secret Tunnel played FROM HAND (real ETB) projects CANT_BE_BLOCKED without any test-fixture baking") {
+        val driver = createDriver()
+        driver.passPriorityUntil(Phase.PRECOMBAT_MAIN)
+        // Ensure it's player 1's main with a land drop available.
+        var safety = 0
+        while (driver.activePlayer != driver.player1 && safety < 20) {
+            driver.bothPass()
+            driver.passPriorityUntil(Phase.PRECOMBAT_MAIN)
+            safety++
+        }
+
+        val tunnel = driver.putCardInHand(driver.player1, "Secret Tunnel")
+        driver.playLand(driver.player1, tunnel).error shouldBe null
+
+        withClue("the REAL play-from-hand ETB path (ZoneTransitionService) must bake the land's static so its 'can't be blocked' projects") {
+            driver.state.projectedState.hasKeyword(tunnel, AbilityFlag.CANT_BE_BLOCKED) shouldBe true
         }
     }
 })

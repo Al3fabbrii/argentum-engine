@@ -155,6 +155,21 @@ class PlayLandHandler(
         newState = com.wingedsheep.engine.handlers.effects.BattlefieldEntry
             .place(newState, action.playerId, action.cardId)
 
+        // Lands bypass ZoneTransitionService (which bakes ETB components for everything else),
+        // so install the land's own static + replacement effect components here — mirroring
+        // ZoneTransitionService's ETB baking and putPermanentOnBattlefield. Done once, before every
+        // tapped/OnEnter/EntersWithChoice branch below, since the land is on the battlefield with its
+        // controller set by now. Without this a land's printed statics never project once it's in
+        // play: e.g. Secret Tunnel's "this land can't be blocked" (relevant once the land is
+        // animated), man-land grants, Urborg's type-setting, Blood Moon-style effects.
+        newState = newState.updateEntity(action.cardId) { c ->
+            val staticAbilityHandler =
+                com.wingedsheep.engine.mechanics.layers.StaticAbilityHandler(cardRegistry)
+            var updated = staticAbilityHandler.addContinuousEffectComponent(c)
+            updated = staticAbilityHandler.addReplacementEffectComponent(updated)
+            updated
+        }
+
         // "Lands you control enter untapped" (The Wandering Minstrel) and similar EntersUntapped
         // replacement effects from other battlefield permanents override every tapped-entry path
         // below (permission-forced, shock-land "pay or tapped", conditional tapped duals). The
