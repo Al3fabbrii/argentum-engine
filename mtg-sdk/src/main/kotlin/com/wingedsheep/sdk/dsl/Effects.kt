@@ -29,6 +29,9 @@ import com.wingedsheep.sdk.scripting.effects.SetLandTypeEffect
 import com.wingedsheep.sdk.scripting.effects.AddCountersToCollectionEffect
 import com.wingedsheep.sdk.scripting.effects.AddManaEffect
 import com.wingedsheep.sdk.scripting.effects.AnimateLandEffect
+import com.wingedsheep.sdk.scripting.effects.Gate
+import com.wingedsheep.sdk.scripting.effects.GatedEffect
+import com.wingedsheep.sdk.scripting.effects.PayManaCostEffect
 import com.wingedsheep.sdk.scripting.effects.ExploreEffect
 import com.wingedsheep.sdk.scripting.effects.BecomeCreatureEffect
 import com.wingedsheep.sdk.scripting.effects.BecomePreparedEffect
@@ -522,6 +525,30 @@ object Effects {
         requiredMatches = requiredMatches,
         prompt = prompt
     )
+
+    /**
+     * "[otherwise] unless you waterbend [amount]." — an in-resolution waterbend payment gate
+     * (Avatar: The Last Airbender). While the effect resolves the controller may pay a waterbend
+     * {amount} cost, paying the generic with mana and/or by tapping their untapped artifacts and
+     * creatures (each {1}, the shared waterbend tap-to-help path). If they pay, nothing else
+     * happens; if they decline or cannot pay, [otherwise] runs.
+     *
+     * Lowers to a [GatedEffect] with a [Gate.MayPay] over a waterbend-flagged [PayManaCostEffect]
+     * (`{amount}` generic), an empty `then` (paying is its own reward) and [otherwise] as the
+     * failure branch — the gated executor recognizes the waterbend flag and surfaces a
+     * tap-to-help mana-source decision instead of a plain "pay?" yes/no. Waterbend is generic-only,
+     * so [amount] carries no colored pips.
+     *
+     * (Waterbending Lesson: "Draw three cards. Then discard a card unless you waterbend {2}.")
+     */
+    fun UnlessYouWaterbend(amount: Int, otherwise: Effect): Effect =
+        GatedEffect(
+            gate = Gate.MayPay(PayManaCostEffect(ManaCost.parse("{$amount}"), waterbend = true)),
+            then = Composite(),
+            otherwise = otherwise,
+            descriptionOverride =
+                "${otherwise.description.replaceFirstChar { it.uppercase() }} unless you waterbend {$amount}"
+        )
 
     /**
      * Connive (CR 702.166): draw a card, then discard a card. If the discarded card
