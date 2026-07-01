@@ -348,6 +348,38 @@ data class EntersUntapped(
 }
 
 /**
+ * "Permanents matching [appliesTo] enter the battlefield tapped" — the global/group counterpart
+ * of the self-only [EntersTapped]. Models a *static* effect carried by a permanent that taps
+ * OTHER permanents it cares about as they enter (e.g. Zhao, the Moon Slayer's "Nonbasic lands
+ * enter tapped"; also Imposing Sovereign / Authority of the Consuls / Thalia, Heretic Cathar
+ * "creatures your opponents control enter tapped").
+ *
+ * Unlike [EntersTapped] — a self-replacement consumed once as the source itself enters — this is
+ * a runtime replacement stamped into the source's replacement component and consulted from the
+ * battlefield whenever some *other* permanent would enter, so the [appliesTo] filter describes
+ * the *affected* permanents (e.g. `GameObjectFilter.NonbasicLand`).
+ *
+ * Per CR 614 (replacement-effect ordering), an [EntersUntapped] effect that also matches the
+ * entering permanent wins — the engine's entry paths consult [EntersUntapped] first and only
+ * apply this tap when no untapped replacement applies.
+ */
+@SerialName("PermanentsEnterTapped")
+@Serializable
+data class PermanentsEnterTapped(
+    override val appliesTo: EventPattern = EventPattern.ZoneChangeEvent(
+        filter = GameObjectFilter.Any,
+        to = Zone.BATTLEFIELD
+    )
+) : ReplacementEffect {
+    override val description: String = "If ${appliesTo.description}, it enters tapped"
+
+    override fun applyTextReplacement(replacer: TextReplacer): ReplacementEffect {
+        val newAppliesTo = appliesTo.applyTextReplacement(replacer)
+        return if (newAppliesTo !== appliesTo) copy(appliesTo = newAppliesTo) else this
+    }
+}
+
+/**
  * Permanent/creature enters with counters.
  * Example: Master Biomancer, Metallic Mimic
  *

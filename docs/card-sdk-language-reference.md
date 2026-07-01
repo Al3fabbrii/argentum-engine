@@ -3296,6 +3296,17 @@ staticAbility {
 - `AddCreatureTypeByCounter` — subtype based on counters present.
 - `SetEnchantedLandType(landType)` — "Enchanted land is an Island" — replaces the enchanted
   land's basic land types with a fixed type (Rule 305.7). (Sea's Claim)
+- `SetLandTypesForGroup(filter, landTypes)` — the **group** counterpart of `SetEnchantedLandType`
+  (and the "set/replace" counterpart of `GrantAdditionalTypesToGroup`, which *adds* and keeps
+  abilities): "[filter] are [types]. (They lose all other land types and abilities and have the new
+  type's mana ability.)" Realizes CR 305.7 over a whole group of lands as two continuous effects —
+  Layer 4 `SetBasicLandTypes` (replace the basic land subtypes) + Layer 6 `RemoveAllAbilities`
+  (strip printed abilities). The new type's **intrinsic** mana ability (Mountain → "{T}: Add {R}")
+  is derived from the projected subtype by `IntrinsicManaAbilities` and survives the ability
+  suppression, so the lands still tap for the appropriate color. Gate behind a
+  `ConditionalStaticAbility` for conditional variants. Blood Moon / Magus of the Moon
+  (`filter = GroupFilter(GameObjectFilter.NonbasicLand)`, `landTypes = setOf("Mountain")`); Zhao,
+  the Moon Slayer gates the same on `Conditions.SourceCounterCountAtLeast(Counters.CONQUEROR, 1)`.
 - `SetEnchantedLandTypeFromChosen` — "Enchanted land is the chosen type" — same, but reads the
   type from the source's `ChosenLandTypeComponent` (paired with
   `EntersWithChoice(ChoiceType.BASIC_LAND_TYPE)`). Chosen-value counterpart to
@@ -5764,6 +5775,17 @@ replacementEffect {
   untapped regardless). Edge not covered: a same-event simultaneous mass-entry where the source itself is
   among the entering permanents (the source isn't yet consulted), and a land tapped via a generic
   `OnEnterRunEffect` self-tap (e.g. Game Trail) is not overridden.
+- `PermanentsEnterTapped(appliesTo = ZoneChangeEvent(filter, to = Zone.BATTLEFIELD))` — the global/group
+  counterpart of the self-only `EntersTapped`: "[filter] enter the battlefield tapped" (Zhao, the Moon
+  Slayer — "Nonbasic lands enter tapped", `filter = GameObjectFilter.NonbasicLand`; also expresses
+  Imposing Sovereign / Authority of the Consuls "creatures your opponents control enter tapped"). Like
+  `EntersUntapped`, it is a *runtime* replacement stamped into the source's `ReplacementEffectSourceComponent`
+  and consulted from the battlefield against OTHER permanents as they enter, so `appliesTo.filter` describes
+  the *affected* permanents. The entry paths (`PlayLandHandler`, `ZoneTransitionService`) call
+  `EnterTappedReplacements.entersTapped(...)` and mark the permanent tapped — **after** consulting
+  `EnterUntappedReplacements`, so per CR 614 an applicable `EntersUntapped` still wins. (Creature ETBs via
+  the stack are not yet wired to the global scan — `StackResolver` only consults the entering card's own
+  `EntersTapped` — so the opponent-creature variants would additionally need that hook.)
 - `RedirectZoneChange(newDestination, appliesTo, linkToSource = false)` — redirect a zone change to a
   different destination (Rest in Peace / Leyline of the Void: graveyard → exile). `appliesTo` is an
   `EventPattern.ZoneChangeEvent(filter, from?, to?)`; the `filter`'s `controllerPredicate` scopes it
@@ -5953,6 +5975,9 @@ substitution.
   gated on `Conditions.SourceCounterCountAtLeast(Counters.FIRE, 3)` grants `GrantCardType("CREATURE")` so the
   Vehicle is an artifact creature at 3+); reused by later Fated/Fated-Firepower cards — another pure passive
   counter with no inherent rule.
+  `conqueror` (`Counters.CONQUEROR`): TLA — Zhao, the Moon Slayer (a `{7}` ability accumulates one; a
+  `ConditionalStaticAbility` gated on `Conditions.SourceCounterCountAtLeast(Counters.CONQUEROR, 1)` switches on a
+  `SetLandTypesForGroup` making all nonbasic lands Mountains) — another pure passive counter with no inherent rule.
 - `stun` — CR 122.1d, a built-in replacement: "If a permanent with a stun counter on it would become untapped,
   instead remove a stun counter from it." Engine-wired through `untapOrConsumeStun` (`rules-engine/core/UntapHelpers.kt`),
   which is invoked from the untap step (`BeginningPhaseManager`), from `TapUntapExecutor`'s untap branch, and from the
