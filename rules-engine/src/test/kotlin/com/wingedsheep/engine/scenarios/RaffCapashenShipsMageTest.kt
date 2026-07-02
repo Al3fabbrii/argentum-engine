@@ -89,8 +89,9 @@ class RaffCapashenShipsMageTest : FunSpec({
         driver.putPermanentOnBattlefield(activePlayer, "Raff Proxy")
 
         val legendary = driver.putCardInHand(activePlayer, "Legendary Bear")
-        driver.giveMana(activePlayer, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(activePlayer, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -115,8 +116,9 @@ class RaffCapashenShipsMageTest : FunSpec({
         driver.putPermanentOnBattlefield(activePlayer, "Raff Proxy")
 
         val artifact = driver.putCardInHand(activePlayer, "Test Artifact")
-        driver.giveColorlessMana(activePlayer, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveColorlessMana(activePlayer, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -141,8 +143,10 @@ class RaffCapashenShipsMageTest : FunSpec({
         driver.putPermanentOnBattlefield(activePlayer, "Raff Proxy")
 
         val bear = driver.putCardInHand(activePlayer, "Plain Bear")
-        driver.giveMana(activePlayer, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because a non-historic creature isn't granted flash, not for lack of mana
+        driver.giveMana(activePlayer, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -170,10 +174,12 @@ class RaffCapashenShipsMageTest : FunSpec({
 
         // Opponent gets a legendary creature
         val legendary = driver.putCardInHand(opponent, "Legendary Bear")
-        driver.giveMana(opponent, Color.GREEN, 2)
 
         driver.passPriorityUntil(Step.END)
         driver.passPriority(activePlayer)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because the flash grant is controller-only, not for lack of mana
+        driver.giveMana(opponent, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(

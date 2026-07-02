@@ -755,9 +755,10 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
 - `RetainUnspentMana(vararg colors)` — "Until end of turn, you don't lose unspent mana of these colours
   as steps and phases end." The colour-filtered, single-player, turn-scoped one-shot cousin of the
   permanent-static `PreventManaPoolEmptying` (Upwelling, which stops *all* emptying for *everyone*).
-  Confers a `RetainUnspentManaComponent` on the resolving controller; at the end-of-turn mana-empty step
-  (`CleanupPhaseManager`) the kept colours survive `ManaPoolComponent.emptyExcept(...)` once, then the
-  marker clears. The Last Agni Kai (`RetainUnspentMana(Color.RED)`).
+  Confers a `RetainUnspentManaComponent` on the resolving controller; at every step/phase-end mana
+  emptying (CR 500.5, `CleanupPhaseManager.emptyManaPools` → `ManaPoolComponent.emptyAtBoundary(...)`)
+  the kept colours survive while everything else empties, until the marker clears at end-of-turn
+  cleanup. The Last Agni Kai (`RetainUnspentMana(Color.RED)`).
 - `AddManaOfChoice(colorSet, amount?, restriction?, riders?)` — **unified primitive.** Add N mana of one color the controller picks from a resolved [ManaColorSet](#manacolorset). All "any-color from a constrained pool" cards (any color, commander identity, among permanents, lands could produce, source-chosen color) are expressed as this effect plus a different `ManaColorSet`. `riders` is a `Set<ManaSpellRider>` consumed when the mana pays for a spell (e.g. Path of Ancestry tags its mana with `ScryOnSharedTypeWithCommander`); when riders are set without a `restriction`, the engine stores the entries under `ManaRestriction.AnySpend` to preserve the rider through the pool.
 - `AddAnyColorMana(amount?, restriction?)` — sugar for `AddManaOfChoice(ManaColorSet.AnyColor, amount)`. "Add N mana of any **one** color" (Gilded Lotus): one chosen color, N of it. For "any **combination** of colors" use `AddManaInAnyCombination`.
 - `AddManaOfChosenColor(amount?)` — sugar for `AddManaOfChoice(ManaColorSet.SourceChosenColor, amount)`.
@@ -3819,10 +3820,11 @@ staticAbility {
   of any type can be spent to activate Sharkey's abilities" → `GroupFilter.source()`.)
 - `PreventManaPoolEmptying` — mana pools don't empty between steps/phases. (Upwelling)
 - `ConvertEmptyingManaToRed` — "If you would lose unspent mana, that mana becomes red instead."
-  The colour-converting cousin of `PreventManaPoolEmptying`: at the mana-empty point (end-of-turn
-  cleanup, `CleanupPhaseManager`) the *controller's* whole pool becomes that many red mana instead
-  of emptying (CR 500.5 / 703.4q emptying replaced per CR 614). Scoped to the controller of the
-  bearing permanent, unlike Upwelling's all-players prevention. (Ozai, the Phoenix King)
+  The colour-converting cousin of `PreventManaPoolEmptying`: at every step/phase-end mana emptying
+  (`CleanupPhaseManager.emptyManaPools`, and for firebending mana at `CombatManager.endCombat`) the
+  *controller's* would-be-lost mana becomes that many red mana instead of emptying (CR 500.5 / 703.4q
+  emptying replaced per CR 614). Scoped to the controller of the bearing permanent, unlike Upwelling's
+  all-players prevention. (Ozai, the Phoenix King)
 - `NoMaximumHandSize` — controller has no hand-size limit *while this permanent is on the
   battlefield*. (Thought Vessel, Reliquary Tower) For a one-shot resolution effect that confers a
   *permanent, player-scoped* "no maximum hand size for the rest of the game" (survives the source

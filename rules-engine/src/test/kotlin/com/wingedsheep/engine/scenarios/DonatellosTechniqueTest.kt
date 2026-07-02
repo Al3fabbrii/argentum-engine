@@ -19,8 +19,9 @@ class DonatellosTechniqueTest : FunSpec({
         driver.initMirrorMatch(deck = Deck.of("Island" to 30), startingLife = 20)
         val player = driver.activePlayer!!
         val spell = driver.putCardInHand(player, "Donatello's Technique")
-        driver.giveMana(player, Color.BLUE, 3)
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.BLUE, 3)
         val before = driver.getHandSize(player)
         driver.castSpell(player, spell).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()

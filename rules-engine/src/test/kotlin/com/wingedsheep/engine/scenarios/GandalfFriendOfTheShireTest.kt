@@ -90,8 +90,9 @@ class GandalfFriendOfTheShireTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf, Friend of the Shire")
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
@@ -107,8 +108,10 @@ class GandalfFriendOfTheShireTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf, Friend of the Shire")
         val beast = driver.putCardInHand(p1, "Test Beast")
-        driver.giveMana(p1, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because a creature spell isn't granted flash, not for lack of mana
+        driver.giveMana(p1, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = beast, paymentStrategy = PaymentStrategy.FromPool)
@@ -125,9 +128,11 @@ class GandalfFriendOfTheShireTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf, Friend of the Shire")
         val sorcery = driver.putCardInHand(p2, "Test Sorcery")
-        driver.giveMana(p2, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
         driver.passPriority(p1)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because the static is controller-only, not for lack of mana
+        driver.giveMana(p2, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p2, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)

@@ -21,9 +21,10 @@ class SplintersTechniqueTest : FunSpec({
         driver.initMirrorMatch(deck = Deck.of("Swamp" to 30), startingLife = 20)
         val player = driver.activePlayer!!
         val spell = driver.putCardInHand(player, "Splinter's Technique")
-        driver.giveMana(player, Color.BLACK, 4)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.BLACK, 4)
         val handBefore = driver.getHandSize(player)
         driver.castSpell(player, spell).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty() && driver.pendingDecision == null) driver.bothPass()

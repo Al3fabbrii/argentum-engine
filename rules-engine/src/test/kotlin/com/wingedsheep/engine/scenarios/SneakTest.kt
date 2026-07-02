@@ -195,7 +195,6 @@ class SneakTest : FunSpec({
         val brawler = driver.putCreatureOnBattlefield(attacker, "Plain Brawler")
         driver.removeSummoningSickness(brawler)
         driver.putCardInHand(attacker, "Sneaky Ninja")
-        driver.giveMana(attacker, Color.GREEN, 2)
 
         val enumerator = LegalActionEnumerator.create(driver.cardRegistry)
         fun sneakActions() = enumerator.enumerate(driver.state, attacker)
@@ -208,6 +207,8 @@ class SneakTest : FunSpec({
 
         // Declare blockers with the Brawler unblocked: the sneak option appears.
         driver.openSneakWindow(attacker, defender, brawler)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(attacker, Color.GREEN, 2)
         sneakActions().isNotEmpty().shouldBeTrue()
     }
 
@@ -240,10 +241,10 @@ class SneakTest : FunSpec({
         val attacker = driver.activePlayer!!
 
         val ninja = driver.putCardInHand(attacker, "Sneaky Ninja")
-        // Pay the full {4}{G}.
-        driver.giveMana(attacker, Color.GREEN, 5)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // Pay the full {4}{G}. mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(attacker, Color.GREEN, 5)
         driver.castSpell(attacker, ninja).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()
 

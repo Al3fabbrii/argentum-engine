@@ -100,7 +100,7 @@ class TheLastAgniKaiScenarioTest : FunSpec({
         driver.red(active) shouldBe 0
     }
 
-    test("red mana is retained through the end-of-turn pool emptying while other colours empty") {
+    test("red mana is retained through each step/phase emptying while other colours empty, until end of turn") {
         val driver = createDriver()
         driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
         val active = driver.activePlayer!!
@@ -120,12 +120,15 @@ class TheLastAgniKaiScenarioTest : FunSpec({
         driver.giveMana(active, Color.GREEN, 2)
         driver.green(active) shouldBe 2
 
-        // Cross this turn's cleanup into the opponent's turn (the engine's only mana-empty point).
-        driver.passPriorityUntil(Step.UPKEEP)
-        driver.activePlayer shouldBe opponent
-
-        // Red survived the end-of-turn emptying; green did not.
+        // Cross a step/phase boundary within the turn (CR 500.5). Red is retained by the Agni Kai
+        // rider; the unprotected green empties as the phase ends.
+        driver.passPriorityUntil(Step.BEGIN_COMBAT)
         driver.red(active) shouldBe 3
         driver.green(active) shouldBe 0
+
+        // The retention is turn-scoped ("until end of turn"): by the opponent's turn the red is gone.
+        driver.passPriorityUntil(Step.UPKEEP)
+        driver.activePlayer shouldBe opponent
+        driver.red(active) shouldBe 0
     }
 })

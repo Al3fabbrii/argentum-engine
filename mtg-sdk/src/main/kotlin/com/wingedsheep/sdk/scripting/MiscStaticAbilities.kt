@@ -582,9 +582,9 @@ data class SuppressEntersTriggers(
  * Prevents mana pools from emptying as steps and phases end.
  * Used for Upwelling: "Players don't lose unspent mana as steps and phases end."
  *
- * The engine checks for this static ability on any permanent on the battlefield
- * during mana pool cleanup. While any permanent with this ability is on the battlefield,
- * mana pools are not emptied.
+ * The engine checks for this static ability on any permanent on the battlefield at every
+ * step/phase-end mana emptying (CR 500.5). While any permanent with this ability is on the
+ * battlefield, mana pools are not emptied.
  */
 @SerialName("PreventManaPoolEmptying")
 @Serializable
@@ -601,9 +601,10 @@ data object PreventManaPoolEmptying : StaticAbility {
  * empties as each step and phase ends) with an equal amount of red. Scoped to the controller of the
  * permanent bearing the ability, unlike Upwelling's all-players prevention.
  *
- * The engine checks for this static ability at the single mana-empty point (end-of-turn cleanup in
- * [com.wingedsheep.engine.core.CleanupPhaseManager]); for each controller of a permanent with this
- * ability, the pool is replaced by that many red mana rather than emptied.
+ * The engine checks for this static ability at every step/phase-end mana emptying (CR 500.5, in
+ * `CleanupPhaseManager.emptyManaPools`, and again for firebending mana in `CombatManager.endCombat`);
+ * for each controller of a permanent with this ability, the would-be-lost mana is replaced by that
+ * many red mana rather than emptied.
  */
 @SerialName("ConvertEmptyingManaToRed")
 @Serializable

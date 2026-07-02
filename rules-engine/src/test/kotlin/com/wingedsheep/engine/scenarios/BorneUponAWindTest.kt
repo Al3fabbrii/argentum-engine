@@ -82,8 +82,9 @@ class BorneUponAWindTest : FunSpec({
         driver.bothPass()
 
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
@@ -111,9 +112,11 @@ class BorneUponAWindTest : FunSpec({
         driver.state.getEntity(p1)?.get<FlashGrantsThisTurnComponent>().shouldBeNull()
 
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
         driver.passPriority(p2) // priority on p1 during p2's end step
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because the flash grant has expired, not for lack of mana
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
