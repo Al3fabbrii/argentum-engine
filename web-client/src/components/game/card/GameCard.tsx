@@ -1996,8 +1996,11 @@ function GameCardImpl({
                 )
               })}
             </div>
-            {/* Lore counter badge in P/T position */}
-            {loreCount > 0 && (
+            {/* Lore counter badge in P/T position — suppressed on Saga creatures
+                (e.g. FIN "Summon:" cards, Enchantment Creature — Saga) where the
+                real P/T overlay already occupies this corner. The chapter track
+                along the left edge conveys the current stage on its own. */}
+            {loreCount > 0 && (card.power === null || card.power === undefined) && (
               <div style={{
                 ...styles.sagaLoreBadge,
                 fontSize: responsive.badges.ptFontSize,
