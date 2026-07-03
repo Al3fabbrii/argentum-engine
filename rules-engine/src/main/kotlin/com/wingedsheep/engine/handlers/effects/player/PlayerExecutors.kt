@@ -51,6 +51,7 @@ class PlayerExecutors(
         CreateGlobalTriggeredAbilityExecutor(),
         CreatePermanentEmblemExecutor(),
         EachPlayerChoosesCreatureTypeExecutor(),
+        EndTheTurnExecutor(),
         GainCitysBlessingExecutor(),
         RemoveMaximumHandSizeExecutor(),
         GiftGivenExecutor(),
