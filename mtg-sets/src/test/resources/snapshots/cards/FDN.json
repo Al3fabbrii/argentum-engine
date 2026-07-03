@@ -3972,6 +3972,59 @@
     ]
 }
 
+// Mischievous Mystic
+{
+    "name": "Mischievous Mystic",
+    "manaCost": "{1}{U}",
+    "typeLine": "Creature — Human Wizard",
+    "oracleText": "Flying\nWhenever you draw your second card each turn, create a 1/1 blue Faerie creature token with flying.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 1
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "NthCardDrawnEvent",
+                    "nthCard": 2
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "BLUE"
+                    ],
+                    "creatureTypes": [
+                        "Faerie"
+                    ],
+                    "keywords": [
+                        "FLYING"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/d/1/d1c0556e-ba3c-4a8e-b704-8eaa7c4dba1c.jpg?1782727481"
+                },
+                "descriptionOverride": "Whenever you draw your second card each turn, create a 1/1 blue Faerie creature token with flying."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "47",
+        "rarity": "UNCOMMON",
+        "artist": "Steve Prescott",
+        "flavorText": "\"Don't worry about where they're taking me. The more pressing question is, why aren't they taking you?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/0/20d89cec-528b-4b2a-87db-e11ce0000622.jpg?1782689225"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Mossborn Hydra
 {
     "name": "Mossborn Hydra",
@@ -4374,6 +4427,49 @@
     "colorIdentityOverride": []
 }
 
+// Raise the Past
+{
+    "name": "Raise the Past",
+    "manaCost": "{2}{W}{W}",
+    "typeLine": "Sorcery",
+    "oracleText": "Return all creature cards with mana value 2 or less from your graveyard to the battlefield.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GatherCards",
+                    "source": {
+                        "type": "FromZone",
+                        "zone": "Graveyard",
+                        "filter": "creature mv<=2"
+                    },
+                    "storeAs": "graveyardCreatures"
+                },
+                {
+                    "type": "MoveCollection",
+                    "from": "graveyardCreatures",
+                    "destination": {
+                        "type": "ToZone",
+                        "zone": "Battlefield"
+                    },
+                    "underOwnersControl": true
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "22",
+        "rarity": "RARE",
+        "artist": "Nathaniel Himawan",
+        "flavorText": "At Strixhaven University, learning about the past means talking to those who were there.",
+        "imageUri": "https://cards.scryfall.io/normal/front/6/c/6c6be129-56da-4fe7-a6bd-6a1d402c09e1.jpg?1782689246"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Refute
 {
     "name": "Refute",
@@ -4639,6 +4735,69 @@
     "colorIdentityOverride": [
         "BLACK"
     ]
+}
+
+// Scrawling Crawler
+{
+    "name": "Scrawling Crawler",
+    "manaCost": "{3}",
+    "typeLine": "Artifact Creature — Phyrexian Construct",
+    "oracleText": "At the beginning of your upkeep, each player draws a card.\nWhenever an opponent draws a card, that player loses 1 life.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "StepEvent",
+                    "step": "UPKEEP"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DrawCards",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "Each"
+                    }
+                },
+                "descriptionOverride": "At the beginning of your upkeep, each player draws a card."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "DrawEvent",
+                    "player": "EachOpponent"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "LoseLife",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 1
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "TriggeringPlayer"
+                    }
+                },
+                "descriptionOverride": "Whenever an opponent draws a card, that player loses 1 life."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "132",
+        "rarity": "RARE",
+        "artist": "Miro Petrov",
+        "flavorText": "It spreads the machine gospel of New Phyrexia, its task incomplete until all surrender to perfection.",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/1/a1176dcf-40ee-4342-aa74-791b8352e99a.jpg?1782689153"
+    }
 }
 
 // Searslicer Goblin
