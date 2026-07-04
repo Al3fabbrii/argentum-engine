@@ -35,6 +35,12 @@ Generated to scope what must be built before the set can be completed.
 >   (`Effects.ExileTargetSpell(fixedAlternativeManaCost)`). The 3 remaining Airbend cards are each
 >   blocked by a *different* gap (cast-zone restriction, each-player-choose Saga chapter, four-bend
 >   events + {WUBRG} reduction), not by airbend itself.
+> - ✅ **Four-bend events** — `Triggers.YouBend(types)` ("Whenever you waterbend, earthbend, firebend,
+>   or airbend, …") + `TurnTracker.DISTINCT_BENDS` ("if you've done all four this turn"). Each keyword
+>   action emits a `BendPerformedEvent` and folds into the per-turn `BendsThisTurnComponent`
+>   (earthbend/airbend/firebend via `Effects.EmitBend` in their composites; waterbend engine-side at
+>   cost payment, CR 701.67c). This + the existing `{WUBRG}` reduction
+>   (`CostModification.ReduceColoredPerUnit`) unblocks **Avatar Aang // Aang, Master of Elements**.
 > - ✅ **Exhaust** keyword (8 cards) — `isExhaust = true` → `ActivationRestriction.Once` (per-object,
 >   CR 702.177 "Activate only once"; *not* once-per-game). Plus a strip-on-leave fix so the once-ever
 >   record resets on a new object (CR 400.7). All 8 exhaust cards implemented.

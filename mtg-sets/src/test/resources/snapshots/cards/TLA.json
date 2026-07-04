@@ -295,6 +295,20 @@
                                 "expiry": "Permanent",
                                 "ownerControls": true,
                                 "fixedAlternativeManaCost": "{2}"
+                            },
+                            {
+                                "type": "Gated",
+                                "gate": {
+                                    "type": "Gate.WhenCondition",
+                                    "condition": {
+                                        "type": "CollectionContainsMatch",
+                                        "collection": "airbendExiled"
+                                    }
+                                },
+                                "then": {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "AIR"
+                                }
                             }
                         ]
                     }
@@ -568,6 +582,10 @@
                                     "name": "target"
                                 },
                                 "duration": "Permanent"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "EARTH"
                             }
                         ]
                     },
@@ -655,6 +673,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -1173,6 +1205,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -1334,6 +1380,20 @@
                                 "expiry": "Permanent",
                                 "ownerControls": true,
                                 "fixedAlternativeManaCost": "{2}"
+                            },
+                            {
+                                "type": "Gated",
+                                "gate": {
+                                    "type": "Gate.WhenCondition",
+                                    "condition": {
+                                        "type": "CollectionContainsMatch",
+                                        "collection": "airbendExiled"
+                                    }
+                                },
+                                "then": {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "AIR"
+                                }
                             }
                         ]
                     },
@@ -1395,6 +1455,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -1650,6 +1724,20 @@
                                         "expiry": "Permanent",
                                         "ownerControls": true,
                                         "fixedAlternativeManaCost": "{2}"
+                                    },
+                                    {
+                                        "type": "Gated",
+                                        "gate": {
+                                            "type": "Gate.WhenCondition",
+                                            "condition": {
+                                                "type": "CollectionContainsMatch",
+                                                "collection": "airbendExiled"
+                                            }
+                                        },
+                                        "then": {
+                                            "type": "EmitBendEvent",
+                                            "bendType": "AIR"
+                                        }
                                     }
                                 ]
                             },
@@ -1719,6 +1807,20 @@
                                         "expiry": "Permanent",
                                         "ownerControls": true,
                                         "fixedAlternativeManaCost": "{2}"
+                                    },
+                                    {
+                                        "type": "Gated",
+                                        "gate": {
+                                            "type": "Gate.WhenCondition",
+                                            "condition": {
+                                                "type": "CollectionContainsMatch",
+                                                "collection": "airbendExiled"
+                                            }
+                                        },
+                                        "then": {
+                                            "type": "EmitBendEvent",
+                                            "bendType": "AIR"
+                                        }
                                     }
                                 ]
                             },
@@ -1797,6 +1899,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -2050,6 +2166,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -2185,13 +2315,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -2363,13 +2502,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -2510,6 +2658,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -2631,6 +2783,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -2758,6 +2914,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -3019,6 +3179,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -3232,6 +3396,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -3402,9 +3570,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -3804,6 +3981,10 @@
                                             "index": 0
                                         },
                                         "duration": "Permanent"
+                                    },
+                                    {
+                                        "type": "EmitBendEvent",
+                                        "bendType": "EARTH"
                                     }
                                 ]
                             },
@@ -3928,6 +4109,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -4599,9 +4784,18 @@
                             "id": "ability_2",
                             "trigger": "AttackEvent",
                             "effect": {
-                                "type": "AddMana",
-                                "color": "RED",
-                                "expiry": "END_OF_COMBAT"
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "AddMana",
+                                        "color": "RED",
+                                        "expiry": "END_OF_COMBAT"
+                                    },
+                                    {
+                                        "type": "EmitBendEvent",
+                                        "bendType": "FIRE"
+                                    }
+                                ]
                             },
                             "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
                         }
@@ -4924,6 +5118,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         },
@@ -4992,6 +5190,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         }
@@ -5219,6 +5421,10 @@
                                     "name": "target land you control"
                                 },
                                 "duration": "Permanent"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "EARTH"
                             }
                         ]
                     },
@@ -5787,6 +5993,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -6089,6 +6299,10 @@
                             "name": "target land you control"
                         },
                         "duration": "Permanent"
+                    },
+                    {
+                        "type": "EmitBendEvent",
+                        "bendType": "EARTH"
                     }
                 ]
             },
@@ -6325,6 +6539,10 @@
                                 "name": "target"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -6432,6 +6650,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         },
@@ -6646,6 +6868,10 @@
                         "name": "target land you control"
                     },
                     "duration": "Permanent"
+                },
+                {
+                    "type": "EmitBendEvent",
+                    "bendType": "EARTH"
                 }
             ]
         },
@@ -6756,6 +6982,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -7289,6 +7519,10 @@
                             "index": 0
                         },
                         "duration": "Permanent"
+                    },
+                    {
+                        "type": "EmitBendEvent",
+                        "bendType": "EARTH"
                     }
                 ]
             },
@@ -7409,13 +7643,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -7587,9 +7830,18 @@
                     "id": "ability_1",
                     "trigger": "AttackEvent",
                     "effect": {
-                        "type": "AddMana",
-                        "color": "RED",
-                        "expiry": "END_OF_COMBAT"
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "AddMana",
+                                "color": "RED",
+                                "expiry": "END_OF_COMBAT"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "FIRE"
+                            }
+                        ]
                     },
                     "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
                 }
@@ -7652,13 +7904,22 @@
                         "id": "ability_2",
                         "trigger": "AttackEvent",
                         "effect": {
-                            "type": "AddMana",
-                            "color": "RED",
-                            "amount": {
-                                "type": "Fixed",
-                                "amount": 2
-                            },
-                            "expiry": "END_OF_COMBAT"
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "AddMana",
+                                    "color": "RED",
+                                    "amount": {
+                                        "type": "Fixed",
+                                        "amount": 2
+                                    },
+                                    "expiry": "END_OF_COMBAT"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "FIRE"
+                                }
+                            ]
                         },
                         "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                     },
@@ -7791,13 +8052,22 @@
                         "id": "ability_3",
                         "trigger": "AttackEvent",
                         "effect": {
-                            "type": "AddMana",
-                            "color": "RED",
-                            "amount": {
-                                "type": "Fixed",
-                                "amount": 4
-                            },
-                            "expiry": "END_OF_COMBAT"
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "AddMana",
+                                    "color": "RED",
+                                    "amount": {
+                                        "type": "Fixed",
+                                        "amount": 4
+                                    },
+                                    "expiry": "END_OF_COMBAT"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "FIRE"
+                                }
+                            ]
                         },
                         "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                     },
@@ -8013,9 +8283,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -8967,6 +9246,20 @@
                             "expiry": "Permanent",
                             "ownerControls": true,
                             "fixedAlternativeManaCost": "{2}"
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "CollectionContainsMatch",
+                                    "collection": "airbendExiled"
+                                }
+                            },
+                            "then": {
+                                "type": "EmitBendEvent",
+                                "bendType": "AIR"
+                            }
                         }
                     ]
                 },
@@ -9591,6 +9884,10 @@
                                 "name": "target"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -10448,13 +10745,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -10792,9 +11098,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -13699,13 +14014,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 4
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 4
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -14509,13 +14833,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -15054,6 +15387,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         }
@@ -15233,6 +15570,10 @@
                         "name": "target land you control"
                     },
                     "duration": "Permanent"
+                },
+                {
+                    "type": "EmitBendEvent",
+                    "bendType": "EARTH"
                 }
             ]
         },
@@ -15334,13 +15675,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -15815,6 +16165,10 @@
                                     "index": 0
                                 },
                                 "duration": "Permanent"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "EARTH"
                             }
                         ]
                     },
@@ -16859,13 +17213,22 @@
                     "id": "ability_1",
                     "trigger": "AttackEvent",
                     "effect": {
-                        "type": "AddMana",
-                        "color": "RED",
-                        "amount": {
-                            "type": "Fixed",
-                            "amount": 5
-                        },
-                        "expiry": "END_OF_COMBAT"
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "AddMana",
+                                "color": "RED",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 5
+                                },
+                                "expiry": "END_OF_COMBAT"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "FIRE"
+                            }
+                        ]
                     },
                     "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                 },
@@ -17649,6 +18012,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -17808,6 +18175,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -18352,6 +18723,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         },
@@ -18522,13 +18897,22 @@
                     "id": "ability_1",
                     "trigger": "AttackEvent",
                     "effect": {
-                        "type": "AddMana",
-                        "color": "RED",
-                        "amount": {
-                            "type": "Fixed",
-                            "amount": 4
-                        },
-                        "expiry": "END_OF_COMBAT"
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "AddMana",
+                                "color": "RED",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 4
+                                },
+                                "expiry": "END_OF_COMBAT"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "FIRE"
+                            }
+                        ]
                     },
                     "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                 }
@@ -18562,13 +18946,22 @@
                                 "id": "ability_3",
                                 "trigger": "AttackEvent",
                                 "effect": {
-                                    "type": "AddMana",
-                                    "color": "RED",
-                                    "amount": {
-                                        "type": "Fixed",
-                                        "amount": 4
-                                    },
-                                    "expiry": "END_OF_COMBAT"
+                                    "type": "Composite",
+                                    "effects": [
+                                        {
+                                            "type": "AddMana",
+                                            "color": "RED",
+                                            "amount": {
+                                                "type": "Fixed",
+                                                "amount": 4
+                                            },
+                                            "expiry": "END_OF_COMBAT"
+                                        },
+                                        {
+                                            "type": "EmitBendEvent",
+                                            "bendType": "FIRE"
+                                        }
+                                    ]
                                 },
                                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                             }
@@ -18756,6 +19149,20 @@
                                 "expiry": "Permanent",
                                 "ownerControls": true,
                                 "fixedAlternativeManaCost": "{2}"
+                            },
+                            {
+                                "type": "Gated",
+                                "gate": {
+                                    "type": "Gate.WhenCondition",
+                                    "condition": {
+                                        "type": "CollectionContainsMatch",
+                                        "collection": "airbendExiled"
+                                    }
+                                },
+                                "then": {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "AIR"
+                                }
                             }
                         ]
                     },
@@ -19106,13 +19513,22 @@
                     "id": "ability_1",
                     "trigger": "AttackEvent",
                     "effect": {
-                        "type": "AddMana",
-                        "color": "RED",
-                        "amount": {
-                            "type": "Fixed",
-                            "amount": 3
-                        },
-                        "expiry": "END_OF_COMBAT"
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "AddMana",
+                                "color": "RED",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 3
+                                },
+                                "expiry": "END_OF_COMBAT"
+                            },
+                            {
+                                "type": "EmitBendEvent",
+                                "bendType": "FIRE"
+                            }
+                        ]
                     },
                     "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
                 },
@@ -19638,6 +20054,10 @@
                                         "name": "target land you control"
                                     },
                                     "duration": "Permanent"
+                                },
+                                {
+                                    "type": "EmitBendEvent",
+                                    "bendType": "EARTH"
                                 }
                             ]
                         },
@@ -19780,6 +20200,10 @@
                                 "name": "target land you control"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -19890,6 +20314,10 @@
                                 "name": "target"
                             },
                             "duration": "Permanent"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "EARTH"
                         }
                     ]
                 },
@@ -20147,9 +20575,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -20528,9 +20965,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -20810,9 +21256,18 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
@@ -22079,13 +22534,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 2
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 2
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             },
@@ -22521,13 +22985,22 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "AddMana",
-                    "color": "RED",
-                    "amount": {
-                        "type": "Fixed",
-                        "amount": 3
-                    },
-                    "expiry": "END_OF_COMBAT"
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "AddMana",
+                            "color": "RED",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 3
+                            },
+                            "expiry": "END_OF_COMBAT"
+                        },
+                        {
+                            "type": "EmitBendEvent",
+                            "bendType": "FIRE"
+                        }
+                    ]
                 },
                 "descriptionOverride": "Whenever this creature attacks, add {R}{R}{R}. Until end of combat, you don't lose this mana as steps and phases end."
             }
