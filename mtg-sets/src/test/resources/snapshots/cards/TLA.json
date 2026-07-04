@@ -270,7 +270,8 @@
                     },
                     "then": {
                         "type": "ExileTargetSpell",
-                        "fixedAlternativeManaCost": "{2}"
+                        "fixedAlternativeManaCost": "{2}",
+                        "emitAirbend": true
                     },
                     "otherwise": {
                         "type": "Composite",

@@ -2,8 +2,11 @@ package com.wingedsheep.engine.scenarios
 
 import com.wingedsheep.engine.core.ActivateAbility
 import com.wingedsheep.engine.core.BendPerformedEvent
+import com.wingedsheep.engine.core.CastSpell
+import com.wingedsheep.engine.core.PaymentStrategy
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.engine.state.components.player.BendsThisTurnComponent
+import com.wingedsheep.engine.state.components.stack.ChosenTarget
 import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.sdk.core.BendType
@@ -125,6 +128,14 @@ class FourBendEventScenarioTest : FunSpec({
     val vanilla = card("Test Wall") {
         manaCost = "{0}"; typeLine = "Creature — Wall"; power = 0; toughness = 4
     }
+    // "Airbend target spell." — the airbend stack branch (Aang, Swift Savior), via Effects.AirbendSpell.
+    val airbendSpellTester = card("Airbend Spell Tester") {
+        manaCost = "{0}"; typeLine = "Instant"; oracleText = "Airbend target spell."
+        spell {
+            target("target spell", TargetObject(count = 1, filter = TargetFilter.SpellOnStack))
+            effect = Effects.AirbendSpell()
+        }
+    }
 
     fun createDriver(): GameTestDriver {
         val d = GameTestDriver()
@@ -132,7 +143,8 @@ class FourBendEventScenarioTest : FunSpec({
             TestCards.all + listOf(
                 DoWaterbend, DoEarthbend, DoFirebend, DoAirbend,
                 BendWatcher, EarthWatcher, AllFourWatcher,
-                earthbendSorcery, airbendAllSorcery, firebrand, waterbendTester, vanilla
+                earthbendSorcery, airbendAllSorcery, firebrand, waterbendTester, vanilla,
+                airbendSpellTester
             )
         )
         return d
@@ -267,6 +279,29 @@ class FourBendEventScenarioTest : FunSpec({
             d.bendEventsSince(mark) shouldContainExactly listOf(BendType.AIR)
             d.bends(me) shouldBe setOf(BendType.AIR)
         }
+    }
+
+    test("airbending a spell (real keyword action) fires the bend trigger once the spell is exiled") {
+        val d = createDriver(); d.initMirrorMatch(Deck.of("Mountain" to 40)); val me = d.activePlayer!!
+        d.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        val watcher = d.putCreatureOnBattlefield(me, "Bend Watcher")
+        // Put a {0} spell on the stack, then airbend that spell (I hold priority after casting it).
+        val wallSpell = d.putCardInHand(me, "Test Wall")
+        d.submit(CastSpell(playerId = me, cardId = wallSpell, paymentStrategy = PaymentStrategy.AutoPay)).error shouldBe null
+        val onStack = d.state.stack.first()
+        val airbend = d.putCardInHand(me, "Airbend Spell Tester")
+        val mark = d.events.size
+        d.submit(
+            CastSpell(
+                playerId = me, cardId = airbend,
+                targets = listOf(ChosenTarget.Spell(onStack)),
+                paymentStrategy = PaymentStrategy.AutoPay
+            )
+        ).error shouldBe null
+        d.resolveStack()
+        d.bendEventsSince(mark) shouldContainExactly listOf(BendType.AIR)
+        d.bends(me) shouldBe setOf(BendType.AIR)
+        d.plusOne(watcher) shouldBe 1                             // the YouBend trigger fired
     }
 
     test("waterbend (real keyword action) fires when the cost is paid — by taps or by pure mana") {

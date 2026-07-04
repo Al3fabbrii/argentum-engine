@@ -38,7 +38,8 @@ Generated to scope what must be built before the set can be completed.
 > - ✅ **Four-bend events** — `Triggers.YouBend(types)` ("Whenever you waterbend, earthbend, firebend,
 >   or airbend, …") + `TurnTracker.DISTINCT_BENDS` ("if you've done all four this turn"). Each keyword
 >   action emits a `BendPerformedEvent` and folds into the per-turn `BendsThisTurnComponent`
->   (earthbend/airbend/firebend via `Effects.EmitBend` in their composites; waterbend engine-side at
+>   (earthbend/airbend/firebend via `Effects.EmitBend` in their composites — including the
+>   airbend-a-spell stack branch `Effects.AirbendSpell`, CR 701.65b; waterbend engine-side at
 >   cost payment, CR 701.67c). This + the existing `{WUBRG}` reduction
 >   (`CostModification.ReduceColoredPerUnit`) unblocks **Avatar Aang // Aang, Master of Elements**.
 > - ✅ **Exhaust** keyword (8 cards) — `isExhaust = true` → `ActivationRestriction.Once` (per-object,

@@ -6462,14 +6462,13 @@ Card authors rarely reference these directly; they are created/updated by the ma
 - **Airbend a spell** (the stack branch — Aang, Swift Savior: "airbend up to one other target creature **or spell**").
   The single target is a cross-zone union — `TargetFilter.anyOf(TargetFilter.Creature, TargetFilter.SpellOnStack)` (the
   same union machinery as Sorceress's Schemes). Branch on whether the chosen target is a spell with
-  `Conditions.TargetIsSpellOnStack(0)`: the spell branch is
-  `Effects.ExileTargetSpell(fixedAlternativeManaCost = {2})` — airbend's reminder says "**exile it**", not "counter it",
-  so it reuses the Aven Interrupter `exileSpell` primitive: it removes the spell from the stack to its *owner's* exile
-  **even if the spell can't be countered**, fires **no** `SpellCounteredEvent`, and grants the **owner** the same
-  fixed-{2} may-play (reusing `PlayWithFixedAlternativeManaCostComponent`). The permanent branch is the normal
-  `Effects.Airbend()`. *(This stack-spell branch does not yet fire the "whenever you airbend" trigger below — only
-  the permanent `Effects.Airbend()` / `Effects.AirbendAll()` composites do. Narrow follow-up; no card currently both
-  airbends a spell and cares about the trigger.)*
+  `Conditions.TargetIsSpellOnStack(0)`: the spell branch is `Effects.AirbendSpell(cost = {2})` — airbend's reminder
+  says "**exile it**", not "counter it", so it reuses the Aven Interrupter `exileSpell` primitive: it removes the spell
+  from the stack to its *owner's* exile **even if the spell can't be countered**, fires **no** `SpellCounteredEvent`, and
+  grants the **owner** the same fixed-{2} may-play (reusing `PlayWithFixedAlternativeManaCostComponent`). The permanent
+  branch is the normal `Effects.Airbend()`. Both branches fire the "whenever you airbend" trigger below once an object is
+  actually exiled (CR 701.65b). (`Effects.AirbendSpell` is `Effects.ExileTargetSpell` with `emitAirbend = true`; use the
+  plain `ExileTargetSpell` — no bend — for a non-airbend exile like Aven Interrupter.)
 - **"Whenever you waterbend, earthbend, firebend, or airbend" (the four-bend event) + "all four this turn"** —
   `Triggers.YouBend(types = BendType.ALL)` fires once per bend of any element in `types` the controller performs
   (Avatar Aang uses all four; pass a subset like `setOf(BendType.EARTH)` for a single-element variant). Backed by a
@@ -6477,7 +6476,8 @@ Card authors rarely reference these directly; they are created/updated by the ma
   701.67c / 702.189b:
   - **earthbend** and **airbend** compose `Effects.EmitBend(BendType.EARTH/AIR)` into their pipelines
     (`Effects.Earthbend`, `Effects.Airbend`/`AirbendAll`); airbend emits only when ≥1 object was exiled (gated on the
-    `airbendExiled` collection, CR 701.65b).
+    `airbendExiled` collection, CR 701.65b). Airbending a **spell** (`Effects.AirbendSpell`, the stack branch) emits the
+    same `BendType.AIR` from `ExileTargetSpellExecutor` once the spell is exiled.
   - **firebending** emits `BendType.FIRE` when its attack trigger resolves (folded into `firebendingAttackTrigger`), so
     both printed `firebending(n)` and `Effects.GrantFirebending` fire it.
   - **waterbend** emits `BendType.WATER` engine-side when the waterbend cost is *paid* — in `CastSpellHandler` /

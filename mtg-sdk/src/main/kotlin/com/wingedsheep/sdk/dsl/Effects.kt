@@ -804,6 +804,17 @@ object Effects {
     ))
 
     /**
+     * Airbend a *spell on the stack* — the stack-zone sibling of [Airbend] ("airbend … target …
+     * spell", Aang, Swift Savior). Exiles the targeted spell (not a counter: works on can't-be-
+     * countered spells and fires no "spell was countered" trigger) and grants its **owner** a fixed
+     * [cost] recast from exile, then fires "whenever you airbend" — but only if the spell was
+     * actually exiled (CR 701.65b). Pair with a spell target; branch to it from a creature-or-spell
+     * effect via [com.wingedsheep.sdk.dsl.Conditions.TargetIsSpellOnStack].
+     */
+    fun AirbendSpell(cost: ManaCost = AIRBEND_COST): Effect =
+        ExileTargetSpellEffect(fixedAlternativeManaCost = cost, emitAirbend = true)
+
+    /**
      * Emit a "you bent" notification of [bendType] for the resolving effect's controller — fires
      * [com.wingedsheep.sdk.dsl.Triggers.YouBend] triggers and records the type in the player's
      * per-turn distinct-bend set. Wired into [Earthbend] / [Airbend] and the firebending attack
