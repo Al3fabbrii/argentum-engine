@@ -24,10 +24,11 @@ class KaraisTechniqueTest : FunSpec({
 
         val bear = driver.putCreatureOnBattlefield(player, "Grizzly Bears") // 2/2
         val spell = driver.putCardInHand(player, "Karai's Technique")
-        driver.giveMana(player, Color.WHITE, 2)
-        driver.giveMana(player, Color.BLACK, 1)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.WHITE, 2)
+        driver.giveMana(player, Color.BLACK, 1)
         driver.submit(
             CastSpell(
                 playerId = player,

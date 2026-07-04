@@ -23,9 +23,10 @@ class TurncoatKunoichiTest : FunSpec({
 
         val victim = driver.putCreatureOnBattlefield(opponent, "Grizzly Bears")
         val turncoat = driver.putCardInHand(player, "Turncoat Kunoichi")
-        driver.giveMana(player, Color.WHITE, 3)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.WHITE, 3)
         driver.castSpell(player, turncoat).isSuccess shouldBe true
         // Resolve Turncoat; its ETB trigger then asks for the target opponent creature.
         while (driver.pendingDecision == null && driver.state.stack.isNotEmpty()) driver.bothPass()

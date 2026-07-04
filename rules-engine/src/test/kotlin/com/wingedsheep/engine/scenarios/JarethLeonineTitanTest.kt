@@ -144,10 +144,11 @@ class JarethLeonineTitanTest : FunSpec({
         val jareth = driver.putCreatureOnBattlefield(player2, "Jareth, Leonine Titan")
         driver.removeSummoningSickness(jareth)
 
-        // Give player 2 white mana and activate protection from red
-        driver.giveMana(player2, Color.WHITE, 1)
-
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        // Give player 2 white mana and activate protection from red
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player2, Color.WHITE, 1)
 
         // Pass priority to player 2
         driver.passPriority(player1)

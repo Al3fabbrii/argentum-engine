@@ -95,8 +95,10 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
 
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because there is no flash grant, not for lack of mana
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
@@ -111,7 +113,6 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
 
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
 
         // Seed the player-scoped flash permission directly (any spell, EOT duration).
         driver.replaceState(
@@ -125,6 +126,8 @@ class GrantFlashToSpellsEffectTest : FunSpec({
             }
         )
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
@@ -140,7 +143,6 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
 
         val sorcery = driver.putCardInHand(p2, "Test Sorcery")
-        driver.giveMana(p2, Color.RED, 2)
 
         // Grant on p1 — p2's sorcery must NOT inherit flash.
         driver.replaceState(
@@ -155,6 +157,9 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         )
         driver.passPriorityUntil(Step.END)
         driver.passPriority(p1) // give p2 priority
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because the grant is owner-scoped to p1, not for lack of mana
+        driver.giveMana(p2, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p2, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)
@@ -169,7 +174,6 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
 
         val beast = driver.putCardInHand(p1, "Test Beast")
-        driver.giveMana(p1, Color.GREEN, 2)
 
         driver.replaceState(
             driver.state.updateEntity(p1) { container ->
@@ -182,6 +186,9 @@ class GrantFlashToSpellsEffectTest : FunSpec({
             }
         )
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because a creature isn't matched by the Sorcery-only grant, not for lack of mana
+        driver.giveMana(p1, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = beast, paymentStrategy = PaymentStrategy.FromPool)
@@ -196,7 +203,6 @@ class GrantFlashToSpellsEffectTest : FunSpec({
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
 
         val sorcery = driver.putCardInHand(p1, "Test Sorcery")
-        driver.giveMana(p1, Color.RED, 2)
 
         driver.replaceState(
             driver.state.updateEntity(p1) { container ->
@@ -209,6 +215,8 @@ class GrantFlashToSpellsEffectTest : FunSpec({
             }
         )
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = sorcery, paymentStrategy = PaymentStrategy.FromPool)

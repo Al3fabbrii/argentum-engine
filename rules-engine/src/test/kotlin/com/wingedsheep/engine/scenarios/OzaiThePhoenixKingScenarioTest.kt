@@ -36,7 +36,7 @@ class OzaiThePhoenixKingScenarioTest : FunSpec({
     fun GameTestDriver.pool(playerId: EntityId): ManaPoolComponent =
         state.getEntity(playerId)?.get<ManaPoolComponent>() ?: ManaPoolComponent()
 
-    test("would-be-lost mana becomes that many red instead of emptying while Ozai is out") {
+    test("would-be-lost mana becomes that many red at each step/phase boundary while Ozai is out") {
         val driver = createDriver()
         driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
         val active = driver.activePlayer!!
@@ -51,18 +51,18 @@ class OzaiThePhoenixKingScenarioTest : FunSpec({
         driver.giveColorlessMana(active, 1)
         driver.giveMana(opponent, Color.GREEN, 2)
 
-        // Cross this turn's cleanup into the opponent's turn (the engine's only mana-empty point).
-        driver.passPriorityUntil(Step.UPKEEP)
-        driver.activePlayer shouldBe opponent
+        // Cross a single step/phase boundary within the turn (CR 500.5: unspent mana empties as the
+        // precombat main phase ends). No need to wait for end of turn.
+        driver.passPriorityUntil(Step.BEGIN_COMBAT)
 
-        // Ozai's controller: nothing lost — the 3 mana became {R}{R}{R}, kept in the pool.
+        // Ozai's controller: nothing lost — the 3 would-be-lost mana became {R}{R}{R}, kept in the pool.
         driver.pool(active).red shouldBe 3
         driver.pool(active).total shouldBe 3
         driver.pool(active).white shouldBe 0
         driver.pool(active).blue shouldBe 0
         driver.pool(active).colorless shouldBe 0
 
-        // Opponent controls no Ozai — their pool emptied normally.
+        // Opponent controls no Ozai — their pool emptied as the phase ended.
         driver.pool(opponent).total shouldBe 0
     }
 

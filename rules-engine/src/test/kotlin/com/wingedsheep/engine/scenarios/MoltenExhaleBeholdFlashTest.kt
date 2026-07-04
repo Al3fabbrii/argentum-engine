@@ -60,10 +60,11 @@ class MoltenExhaleBeholdFlashTest : FunSpec({
         val dragon = driver.putCreatureOnBattlefield(p1, "Test Dragon")
         val ogre = driver.putCreatureOnBattlefield(p2, "Test Ogre")
         val moltenExhale = driver.putCardInHand(p1, "Molten Exhale")
-        driver.giveMana(p1, Color.RED, 2)
 
         // Past the main phase — sorcery speed no longer applies.
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -93,9 +94,11 @@ class MoltenExhaleBeholdFlashTest : FunSpec({
 
         val ogre = driver.putCreatureOnBattlefield(p2, "Test Ogre")
         val moltenExhale = driver.putCardInHand(p1, "Molten Exhale")
-        driver.giveMana(p1, Color.RED, 2)
 
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because it's a sorcery cast at instant speed without beholding, not for lack of mana
+        driver.giveMana(p1, Color.RED, 2)
 
         // Plain cast (no behold) at instant speed is illegal — it's a sorcery.
         val result = driver.submit(

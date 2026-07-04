@@ -22,9 +22,10 @@ class JennikasTechniqueTest : FunSpec({
         driver.putCreatureOnBattlefield(player, "Grizzly Bears")   // 2/2
         driver.putCreatureOnBattlefield(opponent, "Grizzly Bears") // 2/2
         val spell = driver.putCardInHand(player, "Jennika's Technique")
-        driver.giveMana(player, Color.RED, 3)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.RED, 3)
         driver.castSpell(player, spell).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()
 

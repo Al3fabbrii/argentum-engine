@@ -63,9 +63,10 @@ class SteerClearCastTimeCaptureTest : FunSpec({
         // The caster controls a Mount and holds Steer Clear.
         val mount = driver.putCreatureOnBattlefield(caster, "Giant Beaver")
         val steer = driver.putCardInHand(caster, "Steer Clear")
-        driver.giveMana(caster, Color.WHITE, 1)
 
         driver.attackThenGiveCasterPriority(attacker, caster, courser)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(caster, Color.WHITE, 1)
 
         val cast = driver.submit(
             CastSpell(
@@ -96,9 +97,10 @@ class SteerClearCastTimeCaptureTest : FunSpec({
         driver.removeSummoningSickness(courser)
         // No Mount on the caster's side.
         val steer = driver.putCardInHand(caster, "Steer Clear")
-        driver.giveMana(caster, Color.WHITE, 1)
 
         driver.attackThenGiveCasterPriority(attacker, caster, courser)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(caster, Color.WHITE, 1)
 
         val cast = driver.submit(
             CastSpell(
@@ -125,9 +127,10 @@ class SteerClearCastTimeCaptureTest : FunSpec({
         val courser = driver.putCreatureOnBattlefield(attacker, "Centaur Courser")
         driver.removeSummoningSickness(courser)
         val steer = driver.putCardInHand(caster, "Steer Clear")
-        driver.giveMana(caster, Color.WHITE, 1)
 
         driver.attackThenGiveCasterPriority(attacker, caster, courser)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(caster, Color.WHITE, 1)
 
         val cast = driver.submit(
             CastSpell(

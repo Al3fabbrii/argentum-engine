@@ -248,14 +248,15 @@ private fun GameTestDriver.attackAndPayX(
     sozin: EntityId,
     payX: Int
 ): ChooseTargetsDecision {
-    // Mana to pay {X} (firebending also adds {R}{R}{R} live in combat). Given up front, as in the
-    // proven combat-damage flow above.
-    giveColorlessMana(me, payX + 2)
     passPriorityUntil(Step.DECLARE_ATTACKERS)
     declareAttackers(me, listOf(sozin), opp)
     resolveStackSozin() // firebending attack trigger
 
     passPriorityUntil(Step.COMBAT_DAMAGE)
+    // Mana to pay {X} (firebending also adds {R}{R}{R} live in combat). Added here, at the
+    // combat-damage step, because unspent mana now empties as each step/phase ends (CR 500.5) —
+    // given earlier it would drain before the "deals combat damage" pay-{X} trigger resolves.
+    giveColorlessMana(me, payX + 2)
     var g = 0
     while (pendingDecision == null && state.step != Step.POSTCOMBAT_MAIN && g++ < 40) {
         bothPass()

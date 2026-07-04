@@ -379,6 +379,44 @@ class CleanupPhaseManager(
     }
 
     /**
+     * Empty every player's unspent mana as a step or phase ends (CR 500.5 / 703.4q — a turn-based
+     * action that doesn't use the stack). This is the single mana-emptying primitive, called at
+     * every step/phase transition ([com.wingedsheep.engine.core.TurnManager.advanceStep]) and again
+     * as the cleanup step ends (end of turn). It applies the per-player mana-loss statics:
+     *  - Upwelling ([PreventManaPoolEmptying]) — no one loses mana at all (whole action skipped).
+     *  - Ozai, the Phoenix King ([ConvertEmptyingManaToRed]) — the controller's would-be-lost mana
+     *    becomes that many red mana instead (CR 614).
+     *  - The Last Agni Kai ([RetainUnspentManaComponent]) — the named colours are kept.
+     * Firebending (END_OF_COMBAT) mana is preserved by [ManaPoolComponent.emptyAtBoundary] and
+     * handled instead by `CombatManager.endCombat`, since it lasts until end of combat, not step end.
+     */
+    fun emptyManaPools(state: GameState): GameState {
+        // Runs on every step/phase boundary; almost always every pool is already empty (no mana
+        // floated), so skip the battlefield scans below in that common case.
+        if (state.turnOrder.all { state.getEntity(it)?.get<ManaPoolComponent>()?.isEmpty != false }) return state
+        if (isManaPoolEmptyingPrevented(state)) return state
+        var newState = state
+        val convertToRedPlayers = playersConvertingEmptyingManaToRed(state, cardRegistry)
+        for (playerId in state.turnOrder) {
+            newState = newState.updateEntity(playerId) { container ->
+                val manaPool = container.get<ManaPoolComponent>()
+                if (manaPool != null && !manaPool.isEmpty) {
+                    val retained = container.get<RetainUnspentManaComponent>()?.colors ?: emptySet()
+                    container.with(
+                        manaPool.emptyAtBoundary(
+                            convertToRed = playerId in convertToRedPlayers,
+                            retain = retained
+                        )
+                    )
+                } else {
+                    container
+                }
+            }
+        }
+        return newState
+    }
+
+    /**
      * Check if any permanent on the battlefield has the PreventManaPoolEmptying static ability.
      * Used for cards like Upwelling: "Players don't lose unspent mana as steps and phases end."
      */
@@ -470,31 +508,11 @@ class CleanupPhaseManager(
             newState = newState.copy(activeCounterPlacementModifiers = remainingCounterModifiers)
         }
 
-        // 2. Empty mana pools for all players (unless prevented by a static ability like Upwelling).
-        // A player carrying a RetainUnspentManaComponent (The Last Agni Kai) keeps mana of the
-        // named colours through this emptying; the marker itself is cleared in step 4 below.
-        // A player controlling a ConvertEmptyingManaToRed permanent (Ozai, the Phoenix King) has
-        // their whole pool turned into that many red mana instead of emptied — CR 500.5 / 703.4q
-        // (unspent mana empties as each step and phase ends), replaced here per CR 614.
-        if (!isManaPoolEmptyingPrevented(newState)) {
-            val convertToRedPlayers = playersConvertingEmptyingManaToRed(newState, cardRegistry)
-            for (playerId in newState.turnOrder) {
-                newState = newState.updateEntity(playerId) { container ->
-                    val manaPool = container.get<ManaPoolComponent>()
-                    if (manaPool != null && !manaPool.isEmpty) {
-                        val retained = container.get<RetainUnspentManaComponent>()?.colors
-                        when {
-                            playerId in convertToRedPlayers -> container.with(manaPool.convertToRed())
-                            retained != null && retained.isNotEmpty() ->
-                                container.with(manaPool.emptyExcept(retained))
-                            else -> container.with(manaPool.empty())
-                        }
-                    } else {
-                        container
-                    }
-                }
-            }
-        }
+        // 2. Empty mana pools as this (cleanup) step ends — one of the per-step/phase emptyings
+        // (CR 500.5 / 703.4q; if cleanup grants priority, advanceStep empties once more, idempotently).
+        // The RetainUnspentManaComponent marker (The Last Agni Kai) still keeps its colours here; the
+        // marker itself is cleared in step 4 below.
+        newState = emptyManaPools(newState)
 
         // 3. Reset per-turn trackers (land drops reset at start of turn, but clean up here too)
         for (playerId in newState.turnOrder) {

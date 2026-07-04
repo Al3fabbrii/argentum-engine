@@ -237,7 +237,14 @@ class TurnManager(
      * Advance to the next step.
      * Handles automatic step-based actions and turn transitions.
      */
-    fun advanceStep(state: GameState): ExecutionResult {
+    fun advanceStep(state: GameState): ExecutionResult =
+        // CR 500.5 / 703.4q: as the ending step or phase closes, each player's unspent mana empties
+        // (a turn-based action). This is the general per-step/phase emptying — the same action
+        // end-of-turn cleanup performs — applying the Upwelling / Ozai / Last Agni Kai statics.
+        // Firebending (END_OF_COMBAT) mana is preserved and handled by CombatManager.endCombat.
+        advanceStepFromEndedStep(cleanupPhaseManager.emptyManaPools(state))
+
+    private fun advanceStepFromEndedStep(state: GameState): ExecutionResult {
         val currentStep = state.step
         val activePlayer = state.activePlayerId
             ?: return ExecutionResult.error(state, "No active player")

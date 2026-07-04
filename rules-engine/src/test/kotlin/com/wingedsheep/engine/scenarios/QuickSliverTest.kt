@@ -84,10 +84,11 @@ class QuickSliverTest : FunSpec({
 
         // Put the card in hand and give mana, then pass to upkeep (next turn)
         val flashCreature = driver.putCardInHand(activePlayer, "Flash Creature")
-        driver.giveMana(activePlayer, Color.GREEN, 2)
 
-        // Pass to end step — not sorcery speed
+        // Pass to end step — not sorcery speed. Mana is added here (in the end step) because unspent
+        // mana empties as each step/phase ends (CR 500.5), so it can't be floated from an earlier step.
         driver.passPriorityUntil(Step.END)
+        driver.giveMana(activePlayer, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -140,8 +141,8 @@ class QuickSliverTest : FunSpec({
 
         // Try to cast a Sliver at end step
         val sliver = driver.putCardInHand(activePlayer, "Test Sliver")
-        driver.giveMana(activePlayer, Color.RED, 2)
         driver.passPriorityUntil(Step.END)
+        driver.giveMana(activePlayer, Color.RED, 2)
 
         val result = driver.submit(
             CastSpell(
@@ -197,10 +198,10 @@ class QuickSliverTest : FunSpec({
 
         // Opponent gets a Sliver in hand
         val sliver = driver.putCardInHand(opponent, "Test Sliver")
-        driver.giveMana(opponent, Color.RED, 2)
 
-        // Advance to end step
+        // Advance to end step; add mana there (it empties as each step/phase ends, CR 500.5).
         driver.passPriorityUntil(Step.END)
+        driver.giveMana(opponent, Color.RED, 2)
 
         // Pass priority to opponent
         driver.passPriority(activePlayer)

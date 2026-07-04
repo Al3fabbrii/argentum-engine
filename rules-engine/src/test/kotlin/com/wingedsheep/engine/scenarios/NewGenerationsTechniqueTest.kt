@@ -22,9 +22,10 @@ class NewGenerationsTechniqueTest : FunSpec({
         driver.initMirrorMatch(deck = Deck.of("Forest" to 30), startingLife = 20)
         val player = driver.activePlayer!!
         val spell = driver.putCardInHand(player, "New Generation's Technique")
-        driver.giveMana(player, Color.GREEN, 4)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.GREEN, 4)
         val forestsBefore = driver.getPermanents(player).count {
             driver.state.getEntity(it)?.get<com.wingedsheep.engine.state.components.identity.CardComponent>()?.name == "Forest"
         }

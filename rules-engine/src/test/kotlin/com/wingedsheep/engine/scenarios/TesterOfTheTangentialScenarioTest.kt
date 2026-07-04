@@ -57,9 +57,11 @@ class TesterOfTheTangentialScenarioTest : FunSpec({
         val chosen = driver.putCreatureOnBattlefield(driver.player1, "Grizzly Bears")
         val decoy = driver.putCreatureOnBattlefield(driver.player1, "Savannah Lions")
         driver.addComponent(tester, CountersComponent(mapOf(CounterType.PLUS_ONE_PLUS_ONE to 3)))
-        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         driver.advanceToPlayer1BeginCombat()
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); it must be
+        // present for the may-pay-{X} payment during the begin-combat trigger
+        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         // BeginCombat trigger goes on the stack; resolving it presents the MayPayX number chooser.
         driver.bothPass()
@@ -84,9 +86,11 @@ class TesterOfTheTangentialScenarioTest : FunSpec({
         val tester = driver.putCreatureOnBattlefield(driver.player1, "Tester of the Tangential")
         val other = driver.putCreatureOnBattlefield(driver.player1, "Grizzly Bears")
         driver.addComponent(tester, CountersComponent(mapOf(CounterType.PLUS_ONE_PLUS_ONE to 3)))
-        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         driver.advanceToPlayer1BeginCombat()
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); it must be
+        // present for the may-pay-{X} payment during the begin-combat trigger
+        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         driver.bothPass()
         val payDecision = driver.pendingDecision
@@ -105,9 +109,11 @@ class TesterOfTheTangentialScenarioTest : FunSpec({
         val tester = driver.putCreatureOnBattlefield(driver.player1, "Tester of the Tangential")
         val other = driver.putCreatureOnBattlefield(driver.player1, "Grizzly Bears")
         driver.addComponent(tester, CountersComponent(mapOf(CounterType.PLUS_ONE_PLUS_ONE to 3)))
-        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         driver.advanceToPlayer1BeginCombat()
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); it must be
+        // present for the may-pay-{X} payment during the begin-combat trigger
+        driver.giveMana(driver.player1, Color.BLUE, 5)
 
         driver.bothPass()
         val payDecision = driver.pendingDecision

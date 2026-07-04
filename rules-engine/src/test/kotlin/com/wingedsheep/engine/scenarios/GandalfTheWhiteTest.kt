@@ -185,8 +185,9 @@ class GandalfTheWhiteTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf the White")
         val legendary = driver.putCardInHand(p1, "Test Legendary Beast")
-        driver.giveMana(p1, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(p1, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = legendary, paymentStrategy = PaymentStrategy.FromPool)
@@ -202,8 +203,9 @@ class GandalfTheWhiteTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf the White")
         val trinket = driver.putCardInHand(p1, "Test Trinket")
-        driver.giveColorlessMana(p1, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveColorlessMana(p1, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = trinket, paymentStrategy = PaymentStrategy.FromPool)
@@ -219,8 +221,10 @@ class GandalfTheWhiteTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf the White")
         val bear = driver.putCardInHand(p1, "Test Bear")
-        driver.giveMana(p1, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because a vanilla creature isn't granted flash, not for lack of mana
+        driver.giveMana(p1, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p1, cardId = bear, paymentStrategy = PaymentStrategy.FromPool)
@@ -237,9 +241,11 @@ class GandalfTheWhiteTest : FunSpec({
 
         driver.putPermanentOnBattlefield(p1, "Gandalf the White")
         val legendary = driver.putCardInHand(p2, "Test Legendary Beast")
-        driver.giveMana(p2, Color.GREEN, 2)
         driver.passPriorityUntil(Step.END)
         driver.passPriority(p1)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5); the cast must
+        // still fail because the static is controller-only, not for lack of mana
+        driver.giveMana(p2, Color.GREEN, 2)
 
         val result = driver.submit(
             CastSpell(playerId = p2, cardId = legendary, paymentStrategy = PaymentStrategy.FromPool)

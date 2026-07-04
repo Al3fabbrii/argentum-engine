@@ -26,10 +26,11 @@ class FootNinjasTest : FunSpec({
 
         val player = driver.activePlayer!!
         val foot = driver.putCardInHand(player, "Foot Ninjas")
-        // {4}{W/B}{W/B}: six white mana pays the four generic and both hybrid pips.
-        driver.giveMana(player, Color.WHITE, 6)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // {4}{W/B}{W/B}: six white mana pays the four generic and both hybrid pips.
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.WHITE, 6)
         driver.castSpell(player, foot).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()
 

@@ -23,9 +23,10 @@ class TheLastRoninsTechniqueTest : FunSpec({
         val player = driver.activePlayer!!
 
         val spell = driver.putCardInHand(player, "The Last Ronin's Technique")
-        driver.giveMana(player, Color.WHITE, 4)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.WHITE, 4)
         driver.castSpell(player, spell).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()
 

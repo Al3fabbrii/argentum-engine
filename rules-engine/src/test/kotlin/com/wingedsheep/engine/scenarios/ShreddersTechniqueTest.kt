@@ -23,9 +23,10 @@ class ShreddersTechniqueTest : FunSpec({
 
         val victim = driver.putCreatureOnBattlefield(opponent, "Grizzly Bears")
         val spell = driver.putCardInHand(player, "Shredder's Technique")
-        driver.giveMana(player, Color.BLACK, 3)
 
         driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        // mana added here — unspent mana empties as each step/phase ends (CR 500.5)
+        driver.giveMana(player, Color.BLACK, 3)
         driver.castSpellWithTargets(player, spell, listOf(ChosenTarget.Permanent(victim))).isSuccess shouldBe true
         while (driver.state.stack.isNotEmpty()) driver.bothPass()
 

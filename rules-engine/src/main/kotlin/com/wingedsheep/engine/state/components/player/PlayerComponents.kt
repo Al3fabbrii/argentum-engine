@@ -142,32 +142,45 @@ data class ManaPoolComponent(
     fun empty(): ManaPoolComponent = ManaPoolComponent()
 
     /**
-     * Convert every would-be-lost mana into an equal amount of red instead of emptying
-     * (Ozai, the Phoenix King: "If you would lose unspent mana, that mana becomes red instead").
-     * The whole pool — all colours, colorless, and restricted entries counted by [total] — becomes
-     * that many plain red mana; treasure and restriction tags do not carry over. An empty pool
-     * stays empty.
+     * Empty the pool as a step or phase ends (CR 500.5 / 703.4q), the engine's turn-based
+     * mana-loss action. This is the single emptying primitive for every mana-loss point, applying
+     * the per-player mana-loss statics:
+     *  - [convertToRed] = true (Ozai, the Phoenix King, [ConvertEmptyingManaToRed]): the would-be-lost
+     *    mana becomes that many plain red mana instead of emptying (CR 614).
+     *  - [retain] non-empty (The Last Agni Kai, [RetainUnspentManaComponent]): mana of those colours —
+     *    plain counters and same-colour ordinary restricted entries — survives; everything else empties.
+     *  - neither: the ordinary mana empties.
+     * [convertToRed] takes precedence over [retain] (Ozai fully replaces the loss).
+     *
+     * **Firebending mana is preserved.** Restricted entries with [ManaExpiry.END_OF_COMBAT] "last
+     * until end of combat", not until the end of each step — so they survive every step/phase-end
+     * emptying within combat and are handled instead by `CombatManager.endCombat`. Only ordinary
+     * ([ManaExpiry.END_OF_TURN]) mana is subject to this action. (At end of turn no combat-duration
+     * mana remains, so preservation is a no-op there.)
      */
-    fun convertToRed(): ManaPoolComponent = ManaPoolComponent(red = total)
-
-    /**
-     * Empty the pool except for mana of [keep] colours, which is retained. Used by the
-     * colour-filtered, turn-scoped retention ([RetainUnspentManaComponent], The Last Agni Kai):
-     * at end-of-turn cleanup the kept colours' plain counters and any same-colour restricted
-     * entries survive, while every other colour, colorless, treasure, and off-colour restricted
-     * mana empties as normal. An empty [keep] set is identical to [empty].
-     */
-    fun emptyExcept(keep: Set<Color>): ManaPoolComponent =
-        ManaPoolComponent(
-            white = if (Color.WHITE in keep) white else 0,
-            blue = if (Color.BLUE in keep) blue else 0,
-            black = if (Color.BLACK in keep) black else 0,
-            red = if (Color.RED in keep) red else 0,
-            green = if (Color.GREEN in keep) green else 0,
-            colorless = 0,
-            restrictedMana = restrictedMana.filter { it.color != null && it.color in keep },
-            treasureMana = 0
-        )
+    fun emptyAtBoundary(convertToRed: Boolean, retain: Set<Color>): ManaPoolComponent {
+        val preserved = restrictedMana.filter { it.expiry == ManaExpiry.END_OF_COMBAT }
+        val lostRestricted = restrictedMana.filter { it.expiry != ManaExpiry.END_OF_COMBAT }
+        return when {
+            convertToRed -> {
+                // Count the would-be-lost mana the way `total` does (the treasure counter is a tag on
+                // already-counted colour mana, not extra mana); the treasure tag doesn't carry over.
+                val lostTotal = white + blue + black + red + green + colorless + lostRestricted.size
+                ManaPoolComponent(red = lostTotal, restrictedMana = preserved)
+            }
+            retain.isNotEmpty() -> ManaPoolComponent(
+                white = if (Color.WHITE in retain) white else 0,
+                blue = if (Color.BLUE in retain) blue else 0,
+                black = if (Color.BLACK in retain) black else 0,
+                red = if (Color.RED in retain) red else 0,
+                green = if (Color.GREEN in retain) green else 0,
+                colorless = 0,
+                restrictedMana = preserved + lostRestricted.filter { it.color != null && it.color in retain },
+                treasureMana = 0
+            )
+            else -> ManaPoolComponent(restrictedMana = preserved)
+        }
+    }
 }
 
 /**
@@ -179,12 +192,13 @@ data class ManaPoolComponent(
  * [com.wingedsheep.sdk.scripting.PreventManaPoolEmptying] (Upwelling): rather than stopping all
  * emptying for everyone while a permanent is in play, it spares only this player's [colors] mana.
  *
- * Read by [com.wingedsheep.engine.core.CleanupPhaseManager] during the end-of-turn mana-emptying
- * step (the engine's only mana-pool-emptying point): the player's pool is emptied via
- * [ManaPoolComponent.emptyExcept] keeping [colors], then the component is removed if its
- * [removeOn] is [PlayerEffectRemoval.EndOfTurn] (the default).
+ * Read by [com.wingedsheep.engine.core.CleanupPhaseManager.emptyManaPools] at every step/phase-end
+ * mana emptying (CR 500.5): the player's pool is emptied via [ManaPoolComponent.emptyAtBoundary]
+ * keeping [colors]. The component persists across the turn's boundaries and is removed at end-of-turn
+ * cleanup if its [removeOn] is [PlayerEffectRemoval.EndOfTurn] (the default), so the kept mana is
+ * finally lost on the following turn once the retention has ended.
  *
- * @property colors Mana colours kept through this turn's pool emptying.
+ * @property colors Mana colours kept as steps and phases end this turn.
  * @property removeOn When this component is removed.
  */
 @Serializable
