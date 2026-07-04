@@ -590,6 +590,12 @@ class TriggerMatcher(
                     !counterTypesMatch(trigger.counterType, event.counterType)) return false
                 // "First time counters this turn" intervening-if (Stalwart Successor).
                 if (trigger.firstTimeEachTurn && !event.firstThisTurn) return false
+                // Placer restriction (CR 122.6a): "Whenever YOU put counters ...". A placement the
+                // engine didn't attribute to a placer (null) never satisfies a non-null selector.
+                trigger.placedBy?.let { placer ->
+                    val placedBy = event.placedBy ?: return false
+                    if (!matchesPlayer(placer, placedBy, controllerId)) return false
+                }
                 // Check filter: the permanent receiving counters must match
                 if (trigger.filter != GameObjectFilter.Any) {
                     val projected = state.projectedState

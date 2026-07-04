@@ -1461,11 +1461,26 @@ sealed interface EventPattern : TextReplaceable<EventPattern> {
          * event's own "first counters this turn" flag, mirroring how Valiant uses
          * `firstTimeEachTurn` on [BecomesTargetEvent].
          */
-        val firstTimeEachTurn: Boolean = false
+        val firstTimeEachTurn: Boolean = false,
+        /**
+         * Which player must have *put* the counters, per CR 122.6/122.6a — distinct from [filter],
+         * which constrains the permanent *receiving* them. `null` (default) matches any placer, so
+         * "counters put on a creature you control" is expressed purely via the recipient filter.
+         * Set to [Player.You] for "Whenever **you** put one or more counters on a creature" where
+         * the recipient is unrestricted (Earth Kingdom General) — a placement by an opponent then
+         * doesn't fire it. The placer is the controller of the effect that put the counters, or
+         * (for a permanent entering with counters) that permanent's controller (CR 122.6a).
+         * A placement the engine can't attribute to a placer never matches a non-null selector.
+         */
+        val placedBy: Player? = null
     ) : EventPattern {
         override val description: String = buildString {
             val typeLabel = if (counterType == com.wingedsheep.sdk.core.Counters.ANY) "" else "$counterType "
-            append("one or more ${typeLabel}counters are placed on ")
+            if (placedBy != null) {
+                append("${placedBy.description} put one or more ${typeLabel}counters on ")
+            } else {
+                append("one or more ${typeLabel}counters are placed on ")
+            }
             append(describeObjectForEvent(filter))
             if (firstTimeEachTurn) append(" for the first time this turn")
         }

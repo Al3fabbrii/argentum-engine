@@ -3240,12 +3240,20 @@ Dominant back faces that "stay" instead self-exile on their final chapter, dodgi
   sacrifice **a** permanent" wording that also counts the source itself.
 - `Sacrificed` — source is sacrificed.
 - `PlusOneCountersPlacedOnYourCreature` — Hardened Scales shape (+1/+1 only).
-- `countersPlacedOn(filter = Creature.youControl(), counterType = Counters.ANY, firstTimeEachTurn = true, binding = ANY)`
+- `countersPlacedOn(filter = Creature.youControl(), counterType = Counters.ANY, firstTimeEachTurn = true, binding = ANY, placedBy = null)`
   — fires when counters of any type (`Counters.ANY` wildcard) land on a matching permanent;
   `firstTimeEachTurn` gates it to the first counter placement on *that* permanent this turn
   (engine-tracked via `ReceivedCountersThisTurnComponent`). `binding = SELF` restricts it to the
   source permanent (the `TriggerMatcher.CountersPlacedEvent` branch honors `SELF`/`OTHER`).
-  Triggering permanent is `EffectTarget.TriggeringEntity`. Stalwart Successor shape.
+  `placedBy = Player.You` restricts to counters *you* put — the `filter` constrains the permanent
+  *receiving* the counters, `placedBy` constrains the *placer* (CR 122.6a). Use it for
+  "Whenever **you** put one or more +1/+1 counters on **a creature**" (recipient unrestricted, so
+  the "you put" scope can't come from a `.youControl()` recipient filter) — Earth Kingdom General.
+  The placer is the controller of the placing effect, or (for a permanent entering with counters,
+  CR 122.6) that permanent's controller; placements from paths the engine doesn't attribute a placer
+  to (e.g. *moving* counters) carry no placer and never match a non-null `placedBy`. Default `null`
+  matches any placer. Triggering permanent is `EffectTarget.TriggeringEntity`. Stalwart Successor
+  shape.
 - `CountersPlacedOnThis` — "whenever you put one or more counters on ~" (any kind, SELF-bound).
   Aragorn, Company Leader.
 - `OneOrMorePermanentsEnter(filter?, excludeSource?)` — batched ETB trigger; fires at most once per

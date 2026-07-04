@@ -2379,7 +2379,7 @@ class StackResolver(
                     }
                     val (afterMark, firstThisTurn) = DamageUtils.recordCounterPlacement(newState, entityId)
                     newState = afterMark
-                    events.add(CountersAddedEvent(entityId, effect.counterType.description, modifiedCount, entityName, firstThisTurn))
+                    events.add(CountersAddedEvent(entityId, effect.counterType.description, modifiedCount, entityName, firstThisTurn, placedBy = controllerId))
                 }
                 is EntersWithDynamicCounters -> {
                     // Skip "other only" effects when applying to self (e.g., Gev)
@@ -2402,7 +2402,7 @@ class StackResolver(
                         }
                         val (afterMark, firstThisTurn) = DamageUtils.recordCounterPlacement(newState, entityId)
                         newState = afterMark
-                        events.add(CountersAddedEvent(entityId, effect.counterType.description, modifiedCount, entityName, firstThisTurn))
+                        events.add(CountersAddedEvent(entityId, effect.counterType.description, modifiedCount, entityName, firstThisTurn, placedBy = controllerId))
                     }
                 }
                 else -> { /* Other replacement effects handled elsewhere */ }

@@ -3240,18 +3240,15 @@
                 "id": "ability_1",
                 "trigger": "AttackEvent",
                 "effect": {
-                    "type": "Gated",
-                    "gate": "Gate.MayDecide",
-                    "then": {
+                    "type": "ReflexiveTrigger",
+                    "action": {
+                        "type": "Sacrifice",
+                        "filter": "creature|artifact",
+                        "excludeSource": true
+                    },
+                    "reflexiveEffect": {
                         "type": "Composite",
                         "effects": [
-                            {
-                                "type": "SacrificeTarget",
-                                "target": {
-                                    "type": "BoundVariable",
-                                    "name": "another creature or artifact"
-                                }
-                            },
                             {
                                 "type": "DrawCards",
                                 "count": {
@@ -3266,15 +3263,8 @@
                                 "target": "Self"
                             }
                         ]
-                    }
-                },
-                "targetRequirement": {
-                    "type": "TargetObject",
-                    "filter": {
-                        "baseFilter": "creature|artifact ctrl:you",
-                        "excludeSelf": true
                     },
-                    "id": "another creature or artifact"
+                    "hint": "Sacrifice another creature or artifact"
                 },
                 "descriptionOverride": "Whenever this creature attacks, you may sacrifice another creature or artifact. If you do, draw a card and put a +1/+1 counter on this creature."
             }
@@ -6218,17 +6208,21 @@
                 "trigger": {
                     "type": "CountersPlacedEvent",
                     "counterType": "+1/+1",
-                    "filter": "creature"
+                    "filter": "creature",
+                    "placedBy": "You"
                 },
                 "binding": "ANY",
                 "effect": {
-                    "type": "GainLife",
-                    "amount": {
-                        "type": "ContextProperty",
-                        "key": "TRIGGER_COUNTERS_PLACED_AMOUNT"
+                    "type": "Gated",
+                    "gate": "Gate.MayDecide",
+                    "then": {
+                        "type": "GainLife",
+                        "amount": {
+                            "type": "ContextProperty",
+                            "key": "TRIGGER_COUNTERS_PLACED_AMOUNT"
+                        }
                     }
                 },
-                "optional": true,
                 "oncePerTurn": true,
                 "descriptionOverride": "Whenever you put one or more +1/+1 counters on a creature, you may gain that much life. Do this only once each turn."
             }
@@ -14784,9 +14778,10 @@
                 "id": "ability_1",
                 "trigger": {
                     "type": "PermanentsSacrificedEvent",
-                    "filter": "permanent"
+                    "filter": "permanent",
+                    "perPermanent": true
                 },
-                "binding": "ANY",
+                "binding": "OTHER",
                 "effect": {
                     "type": "AddCounters",
                     "counterType": "+1/+1",

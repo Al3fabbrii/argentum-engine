@@ -1178,11 +1178,13 @@ object Triggers {
         counterType: String = Counters.ANY,
         firstTimeEachTurn: Boolean = true,
         binding: TriggerBinding = TriggerBinding.ANY,
+        placedBy: Player? = null,
     ): TriggerSpec = TriggerSpec(
         event = CountersPlacedEvent(
             counterType = counterType,
             filter = filter,
             firstTimeEachTurn = firstTimeEachTurn,
+            placedBy = placedBy,
         ),
         binding = binding
     )

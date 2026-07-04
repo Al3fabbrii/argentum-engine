@@ -900,7 +900,16 @@ data class CountersAddedEvent(
      * (Stalwart Successor). Computed against the target's [ReceivedCountersThisTurnComponent]
      * before that marker is set; defaults to false for emitters that don't track it.
      */
-    val firstThisTurn: Boolean = false
+    val firstThisTurn: Boolean = false,
+    /**
+     * The player who *put* these counters, per CR 122.6a — the controller of the effect that
+     * placed them, or (for a permanent entering with counters) that permanent's controller.
+     * Drives "Whenever **you** put one or more counters on a creature" triggers
+     * ([com.wingedsheep.sdk.scripting.EventPattern.CountersPlacedEvent.placedBy]). `null` when the
+     * emitting path doesn't attribute a placer (e.g. moving counters between permanents); a null
+     * placer never matches a placer-restricted trigger.
+     */
+    val placedBy: EntityId? = null
 ) : GameEvent
 
 /**
