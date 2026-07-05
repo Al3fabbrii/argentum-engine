@@ -818,6 +818,7 @@ class CardBuilder(private val name: String) {
             sagaChapters = sagaChaptersList.toList(),
             selfExileOnResolve = spellBuilder?.exilesOnResolve ?: false,
             paradigm = spellBuilder?.isParadigm ?: false,
+            returnTransformedFromGraveyardOnResolve = spellBuilder?.returnTransformedFromGraveyardMarker,
             selfAlternativeCost = selfAlternativeCost,
             xManaRestriction = spellBuilder?.xManaRestriction ?: emptySet(),
             mayStartOnBattlefield = mayStartOnBattlefield,
@@ -932,6 +933,24 @@ class SpellBuilder {
     }
 
     internal val isParadigm: Boolean get() = paradigm
+
+    private var returnTransformedFromGraveyard: ReturnTransformedFromGraveyard? = null
+
+    /**
+     * Mark this spell so that, when it resolves after being cast from a graveyard, it is exiled and
+     * put onto the battlefield transformed (its back face up) with the given [counters], instead of
+     * going to its owner's graveyard. The card must be double-faced with a permanent back face.
+     *
+     * Models Esper Origins' "If this spell was cast from a graveyard, exile it, then put it onto the
+     * battlefield transformed under its owner's control with a finality counter on it." See
+     * [CardScript.returnTransformedFromGraveyardOnResolve].
+     */
+    fun returnTransformedFromGraveyard(vararg counters: CounterType) {
+        returnTransformedFromGraveyard = ReturnTransformedFromGraveyard(counters.toList())
+    }
+
+    internal val returnTransformedFromGraveyardMarker: ReturnTransformedFromGraveyard?
+        get() = returnTransformedFromGraveyard
 
     /**
      * Alternate effect used when kicker is paid. When set along with [kickerTarget],
