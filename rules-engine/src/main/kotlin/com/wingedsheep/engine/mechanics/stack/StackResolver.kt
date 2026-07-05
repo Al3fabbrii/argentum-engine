@@ -26,6 +26,7 @@ import com.wingedsheep.engine.state.components.identity.CantBeCounteredComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
 import com.wingedsheep.engine.state.components.identity.ControllerComponent
 import com.wingedsheep.engine.state.components.identity.CopyOfComponent
+import com.wingedsheep.engine.state.components.identity.DoubleFacedComponent
 import com.wingedsheep.engine.state.components.identity.FaceDownComponent
 import com.wingedsheep.engine.state.components.identity.HasMorphAbilityComponent
 import com.wingedsheep.engine.state.components.identity.MorphDataComponent
@@ -53,6 +54,7 @@ import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.events.CounterTypeFilter
 import com.wingedsheep.sdk.scripting.EntersAsCopy
 import com.wingedsheep.engine.handlers.effects.EntersWithCountersHelper
+import com.wingedsheep.engine.handlers.effects.permanent.types.returnDfcFaceFromExile
 import com.wingedsheep.engine.handlers.effects.DamageUtils
 import com.wingedsheep.engine.handlers.effects.ReplacementEffectUtils
 import com.wingedsheep.sdk.scripting.EntersTapped
@@ -1636,6 +1638,26 @@ class StackResolver(
                 // For a cast face (Adventure / modal DFC), "Exile <name>." lives on the face's script.
                 val pausedResolvedScript = spellComponent.faceIndex?.let { pausedCardDef?.cardFaces?.getOrNull(it)?.script }
                     ?: pausedCardDef?.script
+
+                // Esper Origins: a graveyard-cast that returns itself to the battlefield transformed
+                // does so even when its resolution paused mid-way (e.g. the Surveil earlier in the
+                // same resolution). The card leaves the stack and enters transformed now; the paused
+                // continuation still resolves the remaining effects. Precedence over flashback exile.
+                val pausedReturnTransformed = pausedResolvedScript?.returnTransformedFromGraveyardOnResolve
+                if (pausedReturnTransformed != null && spellComponent.castFromZone == Zone.GRAVEYARD) {
+                    val transformEvents = mutableListOf<GameEvent>()
+                    val transformed = resolveSelfToBattlefieldTransformed(
+                        effectResult.state, spellId, pausedReturnTransformed.counters, transformEvents
+                    )
+                    if (transformed != null) {
+                        return ExecutionResult.paused(
+                            transformed,
+                            effectResult.pendingDecision!!,
+                            events + effectResult.events + transformEvents
+                        )
+                    }
+                }
+
                 val pausedSelfExile = pausedResolvedScript?.selfExileOnResolve == true
                 // Flashback (printed or granted — Archmage's Newt) or Harmonize (printed or granted
                 // — Songcrafter Mage): a graveyard cast exiles on resolution instead of returning
@@ -1755,6 +1777,21 @@ class StackResolver(
         // For a cast face (Adventure / modal DFC), "Exile <name>." lives on the face's script.
         val resolvedScript = spellComponent.faceIndex?.let { cardDef?.cardFaces?.getOrNull(it)?.script }
             ?: cardDef?.script
+
+        // Esper Origins: a spell cast from a graveyard is put onto the battlefield transformed
+        // instead of going to the graveyard. Gated on the same graveyard cast as the flashback
+        // exile below and takes precedence over it. Falls through to the normal destination if the
+        // card can't enter transformed (non-DFC or non-permanent back face — official ruling).
+        val returnTransformedSpec = resolvedScript?.returnTransformedFromGraveyardOnResolve
+        if (returnTransformedSpec != null && spellComponent.castFromZone == Zone.GRAVEYARD) {
+            val transformed = resolveSelfToBattlefieldTransformed(
+                newState, spellId, returnTransformedSpec.counters, events
+            )
+            if (transformed != null) {
+                return ExecutionResult.success(transformed, events)
+            }
+        }
+
         val selfExile = resolvedScript?.selfExileOnResolve == true
         // Flashback (printed or granted — Archmage's Newt) or Harmonize (printed or granted —
         // Songcrafter Mage): a graveyard cast exiles on resolution instead of returning to the
@@ -1899,6 +1936,77 @@ class StackResolver(
             .clearLibraryReveals(state, ownerId)
         val (library, advanced) = cleared.nextRandom { shuffle(cleared.getZone(libraryZone)) }
         return advanced.copy(zones = advanced.zones + (libraryZone to library))
+    }
+
+    /**
+     * Resolution destination for [com.wingedsheep.sdk.model.CardScript.returnTransformedFromGraveyardOnResolve]
+     * (Esper Origins): a spell cast from a graveyard is put onto the battlefield **transformed**
+     * (its back face up) under its owner's control, entering with [counters], instead of going to
+     * the graveyard/exile.
+     *
+     * Faithful to "exile it, then put it onto the battlefield transformed ... with a finality counter":
+     * the resolved card leaves the stack and a brand-new back-face object enters the battlefield
+     * (leaves/enters triggers fire, a Saga back enters with a fresh lore counter). The intermediate
+     * exile is invisible — no effect keys on it — so the stack → battlefield move is done directly.
+     *
+     * Per the official ruling, a card that is not double-faced (or whose back face is not a permanent)
+     * "will not enter at all"; [returnDfcFaceFromExile] no-ops in that case and the caller must fall
+     * back to the normal graveyard/exile destination.
+     */
+    private fun resolveSelfToBattlefieldTransformed(
+        state: GameState,
+        spellId: EntityId,
+        counters: List<CounterType>,
+        events: MutableList<GameEvent>
+    ): GameState? {
+        val container = state.getEntity(spellId) ?: return null
+        val cardComponent = container.get<CardComponent>() ?: return null
+        val ownerId = cardComponent.ownerId ?: return null
+        val cardDef = cardRegistry.getCard(cardComponent.name) ?: return null
+        val backFace = cardDef.backFace ?: return null
+        // A non-permanent back face can't be put onto the battlefield — no-op, caller falls back.
+        if (!backFace.isPermanent) return null
+
+        // Strip the on-stack bookkeeping (and any alternative-cost permissions) before the card
+        // becomes a permanent, mirroring the normal resolved-spell cleanup.
+        var working = state.updateEntity(spellId) { c ->
+            c.without<SpellOnStackComponent>()
+                .without<TargetsComponent>()
+                .without<PlayWithoutPayingCostComponent>()
+                .without<com.wingedsheep.engine.state.components.identity.PlayWithCostIncreaseComponent>()
+                .without<com.wingedsheep.engine.state.components.identity.PlayWithFixedAlternativeManaCostComponent>()
+                .without<ExileAfterResolveComponent>()
+        }
+        working = working.removeMayPlayPermissionsForCard(spellId)
+
+        // "Exile it, then put it onto the battlefield transformed": the resolving spell was already
+        // popped off the stack (it is in no zone), so place it in its owner's exile — the source
+        // zone [returnDfcFaceFromExile] is built to flip-and-return from.
+        working = working.addToZone(ZoneKey(ownerId, Zone.EXILE), spellId)
+
+        // A DFC spell on the stack carries no DoubleFacedComponent yet (it's stamped on ETB); add
+        // one on its front face so returnDfcFaceFromExile can flip it to the back face.
+        if (working.getEntity(spellId)?.get<DoubleFacedComponent>() == null) {
+            working = working.updateEntity(spellId) { c ->
+                c.with(
+                    DoubleFacedComponent(
+                        frontCardDefinitionId = cardDef.name,
+                        backCardDefinitionId = backFace.name,
+                        currentFace = DoubleFacedComponent.Face.FRONT
+                    )
+                )
+            }
+        }
+
+        val transition = returnDfcFaceFromExile(working, cardRegistry, spellId, DoubleFacedComponent.Face.BACK)
+        working = transition.state
+        events.addAll(transition.events)
+
+        // The finality counter (and any others) land on the new back-face permanent.
+        if (counters.isNotEmpty()) {
+            working = applyExileCounters(working, spellId, counters, events)
+        }
+        return working
     }
 
     /**

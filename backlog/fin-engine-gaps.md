@@ -151,9 +151,10 @@ instead of sacrifice, sorcery-speed gating, second card).
   - Crystal Fragments // Summon: Alexander — Equipment front works via `CardDefinition.doubleFacedPermanent`, but
     the Alexander back needs a **group damage-prevention shield** ("prevent all damage that would be dealt to
     creatures you control this turn" — `PreventDamageEffect` only targets a single entity today).
-  - Esper Origins — a different template (a *sorcery* that, when cast from a graveyard, exiles itself off the stack
-    and *puts itself onto the battlefield transformed with a finality counter*) — a spell-becomes-permanent shape,
-    not the permanent exile-and-return this effect models.
+  - Esper Origins ✅ **DONE** — a *sorcery* that, when cast from a graveyard, exiles itself off the stack and puts
+    itself onto the battlefield transformed with a finality counter. Implemented as the resolution-destination flag
+    `CardScript.returnTransformedFromGraveyardOnResolve` (`spell { returnTransformedFromGraveyard(CounterType.FINALITY) }`),
+    read by `StackResolver` — not the permanent exile-and-return effect. See `EsperOriginsScenarioTest`.
 
 ### 3. Job select (≈16 Equipment) — ❌ **GAP** (create-token-then-attach-self)
 
@@ -478,5 +479,10 @@ stale on both:
   `Conditions.TriggeringPlayerIs(Player.ChosenOpponent)` + `Effects.WinGame()`. Also fixed
   `TriggerMatcher.filterByTriggerCondition` to thread `triggeringPlayerId` into the intervening-if
   context (previously null). Covered by `ZenosYaeGalvusScenarioTest` (incl. a 3-player win-con pod).
-- Remaining missing FIN cards (2): Esper Origins; Ultima, Origin of Oblivion — both still `add-feature`
-  scope (see Tier-3 above). (Emet-Selch, Unsundered and Gogo, Master of Mimicry are now implemented.)
+- Remaining missing FIN cards (1): Ultima, Origin of Oblivion — still `add-feature` scope (see Tier-3
+  above). (Emet-Selch, Unsundered; Gogo, Master of Mimicry; and Esper Origins are now implemented.)
+- Esper Origins ✅ — implemented via a new `CardScript.returnTransformedFromGraveyardOnResolve` flag
+  (`spell { returnTransformedFromGraveyard(CounterType.FINALITY) }`): a graveyard-cast spell resolves
+  onto the battlefield transformed with a finality counter (destination derived from `castFromZone` in
+  `StackResolver`, precedence over flashback exile, survives the Surveil mid-resolution pause). Covered
+  by `EsperOriginsScenarioTest`.
