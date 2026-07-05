@@ -3411,6 +3411,42 @@
     ]
 }
 
+// Homunculus Horde
+{
+    "name": "Homunculus Horde",
+    "manaCost": "{3}{U}",
+    "typeLine": "Creature — Homunculus",
+    "oracleText": "Whenever you draw your second card each turn, create a token that's a copy of this creature.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "NthCardDrawnEvent",
+                    "nthCard": 2
+                },
+                "binding": "ANY",
+                "effect": "CreateTokenCopyOfSource",
+                "descriptionOverride": "Whenever you draw your second card each turn, create a token that's a copy of this creature."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "41",
+        "rarity": "RARE",
+        "artist": "Adrián Rodríguez Pérez",
+        "flavorText": "\"That is why you triple-check all decimals when commissioning a new batch of homunculi!\"\n—Trigori, Azorius senator",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/7/470c4d03-340a-4e0e-a59f-f19d05497785.jpg?1782689229"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Hungry Ghoul
 {
     "name": "Hungry Ghoul",
@@ -5678,6 +5714,54 @@
     ]
 }
 
+// Sphinx of Forgotten Lore
+{
+    "name": "Sphinx of Forgotten Lore",
+    "manaCost": "{2}{U}{U}",
+    "typeLine": "Creature — Sphinx",
+    "oracleText": "Flash\nFlying\nWhenever this creature attacks, target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to that card's mana cost. (You may cast that card from your graveyard for its flashback cost. Then exile it.)",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "FLASH",
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "GrantFlashback",
+                    "target": {
+                        "type": "ContextTarget",
+                        "index": 0
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "instant|sorcery own:you",
+                        "zone": "Graveyard"
+                    }
+                },
+                "descriptionOverride": "Whenever this creature attacks, target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to that card's mana cost."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "51",
+        "rarity": "MYTHIC",
+        "artist": "Dmitry Burmak",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/f/af6e46b8-62ed-4bca-ba38-a821f225b59f.jpg?1782689220"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Spinner of Souls
 {
     "name": "Spinner of Souls",
@@ -6463,6 +6547,46 @@
     },
     "colorIdentityOverride": [
         "WHITE"
+    ]
+}
+
+// Twinflame Tyrant
+{
+    "name": "Twinflame Tyrant",
+    "manaCost": "{3}{R}{R}",
+    "typeLine": "Creature — Dragon",
+    "oracleText": "Flying\nIf a source you control would deal damage to an opponent or a permanent an opponent controls, it deals double that damage instead.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 5
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "replacementEffects": [
+            {
+                "type": "DoubleDamage",
+                "appliesTo": {
+                    "type": "DamageEvent",
+                    "recipient": "OpponentOrPermanentTheyControl",
+                    "source": {
+                        "type": "SourceMatching",
+                        "filter": "ctrl:you"
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "97",
+        "rarity": "MYTHIC",
+        "artist": "Xabi Gaztelua",
+        "flavorText": "\"Job only paid enough for one head. I'm out.\"\n—Peren, veteran mercenary",
+        "imageUri": "https://cards.scryfall.io/normal/front/1/e/1eb34f51-0bd2-43c3-af95-2ce8dabcc7bb.jpg?1782689182"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 
