@@ -3844,6 +3844,63 @@
     "colorIdentityOverride": []
 }
 
+// Screaming Phantom
+{
+    "name": "Screaming Phantom",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Spirit",
+    "oracleText": "Flying\nWhenever this creature attacks, mill a card. (Put the top card of your library into your graveyard.)",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                },
+                                "isMill": true
+                            },
+                            "storeAs": "milled"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "milled",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "118",
+        "artist": "Halil Ural",
+        "flavorText": "After a slow death in darkness, she flies into a rage at the slightest glimpse of light.",
+        "imageUri": "https://cards.scryfall.io/normal/front/b/c/bc2f3efb-1526-48c0-842a-374af63ea467.jpg?1782694518"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Seismic Monstrosaur
 {
     "name": "Seismic Monstrosaur",

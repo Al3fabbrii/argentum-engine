@@ -215,7 +215,7 @@
 - [ ] Saheeli, the Sun's Brilliance
 - [ ] Sanguine Evangelist
 - [x] Scampering Surveyor
-- [ ] Screaming Phantom
+- [x] Screaming Phantom
 - [ ] Scytheclaw Raptor
 - [ ] Seeker of Sunlight
 - [x] Seismic Monstrosaur
