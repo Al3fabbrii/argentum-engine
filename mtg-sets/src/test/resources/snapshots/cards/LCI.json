@@ -5092,6 +5092,55 @@
     ]
 }
 
+// Walk with the Ancestors
+{
+    "name": "Walk with the Ancestors",
+    "manaCost": "{4}{G}",
+    "typeLine": "Sorcery",
+    "oracleText": "Return up to one target permanent card from your graveyard to your hand.\nDiscover 4.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "MoveToZone",
+                    "target": {
+                        "type": "ContextTarget",
+                        "index": 0
+                    },
+                    "destination": "Hand"
+                },
+                {
+                    "type": "Discover",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 4
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "optional": true,
+                "filter": {
+                    "baseFilter": "permanent own:you",
+                    "zone": "Graveyard"
+                },
+                "id": "up to one target permanent card from your graveyard"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "218",
+        "artist": "Loïc Canavaggia",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/1/71a6f85b-5ef8-4526-9c86-7cb71508b4c0.jpg?1782694435"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Waterwind Scout
 {
     "name": "Waterwind Scout",

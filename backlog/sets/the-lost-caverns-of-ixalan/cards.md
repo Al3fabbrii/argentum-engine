@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 92 / 286
+**Implemented:** 93 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -281,7 +281,7 @@
 - [ ] Volatile Fault
 - [x] Volatile Wanderglyph
 - [ ] Wail of the Forgotten
-- [ ] Walk with the Ancestors
+- [x] Walk with the Ancestors
 - [ ] Warden of the Inner Sky
 - [ ] Waterlogged Hulk
 - [x] Waterwind Scout
