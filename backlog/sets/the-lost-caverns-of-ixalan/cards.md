@@ -180,7 +180,7 @@
 - [ ] Over the Edge
 - [x] Palani's Hatcher
 - [x] Panicked Altisaur
-- [ ] Pathfinding Axejaw
+- [x] Pathfinding Axejaw
 - [ ] Petrify
 - [ ] Pirate Hat
 - [ ] Pit of Offerings
