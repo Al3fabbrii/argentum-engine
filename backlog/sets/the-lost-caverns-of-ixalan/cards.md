@@ -141,7 +141,7 @@
 - [ ] Join the Dead
 - [ ] Kaslem's Stonetree
 - [ ] Kellan, Daring Traveler
-- [ ] Kinjalli's Dawnrunner
+- [x] Kinjalli's Dawnrunner
 - [ ] Kitesail Larcenist
 - [ ] Kutzil's Flanker
 - [ ] Kutzil, Malamet Exemplar
