@@ -2389,6 +2389,52 @@
     ]
 }
 
+// Hit the Mother Lode
+{
+    "name": "Hit the Mother Lode",
+    "manaCost": "{4}{R}{R}{R}",
+    "typeLine": "Sorcery",
+    "oracleText": "Discover 10. If the discovered card's mana value is less than 10, create a number of tapped Treasure tokens equal to the difference.",
+    "script": {
+        "spellEffect": {
+            "type": "Discover",
+            "amount": {
+                "type": "Fixed",
+                "amount": 10
+            },
+            "storeDiscoveredAs": "discovered",
+            "thenEffect": {
+                "type": "CreatePredefinedToken",
+                "tokenType": "Treasure",
+                "tapped": true,
+                "dynamicCount": {
+                    "type": "IfPositive",
+                    "amount": {
+                        "type": "Subtract",
+                        "left": {
+                            "type": "Fixed",
+                            "amount": 10
+                        },
+                        "right": {
+                            "type": "StoredCardManaValue",
+                            "collectionName": "discovered"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "153",
+        "rarity": "RARE",
+        "artist": "Diego Gisbert",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/7/e75f460c-43e2-4353-8b73-71ff8651a79d.jpg?1782694484"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Hotfoot Gnome
 {
     "name": "Hotfoot Gnome",
