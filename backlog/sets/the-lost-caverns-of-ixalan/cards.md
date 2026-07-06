@@ -161,7 +161,7 @@
 - [x] Mephitic Draught
 - [ ] Merfolk Cave-Diver
 - [x] Might of the Ancestors
-- [ ] Miner's Guidewing
+- [x] Miner's Guidewing
 - [x] Mineshaft Spider
 - [x] Mischievous Pup
 - [ ] Molten Collapse

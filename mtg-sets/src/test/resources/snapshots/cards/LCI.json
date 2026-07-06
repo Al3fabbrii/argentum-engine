@@ -2631,6 +2631,56 @@
     ]
 }
 
+// Miner's Guidewing
+{
+    "name": "Miner's Guidewing",
+    "manaCost": "{W}",
+    "typeLine": "Creature — Bird",
+    "oracleText": "Flying, vigilance\nWhen this creature dies, target creature you control explores. (Reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on that creature, then put the card back or put it into your graveyard.)",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "keywords": [
+        "FLYING",
+        "VIGILANCE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "Explore",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target creature you control"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature ctrl:you"
+                    },
+                    "id": "target creature you control"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "24",
+        "artist": "Allen Douglas",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/0/9048cd9d-df3f-4705-a5f4-e5b09760c631.jpg?1782694591"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Mineshaft Spider
 {
     "name": "Mineshaft Spider",
