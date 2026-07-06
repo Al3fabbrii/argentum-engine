@@ -615,6 +615,60 @@
     ]
 }
 
+// Buried Treasure
+{
+    "name": "Buried Treasure",
+    "manaCost": "{2}",
+    "typeLine": "Artifact — Treasure",
+    "oracleText": "{T}, Sacrifice this artifact: Add one mana of any color.\n{5}, Exile this card from your graveyard: Discover 5. Activate only as a sorcery.",
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        "CostTap",
+                        "CostSacrificeSelf"
+                    ]
+                },
+                "effect": "AddManaOfChoice",
+                "isManaAbility": true
+            },
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{5}"
+                            }
+                        },
+                        "CostExileSelf"
+                    ]
+                },
+                "effect": {
+                    "type": "Discover",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 5
+                    }
+                },
+                "timing": "SorcerySpeed",
+                "activateFromZone": "Graveyard"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "246",
+        "artist": "Jarel Threat",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/c/4c9c45b6-dedd-4481-a06a-c83ace2f18fa.jpg?1782694415"
+    }
+}
+
 // Captivating Cave
 {
     "name": "Captivating Cave",

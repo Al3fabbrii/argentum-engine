@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 99 / 286
+**Implemented:** 100 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -36,7 +36,7 @@
 - [ ] Breeches, Eager Pillager
 - [x] Bringer of the Last Gift
 - [ ] Broodrage Mycoid
-- [ ] Buried Treasure
+- [x] Buried Treasure
 - [ ] Burning Sun Cavalry
 - [ ] Calamitous Cave-In
 - [ ] Canonized in Blood
