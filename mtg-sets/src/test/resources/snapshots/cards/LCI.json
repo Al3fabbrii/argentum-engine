@@ -3392,6 +3392,44 @@
     ]
 }
 
+// River Herald Guide
+{
+    "name": "River Herald Guide",
+    "manaCost": "{2}{G}",
+    "typeLine": "Creature — Merfolk Scout",
+    "oracleText": "Vigilance\nWhen this creature enters, it explores. (Reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on this creature, then put the card back or put it into your graveyard.)",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 1
+    },
+    "keywords": [
+        "VIGILANCE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Explore",
+                    "target": "Self"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "209",
+        "artist": "David Astruga",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/e/9ea7e323-f329-4928-b25a-c0b44c5ac058.jpg?1782694442"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // River Herald Scout
 {
     "name": "River Herald Scout",

@@ -204,7 +204,7 @@
 - [ ] Restless Reef
 - [ ] Restless Ridgeline
 - [ ] Restless Vents
-- [ ] River Herald Guide
+- [x] River Herald Guide
 - [x] River Herald Scout
 - [ ] Roaming Throne
 - [x] Ruin-Lurker Bat
