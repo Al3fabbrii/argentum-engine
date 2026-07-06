@@ -208,7 +208,7 @@
 - [x] River Herald Scout
 - [ ] Roaming Throne
 - [x] Ruin-Lurker Bat
-- [ ] Rumbling Rockslide
+- [x] Rumbling Rockslide
 - [x] Runaway Boulder
 - [ ] Sage of Days
 - [x] Saheeli's Lattice
