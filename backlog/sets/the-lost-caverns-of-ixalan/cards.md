@@ -48,7 +48,7 @@
 - [ ] Cavern Stomper
 - [x] Cavern of Souls
 - [ ] Cavernous Maw
-- [ ] Cenote Scout
+- [x] Cenote Scout
 - [x] Chart a Course
 - [ ] Child of the Volcano
 - [ ] Chimil, the Inner Sun

@@ -742,6 +742,43 @@
     "colorIdentityOverride": []
 }
 
+// Cenote Scout
+{
+    "name": "Cenote Scout",
+    "manaCost": "{G}",
+    "typeLine": "Creature — Merfolk Scout",
+    "oracleText": "When this creature enters, it explores. (Reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on this creature, then put the card back or put it into your graveyard.)",
+    "creatureStats": {
+        "power": 1,
+        "toughness": 1
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Explore",
+                    "target": "Self"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "178",
+        "rarity": "UNCOMMON",
+        "artist": "Caroline Gariba",
+        "flavorText": "\"If you're afraid to dive into the unknown, how will you ever find anything new?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/c/4ce4b7bc-636b-4723-a7c1-2c859f333492.jpg?1782694467"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Chupacabra Echo
 {
     "name": "Chupacabra Echo",
