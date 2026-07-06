@@ -852,17 +852,18 @@ class LibraryAndZoneContinuationResumer(
      * your hand?" during a [com.wingedsheep.sdk.scripting.effects.DiscoverEffect] (CR 701.57a).
      *
      * In both branches the *other* exiled cards are bottom-randomized first. Then:
-     *  - **Cast** (yes): the discovered card is free-cast by reusing
-     *    [com.wingedsheep.sdk.scripting.effects.CastFromCollectionWithoutPayingCostEffect] (so
-     *    target / X / mode prompts flow through the normal cast machinery). If the cast can't
+     *  - **Cast** (yes): the discovered card is granted a free cast (like [CascadeExecutor]) and
+     *    synthesized through the normal cast machinery, so target / X / mode prompts surface and the
+     *    cast's "whenever you cast a spell (from exile)" triggers are stacked exactly once (the
+     *    `triggersAlreadyProcessed` flag is propagated so they aren't re-scanned). If the cast can't
      *    initiate — no legal target, etc. — the card falls back to the controller's hand, per
      *    "If you don't cast it, put that card into your hand."
      *  - **Hand** (no): the discovered card is moved straight to the controller's hand.
      *
      * Any [DiscoverMayCastContinuation.thenEffect] then resolves last, with the discovered card
      * published to [DiscoverMayCastContinuation.storeDiscoveredAs] so it can be read (Hit the
-     * Mother Lode's "…create Treasure tokens equal to the difference"). The follow-up is chained
-     * through [effectRunner], so its own pauses (if any) resume correctly.
+     * Mother Lode's "…create Treasure tokens equal to the difference"). In the cast branch it is
+     * pre-pushed as an [EffectContinuation] so it runs after the cast even if the cast pauses.
      */
     fun resumeDiscoverMayCast(
         state: GameState,
@@ -903,36 +904,70 @@ class LibraryAndZoneContinuationResumer(
             )
         }
 
-        // Cast branch: free-cast the discovered card (from a private collection), then the follow-up.
-        val castKey = "discover\$cast"
-        val ctx = EffectContext(
-            sourceId = continuation.sourceId,
-            controllerId = continuation.playerId,
-            pipeline = PipelineState.EMPTY.copy(
-                storedCollections = discoveredCollections + (castKey to listOf(discovered))
+        // Cast branch: grant a free cast and synthesize it through the normal cast machinery —
+        // mirroring CascadeExecutor's may-cast rather than the CastFromCollection effect, so the
+        // cast's "whenever you cast a spell (from exile)" triggers are stacked exactly once
+        // (Quintorius Kand). The follow-up [thenEffect] is pre-pushed as an EffectContinuation so it
+        // resolves after the cast even if the cast pauses for targets / X.
+        var stateForCast = afterBottom
+        if (continuation.thenEffect != null) {
+            val thenCtx = EffectContext(
+                sourceId = continuation.sourceId,
+                controllerId = continuation.playerId,
+                pipeline = PipelineState.EMPTY.copy(storedCollections = discoveredCollections)
             )
-        )
-        val effects = buildList {
-            add(CastFromCollectionWithoutPayingCostEffect(from = castKey))
-            continuation.thenEffect?.let { add(it) }
-        }
-        val result = effectRunner.executeRemainingEffects(afterBottom, effects, ctx)
-        if (result.isPaused) {
-            return ExecutionResult.paused(result.state, result.pendingDecision!!, bottomEvents + result.events)
+            stateForCast = stateForCast.pushContinuation(
+                EffectContinuation(
+                    decisionId = "pending",
+                    remainingEffects = listOf(continuation.thenEffect),
+                    effectContext = thenCtx
+                )
+            )
         }
 
-        // If the cast couldn't initiate, the discovered card is still in exile — fall back to
-        // hand ("If you don't cast it, put that card into your hand", CR 701.57a).
-        var finalState = result.state
-        val tailEvents = mutableListOf<com.wingedsheep.engine.core.GameEvent>()
-        if (findEntityZone(finalState, discovered)?.zoneType == Zone.EXILE) {
-            val moveResult = ZoneMovementUtils.moveCardToZone(finalState, discovered, Zone.HAND)
-            if (moveResult.isSuccess) {
-                finalState = moveResult.state
-                tailEvents.addAll(moveResult.events)
-            }
+        var granted = stateForCast.updateEntity(discovered) { container ->
+            container.with(PlayWithoutPayingCostComponent(controllerId = continuation.playerId))
         }
-        return checkForMore(finalState, bottomEvents + result.events + tailEvents)
+        val (permId, stateWithPerm) = granted.newEntity()
+        granted = stateWithPerm.addMayPlayPermission(
+            MayPlayPermission(
+                id = permId,
+                cardIds = setOf(discovered),
+                controllerId = continuation.playerId,
+                sourceId = continuation.sourceId,
+                timestamp = stateWithPerm.timestamp,
+            )
+        )
+        val stateReady = granted.copy(priorityPlayerId = continuation.playerId)
+        val castResult = castSpellHandler.execute(stateReady, CastSpell(continuation.playerId, discovered))
+
+        if (castResult.error != null) {
+            // The cast couldn't initiate — pop the pre-pushed follow-up, put the discovered card
+            // into hand ("If you don't cast it, put that card into your hand"), then run the
+            // follow-up (Hit the Mother Lode still makes its Treasures — a card was discovered).
+            val withoutThen = if (continuation.thenEffect != null) granted.popContinuation().second else granted
+            val moveResult = ZoneMovementUtils.moveCardToZone(withoutThen, discovered, Zone.HAND)
+            var afterHand = withoutThen
+            val handEvents = bottomEvents.toMutableList()
+            if (moveResult.isSuccess) {
+                afterHand = moveResult.state
+                handEvents.addAll(moveResult.events)
+            }
+            return runDiscoverThenEffect(afterHand, continuation, discoveredCollections, handEvents, checkForMore)
+        }
+
+        if (castResult.pendingDecision != null) {
+            // The cast paused (targets / X); the pre-pushed follow-up runs when it resumes.
+            return ExecutionResult.paused(castResult.state, castResult.pendingDecision, bottomEvents + castResult.events)
+                .copy(triggersAlreadyProcessed = castResult.triggersAlreadyProcessed)
+        }
+
+        // Cast succeeded synchronously; checkForMore drains the pre-pushed follow-up continuation.
+        // CastSpellHandler already stacked this cast's triggers (e.g. Quintorius Kand's "whenever you
+        // cast a spell from exile"); propagate the flag so SubmitDecisionHandler doesn't re-scan the
+        // SpellCastEvent and double-fire them.
+        return checkForMore(castResult.state, bottomEvents + castResult.events)
+            .copy(triggersAlreadyProcessed = castResult.triggersAlreadyProcessed)
     }
 
     /** Run a discover [DiscoverMayCastContinuation.thenEffect] (if any) with the discovered card published. */
@@ -957,12 +992,6 @@ class LibraryAndZoneContinuationResumer(
         return checkForMore(result.state, leadingEvents + result.events)
     }
 
-    private fun findEntityZone(state: GameState, entityId: EntityId): ZoneKey? {
-        for ((zoneKey, entities) in state.zones) {
-            if (entityId in entities) return zoneKey
-        }
-        return null
-    }
 
     /**
      * Resume after the controller picks targets for a free synthesized cast triggered by
