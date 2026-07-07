@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 108 / 286
+**Implemented:** 109 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -286,6 +286,6 @@
 - [ ] Waterlogged Hulk
 - [x] Waterwind Scout
 - [x] Waylaying Pirates
-- [ ] Zoetic Glyph
+- [x] Zoetic Glyph
 - [ ] Zoyowa Lava-Tongue
 - [ ] Zoyowa's Justice

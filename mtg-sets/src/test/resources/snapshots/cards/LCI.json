@@ -6194,3 +6194,68 @@
         "BLUE"
     ]
 }
+
+// Zoetic Glyph
+{
+    "name": "Zoetic Glyph",
+    "manaCost": "{2}{U}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant artifact\nEnchanted artifact is a Golem creature with base power and toughness 5/4 in addition to its other types.\nWhen this Aura is put into a graveyard from the battlefield, discover 3.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "Discover",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 3
+                    }
+                }
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "GrantCardType",
+                "cardType": "CREATURE",
+                "filter": {
+                    "baseFilter": "permanent",
+                    "scope": "AttachedTo"
+                }
+            },
+            {
+                "type": "GrantSubtype",
+                "subtype": "Golem",
+                "filter": {
+                    "baseFilter": "permanent",
+                    "scope": "AttachedTo"
+                }
+            },
+            {
+                "type": "SetBasePowerToughnessStatic",
+                "power": 5,
+                "toughness": 4
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "artifact"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "86",
+        "rarity": "UNCOMMON",
+        "artist": "Yeong-Hao Han",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/2/a2f498ac-179e-4055-9b83-97bcc5ab1bb9.jpg?1782694541"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
