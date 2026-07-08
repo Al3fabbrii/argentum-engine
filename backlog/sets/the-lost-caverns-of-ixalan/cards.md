@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 201 / 286
+**Implemented:** 206 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -264,20 +264,20 @@
 - [x] Thrashing Brontodon
 - [x] Threefold Thunderhulk
 - [ ] Throne of the Grim Captain
-- [ ] Tinker's Tote
+- [x] Tinker's Tote
 - [ ] Tishana's Tidebinder
 - [ ] Tithing Blade
 - [ ] Treasure Map
-- [ ] Triumphant Chomp
+- [x] Triumphant Chomp
 - [x] Trumpeting Carnosaur
 - [ ] Twists and Turns
-- [ ] Uchbenbak, the Great Mistake
-- [ ] Unlucky Drop
+- [x] Uchbenbak, the Great Mistake
+- [x] Unlucky Drop
 - [ ] Unstable Glyphbridge
 - [x] Vanguard of the Rose
 - [ ] Visage of Dread
 - [x] Vito's Inquisitor
-- [ ] Vito, Fanatic of Aclazotz
+- [x] Vito, Fanatic of Aclazotz
 - [ ] Volatile Fault
 - [x] Volatile Wanderglyph
 - [ ] Wail of the Forgotten
