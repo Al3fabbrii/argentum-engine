@@ -45,6 +45,7 @@ val JoinTheDead = card("Join the Dead") {
         rarity = Rarity.COMMON
         collectorNumber = "110"
         artist = "Olivier Bernard"
+        flavorText = "The more creatures that plunge to their deaths in the abyss, the more angry Echoes that arise to drag others down."
         imageUri = "https://cards.scryfall.io/normal/front/b/5/b5bf6c25-a7d7-40b6-aa19-f852d348967f.jpg?1782694524"
     }
 }

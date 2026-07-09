@@ -6215,6 +6215,7 @@
         "collectorNumber": "230",
         "rarity": "UNCOMMON",
         "artist": "Lars Grant-West",
+        "flavorText": "\"Dinosaurs have no concept of royalty, but they recognize the scent of the mightiest among them.\"\n—Atla Palani, nest tender",
         "imageUri": "https://cards.scryfall.io/normal/front/7/1/7112c366-b36a-4bc8-aa64-6bad16bebc39.jpg?1782694426"
     },
     "colorIdentityOverride": [
@@ -6295,6 +6296,7 @@
         "collectorNumber": "196",
         "rarity": "RARE",
         "artist": "Izzy",
+        "flavorText": "The River Heralds found clues to a grand heritage below Ixalan's surface.",
         "imageUri": "https://cards.scryfall.io/normal/front/6/8/68e633d3-47e2-48c5-9be3-574ce5023bf7.jpg?1782694451"
     },
     "colorIdentityOverride": [
@@ -6372,6 +6374,7 @@
     "metadata": {
         "collectorNumber": "110",
         "artist": "Olivier Bernard",
+        "flavorText": "The more creatures that plunge to their deaths in the abyss, the more angry Echoes that arise to drag others down.",
         "imageUri": "https://cards.scryfall.io/normal/front/b/5/b5bf6c25-a7d7-40b6-aa19-f852d348967f.jpg?1782694524"
     },
     "colorIdentityOverride": [

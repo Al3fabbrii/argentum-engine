@@ -44,6 +44,7 @@ val JadelightSpelunker = card("Jadelight Spelunker") {
         rarity = Rarity.RARE
         collectorNumber = "196"
         artist = "Izzy"
+        flavorText = "The River Heralds found clues to a grand heritage below Ixalan's surface."
         imageUri = "https://cards.scryfall.io/normal/front/6/8/68e633d3-47e2-48c5-9be3-574ce5023bf7.jpg?1782694451"
     }
 }

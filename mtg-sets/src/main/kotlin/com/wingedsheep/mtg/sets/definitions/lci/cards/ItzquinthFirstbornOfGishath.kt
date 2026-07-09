@@ -21,9 +21,10 @@ import com.wingedsheep.sdk.scripting.targets.TargetOther
  * When Itzquinth enters, you may pay {2}. When you do, target Dinosaur you control deals
  * damage equal to its power to another target creature.
  *
- * The "When you do" phrasing creates a gated effect ([MayPayManaEffect]) where paying {2}
- * unlocks the bite. Targets are chosen when the ETB trigger goes on the stack (CR 603.3d),
- * before the may-pay decision is offered at resolution (CR 117.3a):
+ * The "When you do" phrasing is a reflexive trigger (CR 603.12), modeled as a gated effect
+ * ([MayPayManaEffect]) where paying {2} unlocks the bite. The ETB trigger resolves to the
+ * "Pay {2}?" decision first; only after payment does the reflexive trigger go on the stack
+ * and prompt for its two targets:
  *   - t1 (index 0): target Dinosaur you control — any Creature with subtype Dinosaur you
  *     control (including Itzquinth itself, which IS a Dinosaur).
  *   - t2 (index 1): another target creature — [TargetOther] ensures this differs from t1.
@@ -64,6 +65,7 @@ val ItzquinthFirstbornOfGishath = card("Itzquinth, Firstborn of Gishath") {
         rarity = Rarity.UNCOMMON
         collectorNumber = "230"
         artist = "Lars Grant-West"
+        flavorText = "\"Dinosaurs have no concept of royalty, but they recognize the scent of the mightiest among them.\"\n—Atla Palani, nest tender"
         imageUri = "https://cards.scryfall.io/normal/front/7/1/7112c366-b36a-4bc8-aa64-6bad16bebc39.jpg?1782694426"
     }
 }
