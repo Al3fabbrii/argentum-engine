@@ -168,7 +168,7 @@ function processStateUpdate(
 
   const cardsRevealedEvents = msg.events.filter(
     (e) => e.type === 'cardsRevealed'
-  ) as { type: 'cardsRevealed'; revealingPlayerId: EntityId; cardIds: readonly EntityId[]; cardNames: readonly string[]; imageUris: readonly (string | null)[]; source: string | null; cardOwnerIds?: readonly EntityId[]; fromZone?: string | null; toZone?: string | null }[]
+  ) as RawCardsRevealedEvent[]
 
   // A single resolution can reveal more than once (e.g. Defossilize's creature explores
   // twice → two cardsRevealed events in one update). Merge them into one overlay payload

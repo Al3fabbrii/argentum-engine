@@ -41,7 +41,7 @@ val DisturbedSlumber = card("Disturbed Slumber") {
                 power = 4,
                 toughness = 4,
                 keywords = setOf(Keyword.REACH, Keyword.HASTE),
-                creatureTypes = setOf("DINOSAUR")
+                creatureTypes = setOf("Dinosaur")
             ),
             MustBeBlockedEffect(t, allCreatures = false)
         )

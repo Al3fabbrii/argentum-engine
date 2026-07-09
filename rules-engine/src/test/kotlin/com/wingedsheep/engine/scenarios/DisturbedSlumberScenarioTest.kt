@@ -56,7 +56,7 @@ class DisturbedSlumberScenarioTest : FunSpec({
         projected.getPower(forest) shouldBe 4
         projected.getToughness(forest) shouldBe 4
         // Creature type is Dinosaur.
-        projected.hasSubtype(forest, "DINOSAUR") shouldBe true
+        projected.hasSubtype(forest, "Dinosaur") shouldBe true
         // Granted keywords: reach and haste.
         projected.hasKeyword(forest, Keyword.REACH) shouldBe true
         projected.hasKeyword(forest, Keyword.HASTE) shouldBe true
