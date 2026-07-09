@@ -746,20 +746,68 @@ internal class BlockPhaseManager(
             }
         }
 
-        // 2. "Must be blocked if able" (Gaea's Protector): at least one creature must block it
+        // 2. "Must be blocked if able" (Gaea's Protector): at least one creature must block it.
+        // Rule 509.1c: the declaration is illegal if the number of requirements being obeyed is
+        // fewer than the maximum number that could be obeyed. That maximum is a maximum bipartite
+        // matching between the must-be-blocked attackers and the blockers hypothetically free to
+        // cover them: a provoke-pinned blocker is only free for its pinned attacker, and a blocker
+        // that can block a Lure-style attacker is claimed by that requirement (section 1 forces it
+        // there). Per-pair blocking restrictions go through canCreatureBlockAttacker; declaration-
+        // wide restrictions (e.g. can't-block-alone) are not modelled, so the computed maximum can
+        // only over-count in those corners — never rejecting more than 509.1c would.
         val mustBeBlockedIfAbleAttackers = findMustBeBlockedIfAbleAttackers(state)
-        for (attackerId in mustBeBlockedIfAbleAttackers) {
-            val blockersAssigned = attackerToBlockers[attackerId] ?: emptySet()
-            if (blockersAssigned.isNotEmpty()) continue
+        if (mustBeBlockedIfAbleAttackers.isNotEmpty()) {
+            val provokePinnedAttackers = state.floatingEffects
+                .filter { it.effect.modification is SerializableModification.MustBlockSpecificAttacker }
+                .flatMap { floatingEffect ->
+                    val modification =
+                        floatingEffect.effect.modification as SerializableModification.MustBlockSpecificAttacker
+                    floatingEffect.effect.affectedEntities.map { it to modification.attackerId }
+                }
+                .groupBy({ it.first }, { it.second })
+                .mapValues { it.value.toSet() }
+            val lureClaimedBlockers = potentialBlockers.filter { blockerId ->
+                mustBeBlockedByAllAttackers.any { attackerId ->
+                    canCreatureBlockAttacker(state, blockerId, attackerId, blockingPlayer, projected)
+                }
+            }.toSet()
 
-            // Check if any potential blocker can actually block this attacker
-            val canBeBlocked = potentialBlockers.any { blockerId ->
-                canCreatureBlockAttacker(state, blockerId, attackerId, blockingPlayer, projected)
+            fun canHypotheticallyBlock(blockerId: EntityId, attackerId: EntityId): Boolean {
+                if (blockerId in lureClaimedBlockers) return false
+                provokePinnedAttackers[blockerId]?.let { pins -> if (attackerId !in pins) return false }
+                return canCreatureBlockAttacker(state, blockerId, attackerId, blockingPlayer, projected)
             }
-            if (!canBeBlocked) continue
 
-            val attackerName = state.getEntity(attackerId)?.get<CardComponent>()?.name ?: "Creature"
-            return "$attackerName must be blocked if able"
+            // Kuhn's augmenting-path matching: try to give each attacker its own blocker,
+            // recursively re-homing a blocker's current attacker when contested.
+            val matchedAttackerOfBlocker = mutableMapOf<EntityId, EntityId>()
+            fun assignBlocker(attackerId: EntityId, visited: MutableSet<EntityId>): Boolean {
+                for (blockerId in potentialBlockers) {
+                    if (!canHypotheticallyBlock(blockerId, attackerId)) continue
+                    if (!visited.add(blockerId)) continue
+                    val currentAttacker = matchedAttackerOfBlocker[blockerId]
+                    if (currentAttacker == null || assignBlocker(currentAttacker, visited)) {
+                        matchedAttackerOfBlocker[blockerId] = attackerId
+                        return true
+                    }
+                }
+                return false
+            }
+
+            var maxSatisfiable = 0
+            for (attackerId in mustBeBlockedIfAbleAttackers) {
+                if (assignBlocker(attackerId, mutableSetOf())) maxSatisfiable++
+            }
+            val satisfied = mustBeBlockedIfAbleAttackers.count { !attackerToBlockers[it].isNullOrEmpty() }
+
+            if (satisfied < maxSatisfiable) {
+                val matchedAttackers = matchedAttackerOfBlocker.values.toSet()
+                val culpritId = mustBeBlockedIfAbleAttackers.first {
+                    it in matchedAttackers && attackerToBlockers[it].isNullOrEmpty()
+                }
+                val attackerName = state.getEntity(culpritId)?.get<CardComponent>()?.name ?: "Creature"
+                return "$attackerName must be blocked if able"
+            }
         }
 
         return null
