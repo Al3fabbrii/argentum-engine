@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 181 / 286
+**Implemented:** 186 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -213,7 +213,7 @@
 - [x] Sage of Days
 - [x] Saheeli's Lattice
 - [x] Saheeli, the Sun's Brilliance
-- [ ] Sanguine Evangelist
+- [x] Sanguine Evangelist
 - [x] Scampering Surveyor
 - [x] Screaming Phantom
 - [ ] Scytheclaw Raptor
@@ -221,11 +221,11 @@
 - [x] Seismic Monstrosaur
 - [x] Self-Reflection
 - [x] Sentinel of the Nameless City
-- [ ] Shipwreck Sentry
-- [ ] Sinuous Benthisaur
-- [ ] Skullcap Snail
+- [x] Shipwreck Sentry
+- [x] Sinuous Benthisaur
+- [x] Skullcap Snail
 - [x] Soaring Sandwing
-- [ ] Song of Stupefaction
+- [x] Song of Stupefaction
 - [ ] Sorcerous Spyglass
 - [x] Soulcoil Viper
 - [ ] Souls of the Lost
