@@ -12272,6 +12272,123 @@
     }
 }
 
+// Tinker's Tote
+{
+    "name": "Tinker's Tote",
+    "manaCost": "{2}{W}",
+    "typeLine": "Artifact",
+    "oracleText": "When this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.\n{W}, Sacrifice this artifact: You gain 3 life.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "count": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [],
+                    "creatureTypes": [
+                        "Gnome"
+                    ],
+                    "artifactToken": true
+                }
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{W}"
+                            }
+                        },
+                        "CostSacrificeSelf"
+                    ]
+                },
+                "effect": {
+                    "type": "GainLife",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 3
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "40",
+        "artist": "Julia Metzger",
+        "flavorText": "Never leave home without a gnome.",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/3/8321857e-7977-46dd-8357-d732312e5261.jpg?1782694579"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
+// Triumphant Chomp
+{
+    "name": "Triumphant Chomp",
+    "manaCost": "{R}",
+    "typeLine": "Sorcery",
+    "oracleText": "Triumphant Chomp deals damage to target creature equal to 2 or the greatest power among Dinosaurs you control, whichever is greater.",
+    "script": {
+        "spellEffect": {
+            "type": "DealDamage",
+            "amount": {
+                "type": "Max",
+                "left": {
+                    "type": "Fixed",
+                    "amount": 2
+                },
+                "right": {
+                    "type": "AggregateBattlefield",
+                    "player": "You",
+                    "filter": "creature Dinosaur",
+                    "aggregation": "MAX",
+                    "property": "POWER"
+                }
+            },
+            "target": {
+                "type": "BoundVariable",
+                "name": "target creature"
+            }
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature"
+                },
+                "id": "target creature"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "170",
+        "rarity": "UNCOMMON",
+        "artist": "Simon Dominic",
+        "flavorText": "With crunchy outer shells and juicy innards, cave crawlers quickly became a favorite snack of the Sun Empire's dinosaur companions.",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/6/06b28139-efa7-4818-a012-cf8150692b43.jpg?1782694475"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Trumpeting Carnosaur
 {
     "name": "Trumpeting Carnosaur",
@@ -12348,6 +12465,119 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Uchbenbak, the Great Mistake
+{
+    "name": "Uchbenbak, the Great Mistake",
+    "manaCost": "{3}{U}{B}",
+    "typeLine": "Legendary Creature — Skeleton Horror",
+    "oracleText": "Vigilance, menace\nDescend 8 — {4}{U}{B}: Return this card from your graveyard to the battlefield with a finality counter on it. Activate only if there are eight or more permanent cards in your graveyard and only as a sorcery. (If a creature with a finality counter on it would die, exile it instead.)",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 4
+    },
+    "keywords": [
+        "VIGILANCE",
+        "MENACE"
+    ],
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{4}{U}{B}"
+                    }
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "MoveToZone",
+                            "target": "Self",
+                            "destination": "Battlefield",
+                            "fromZone": "Graveyard"
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "finality",
+                            "count": 1,
+                            "target": "Self"
+                        }
+                    ]
+                },
+                "timing": "SorcerySpeed",
+                "restrictions": [
+                    {
+                        "type": "ActivationOnlyIfCondition",
+                        "condition": {
+                            "type": "Compare",
+                            "left": {
+                                "type": "Count",
+                                "player": "You",
+                                "zone": "Graveyard",
+                                "filter": "permanent"
+                            },
+                            "operator": "GTE",
+                            "right": {
+                                "type": "Fixed",
+                                "amount": 8
+                            }
+                        }
+                    }
+                ],
+                "activateFromZone": "Graveyard"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "242",
+        "rarity": "UNCOMMON",
+        "artist": "Steven Belledin",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/0/a062202c-f9fb-4dd6-989a-c3083644f1c0.jpg?1782694417"
+    },
+    "colorIdentityOverride": [
+        "BLUE",
+        "BLACK"
+    ]
+}
+
+// Unlucky Drop
+{
+    "name": "Unlucky Drop",
+    "manaCost": "{3}{U}",
+    "typeLine": "Instant",
+    "oracleText": "Target artifact or creature's owner puts it on their choice of the top or bottom of their library.",
+    "script": {
+        "spellEffect": {
+            "type": "PutOnLibraryPositionOfChoice",
+            "target": {
+                "type": "BoundVariable",
+                "name": "target artifact or creature to put on top or bottom of library"
+            }
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature|artifact"
+                },
+                "id": "target artifact or creature to put on top or bottom of library"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "82",
+        "artist": "Patrik Hell",
+        "flavorText": "\"First rule down here is the same as it is on the water: always double-check your knots.\"\n—Captain Lannery Storm",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/6/76ebb2df-8891-434e-9cd0-f25b848cb754.jpg?1782694544"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
     ]
 }
 
@@ -12474,6 +12704,115 @@
         "imageUri": "https://cards.scryfall.io/normal/front/9/0/9030048a-b866-4a89-8d4a-aa55411463e4.jpg"
     },
     "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
+// Vito, Fanatic of Aclazotz
+{
+    "name": "Vito, Fanatic of Aclazotz",
+    "manaCost": "{2}{W}{B}",
+    "typeLine": "Legendary Creature — Vampire Demon",
+    "oracleText": "Flying\nWhenever you sacrifice another permanent, you gain 2 life if this is the first time this ability has resolved this turn. If it's the second time, each opponent loses 2 life. If it's the third time, create a 4/3 white and black Vampire Demon creature token with flying.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 4
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "PermanentsSacrificedEvent",
+                    "filter": "permanent",
+                    "perPermanent": true
+                },
+                "binding": "OTHER",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        "IncrementAbilityResolutionCount",
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 1
+                                }
+                            },
+                            "then": {
+                                "type": "GainLife",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                }
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 2
+                                }
+                            },
+                            "then": {
+                                "type": "LoseLife",
+                                "amount": {
+                                    "type": "Fixed",
+                                    "amount": 2
+                                },
+                                "target": {
+                                    "type": "PlayerRef",
+                                    "player": "EachOpponent"
+                                }
+                            }
+                        },
+                        {
+                            "type": "Gated",
+                            "gate": {
+                                "type": "Gate.WhenCondition",
+                                "condition": {
+                                    "type": "SourceAbilityResolvedNTimesThisTurn",
+                                    "count": 3
+                                }
+                            },
+                            "then": {
+                                "type": "CreateToken",
+                                "power": 4,
+                                "toughness": 3,
+                                "colors": [
+                                    "WHITE",
+                                    "BLACK"
+                                ],
+                                "creatureTypes": [
+                                    "Vampire",
+                                    "Demon"
+                                ],
+                                "keywords": [
+                                    "FLYING"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "descriptionOverride": "Whenever you sacrifice another permanent, you gain 2 life if this is the first time this ability has resolved this turn. If it's the second time, each opponent loses 2 life. If it's the third time, create a 4/3 white and black Vampire Demon creature token with flying."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "243",
+        "rarity": "MYTHIC",
+        "artist": "Marta Nael",
+        "imageUri": "https://cards.scryfall.io/normal/front/c/4/c4fd9047-df91-4d82-be00-c623acae0f01.jpg?1782694417"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
         "BLACK"
     ]
 }
