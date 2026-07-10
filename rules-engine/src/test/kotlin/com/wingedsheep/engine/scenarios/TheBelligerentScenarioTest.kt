@@ -4,12 +4,14 @@ import com.wingedsheep.engine.core.CrewVehicle
 import com.wingedsheep.engine.core.DeclareAttackers
 import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
-import com.wingedsheep.mtg.sets.definitions.lci.cards.TheBelligerent
+import com.wingedsheep.engine.view.ClientStateTransformer
 import com.wingedsheep.mtg.sets.tokens.PredefinedTokens
 import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.model.Deck
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 
@@ -34,12 +36,14 @@ class TheBelligerentScenarioTest : FunSpec({
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
         driver.registerCards(TestCards.all)
-        driver.registerCard(TheBelligerent)
-        // The attack trigger's CreateTreasure looks up the "Treasure" token definition in the
-        // registry, so it must be registered alongside the card.
+        // TestCards.all covers every catalog card but not tokens; the attack trigger's
+        // CreateTreasure looks up the "Treasure" token definition in the registry.
         driver.registerCard(PredefinedTokens.Treasure)
         return driver
     }
+
+    fun transformer(d: GameTestDriver): ClientStateTransformer =
+        ClientStateTransformer(cardRegistry = d.cardRegistry)
 
     test("cannot play the top card of library before The Belligerent attacks") {
         val driver = createDriver()
@@ -54,6 +58,10 @@ class TheBelligerentScenarioTest : FunSpec({
         // A land on top of library can only be played via the (currently inactive) permission.
         driver.playLand(you, mountainOnTop).isSuccess shouldBe false
         driver.findPermanent(you, "Mountain") shouldBe null
+
+        // The client view mirrors the gate: the top card is not revealed to the controller yet.
+        val view = transformer(driver).transform(driver.state, viewingPlayerId = you)
+        view.cards.keys shouldNotContain mountainOnTop
     }
 
     test("attacking creates a Treasure token and opens the play-from-top window") {
@@ -82,6 +90,14 @@ class TheBelligerentScenarioTest : FunSpec({
         driver.passPriorityUntil(Step.POSTCOMBAT_MAIN)
 
         val mountainOnTop = driver.putCardOnTopOfLibrary(you, "Mountain")
+
+        // The look permission is active: the client view reveals the top card to the
+        // controller privately — the defender still must not see it.
+        transformer(driver).transform(driver.state, viewingPlayerId = you)
+            .cards.keys shouldContain mountainOnTop
+        transformer(driver).transform(driver.state, viewingPlayerId = opponent)
+            .cards.keys shouldNotContain mountainOnTop
+
         driver.playLand(you, mountainOnTop).isSuccess shouldBe true
         driver.findPermanent(you, "Mountain") shouldNotBe null
     }

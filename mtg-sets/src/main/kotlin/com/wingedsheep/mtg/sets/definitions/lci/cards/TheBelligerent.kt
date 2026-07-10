@@ -23,8 +23,12 @@ import com.wingedsheep.sdk.scripting.PlayLandsAndCastFilteredFromTopOfLibrary
  *
  * The attack trigger creates the Treasure token (a one-shot effect). The "until end of turn" play
  * window is modeled as the Lunar Whale pattern: two conditional statics gated on
- * [Conditions.SourceAttackedThisTurn], since "attacked this turn" is functionally "from when it
- * attacks until end of turn". [LookAtTopOfLibrary] grants the non-revealing peek, and
+ * [Conditions.SourceAttackedThisTurn]. This approximates the printed card, which grants the
+ * permission as a one-shot effect of the trigger: (a) if The Belligerent leaves the battlefield
+ * after attacking (dies in combat, bounced), the real permission lasts until end of turn but the
+ * statics end with the permanent; (b) the window opens at attack declaration rather than trigger
+ * resolution. Fixing both needs an until-end-of-turn floating permission grant (add-feature
+ * territory). [LookAtTopOfLibrary] grants the non-revealing peek, and
  * [PlayLandsAndCastFilteredFromTopOfLibrary] with an unrestricted [GameObjectFilter.Any] spell
  * filter grants "play lands and cast spells from the top of your library" (any card type).
  */

@@ -2,7 +2,6 @@ package com.wingedsheep.engine.scenarios
 
 import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
-import com.wingedsheep.mtg.sets.definitions.lci.cards.ThousandMoonsInfantry
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
@@ -28,7 +27,9 @@ class ThousandMoonsInfantryScenarioTest : FunSpec({
     }
 
     fun driver(): GameTestDriver = GameTestDriver().apply {
-        registerCards(TestCards.all + listOf(ThousandMoonsInfantry, PlainSoldier))
+        // TestCards.all already includes the catalog's LCI cards; only the test-local
+        // vanilla control needs explicit registration.
+        registerCards(TestCards.all + listOf(PlainSoldier))
         initMirrorMatch(deck = Deck.of("Plains" to 40), startingLife = 20)
     }
 

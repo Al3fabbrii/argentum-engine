@@ -3,8 +3,6 @@ package com.wingedsheep.engine.scenarios
 import com.wingedsheep.engine.handlers.effects.ZoneTransitionService
 import com.wingedsheep.engine.support.GameTestDriver
 import com.wingedsheep.engine.support.TestCards
-import com.wingedsheep.mtg.sets.definitions.lci.cards.BroodrageMycoid
-import com.wingedsheep.mtg.sets.definitions.lci.cards.TheMycotyrant
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.core.Zone
@@ -34,7 +32,7 @@ class TheMycotyrantScenarioTest : FunSpec({
 
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
-        driver.registerCards(TestCards.all + listOf(TheMycotyrant, BroodrageMycoid))
+        driver.registerCards(TestCards.all)
         driver.initMirrorMatch(
             deck = Deck.of("Swamp" to 20, "Grizzly Bears" to 20),
             skipMulligans = true

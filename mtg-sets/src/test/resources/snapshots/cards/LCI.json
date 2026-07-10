@@ -12165,7 +12165,10 @@
         "artist": "Manuel Castañón",
         "flavorText": "The Thousand Moons train and fight in tight-knit squads of ten. Every tenth Moon functions as an officer, every hundredth as a captain, and the thousandth, Anim Pakal, as supreme commander.",
         "imageUri": "https://cards.scryfall.io/normal/front/c/1/c1974a8c-3328-4ff5-9a00-cb79ebb8ccf6.jpg?1782694580"
-    }
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
 }
 
 // Threefold Thunderhulk

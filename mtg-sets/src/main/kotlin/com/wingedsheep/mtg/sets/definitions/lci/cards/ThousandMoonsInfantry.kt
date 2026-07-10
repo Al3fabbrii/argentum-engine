@@ -12,6 +12,7 @@ import com.wingedsheep.sdk.scripting.UntapSelfDuringOtherUntapSteps
  */
 val ThousandMoonsInfantry = card("Thousand Moons Infantry") {
     manaCost = "{2}{W}"
+    colorIdentity = "W"
     typeLine = "Creature — Human Soldier"
     oracleText = "Untap this creature during each other player's untap step."
     power = 2
