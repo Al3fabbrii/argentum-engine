@@ -421,66 +421,78 @@ class ClientStateTransformer(
     }
 
     /**
+     * Resolve a static ability that may be gated by a [ConditionalStaticAbility] (e.g. The
+     * Belligerent's play-from-top window, a [LookAtTopOfLibrary] gated on "attacked this turn").
+     * Unconditional abilities pass through unchanged; a conditional one resolves to its inner
+     * ability only while its condition currently holds for the granting permanent, and to null
+     * otherwise. Mirrors `CastPermissionUtils.activeStaticAbility` so that what a player can SEE
+     * stays in sync with what the legal-actions layer lets them DO.
+     */
+    private fun activeStaticAbility(
+        state: GameState,
+        ability: com.wingedsheep.sdk.scripting.StaticAbility,
+        sourceId: EntityId,
+        controllerId: EntityId
+    ): com.wingedsheep.sdk.scripting.StaticAbility? = when (ability) {
+        is ConditionalStaticAbility -> {
+            val context = EffectContext(sourceId = sourceId, controllerId = controllerId)
+            if (conditionEvaluator.evaluate(state, ability.condition, context)) ability.ability else null
+        }
+        else -> ability
+    }
+
+    /**
+     * Check whether any static ability active on [playerId]'s battlefield satisfies [predicate],
+     * honoring [ConditionalStaticAbility] gates via [activeStaticAbility].
+     */
+    private fun hasActiveStaticAbility(
+        state: GameState,
+        playerId: EntityId,
+        predicate: (com.wingedsheep.sdk.scripting.StaticAbility) -> Boolean
+    ): Boolean {
+        for (entityId in state.getBattlefield(playerId)) {
+            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
+            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
+            if (cardDef.script.staticAbilities.any { ability ->
+                    activeStaticAbility(state, ability, entityId, playerId)?.let(predicate) == true
+                }
+            ) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
      * Check if a player controls a permanent that reveals the top card of their library to all
      * players — either [PlayFromTopOfLibrary] (Future Sight) or [RevealTopOfLibrary] (Goblin Spy).
      * The two abilities share the public-reveal visibility; they diverge only in play permission,
      * which is handled by the cast/play-from-top paths (keyed on [PlayFromTopOfLibrary] alone).
      */
-    private fun revealsTopOfLibraryPublicly(state: GameState, playerId: EntityId): Boolean {
-        for (entityId in state.getBattlefield(playerId)) {
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            if (cardDef.script.staticAbilities.any { it is PlayFromTopOfLibrary || it is RevealTopOfLibrary }) {
-                return true
-            }
-        }
-        return false
-    }
+    private fun revealsTopOfLibraryPublicly(state: GameState, playerId: EntityId): Boolean =
+        hasActiveStaticAbility(state, playerId) { it is PlayFromTopOfLibrary || it is RevealTopOfLibrary }
 
     /**
      * Check if [playerId] controls a permanent with [OpponentsPlayWithHandsRevealed]
      * (e.g., Seer's Vision). While they do, their opponents' hands are visible to them.
      */
-    private fun revealsOpponentHandsTo(state: GameState, playerId: EntityId): Boolean {
-        for (entityId in state.getBattlefield(playerId)) {
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            if (cardDef.script.staticAbilities.any { it is OpponentsPlayWithHandsRevealed }) {
-                return true
-            }
-        }
-        return false
-    }
+    private fun revealsOpponentHandsTo(state: GameState, playerId: EntityId): Boolean =
+        hasActiveStaticAbility(state, playerId) { it is OpponentsPlayWithHandsRevealed }
 
     /**
-     * Check if a player controls a permanent with LookAtTopOfLibrary (e.g., Lens of Clarity).
+     * Check if a player controls a permanent with an active LookAtTopOfLibrary (e.g., Lens of
+     * Clarity; The Belligerent's is gated behind "attacked this turn").
      * This reveals the top card of the controller's library privately (only to them).
      */
-    private fun hasLookAtTopOfLibrary(state: GameState, playerId: EntityId): Boolean {
-        for (entityId in state.getBattlefield(playerId)) {
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            if (cardDef.script.staticAbilities.any { it is LookAtTopOfLibrary }) {
-                return true
-            }
-        }
-        return false
-    }
+    private fun hasLookAtTopOfLibrary(state: GameState, playerId: EntityId): Boolean =
+        hasActiveStaticAbility(state, playerId) { it is LookAtTopOfLibrary }
 
     /**
      * Check if a player controls a permanent with LookAtFaceDownCreatures (e.g., Lens of Clarity).
      * This reveals the identity of opponent's face-down battlefield creatures to the controller.
      */
-    private fun hasLookAtFaceDownCreatures(state: GameState, playerId: EntityId): Boolean {
-        for (entityId in state.getBattlefield(playerId)) {
-            val card = state.getEntity(entityId)?.get<CardComponent>() ?: continue
-            val cardDef = cardRegistry.getCard(card.cardDefinitionId) ?: continue
-            if (cardDef.script.staticAbilities.any { it is LookAtFaceDownCreatures }) {
-                return true
-            }
-        }
-        return false
-    }
+    private fun hasLookAtFaceDownCreatures(state: GameState, playerId: EntityId): Boolean =
+        hasActiveStaticAbility(state, playerId) { it is LookAtFaceDownCreatures }
 
     /**
      * Check if an individual card has been revealed to a specific player.
