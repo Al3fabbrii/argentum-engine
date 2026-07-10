@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 166 / 286
+**Implemented:** 171 / 286
 - [x] Abrade
 - [ ] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -181,17 +181,17 @@
 - [x] Palani's Hatcher
 - [x] Panicked Altisaur
 - [x] Pathfinding Axejaw
-- [ ] Petrify
-- [ ] Pirate Hat
+- [x] Petrify
+- [x] Pirate Hat
 - [ ] Pit of Offerings
 - [x] Plundering Pirate
-- [ ] Poetic Ingenuity
+- [x] Poetic Ingenuity
 - [x] Poison Dart Frog
 - [ ] Preacher of the Schism
 - [x] Primordial Gnawer
 - [x] Promising Vein
-- [ ] Pugnacious Hammerskull
-- [ ] Queen's Bay Paladin
+- [x] Pugnacious Hammerskull
+- [x] Queen's Bay Paladin
 - [x] Quicksand Whirlpool
 - [x] Quintorius Kand
 - [x] Rampaging Ceratops
