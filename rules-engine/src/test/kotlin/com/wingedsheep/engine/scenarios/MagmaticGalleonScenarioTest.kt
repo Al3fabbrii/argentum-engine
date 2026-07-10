@@ -15,6 +15,10 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.model.EntityId
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.effects.DealDamageEffect
+import com.wingedsheep.sdk.scripting.filters.unified.GroupFilter
+import com.wingedsheep.sdk.scripting.targets.EffectTarget
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -27,11 +31,14 @@ import io.kotest.matchers.shouldBe
  *
  * VERIFY focus: the second ability is the Gap 12 excess-damage trigger primitive
  * (`Triggers.dealsDamage(damageType = NonCombat, recipient = CreatureOpponentControls,
- * requireExcess = true)`, ANY binding — same primitive Fall of Cair Andros composes), paired
- * with `Effects.CreateTreasure()`. Tests prove: (a) the Galleon's own ETB 5-damage strike that
+ * requireExcess = true)`, ANY binding — same primitive Fall of Cair Andros composes) with
+ * `batch = true` for the "one or more creatures" wording, paired with
+ * `Effects.CreateTreasure()`. Tests prove: (a) the Galleon's own ETB 5-damage strike that
  * exceeds lethal makes a Treasure, (b) the `requireExcess` gate suppresses the Treasure when the
- * damage is exactly lethal, and (c) the ANY-binding trigger also fires for excess noncombat
- * damage from a *different* source while the Galleon sits on the battlefield.
+ * damage is exactly lethal, (c) the ANY-binding trigger also fires for excess noncombat
+ * damage from a *different* source while the Galleon sits on the battlefield, and (d) the batch
+ * semantics (CR 603.2c): one sweep dealing excess damage to several opposing creatures
+ * simultaneously makes exactly one Treasure.
  */
 class MagmaticGalleonScenarioTest : FunSpec({
 
@@ -64,10 +71,23 @@ class MagmaticGalleonScenarioTest : FunSpec({
         }
     }
 
+    // {0} Pyroclasm-at-5: simultaneous noncombat damage to every creature — the batch case (d).
+    val BigSweep = card("Galleon Big Sweep") {
+        manaCost = "{0}"
+        typeLine = "Sorcery"
+        oracleText = "This deals 5 damage to each creature."
+        spell {
+            effect = Effects.ForEachInGroup(
+                GroupFilter(GameObjectFilter.Creature),
+                DealDamageEffect(5, EffectTarget.Self)
+            )
+        }
+    }
+
     fun createDriver(): GameTestDriver {
         val driver = GameTestDriver()
         driver.registerCards(
-            TestCards.all + listOf(MagmaticGalleon, PredefinedTokens.Treasure, TargetBear, ToughWall, BigBolt)
+            TestCards.all + listOf(MagmaticGalleon, PredefinedTokens.Treasure, TargetBear, ToughWall, BigBolt, BigSweep)
         )
         return driver
     }
@@ -126,6 +146,30 @@ class MagmaticGalleonScenarioTest : FunSpec({
         // 5 damage to a 5-toughness creature = exactly lethal, 0 excess → requireExcess gate blocks.
         driver.findPermanent(opponent, "Galleon Test Wall") shouldBe null
         driver.treasureCount() shouldBe 0
+    }
+
+    test("batch: simultaneous excess noncombat damage to several opposing creatures makes exactly one Treasure") {
+        val driver = createDriver()
+        driver.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        val active = driver.activePlayer!!
+        val opponent = driver.getOpponent(active)
+        driver.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        driver.putPermanentOnBattlefield(active, "Magmatic Galleon")
+        // Two 2/2s take 3 excess each; the 0/5 takes exactly lethal (no excess). "One or more
+        // creatures ... are dealt excess noncombat damage" is a batch trigger (CR 603.2c): one
+        // simultaneous sweep = one event = ONE Treasure, not one per excess-damaged creature.
+        driver.putCreatureOnBattlefield(opponent, "Galleon Test Bear")
+        driver.putCreatureOnBattlefield(opponent, "Galleon Test Bear")
+        driver.putCreatureOnBattlefield(opponent, "Galleon Test Wall")
+
+        val sweep = driver.putCardInHand(active, "Galleon Big Sweep")
+        driver.castSpell(active, sweep, emptyList())
+        driver.drainStack()
+
+        driver.findPermanent(opponent, "Galleon Test Bear") shouldBe null
+        driver.findPermanent(opponent, "Galleon Test Wall") shouldBe null
+        driver.treasureCount() shouldBe 1
     }
 
     test("ANY-binding: excess noncombat damage from another source to an opponent's creature makes a Treasure") {

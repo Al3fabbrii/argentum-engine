@@ -34,12 +34,11 @@ import com.wingedsheep.sdk.scripting.values.DynamicAmount
  * reflexive ability — which targets an attacking creature chosen as it goes on the stack —
  * only fires if a card is actually discarded ([ReflexiveTriggerEffect]).
  *
- * Ability 2 uses the [Triggers.YouDiscard] discard trigger. Like every discard trigger in
- * the engine it fires once per card discarded (CardsDiscardedEvent → matchingDiscardCount),
- * not once per batch; for the common one-card discard (including Inti's own ability 1) this
- * matches the printed "one or more cards" wording. The impulse-exile grants play permission
- * until the controller's next end step ([MayPlayExpiry.UntilNextEndStep] — this turn's end
- * step counts on your own turn).
+ * Ability 2 uses [Triggers.YouDiscardOneOrMore] — the batch discard trigger (CR 603.2c):
+ * discarding several cards in one discard event fires it once, matching the printed "one or
+ * more cards" wording (a per-card trigger would impulse-exile once per discarded card). The
+ * impulse-exile grants play permission until the controller's next end step
+ * ([MayPlayExpiry.UntilNextEndStep] — this turn's end step counts on your own turn).
  */
 val IntiSeneschalOfTheSun = card("Inti, Seneschal of the Sun") {
     manaCost = "{1}{R}"
@@ -70,7 +69,7 @@ val IntiSeneschalOfTheSun = card("Inti, Seneschal of the Sun") {
     // "Whenever you discard one or more cards, exile the top card of your library. You may
     // play that card until your next end step."
     triggeredAbility {
-        trigger = Triggers.YouDiscard
+        trigger = Triggers.YouDiscardOneOrMore
         effect = Effects.Composite(listOf(
             GatherCardsEffect(
                 source = CardSource.TopOfLibrary(DynamicAmount.Fixed(1)),

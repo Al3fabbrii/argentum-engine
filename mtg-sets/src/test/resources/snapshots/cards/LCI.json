@@ -6366,7 +6366,10 @@
             },
             {
                 "id": "ability_2",
-                "trigger": "DiscardEvent",
+                "trigger": {
+                    "type": "DiscardEvent",
+                    "batch": true
+                },
                 "binding": "ANY",
                 "effect": {
                     "type": "Composite",
@@ -6794,7 +6797,8 @@
                     "type": "DealsDamageEvent",
                     "damageType": "DamageNonCombat",
                     "recipient": "CreatureOpponentControls",
-                    "requireExcess": true
+                    "requireExcess": true,
+                    "batch": true
                 },
                 "binding": "ANY",
                 "effect": {

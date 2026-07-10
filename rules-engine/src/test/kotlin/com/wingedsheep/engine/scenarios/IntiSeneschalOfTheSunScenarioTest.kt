@@ -11,6 +11,8 @@ import com.wingedsheep.engine.support.TestCards
 import com.wingedsheep.sdk.core.CounterType
 import com.wingedsheep.sdk.core.Keyword
 import com.wingedsheep.sdk.core.Step
+import com.wingedsheep.sdk.dsl.Effects
+import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Deck
 import com.wingedsheep.sdk.model.EntityId
 import io.kotest.core.spec.style.FunSpec
@@ -26,16 +28,29 @@ import io.kotest.matchers.shouldBe
  *
  * Ability 1 is a reflexive [com.wingedsheep.sdk.scripting.effects.ReflexiveTriggerEffect]: the optional
  * discard is the action; only if a card is actually discarded does "put a +1/+1 counter on target
- * attacking creature; it gains trample" go on the stack. Ability 2 ([com.wingedsheep.sdk.dsl.Triggers.YouDiscard])
- * fires off that same discard, impulse-exiling the top of library with a play window that lasts until
- * the controller's next end step. This test exercises both the discard path and the decline path.
+ * attacking creature; it gains trample" go on the stack. Ability 2
+ * ([com.wingedsheep.sdk.dsl.Triggers.YouDiscardOneOrMore]) fires off that same discard,
+ * impulse-exiling the top of library with a play window that lasts until the controller's next end
+ * step. Its "one or more cards" wording is a batch trigger (CR 603.2c): a multi-card discard event
+ * fires it once, exiling one card — not one per discarded card. This test exercises the discard
+ * path, the decline path, and the multi-card batch.
  */
 class IntiSeneschalOfTheSunScenarioTest : FunSpec({
 
     val projector = StateProjector()
 
+    // {0} sorcery discarding two cards in one event — the batch-discard case.
+    val MindShred = card("Inti Test Mind Shred") {
+        manaCost = "{0}"
+        typeLine = "Sorcery"
+        oracleText = "Discard two cards."
+        spell {
+            effect = Effects.Discard(2)
+        }
+    }
+
     fun driver(): GameTestDriver = GameTestDriver().apply {
-        registerCards(TestCards.all)
+        registerCards(TestCards.all + listOf(MindShred))
         initMirrorMatch(deck = Deck.of("Mountain" to 40), startingLife = 20)
     }
 
@@ -92,6 +107,35 @@ class IntiSeneschalOfTheSunScenarioTest : FunSpec({
         d.getExileCardNames(you).contains("Savannah Lions") shouldBe true
         val exiledIds = d.getExile(you)
         d.state.mayPlayPermissions.any { perm -> exiledIds.any { it in perm.cardIds } } shouldBe true
+    }
+
+    test("batch: discarding two cards in one event impulse-exiles exactly one card") {
+        val d = driver()
+        val you = d.activePlayer!!
+
+        d.putCreatureOnBattlefield(you, "Inti, Seneschal of the Sun")
+        // Two known cards on top: only the topmost (Savannah Lions) may be exiled. A per-card
+        // trigger would fire twice and exile Grizzly Bears too — the batch wording ("one or
+        // more cards", CR 603.2c) fires once for the two-card discard event.
+        d.putCardOnTopOfLibrary(you, "Grizzly Bears")
+        d.putCardOnTopOfLibrary(you, "Savannah Lions")
+
+        d.passPriorityUntil(Step.PRECOMBAT_MAIN)
+        val shred = d.putCardInHand(you, "Inti Test Mind Shred")
+        val handBefore = d.getHandSize(you)
+        d.castSpell(you, shred, emptyList()).isSuccess shouldBe true
+
+        var guard = 0
+        while (guard++ < 40) {
+            when (val dec = d.pendingDecision) {
+                is SelectCardsDecision -> d.submitCardSelection(you, dec.options.take(dec.minSelections.coerceAtLeast(1)))
+                else -> if (d.state.stack.isNotEmpty()) d.bothPass() else break
+            }
+        }
+
+        // Cast (-1) plus the two discarded cards (-2).
+        d.getHandSize(you) shouldBe handBefore - 3
+        d.getExileCardNames(you) shouldBe listOf("Savannah Lions")
     }
 
     test("declining the optional discard leaves no counter, no trample, and no impulse exile") {

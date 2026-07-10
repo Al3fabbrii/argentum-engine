@@ -23,9 +23,11 @@ import com.wingedsheep.sdk.scripting.events.RecipientFilter
  *
  * The excess-noncombat-damage payoff reuses the Gap 12 excess-damage trigger primitive
  * (`Triggers.dealsDamage(damageType = NonCombat, recipient = CreatureOpponentControls,
- * requireExcess = true)`, the same primitive Fall of Cair Andros composes) and pairs it with
- * `Effects.CreateTreasure()`. The Galleon's own ETB 5-damage strike is a common source of that
- * excess damage.
+ * requireExcess = true)`, the same primitive Fall of Cair Andros composes) with `batch = true`
+ * for the printed "one or more creatures" wording (CR 603.2c) — a sweeper dealing excess damage
+ * to several opposing creatures simultaneously makes one Treasure, not one per creature —
+ * and pairs it with `Effects.CreateTreasure()`. The Galleon's own ETB 5-damage strike is a
+ * common source of that excess damage.
  */
 val MagmaticGalleon = card("Magmatic Galleon") {
     manaCost = "{3}{R}{R}"
@@ -49,6 +51,7 @@ val MagmaticGalleon = card("Magmatic Galleon") {
             recipient = RecipientFilter.CreatureOpponentControls,
             binding = TriggerBinding.ANY,
             requireExcess = true,
+            batch = true,
         )
         effect = Effects.CreateTreasure()
     }
