@@ -13,9 +13,14 @@ import com.wingedsheep.sdk.core.Color
 import com.wingedsheep.sdk.core.ManaCost
 import com.wingedsheep.sdk.core.Step
 import com.wingedsheep.sdk.core.TypeLine
+import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.CardDefinition
 import com.wingedsheep.sdk.model.CardScript
 import com.wingedsheep.sdk.model.Deck
+import com.wingedsheep.sdk.scripting.CostModification
+import com.wingedsheep.sdk.scripting.GameObjectFilter
+import com.wingedsheep.sdk.scripting.ModifySpellCost
+import com.wingedsheep.sdk.scripting.SpellCostTarget
 import com.wingedsheep.sdk.scripting.effects.DrawCardsEffect
 import com.wingedsheep.sdk.scripting.effects.GainLifeEffect
 import com.wingedsheep.sdk.scripting.effects.LoseLifeEffect
@@ -74,9 +79,51 @@ class ModalCastTimeModeAffordabilityTest : FunSpec({
         )
     )
 
+    // Base {1}{R}; Mode 0: free "Gain 1 life"; Mode 1: +{2} "Lose 1 life". Cast under
+    // the reducer below so the gate must price mode picks through the reduced effective
+    // cost, not the printed one.
+    val ReducedCostModal = CardDefinition(
+        name = "Test Reduced Cost Modal",
+        manaCost = ManaCost.parse("{1}{R}"),
+        typeLine = TypeLine.sorcery(),
+        oracleText = "Choose one or more —\n• Gain 1 life\n• {2}: You lose 1 life",
+        script = CardScript.spell(
+            effect = ModalEffect(
+                modes = listOf(
+                    Mode.noTarget(
+                        GainLifeEffect(DynamicAmount.Fixed(1), EffectTarget.Controller),
+                        "Gain 1 life"
+                    ),
+                    Mode(
+                        effect = LoseLifeEffect(DynamicAmount.Fixed(1), EffectTarget.Controller),
+                        description = "Pay {2}: You lose 1 life",
+                        additionalManaCost = "{2}"
+                    )
+                ),
+                chooseCount = 2,
+                minChooseCount = 1
+            )
+        )
+    )
+
+    val SpellCostReducer = card("Test Spell Cost Reducer") {
+        manaCost = "{1}"
+        colorIdentity = ""
+        typeLine = "Artifact"
+        oracleText = "Spells you cast cost {1} less to cast."
+        staticAbility {
+            ability = ModifySpellCost(
+                target = SpellCostTarget.YouCast(GameObjectFilter.Any),
+                modification = CostModification.ReduceGeneric(1),
+            )
+        }
+    }
+
     fun driver(): GameTestDriver {
         val d = GameTestDriver()
-        d.registerCards(TestCards.all + StackingCostsModal + UnfortunateAccident)
+        d.registerCards(
+            TestCards.all + StackingCostsModal + ReducedCostModal + SpellCostReducer + UnfortunateAccident
+        )
         return d
     }
 
@@ -134,6 +181,40 @@ class ModalCastTimeModeAffordabilityTest : FunSpec({
 
         val secondPick = d.pendingDecision.shouldBeInstanceOf<ChooseOptionDecision>()
         secondPick.options shouldContain "Pay {1}: Draw a card"
+    }
+
+    test("a mode affordable only through a cost-reduction static is still offered") {
+        val d = driver()
+        d.initMirrorMatch(deck = Deck.of("Mountain" to 40))
+        val p1 = d.activePlayer!!
+        d.passPriorityUntil(Step.PRECOMBAT_MAIN)
+
+        d.putPermanentOnBattlefield(p1, "Test Spell Cost Reducer")
+        // {R} + {2}: the reduced base ({1}{R} less {1} = {R}) plus the {2} mode is exactly
+        // affordable. Priced at the printed {1}{R} the mode would (wrongly) be withheld —
+        // the gate must use the same cost pipeline payment does.
+        d.giveMana(p1, Color.RED, 1)
+        d.giveColorlessMana(p1, 2)
+
+        val lifeBefore = d.state.getEntity(p1)!!.get<LifeTotalComponent>()!!.life
+        val spell = d.putCardInHand(p1, "Test Reduced Cost Modal")
+        d.submit(
+            CastSpell(playerId = p1, cardId = spell, paymentStrategy = PaymentStrategy.FromPool)
+        ).isPaused shouldBe true
+
+        val firstPick = d.pendingDecision.shouldBeInstanceOf<ChooseOptionDecision>()
+        firstPick.options shouldBe listOf("Gain 1 life", "Pay {2}: You lose 1 life")
+        d.submitDecision(p1, OptionChosenResponse(firstPick.id, 1)) // the {2} mode
+
+        val secondPick = d.pendingDecision.shouldBeInstanceOf<ChooseOptionDecision>()
+        secondPick.options shouldBe listOf("Gain 1 life", "Done")
+        d.submitDecision(p1, OptionChosenResponse(secondPick.id, 1)) // Done
+
+        d.bothPass()
+
+        // The {2} mode resolved, paid through the reduced cost — no payment dead-end.
+        d.state.pendingDecision shouldBe null
+        d.state.getEntity(p1)!!.get<LifeTotalComponent>()!!.life shouldBe (lifeBefore - 1)
     }
 
     test("Unfortunate Accident with 4 mana: destroy mode picked, token mode withheld, cast completes") {
