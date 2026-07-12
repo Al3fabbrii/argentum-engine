@@ -53,7 +53,7 @@
 - [x] Child of the Volcano
 - [x] Chimil, the Inner Sun
 - [x] Chupacabra Echo
-- [ ] Clay-Fired Bricks
+- [x] Clay-Fired Bricks
 - [x] Coati Scavenger
 - [x] Cogwork Wrestler
 - [x] Colossadactyl
