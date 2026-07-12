@@ -14931,6 +14931,134 @@
     ]
 }
 
+// Waterlogged Hulk
+{
+    "name": "Waterlogged Hulk",
+    "manaCost": "{U}",
+    "typeLine": "Artifact",
+    "oracleText": "{T}: Mill a card. (Put the top card of your library into your graveyard.)\nCraft with Island {3}{U} ({3}{U}, Exile this artifact, Exile an Island you control or an Island card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "keywords": [
+        "CRAFT"
+    ],
+    "script": {
+        "activatedAbilities": [
+            {
+                "id": "ability_1",
+                "cost": "CostTap",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                },
+                                "isMill": true
+                            },
+                            "storeAs": "milled"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "milled",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{3}{U}"
+                            }
+                        },
+                        {
+                            "type": "CostCraft",
+                            "filter": "Island",
+                            "maxCount": 1
+                        }
+                    ]
+                },
+                "effect": "ReturnSelfFromExileTransformed",
+                "timing": "SorcerySpeed",
+                "descriptionOverride": "Craft with Island — {3}{U}"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Watertight Gondola",
+        "manaCost": "",
+        "typeLine": "Artifact — Vehicle",
+        "oracleText": "Vigilance\nDescend 8 — This Vehicle can't be blocked as long as there are eight or more permanent cards in your graveyard.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+        "creatureStats": {
+            "power": 4,
+            "toughness": 4
+        },
+        "keywords": [
+            "VIGILANCE",
+            "CREW"
+        ],
+        "keywordAbilities": [
+            {
+                "type": "Numeric",
+                "keyword": "CREW",
+                "n": 1
+            }
+        ],
+        "script": {
+            "staticAbilities": [
+                {
+                    "type": "ConditionalStaticAbility",
+                    "ability": "CantBeBlocked",
+                    "condition": {
+                        "type": "Compare",
+                        "left": {
+                            "type": "Count",
+                            "player": "You",
+                            "zone": "Graveyard",
+                            "filter": "permanent"
+                        },
+                        "operator": "GTE",
+                        "right": {
+                            "type": "Fixed",
+                            "amount": 8
+                        }
+                    }
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "83",
+            "rarity": "UNCOMMON",
+            "artist": "Artur Treffner",
+            "imageUri": "https://cards.scryfall.io/normal/back/7/e/7ea89d3c-8d47-4bbb-9271-8cdfd9296e2f.jpg?1782694543"
+        },
+        "colorIdentityOverride": [
+            "BLUE"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "83",
+        "rarity": "UNCOMMON",
+        "artist": "Artur Treffner",
+        "imageUri": "https://cards.scryfall.io/normal/front/7/e/7ea89d3c-8d47-4bbb-9271-8cdfd9296e2f.jpg?1782694543"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Waterwind Scout
 {
     "name": "Waterwind Scout",

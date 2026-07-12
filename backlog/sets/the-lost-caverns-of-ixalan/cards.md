@@ -283,7 +283,7 @@
 - [x] Wail of the Forgotten
 - [x] Walk with the Ancestors
 - [x] Warden of the Inner Sky
-- [ ] Waterlogged Hulk
+- [x] Waterlogged Hulk
 - [x] Waterwind Scout
 - [x] Waylaying Pirates
 - [x] Zoetic Glyph
