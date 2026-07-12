@@ -156,7 +156,7 @@
 - [ ] Malicious Eclipse
 - [x] Marauding Brinefang
 - [ ] Market Gnome
-- [ ] Master's Guide-Mural
+- [x] Master's Guide-Mural
 - [ ] Matzalantli, the Great Door
 - [x] Mephitic Draught
 - [ ] Merfolk Cave-Diver

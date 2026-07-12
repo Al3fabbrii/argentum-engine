@@ -7978,6 +7978,125 @@
     ]
 }
 
+// Master's Guide-Mural
+{
+    "name": "Master's Guide-Mural",
+    "manaCost": "{3}{W}{U}",
+    "typeLine": "Artifact",
+    "oracleText": "When this artifact enters, create a 4/4 white and blue Golem artifact creature token.\nCraft with artifact {4}{W}{W}{U} ({4}{W}{W}{U}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "keywords": [
+        "CRAFT"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 4,
+                    "toughness": 4,
+                    "colors": [
+                        "WHITE",
+                        "BLUE"
+                    ],
+                    "creatureTypes": [
+                        "Golem"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/3/3/33a88096-dcfd-4acb-a092-b51507edd13e.jpg?1782731574",
+                    "artifactToken": true
+                }
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{4}{W}{W}{U}"
+                            }
+                        },
+                        {
+                            "type": "CostCraft",
+                            "filter": "artifact",
+                            "maxCount": 1
+                        }
+                    ]
+                },
+                "effect": "ReturnSelfFromExileTransformed",
+                "timing": "SorcerySpeed",
+                "descriptionOverride": "Craft with artifact — {4}{W}{W}{U}"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Master's Manufactory",
+        "manaCost": "",
+        "typeLine": "Artifact",
+        "oracleText": "{T}: Create a 4/4 white and blue Golem artifact creature token. Activate only if this artifact or another artifact entered the battlefield under your control this turn.",
+        "script": {
+            "activatedAbilities": [
+                {
+                    "id": "ability_3",
+                    "cost": "CostTap",
+                    "effect": {
+                        "type": "CreateToken",
+                        "power": 4,
+                        "toughness": 4,
+                        "colors": [
+                            "WHITE",
+                            "BLUE"
+                        ],
+                        "creatureTypes": [
+                            "Golem"
+                        ],
+                        "imageUri": "https://cards.scryfall.io/normal/front/3/3/33a88096-dcfd-4acb-a092-b51507edd13e.jpg?1782731574",
+                        "artifactToken": true
+                    },
+                    "restrictions": [
+                        {
+                            "type": "ActivationOnlyIfCondition",
+                            "condition": {
+                                "type": "PermanentTypeEnteredBattlefieldThisTurn",
+                                "cardType": "ARTIFACT"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "233",
+            "rarity": "UNCOMMON",
+            "artist": "Racrufi",
+            "flavorText": "\"The Fomori are a foul and distant memory, but their war machines taught us much about large-scale armorcraft.\"\n—Anim Pakal, Thousandth Moon",
+            "imageUri": "https://cards.scryfall.io/normal/back/f/7/f7a41343-7cdb-49aa-a9d1-7460195355d8.jpg?1782694425"
+        },
+        "colorIdentityOverride": [
+            "WHITE",
+            "BLUE"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "233",
+        "rarity": "UNCOMMON",
+        "artist": "Racrufi",
+        "imageUri": "https://cards.scryfall.io/normal/front/f/7/f7a41343-7cdb-49aa-a9d1-7460195355d8.jpg?1782694425"
+    },
+    "colorIdentityOverride": [
+        "WHITE",
+        "BLUE"
+    ]
+}
+
 // Mephitic Draught
 {
     "name": "Mephitic Draught",
