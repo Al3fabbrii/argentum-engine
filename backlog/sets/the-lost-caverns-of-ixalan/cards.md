@@ -145,7 +145,7 @@
 - [ ] Kitesail Larcenist
 - [ ] Kutzil's Flanker
 - [ ] Kutzil, Malamet Exemplar
-- [ ] Lodestone Needle
+- [x] Lodestone Needle
 - [x] Magmatic Galleon
 - [ ] Malamet Battle Glyph
 - [x] Malamet Brawler

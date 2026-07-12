@@ -7184,6 +7184,144 @@
     ]
 }
 
+// Lodestone Needle
+{
+    "name": "Lodestone Needle",
+    "manaCost": "{1}{U}",
+    "typeLine": "Artifact",
+    "oracleText": "Flash\nWhen this artifact enters, tap up to one target artifact or creature and put two stun counters on it.\nCraft with artifact {2}{U} ({2}{U}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "keywords": [
+        "FLASH",
+        "CRAFT"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "TapUntap",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "up to one target artifact or creature"
+                            }
+                        },
+                        {
+                            "type": "AddCounters",
+                            "counterType": "stun",
+                            "count": 2,
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "up to one target artifact or creature"
+                            }
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature|artifact"
+                    },
+                    "id": "up to one target artifact or creature"
+                }
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{2}{U}"
+                            }
+                        },
+                        {
+                            "type": "CostCraft",
+                            "filter": "artifact",
+                            "maxCount": 1
+                        }
+                    ]
+                },
+                "effect": "ReturnSelfFromExileTransformed",
+                "timing": "SorcerySpeed",
+                "descriptionOverride": "Craft with artifact — {2}{U}"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Guidestone Compass",
+        "manaCost": "",
+        "typeLine": "Artifact",
+        "oracleText": "{1}, {T}: Target creature you control explores. Activate only as a sorcery. (Reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on that creature, then put the card back or put it into your graveyard.)",
+        "script": {
+            "activatedAbilities": [
+                {
+                    "id": "ability_3",
+                    "cost": {
+                        "type": "CostComposite",
+                        "costs": [
+                            {
+                                "type": "CostAtomWrapper",
+                                "atom": {
+                                    "type": "AtomMana",
+                                    "cost": "{1}"
+                                }
+                            },
+                            "CostTap"
+                        ]
+                    },
+                    "effect": {
+                        "type": "Explore",
+                        "target": {
+                            "type": "BoundVariable",
+                            "name": "target creature you control"
+                        }
+                    },
+                    "targetRequirements": [
+                        {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "creature ctrl:you"
+                            },
+                            "id": "target creature you control"
+                        }
+                    ],
+                    "timing": "SorcerySpeed"
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "62",
+            "rarity": "UNCOMMON",
+            "artist": "José Parodi",
+            "imageUri": "https://cards.scryfall.io/normal/back/d/e/dedd7a22-92e2-41fd-aa80-944c69653a5e.jpg?1782694560"
+        },
+        "colorIdentityOverride": [
+            "BLUE"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "62",
+        "rarity": "UNCOMMON",
+        "artist": "José Parodi",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/e/dedd7a22-92e2-41fd-aa80-944c69653a5e.jpg?1782694560"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Magmatic Galleon
 {
     "name": "Magmatic Galleon",
