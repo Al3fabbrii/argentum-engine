@@ -266,7 +266,7 @@
 - [ ] Throne of the Grim Captain
 - [x] Tinker's Tote
 - [ ] Tishana's Tidebinder
-- [ ] Tithing Blade
+- [x] Tithing Blade
 - [ ] Treasure Map
 - [x] Triumphant Chomp
 - [x] Trumpeting Carnosaur
