@@ -275,7 +275,7 @@
 - [x] Unlucky Drop
 - [ ] Unstable Glyphbridge
 - [x] Vanguard of the Rose
-- [ ] Visage of Dread
+- [x] Visage of Dread
 - [x] Vito's Inquisitor
 - [x] Vito, Fanatic of Aclazotz
 - [x] Volatile Fault

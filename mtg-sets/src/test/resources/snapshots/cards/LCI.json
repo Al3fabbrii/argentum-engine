@@ -14645,6 +14645,214 @@
     ]
 }
 
+// Visage of Dread
+{
+    "name": "Visage of Dread",
+    "manaCost": "{1}{B}",
+    "typeLine": "Artifact",
+    "oracleText": "When this artifact enters, target opponent reveals their hand. You choose an artifact or creature card from it. That player discards that card.\nCraft with two creatures {5}{B} ({5}{B}, Exile this artifact, Exile the two from among creatures you control and/or creature cards in your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "keywords": [
+        "CRAFT"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "RevealHand",
+                            "target": {
+                                "type": "BoundVariable",
+                                "name": "opponent"
+                            }
+                        },
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "FromZone",
+                                "zone": "Hand",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            },
+                            "storeAs": "revealedHand"
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "revealedHand",
+                            "selection": {
+                                "type": "ChooseExactly",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "filter": "creature|artifact",
+                            "storeSelected": "chosenCard",
+                            "prompt": "Choose an artifact or creature card to discard"
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "chosenCard",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Graveyard",
+                                "player": {
+                                    "type": "ContextPlayer",
+                                    "index": 0
+                                }
+                            },
+                            "moveType": "Discard"
+                        }
+                    ]
+                },
+                "targetRequirement": {
+                    "type": "TargetOpponent",
+                    "id": "opponent"
+                }
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostComposite",
+                    "costs": [
+                        {
+                            "type": "CostAtomWrapper",
+                            "atom": {
+                                "type": "AtomMana",
+                                "cost": "{5}{B}"
+                            }
+                        },
+                        {
+                            "type": "CostCraft",
+                            "filter": "creature",
+                            "minCount": 2,
+                            "maxCount": 2
+                        }
+                    ]
+                },
+                "effect": "ReturnSelfFromExileTransformed",
+                "timing": "SorcerySpeed",
+                "descriptionOverride": "Craft with two creatures — {5}{B}"
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Dread Osseosaur",
+        "manaCost": "",
+        "typeLine": "Creature — Dinosaur Skeleton Horror",
+        "oracleText": "Menace\nWhenever this creature enters or attacks, you may mill two cards. (You may put the top two cards of your library into your graveyard.)",
+        "creatureStats": {
+            "power": 5,
+            "toughness": 4
+        },
+        "keywords": [
+            "MENACE"
+        ],
+        "script": {
+            "triggeredAbilities": [
+                {
+                    "id": "ability_3",
+                    "trigger": {
+                        "type": "ZoneChangeEvent",
+                        "to": "Battlefield"
+                    },
+                    "effect": {
+                        "type": "Gated",
+                        "gate": "Gate.MayDecide",
+                        "then": {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "TopOfLibrary",
+                                        "count": {
+                                            "type": "Fixed",
+                                            "amount": 2
+                                        },
+                                        "isMill": true
+                                    },
+                                    "storeAs": "milled"
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "milled",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "id": "ability_4",
+                    "trigger": "AttackEvent",
+                    "effect": {
+                        "type": "Gated",
+                        "gate": "Gate.MayDecide",
+                        "then": {
+                            "type": "Composite",
+                            "effects": [
+                                {
+                                    "type": "GatherCards",
+                                    "source": {
+                                        "type": "TopOfLibrary",
+                                        "count": {
+                                            "type": "Fixed",
+                                            "amount": 2
+                                        },
+                                        "isMill": true
+                                    },
+                                    "storeAs": "milled"
+                                },
+                                {
+                                    "type": "MoveCollection",
+                                    "from": "milled",
+                                    "destination": {
+                                        "type": "ToZone",
+                                        "zone": "Graveyard"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "129",
+            "rarity": "UNCOMMON",
+            "artist": "David Auden Nash",
+            "flavorText": "\"It's not my fault! The glyphs for 'blessed' and 'cursed' look very similar!\"\n—Diego, Brazen Coalition translator",
+            "imageUri": "https://cards.scryfall.io/normal/back/3/d/3d4b61c6-3e88-49f5-9e16-aa8a59653327.jpg?1782694508"
+        },
+        "colorIdentityOverride": [
+            "BLACK"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "129",
+        "rarity": "UNCOMMON",
+        "artist": "David Auden Nash",
+        "imageUri": "https://cards.scryfall.io/normal/front/3/d/3d4b61c6-3e88-49f5-9e16-aa8a59653327.jpg?1782694508"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Vito's Inquisitor
 {
     "name": "Vito's Inquisitor",
