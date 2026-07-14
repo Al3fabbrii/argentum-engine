@@ -2242,6 +2242,9 @@ This is the player-arm prerequisite for the planned composable mixed `TargetUnio
   the type-negation analogue of `.notColor(c)` / `.notSubtype(s)`.
 - `.notCreature()` — appends `CardPredicate.Not(CardPredicate.IsCreature)` ("noncreature artifact",
   e.g. `GameObjectFilter.Artifact.notCreature().youControl()` — Guardian Beast).
+- `.withCardPredicate(p)` — appends any `CardPredicate` for which there's no dedicated combinator
+  (general-purpose escape hatch), e.g.
+  `GameObjectFilter.Nonland.withCardPredicate(CardPredicate.HasActivatedAbility)` — The Enigma Jewel.
 - `.nonbasic()` — appends `CardPredicate.Not(CardPredicate.IsBasicLand)` ("nonbasic land"); compose on
   the land base (`GameObjectFilter.Land.nonbasic()`), or use the named constant `GameObjectFilter.NonbasicLand`
   / `TargetFilter.NonbasicLand` (Rocket Volley, Shivan Harvest, Encroaching Wastes). `TargetFilter.Land.nonbasic()`
@@ -2431,6 +2434,15 @@ work for abilities-on-stack (which carry no `CardComponent`).
   Backed by the precomputed `CardComponent.hasNonManaActivatedAbility` flag (set at entity creation from
   `CardDefinition.hasNonManaActivatedAbility`), so abilities granted by other continuous effects are not
   counted. Used by Tsabo's Web ("each land with an activated ability that isn't a mana ability …").
+- `CardPredicate.HasActivatedAbility` — matches a permanent/graveyard card whose printed activated
+  abilities include at least one that functions from the **battlefield or the graveyard**, **of any kind,
+  mana abilities included** (the difference from `HasNonManaActivatedAbility`). Backed by the precomputed
+  `CardComponent.hasActivatedAbility` flag (from `CardDefinition.hasActivatedAbility`); granted abilities
+  aren't counted. The battlefield-or-graveyard scope matches the zones a craft material comes from, so a
+  mana rock/dork qualifies and so does a graveyard card whose only ability is graveyard-activated (a
+  hand-only cycling ability does not). Used by The Enigma Jewel's craft material clause ("four or more
+  nonlands with activated abilities"). Compose onto any filter with `.withCardPredicate(...)`, e.g.
+  `GameObjectFilter.Nonland.withCardPredicate(CardPredicate.HasActivatedAbility)`.
 
 ### `StatePredicate` — battlefield state checks
 
@@ -3921,26 +3933,35 @@ staticAbility {
   entry in §3 for the durational, targeted form (Braided Net:
   `PreventActivatedAbilities(GameObjectFilter.Permanent.sourceItself())` +
   `Duration.WhileAffectedTapped`).
-- `HasAllActivatedAbilitiesOfLinkedExiledCard(filter = GroupFilter.source(), creatureCardsOnly = false)`
-  — the permanents matching `filter` gain **all activated abilities of the cards in this source's
-  linked-exile pile** (`LinkedExileComponent`). Resolved dynamically at activation-legality time: the
-  engine pulls each exiled card's `activatedAbilities` and surfaces them on every matching permanent,
-  with **that permanent** as granter (so `{T}` taps it and "this card" self-references bind to it —
-  CR-faithful). Grants *activated* abilities only, not triggered/static/replacement. Pair with
-  `Effects.ExileLinkedToSource(target)` to fill the pile.
+- `HasAllActivatedAbilitiesOfExiledCards(source = ExiledCardsSource.LINKED, filter = GroupFilter.source(), creatureCardsOnly = false, oncePerTurnEach = false)`
+  — the permanents matching `filter` gain **all activated abilities of the cards in this source's exile
+  pile**. `source` selects the pile: `LINKED` reads the `LinkedExileComponent`; `CRAFTED` reads the
+  `CraftedFromExiledComponent` recorded by a `craft(...)` cost (CR 702.167c). Resolved dynamically at
+  activation-legality time: the engine pulls each exiled card's `activatedAbilities` and surfaces them on
+  every matching permanent, with **that permanent** as granter (so `{T}` taps it and "this card"
+  self-references bind to it — CR 113.7). Grants *activated* abilities only, not triggered/static/replacement.
     - `filter = GroupFilter.source()` (the default) → "This permanent has all activated abilities of
-      the exiled card" — the source grants the abilities to *itself* (Territory Forge).
-    - any battlefield filter → the source grants the abilities to *other* matching permanents
-      ("Creatures you control with +1/+1 counters on them have all activated abilities of all creature
-      cards exiled with this" — Agatha's Soul Cauldron →
-      `HasAllActivatedAbilitiesOfLinkedExiledCard(GroupFilter.AllCreaturesYouControl.withCounter(Counters.PLUS_ONE_PLUS_ONE), creatureCardsOnly = true)`).
-    - `creatureCardsOnly = true` restricts the source pile to *creature* cards (the exiled card's
-      printed type), for the "all **creature** cards exiled with" wording.
+      the exiled cards" — the source grants to *itself* (Territory Forge with `LINKED`; Locus of
+      Enlightenment with `CRAFTED`).
+    - any battlefield filter → the source grants to *other* matching permanents ("Creatures you control
+      with +1/+1 counters on them have all activated abilities of all creature cards exiled with this" —
+      Agatha's Soul Cauldron →
+      `HasAllActivatedAbilitiesOfExiledCards(filter = GroupFilter.AllCreaturesYouControl.withCounter(Counters.PLUS_ONE_PLUS_ONE), creatureCardsOnly = true)`).
+    - `creatureCardsOnly = true` restricts the pile to *creature* cards (the exiled card's printed type),
+      for the "all **creature** cards exiled with" wording.
+    - `oncePerTurnEach = true` (Locus of Enlightenment's "only once each turn") gives each granted ability
+      an `ActivationRestriction.OncePerTurn` **tracked per exiled card**: each granted ability is re-stamped
+      with an exiled-card-derived `AbilityId` (`exiled_<entity>_<printedId>`), so two exiled copies of one
+      card get independent budgets rather than sharing one, and duplicate materials aren't collapsed by the
+      granter-dedup. Left `false`, abilities are granted unmodified (Territory Forge, Agatha). Locus →
+      `HasAllActivatedAbilitiesOfExiledCards(source = ExiledCardsSource.CRAFTED, oncePerTurnEach = true)`.
+    - Fill a `LINKED` pile with `Effects.ExileLinkedToSource(target)`; a `CRAFTED` pile is filled by the
+      `craft(...)` cost.
 - `HasAbilitiesOfChosenLinkedExiledCard(grantActivated = true, grantTriggered = true)` — the source
   permanent has all **activated and/or triggered abilities of the single card it most recently *chose***
   from its linked-exile pile (its "last chosen card", stamped by
   `Effects.RecordChosenLinkedExile(from)`). The self-scoped, one-card, activated-**and**-triggered
-  sibling of `HasAllActivatedAbilitiesOfLinkedExiledCard`: it reads the source's
+  sibling of `HasAllActivatedAbilitiesOfExiledCards`: it reads the source's
   `ChosenLinkedExileComponent` and re-reads it live, so re-choosing a different exiled card swaps which
   abilities the source has. Granted abilities use the source as their own source (`{T}`/self-references
   bind to it). Use the two flags to grant activated abilities, triggered abilities, or both; it never
