@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 243 / 286
+**Implemented:** 244 / 286
 - [x] Abrade
 - [x] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -12,7 +12,7 @@
 - [x] Acrobatic Leap
 - [x] Adaptive Gemguard
 - [x] Akal Pakal, First Among Equals
-- [ ] Akawalli, the Seething Tower
+- [x] Akawalli, the Seething Tower
 - [x] Amalia Benavides Aguirre
 - [x] Ancestors' Aid
 - [x] Ancestral Reminiscence
