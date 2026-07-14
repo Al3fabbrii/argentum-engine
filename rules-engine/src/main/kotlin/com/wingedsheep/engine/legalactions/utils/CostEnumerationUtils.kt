@@ -460,7 +460,7 @@ class CostEnumerationUtils(
             com.wingedsheep.engine.handlers.effects.permanent.counters.resolveCounterType(it)
         }
         return state.entities.mapNotNull { (eid, c) ->
-            if (c.get<ControllerComponent>()?.playerId != playerId) return@mapNotNull null
+            if (projected.getController(eid) != playerId) return@mapNotNull null
             if (!predicateEvaluator.matches(state, projected, eid, filter, context)) return@mapNotNull null
             val counters = c.get<CountersComponent>() ?: return@mapNotNull null
             val card = c.get<CardComponent>() ?: return@mapNotNull null
