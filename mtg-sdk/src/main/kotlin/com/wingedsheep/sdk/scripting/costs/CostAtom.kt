@@ -212,13 +212,18 @@ sealed interface CostAtom : TextReplaceable<CostAtom> {
         }
         override val description: String get() = buildString {
             append("remove ")
+            val counterTypeString = if (counterType != null) "$counterType counter" else "counter"
+            val isSingle = count is DynamicAmount.Fixed && count.amount == 1
             when (count) {
-                is DynamicAmount.XValue -> append("X $counterType counters")
-                is DynamicAmount.Fixed -> append(quantify(count.amount, "$counterType counter"))
+                is DynamicAmount.XValue -> append("X ${counterTypeString}s")
+                is DynamicAmount.Fixed -> append(quantify(count.amount, counterTypeString))
                 else -> throw IllegalArgumentException("Unsupported DynamicAmount type: ${count::class.simpleName}")
             }
             if (self) append(" from this permanent")
-            else {
+            else if (isSingle) {
+                val article = if (filter.description.firstOrNull()?.lowercaseChar() in listOf('a', 'e', 'i', 'o', 'u')) "an" else "a"
+                append(" from $article ${filter.description} you control")
+            } else {
                 append(" from among ")
                 append(filter.description)
                 append("s you control")

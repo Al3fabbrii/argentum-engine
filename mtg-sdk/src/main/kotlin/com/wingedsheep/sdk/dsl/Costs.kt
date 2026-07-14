@@ -274,7 +274,7 @@ object Costs {
      * Used for artifacts with charge/gem counters as activation costs.
      * Delegates to [RemoveCounters] with [self] = true.
      */
-    fun RemoveCounterFromSelf(counterType: String, count: Int = 1): AbilityCost =
+    fun RemoveCounterFromSelf(counterType: String?, count: Int = 1): AbilityCost =
         AbilityCost.Atom(CostAtom.RemoveCounters(counterType, DynamicAmount.Fixed(count), self = true))
 
     /**
@@ -291,7 +291,7 @@ object Costs {
     fun RemoveCounters(
         count: Int = 1,
         counterType: String? = null,
-        filter: GameObjectFilter = GameObjectFilter.Any
+        filter: GameObjectFilter = GameObjectFilter.Permanent
     ): AbilityCost = AbilityCost.Atom(CostAtom.RemoveCounters(counterType, DynamicAmount.Fixed(count), filter))
 
     /**
@@ -301,7 +301,7 @@ object Costs {
     fun RemoveXCounters(
             counterType: String? = null,
             count: DynamicAmount = DynamicAmount.XValue,
-            filter: GameObjectFilter = GameObjectFilter.Creature.youControl()
+            filter: GameObjectFilter = GameObjectFilter.Permanent
         ): AbilityCost = AbilityCost.Atom(CostAtom.RemoveCounters(counterType, count, filter))
 
     // =========================================================================
@@ -487,7 +487,7 @@ object Costs {
         fun RemoveCounters(
             count: Int = 1,
             counterType: String? = null,
-            filter: GameObjectFilter = GameObjectFilter.Any
+            filter: GameObjectFilter = GameObjectFilter.Permanent
         ): AdditionalCost = AdditionalCost.Atom(CostAtom.RemoveCounters(counterType, DynamicAmount.Fixed(count), filter))
 
         /** Tap [count] untapped permanents matching [filter] you control. */

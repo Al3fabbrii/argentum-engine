@@ -64,10 +64,28 @@ class RemoveCountersAtomCostTest : FunSpec({
     }
 
     test("check filter ability description") {
+        // specific type >1
         removeCountersCard.activatedAbilities[0].cost.description shouldBe
             "Remove two +1/+1 counters from among creatures you control"
+        // specific type singular
+        Costs.RemoveCounters(count = 1, counterType = "+1/+1", filter = GameObjectFilter.Creature).description shouldBe
+            "Remove a +1/+1 counter from a creature you control"
+        // x counters specific type
         Costs.RemoveXCounters(counterType = "+1/+1", filter = GameObjectFilter.Creature).description shouldBe
             "Remove X +1/+1 counters from among creatures you control"
+        // x counters any type
+        Costs.RemoveXCounters().description shouldBe "Remove X counters from among permanents you control"
+        // multi non-specific type
+        Costs.RemoveCounters(count = 2).description shouldBe "Remove two counters from among permanents you control"
+        // singular non-specific type
+        Costs.RemoveCounters(count = 1).description shouldBe "Remove a counter from a permanent you control"
+        // singular self non-specific type
+        Costs.RemoveCounterFromSelf(null).description shouldBe "Remove a counter from this permanent"
+        // singular self specific type
+        Costs.RemoveCounterFromSelf("+1/+1").description shouldBe "Remove a +1/+1 counter from this permanent"
+        // multi self specific type
+        Costs.RemoveCounterFromSelf(count = 2, counterType = "+1/+1").description shouldBe
+            "Remove two +1/+1 counters from this permanent"
     }
 
     test("pay cost by removing two +1/+1 counters distributed across two creatures") {

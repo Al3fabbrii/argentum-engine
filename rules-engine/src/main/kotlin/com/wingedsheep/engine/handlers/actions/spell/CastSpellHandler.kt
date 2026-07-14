@@ -1449,7 +1449,9 @@ class CastSpellHandler(
                         val removals = resolveDistributedCounterRemovalsForPayment(action)
                         val total = removals.sumOf { it.count }
                         if (total < needed) {
-                            return "You must remove $needed counters from among ${atom.filter.description}s you control to cast this spell"
+                            val phrase = if (needed == 1) "1 counter from a" else "$needed counters from among"
+                            val plural = if (needed == 1) "" else "s"
+                            return "You must remove $phrase ${atom.filter.description}$plural you control to cast this spell"
                         }
                         val demanded = mutableMapOf<Pair<EntityId, CounterType>, Int>()
                         for (removal in removals) {
