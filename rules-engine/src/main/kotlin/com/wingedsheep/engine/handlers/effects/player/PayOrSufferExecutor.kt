@@ -12,7 +12,6 @@ import com.wingedsheep.engine.state.GameState
 import com.wingedsheep.engine.state.ZoneKey
 import com.wingedsheep.engine.state.components.battlefield.CountersComponent
 import com.wingedsheep.engine.state.components.identity.CardComponent
-import com.wingedsheep.sdk.core.CounterType
 import com.wingedsheep.sdk.core.Zone
 import com.wingedsheep.sdk.model.EntityId
 import com.wingedsheep.sdk.scripting.GameObjectFilter
@@ -763,10 +762,16 @@ class PayOrSufferExecutor(
                 is CostAtom.ReturnToHand -> false
                 is CostAtom.RevealFromHand -> false
                 is CostAtom.RemoveCounters -> {
-                    // Can pay if there are permanents matching the filter with enough counters
+                    // Can pay if there are permanents matching the filter with enough counters.
+                    // Don't exclude the source — removing counters from the source itself is a
+                    // legitimate payment, matching the logic in handleRemoveCountersCost.
                     val candidates = if (atom.self) listOf(sourceId)
-                    else findValidPermanentsOnBattlefield(state, playerId, atom.filter, sourceId)
-                    val counterType = atom.counterType?.let { CounterType.fromName(it) }
+                    else BattlefieldFilterUtils.findMatchingOnBattlefield(
+                        state, atom.filter.youControl(), PredicateContext(controllerId = playerId)
+                    )
+                    val counterType = atom.counterType?.let {
+                        com.wingedsheep.engine.handlers.effects.permanent.counters.resolveCounterType(it)
+                    }
                     val required = (atom.count as? com.wingedsheep.sdk.scripting.values.DynamicAmount.Fixed)?.amount ?: 0
                     val total = candidates.sumOf { permId ->
                         val counters = state.getEntity(permId)?.get<CountersComponent>() ?: return@sumOf 0
