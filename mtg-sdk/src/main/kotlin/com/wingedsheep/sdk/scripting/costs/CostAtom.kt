@@ -221,8 +221,7 @@ sealed interface CostAtom : TextReplaceable<CostAtom> {
             }
             if (self) append(" from this permanent")
             else if (isSingle) {
-                val article = if (filter.description.firstOrNull()?.lowercaseChar() in listOf('a', 'e', 'i', 'o', 'u')) "an" else "a"
-                append(" from $article ${filter.description} you control")
+                append(" from ${filter.indefiniteArticle} ${filter.description} you control")
             } else {
                 append(" from among ")
                 append(filter.description)
