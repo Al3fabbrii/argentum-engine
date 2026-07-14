@@ -2381,6 +2381,69 @@
     }
 }
 
+// Cavern Stomper
+{
+    "name": "Cavern Stomper",
+    "manaCost": "{4}{G}{G}",
+    "typeLine": "Creature — Dinosaur",
+    "oracleText": "When this creature enters, scry 2.\n{3}{G}: This creature can't be blocked by creatures with power 2 or less this turn.",
+    "creatureStats": {
+        "power": 7,
+        "toughness": 7
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Scry",
+                    "count": 2
+                }
+            }
+        ],
+        "activatedAbilities": [
+            {
+                "id": "ability_2",
+                "cost": {
+                    "type": "CostAtomWrapper",
+                    "atom": {
+                        "type": "AtomMana",
+                        "cost": "{3}{G}"
+                    }
+                },
+                "effect": {
+                    "type": "GrantStaticAbility",
+                    "ability": {
+                        "type": "CantBeBlockedBy",
+                        "blockerFilter": {
+                            "cardPredicates": [
+                                "IsCreature",
+                                {
+                                    "type": "PowerAtMost",
+                                    "max": 2
+                                }
+                            ]
+                        }
+                    },
+                    "target": "Self"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "177",
+        "artist": "David Szabo",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/e/decdfd6b-55ab-47fd-9f98-1845261f1caf.jpg?1782694468"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Cavernous Maw
 {
     "name": "Cavernous Maw",
@@ -8024,6 +8087,85 @@
     },
     "colorIdentityOverride": [
         "RED"
+    ]
+}
+
+// Malamet Battle Glyph
+{
+    "name": "Malamet Battle Glyph",
+    "manaCost": "{G}",
+    "typeLine": "Sorcery",
+    "oracleText": "Choose target creature you control and target creature you don't control. If the creature you control entered this turn, put a +1/+1 counter on it. Then those creatures fight each other.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.WhenCondition",
+                        "condition": {
+                            "type": "EntityMatches",
+                            "entity": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            },
+                            "filter": {
+                                "statePredicates": [
+                                    "EnteredThisTurn"
+                                ]
+                            }
+                        }
+                    },
+                    "then": {
+                        "type": "AddCounters",
+                        "counterType": "+1/+1",
+                        "count": 1,
+                        "target": {
+                            "type": "ContextTarget",
+                            "index": 0
+                        }
+                    }
+                },
+                {
+                    "type": "Fight",
+                    "target1": {
+                        "type": "BoundVariable",
+                        "name": "target creature you control"
+                    },
+                    "target2": {
+                        "type": "BoundVariable",
+                        "name": "target creature you don't control"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature ctrl:you"
+                },
+                "id": "target creature you control"
+            },
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature ctrl:opponent"
+                },
+                "id": "target creature you don't control"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "198",
+        "rarity": "UNCOMMON",
+        "artist": "Andrew Mar",
+        "flavorText": "\"Let's not give the surface-dwellers time to learn what tactics work best here.\"\n—Daram, Malamet marshal",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/2/2259f959-ca97-4df9-8d50-0532090fb967.jpg?1782694450"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
     ]
 }
 
