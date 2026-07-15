@@ -7,6 +7,7 @@ import com.wingedsheep.engine.core.CardCycledEvent
 import com.wingedsheep.engine.core.CardPlottedEvent
 import com.wingedsheep.engine.core.CardsDiscardedEvent
 import com.wingedsheep.engine.core.CardsDrawnEvent
+import com.wingedsheep.engine.core.TappedEvent
 import com.wingedsheep.engine.core.ControlChangedEvent
 import com.wingedsheep.engine.core.DoorUnlockedEvent
 import com.wingedsheep.engine.core.DamageDealtEvent
@@ -273,6 +274,11 @@ class TriggerDetector(
         // (e.g., Camellia, the Seedmiser). Groups sacrifice events per controller
         // and fires the trigger at most once per controller.
         detectSacrificeBatchTriggers(state, events, triggers, index)
+
+        // Detect "whenever one or more [filtered] permanents become tapped" batching triggers
+        // (e.g., Deeproot Pilgrimage). Fires the trigger at most once per source regardless of how
+        // many matching permanents were tapped simultaneously; the per-event path skips batch taps.
+        detectTapBatchTriggers(state, events, triggers, index)
 
         // Detect "whenever one or more [creatures] you control deal combat damage to a player"
         // batching triggers (e.g., Kastral, the Windcrested). Groups combat damage events
@@ -2023,6 +2029,61 @@ class TriggerDetector(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Detect "whenever one or more [filtered] permanents become tapped" batching triggers
+     * (`TapEvent(batch = true)`, ANY binding — Deeproot Pilgrimage). A simultaneous tap of several
+     * matching permanents (attacking, convoke, crew) emits several [TappedEvent]s in one batch; this
+     * fires the trigger **once** for that batch, not once per permanent (the over-count the per-event
+     * path — which skips batch taps — would produce). The filter (e.g. "nontoken Merfolk you
+     * control") is evaluated against projected state relative to the source's controller.
+     */
+    private fun detectTapBatchTriggers(
+        state: GameState,
+        events: List<EngineGameEvent>,
+        triggers: MutableList<PendingTrigger>,
+        index: TriggerIndex
+    ) {
+        val tappedIds = events.filterIsInstance<TappedEvent>().map { it.entityId }
+        if (tappedIds.isEmpty()) return
+
+        for (entry in index.getEntitiesForCategory(TriggerCategory.TAPPED)) {
+            for (ability in entry.abilities) {
+                val trigger = ability.trigger
+                if (trigger !is EventPattern.TapEvent || !trigger.batch) continue
+                // Batch tap triggers are "one or more … become tapped" observers (ANY binding).
+                if (ability.binding != TriggerBinding.ANY) continue
+
+                val filter = trigger.filter
+                val matched = if (filter == null) {
+                    tappedIds
+                } else {
+                    val predicateContext = com.wingedsheep.engine.handlers.PredicateContext(
+                        controllerId = entry.controllerId,
+                        sourceId = entry.entityId
+                    )
+                    tappedIds.filter { tappedId ->
+                        predicateEvaluator.matches(
+                            state, state.projectedState, tappedId, filter, predicateContext
+                        )
+                    }
+                }
+                if (matched.isEmpty()) continue
+
+                // Fire once for the whole batch; bind the first matching permanent as the triggering
+                // entity so any "it" payoff has a referent (CR 603.2c).
+                triggers.add(
+                    PendingTrigger(
+                        ability = ability,
+                        sourceId = entry.entityId,
+                        sourceName = entry.cardComponent.name,
+                        controllerId = entry.controllerId,
+                        triggerContext = TriggerContext(triggeringEntityId = matched.first())
+                    )
+                )
             }
         }
     }

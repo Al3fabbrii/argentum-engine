@@ -4338,6 +4338,51 @@
     ]
 }
 
+// Deeproot Pilgrimage
+{
+    "name": "Deeproot Pilgrimage",
+    "manaCost": "{1}{U}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever one or more nontoken Merfolk you control become tapped, create a 1/1 blue Merfolk creature token with hexproof.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "TapEvent",
+                    "filter": "creature Merfolk nontoken ctrl:you",
+                    "batch": true
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "BLUE"
+                    ],
+                    "creatureTypes": [
+                        "Merfolk"
+                    ],
+                    "keywords": [
+                        "HEXPROOF"
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "52",
+        "rarity": "RARE",
+        "artist": "Rémi Jacquot",
+        "flavorText": "\"These glyphs are more than trail markings! They tell a story as they go. But does it end in celebration or tragedy?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/2/e2449311-a705-4a31-a345-a36d436ae561.jpg?1782694567"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Defossilize
 {
     "name": "Defossilize",

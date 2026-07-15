@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 244 / 286
+**Implemented:** 245 / 286
 - [x] Abrade
 - [x] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -73,7 +73,7 @@
 - [x] Deep Goblin Skulltaker
 - [x] Deep-Cavern Bat
 - [x] Deepfathom Echo
-- [ ] Deeproot Pilgrimage
+- [x] Deeproot Pilgrimage
 - [x] Defossilize
 - [x] Diamond Pick-Axe
 - [x] Didact Echo

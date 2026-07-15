@@ -1353,6 +1353,19 @@ object Triggers {
         TriggerSpec(event = TapEvent(filter), binding = binding)
 
     /**
+     * Whenever one or more permanents matching [filter] become tapped — a **batching** trigger
+     * (CR 603.2c) that fires at most once per simultaneous tap batch, not once per tapped permanent.
+     * Use for the "Whenever one or more … become tapped" wording (Deeproot Pilgrimage: "Whenever one
+     * or more nontoken Merfolk you control become tapped, create a … token"), where tapping several
+     * matching permanents at once (attacking, convoke, crew) must still make a single token.
+     *
+     * Distinct from [becomesTapped] (per-permanent — fires once for each tapped permanent). ANY
+     * binding; scope with the filter's `youControl` for "you control".
+     */
+    fun OneOrMoreBecomeTapped(filter: GameObjectFilter): TriggerSpec =
+        TriggerSpec(event = TapEvent(filter = filter, batch = true), binding = TriggerBinding.ANY)
+
+    /**
      * Whenever any player taps a land for mana. (ANY binding.)
      *
      * Backs the "Whenever a player taps a land for mana" family (Overabundance, Mana Flare,
