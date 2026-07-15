@@ -2280,6 +2280,17 @@ This is the player-arm prerequisite for the planned composable mixed `TargetUnio
   as whoever Sozin just damaged. Works at target-validation/finding time in a graveyard zone:
   `TargetObject(unlimited = true, filter = TargetFilter(GameObjectFilter.Creature.ownedByTriggeringPlayer(),
   zone = Zone.GRAVEYARD), totalManaValueAtMost = DynamicAmount.XValue)`.
+- `.controlledByTriggeringPlayer()` (`ControllerPredicate.ControlledByTriggeringPlayer`, FQL
+  `ctrl:triggering-player`) — the **control** sibling of `.ownedByTriggeringPlayer()`: controlled by the
+  trigger's associated player (the damaged player for a combat/damage trigger). Reads *projected*
+  control (so it tracks control-changing effects), where the owner sibling reads immutable ownership.
+  Use for the *non-targeted* "that player controls" wording — **Dreadmaw's Ire** grants "whenever this
+  creature deals combat damage to a player, destroy target artifact **that player** controls." Resolves
+  via `context.triggeringPlayerId ?: context.triggeringEntityId` (the damaged player rides on the
+  triggering entity for damage triggers), and works at target-finding time: `TargetFinder` threads the
+  trigger's entity into the battlefield-target predicate context. The SELF-binding combat-damage path
+  (`DamageTriggerDetector.detectDamageSourceTriggers`) sets `triggeringPlayerId` to the damaged player,
+  mirroring the ANY-binding observer path.
 - `.withControllerPredicate(p)` — set any `ControllerPredicate` directly; the entry point for the
   **composed** predicates `ControllerPredicate.And(list)` / `Or(list)` / `Not(p)`, which express
   heterogeneous controller/owner relationships in one filter — e.g. "creatures you own but don't

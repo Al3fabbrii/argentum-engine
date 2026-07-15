@@ -83,7 +83,7 @@
 - [x] Disruptor Wanderglyph
 - [x] Disturbed Slumber
 - [ ] Dowsing Device
-- [ ] Dreadmaw's Ire
+- [x] Dreadmaw's Ire
 - [x] Dusk Rose Reliquary
 - [x] Earthshaker Dreadmaw
 - [x] Eaten by Piranhas

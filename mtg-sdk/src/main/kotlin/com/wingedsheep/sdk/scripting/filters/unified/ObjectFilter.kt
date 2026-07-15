@@ -959,6 +959,14 @@ data class GameObjectFilter(
     fun ownedByTriggeringPlayer() = copy(controllerPredicate = ControllerPredicate.OwnedByTriggeringPlayer)
 
     /**
+     * Must be controlled by the trigger's associated player — the damaged player for a combat/damage
+     * trigger (Dreadmaw's Ire — "destroy target artifact that player controls"). Reads projected
+     * control, so it tracks control-changing effects, unlike the owner-based
+     * [ownedByTriggeringPlayer].
+     */
+    fun controlledByTriggeringPlayer() = copy(controllerPredicate = ControllerPredicate.ControlledByTriggeringPlayer)
+
+    /**
      * Must match [predicate] on the controller/owner axis. The entry point for *composed*
      * predicates ([ControllerPredicate.And] / [ControllerPredicate.Or] / [ControllerPredicate.Not])
      * — e.g. "permanents you own but don't control":
