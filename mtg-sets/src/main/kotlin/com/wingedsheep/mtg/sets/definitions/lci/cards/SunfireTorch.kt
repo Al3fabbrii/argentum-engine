@@ -32,12 +32,12 @@ import com.wingedsheep.sdk.scripting.targets.TargetObject
  *   the stack to choose any target and deal 2 damage. The damage source defaults to the granted
  *   ability's source — the equipped creature — matching "this creature deals 2 damage."
  *
- * KNOWN APPROXIMATION — "sacrifice Sunfire Torch":
- * As with Dire Blunderbuss, granted *triggered* abilities resolve with the equipped creature
- * as their source and no reference to the granting Equipment, so the self-sacrifice is modeled
- * as a name filter (`Artifact you control named "Sunfire Torch"`). Corner case: with a second
- * Sunfire Torch on the battlefield the printed ability sacrifices *this* one, but the name
- * filter lets you pick either. Accepted, documented corner.
+ * "sacrifice Sunfire Torch" — CR 201.5a: the name refers only to the specific granting
+ * Equipment. A granted *triggered* ability resolves with the equipped creature as its source
+ * (not the Equipment), so the sacrifice is scoped with `.attachedToSource()` to "the Sunfire
+ * Torch attached to this creature" — i.e. the Equipment that granted the ability. With a second
+ * Sunfire Torch elsewhere on the battlefield this correctly leaves it untouched (only the one
+ * attached to the attacking creature is a legal sacrifice).
  */
 val SunfireTorch = card("Sunfire Torch") {
     manaCost = "{R}"
@@ -64,7 +64,7 @@ val SunfireTorch = card("Sunfire Torch") {
                         SelectTargetEffect(
                             requirement = TargetObject(
                                 filter = TargetFilter(
-                                    GameObjectFilter.Artifact.youControl().named("Sunfire Torch")
+                                    GameObjectFilter.Artifact.named("Sunfire Torch").attachedToSource()
                                 )
                             ),
                             storeAs = "toSacrifice"

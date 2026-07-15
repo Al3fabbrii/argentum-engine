@@ -49,22 +49,22 @@ import com.wingedsheep.sdk.scripting.targets.TargetObject
  *    Pirate Hat idiom), so it lives on the creature and fires when that creature attacks.
  *    The ability body is a [ReflexiveTriggerEffect] (the Glorifier of Suffering /
  *    Thousand Moons Crackshot idiom): the optional action selects an artifact you control
- *    (excluding Dire Blunderbuss) and sacrifices it; only "when you do" does the reflexive
- *    part go on the stack, choose target creature, and deal damage equal to the equipped
- *    creature's power ([DynamicAmounts.sourcePower] — the granted ability's source is the
- *    equipped creature; the damage source defaults to it, matching "this creature deals").
+ *    other than the granting Equipment and sacrifices it; only "when you do" does the
+ *    reflexive part go on the stack, choose target creature, and deal damage equal to the
+ *    equipped creature's power ([DynamicAmounts.sourcePower] — the granted ability's source
+ *    is the equipped creature; the damage source defaults to it, matching "this creature deals").
  *
- * KNOWN APPROXIMATION — "an artifact other than Dire Blunderbuss":
- * By CR 201.5a the name in the granted ability refers only to the specific Equipment that
- * granted it. The engine, however, threads a `granterId` only into granted *activated*
- * abilities (`AbilityOnStack.granterId` / `EffectTarget.GrantingSource`); granted
- * *triggered* abilities resolve with the equipped creature as their source and no
- * reference to the granting Equipment, so an entity-based exclusion is not expressible
- * today. The exclusion is therefore modeled as a name filter
- * (`GameObjectFilter.notNamed("Dire Blunderbuss")`). Corner case this mis-handles: with a
- * second Dire Blunderbuss on the battlefield, the printed card lets you sacrifice the
- * *other* copy, but the name filter wrongly excludes it too. Accepted, documented corner —
- * fix properly by threading granterId through granted triggered abilities.
+ * "an artifact other than Dire Blunderbuss" — CR 201.5a: the name refers only to the specific
+ * granting Equipment. A granted *triggered* ability resolves with the equipped creature as its
+ * source (not the Equipment), and the engine threads a `granterId` only into granted *activated*
+ * abilities, so the granter can't be referenced by entity here. Instead the exclusion is scoped
+ * with `.notAttachedToSource()`: the granting Blunderbuss is the Equipment attached to the
+ * attacking creature (the source), so this excludes exactly it while leaving a *second* Dire
+ * Blunderbuss elsewhere (on another creature or unattached) sacrificable — fixing the corner the
+ * old `notNamed("Dire Blunderbuss")` filter mis-handled. Residual, rarer corner: another artifact
+ * Equipment/Aura *also* attached to the same creature is likewise excluded (it shouldn't be); the
+ * fully-correct fix is an entity-based exclusion once granterId is threaded through granted
+ * triggered abilities.
  */
 
 private val DireFlailFront = card("Dire Flail") {
@@ -129,7 +129,7 @@ private val DireBlunderbuss = card("Dire Blunderbuss") {
                                 filter = TargetFilter(
                                     GameObjectFilter.Artifact
                                         .youControl()
-                                        .notNamed("Dire Blunderbuss")
+                                        .notAttachedToSource()
                                 )
                             ),
                             storeAs = "toSacrifice"

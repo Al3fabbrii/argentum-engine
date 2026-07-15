@@ -122,6 +122,10 @@ class CostHandler {
                 // since left, ActivateAbilityHandler's lookup would have failed before payment.
                 true
             }
+            is AbilityCost.SacrificeGrantingPermanent -> {
+                // Same granter-resolution contract as ExileGrantingPermanent above.
+                true
+            }
             is AbilityCost.TapXPermanents -> {
                 // X can be 0, so this is always payable
                 // maxAffordableX is capped by untapped permanent count in LegalActionsCalculator
@@ -337,6 +341,28 @@ class CostHandler {
                 )
 
                 CostPaymentResult.success(transitionResult.state, manaPool, transitionResult.events)
+            }
+            is AbilityCost.SacrificeGrantingPermanent -> {
+                val granterId = choices.granterId
+                    ?: return CostPaymentResult.failure("Granting permanent not provided for cost")
+                val granter = state.getEntity(granterId)
+                    ?: return CostPaymentResult.failure("Granting permanent not found")
+                val granterController = granter.get<ControllerComponent>()?.playerId
+                    ?: return CostPaymentResult.failure("Granting permanent has no controller")
+
+                // Track Food/dies-with-counter sacrifice bookkeeping before the zone transition,
+                // then move to the graveyard — mirrors the SacrificeSelf branch, but on the granter.
+                val preState = com.wingedsheep.engine.handlers.effects.ZoneTransitionService
+                    .trackPermanentSacrifice(state, listOf(granterId), granterController)
+                val transitionResult = com.wingedsheep.engine.handlers.effects.ZoneTransitionService.moveToZone(
+                    preState, granterId, Zone.GRAVEYARD
+                )
+
+                val events = mutableListOf<GameEvent>()
+                events.add(PermanentsSacrificedEvent(granterController, listOf(granterId)))
+                events.addAll(transitionResult.events)
+
+                CostPaymentResult.success(transitionResult.state, manaPool, events)
             }
             is AbilityCost.TapAttachedCreature -> {
                 val attachedId = state.getEntity(sourceId)?.get<AttachedToComponent>()?.targetId

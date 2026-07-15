@@ -8,7 +8,6 @@ import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
 import com.wingedsheep.sdk.scripting.AbilityId
 import com.wingedsheep.sdk.scripting.ActivatedAbility
-import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantActivatedAbility
 import com.wingedsheep.sdk.scripting.ModifyStats
 import com.wingedsheep.sdk.scripting.targets.EffectTarget
@@ -27,17 +26,10 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  *   `{T}` taps that creature (the granted ability's source, CR 113.7), and the mana +
  *   sacrifice are paid by that creature's controller. [Effects.Destroy] hits the ability's
  *   sole target ([Targets.ArtifactOrEnchantment]).
- *
- * KNOWN APPROXIMATION — "Sacrifice Deconstruction Hammer":
- * By CR 201.5a the name in the granted ability refers only to the specific Equipment that
- * granted it. The engine has no cost that sacrifices the *granting* permanent (only
- * [com.wingedsheep.sdk.scripting.AbilityCost.ExileGrantingPermanent] exists, and that
- * exiles rather than sacrifices), so the self-sacrifice is modeled as a name filter
- * (`Artifact you control named "Deconstruction Hammer"`) — the documented Dire Blunderbuss
- * idiom. Corner case this mis-handles: with a second Deconstruction Hammer on the
- * battlefield, the printed ability sacrifices *this* one, but the name filter lets you pick
- * either. Accepted, documented corner — fix properly by adding a sacrifice-granting-permanent
- * cost.
+ * - "Sacrifice Deconstruction Hammer" refers only to the specific granting Equipment
+ *   (CR 201.5a), so the cost is [Costs.SacrificeGrantingPermanent], which sacrifices exactly
+ *   the granter resolved at activation time — no name filter, no target prompt, and correct
+ *   with a second Deconstruction Hammer on the battlefield.
  */
 val DeconstructionHammer = card("Deconstruction Hammer") {
     manaCost = "{W}"
@@ -60,7 +52,7 @@ val DeconstructionHammer = card("Deconstruction Hammer") {
                 cost = Costs.Composite(
                     Costs.Mana("{3}"),
                     Costs.Tap,
-                    Costs.Sacrifice(GameObjectFilter.Artifact.youControl().named("Deconstruction Hammer"))
+                    Costs.SacrificeGrantingPermanent
                 ),
                 effect = Effects.Destroy(EffectTarget.ContextTarget(0)),
                 targetRequirements = listOf(Targets.ArtifactOrEnchantment),

@@ -2667,6 +2667,34 @@ class ClientStateTransformer(
             )
         }
 
+        // Printed "can't be blocked by more than N" restrictions (incl. the conditional descend
+        // form, e.g. Akawalli's descend-8) are read directly by BlockPhaseManager, never through
+        // the layer system, so they never reach the projected keyword set / abilityFlags and get
+        // no keyword chip. Surface an active one as a badge so the restriction is visible in play.
+        val cardDefForRestrictions = state.getEntity(entityId)?.get<CardComponent>()
+            ?.let { cardRegistry.getCard(it.cardDefinitionId) }
+        val restrictionController = state.projectedState.getController(entityId)
+        if (cardDefForRestrictions != null && restrictionController != null) {
+            for (ability in cardDefForRestrictions.script.staticAbilities) {
+                val active = activeStaticAbility(state, ability, entityId, restrictionController)
+                if (active is com.wingedsheep.sdk.scripting.CantBeBlockedByMoreThan &&
+                    active.filter.scope is com.wingedsheep.sdk.scripting.filters.unified.Scope.Self
+                ) {
+                    val description = active.description.replaceFirstChar { it.uppercase() }
+                    if (seenGrantDescriptions.add(description)) {
+                        effects.add(
+                            ClientCardEffect(
+                                effectId = "block_restriction_${description.hashCode()}",
+                                name = "Evasion",
+                                description = description,
+                                icon = "evasion"
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         return effects
     }
 

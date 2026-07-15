@@ -5,12 +5,16 @@
     "lifeTotal": 20,
     "hand": [
       "Deconstruction Hammer",
+      "Deconstruction Hammer",
       "Sunfire Torch",
       "Bloodthorn Flail",
       "Glowcap Lantern",
       "Akawalli, the Seething Tower"
     ],
     "battlefield": [
+      {"name": "Millstone"},
+      {"name": "Millstone"},
+      {"name": "Millstone"},
       {"name": "Grizzly Bears"},
       {"name": "Plains"},
       {"name": "Plains"},
@@ -21,8 +25,23 @@
       {"name": "Forest"},
       {"name": "Forest"}
     ],
-    "graveyard": [],
+    "graveyard": ["Forest", "Forest"],
     "library": [
+      "Plains",
+      "Swamp",
+      "Forest",
+      "Plains",
+      "Swamp",
+      "Forest",
+      "Plains",
+      "Swamp",
+      "Forest",
+      "Plains",
+      "Swamp",
+      "Forest",
+      "Plains",
+      "Swamp",
+      "Forest",
       "Plains",
       "Swamp",
       "Forest",
@@ -51,5 +70,6 @@
   "player1StopAtSteps": [],
   "player2StopAtSteps": [],
   "player1OpponentStopAtSteps": [],
-  "player2OpponentStopAtSteps": []
+  "player2OpponentStopAtSteps": [],
+  "mode": "AI"
 }

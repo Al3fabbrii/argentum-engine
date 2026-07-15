@@ -1,10 +1,12 @@
 package com.wingedsheep.mtg.sets.definitions.lci.cards
 
+import com.wingedsheep.sdk.dsl.Conditions
 import com.wingedsheep.sdk.dsl.Effects
 import com.wingedsheep.sdk.dsl.Filters
 import com.wingedsheep.sdk.dsl.Triggers
 import com.wingedsheep.sdk.dsl.card
 import com.wingedsheep.sdk.model.Rarity
+import com.wingedsheep.sdk.scripting.GameObjectFilter
 import com.wingedsheep.sdk.scripting.GrantTriggeredAbility
 import com.wingedsheep.sdk.scripting.LookAtTopOfLibrary
 import com.wingedsheep.sdk.scripting.TriggeredAbility
@@ -23,12 +25,12 @@ import com.wingedsheep.sdk.scripting.targets.EffectTarget
  *   [EffectTarget.Self] — the granted ability's source, i.e. the equipped creature — so "it"
  *   explores and any +1/+1 counter lands on that creature.
  * - "You may look at the top card of your library any time" is the filterless player-permission
- *   static [LookAtTopOfLibrary], which grants its controller the private peek. There is no engine
- *   primitive to scope a filterless player static onto the *equipped creature* (no generic
- *   grant-static-ability + no is-attached condition), so it is placed directly on the Equipment.
- *   In the common case (Equipment and creature share a controller) this is identical to the
- *   printed card. Minor documented deviation: an *unattached* Glowcap Lantern still lets its
- *   controller peek — harmless, since the peek is private and changes no game state.
+ *   static [LookAtTopOfLibrary], which grants its controller the private peek. It lives on the
+ *   Equipment (there is no primitive to scope a filterless player static onto the equipped
+ *   creature) but is gated on the Equipment being attached — a conditional static whose
+ *   condition is [Conditions.SourceMatches] "attached to a creature" — so an *unattached*
+ *   Glowcap Lantern grants no peek, matching the printed card (the permission only exists while
+ *   attached, as part of "Equipped creature has ...").
  */
 val GlowcapLantern = card("Glowcap Lantern") {
     manaCost = "{G}"
@@ -40,8 +42,9 @@ val GlowcapLantern = card("Glowcap Lantern") {
         "the card back or put it into your graveyard.)\n" +
         "Equip {2}"
 
-    // "You may look at the top card of your library any time" — see KDoc deviation note.
+    // "You may look at the top card of your library any time" — only while attached (see KDoc).
     staticAbility {
+        condition = Conditions.SourceMatches(GameObjectFilter.Any.attachedTo(GameObjectFilter.Creature))
         ability = LookAtTopOfLibrary
     }
 

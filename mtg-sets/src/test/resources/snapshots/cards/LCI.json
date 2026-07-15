@@ -4049,13 +4049,7 @@
                                 }
                             },
                             "CostTap",
-                            {
-                                "type": "CostAtomWrapper",
-                                "atom": {
-                                    "type": "AtomSacrifice",
-                                    "filter": "artifact name:Deconstruction Hammer ctrl:you"
-                                }
-                            }
+                            "CostSacrificeGrantingPermanent"
                         ]
                     },
                     "effect": {
@@ -4796,13 +4790,12 @@
                                             "filter": {
                                                 "baseFilter": {
                                                     "cardPredicates": [
-                                                        "IsArtifact",
+                                                        "IsArtifact"
+                                                    ],
+                                                    "statePredicates": [
                                                         {
-                                                            "type": "Not",
-                                                            "predicate": {
-                                                                "type": "NameEquals",
-                                                                "name": "Dire Blunderbuss"
-                                                            }
+                                                            "type": "StateNot",
+                                                            "predicate": "IsAttachedToSource"
                                                         }
                                                     ],
                                                     "controllerPredicate": "ControlledByYou"
@@ -6140,7 +6133,22 @@
             }
         ],
         "staticAbilities": [
-            "LookAtTopOfLibrary",
+            {
+                "type": "ConditionalStaticAbility",
+                "ability": "LookAtTopOfLibrary",
+                "condition": {
+                    "type": "EntityMatches",
+                    "entity": "Self",
+                    "filter": {
+                        "statePredicates": [
+                            {
+                                "type": "IsAttachedTo",
+                                "filter": "creature"
+                            }
+                        ]
+                    }
+                }
+            },
             {
                 "type": "GrantTriggeredAbility",
                 "ability": {
@@ -14236,7 +14244,18 @@
                                     "requirement": {
                                         "type": "TargetObject",
                                         "filter": {
-                                            "baseFilter": "artifact name:Sunfire Torch ctrl:you"
+                                            "baseFilter": {
+                                                "cardPredicates": [
+                                                    "IsArtifact",
+                                                    {
+                                                        "type": "NameEquals",
+                                                        "name": "Sunfire Torch"
+                                                    }
+                                                ],
+                                                "statePredicates": [
+                                                    "IsAttachedToSource"
+                                                ]
+                                            }
                                         }
                                     },
                                     "storeAs": "toSacrifice"
