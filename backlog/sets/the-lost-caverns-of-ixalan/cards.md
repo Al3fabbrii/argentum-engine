@@ -216,7 +216,7 @@
 - [x] Sanguine Evangelist
 - [x] Scampering Surveyor
 - [x] Screaming Phantom
-- [ ] Scytheclaw Raptor
+- [x] Scytheclaw Raptor
 - [x] Seeker of Sunlight
 - [x] Seismic Monstrosaur
 - [x] Self-Reflection

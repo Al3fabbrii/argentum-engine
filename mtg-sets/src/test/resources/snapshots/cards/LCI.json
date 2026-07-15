@@ -13143,6 +13143,58 @@
     ]
 }
 
+// Scytheclaw Raptor
+{
+    "name": "Scytheclaw Raptor",
+    "manaCost": "{2}{R}",
+    "typeLine": "Creature — Dinosaur",
+    "oracleText": "Whenever a player casts a spell, if it's not their turn, this creature deals 4 damage to them.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "SpellCastEvent",
+                    "player": "Each"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 4
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "TriggeringPlayer"
+                    }
+                },
+                "triggerCondition": {
+                    "type": "Not",
+                    "condition": {
+                        "type": "IsPlayersTurn",
+                        "player": "TriggeringPlayer"
+                    }
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "165",
+        "rarity": "UNCOMMON",
+        "artist": "John Tedrick",
+        "flavorText": "\"She's a smart one. Noticed all on her own that the bloodsuckers wave their hands around to do their filthy magic, so she rips off their hands first.\"\n—Citamitzin, Sun Empire warrior",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/4/9436cf62-56d6-4662-9982-72e9be80d25c.jpg?1782694476"
+    },
+    "colorIdentityOverride": [
+        "RED"
+    ]
+}
+
 // Seeker of Sunlight
 {
     "name": "Seeker of Sunlight",

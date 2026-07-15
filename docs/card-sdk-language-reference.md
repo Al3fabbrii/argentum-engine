@@ -5325,6 +5325,11 @@ that works in both resolution and static-ability (projection) contexts.
 
 - `IsYourTurn` — it's your turn.
 - `IsNotYourTurn` — it's an opponent's turn.
+- `IsPlayersTurn(player)` — it's `player`'s turn; the `Player`-parametric form of `IsYourTurn`, for a
+  turn check relative to a player other than the controller. Wrap in `Not` for "if it's not their
+  turn" where "their" is a non-controller player — Scytheclaw Raptor's "whenever a player casts a
+  spell, if it's not their turn" is `Not(IsPlayersTurn(Player.TriggeringPlayer))` (the intervening-if
+  carries the casting player as `Player.TriggeringPlayer`).
 - `IsInPhase(phase)` — currently in `BEGINNING | MAIN | COMBAT | …`.
 - `IsInStep(steps, yoursOnly = true)` — current step is one of `steps` (e.g. `Step.END`). Board-derived
   (reads `state.step` + active player), so it evaluates identically at resolution and under projection,

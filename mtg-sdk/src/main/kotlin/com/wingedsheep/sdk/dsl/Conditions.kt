@@ -35,6 +35,7 @@ import com.wingedsheep.sdk.scripting.conditions.YouChoseOtherCreatureAsRingBeare
 import com.wingedsheep.sdk.scripting.predicates.StatePredicate
 import com.wingedsheep.sdk.scripting.conditions.IsYourTurn as IsYourTurnCondition
 import com.wingedsheep.sdk.scripting.conditions.IsNotYourTurn as IsNotYourTurnCondition
+import com.wingedsheep.sdk.scripting.conditions.IsPlayersTurn as IsPlayersTurnCondition
 import com.wingedsheep.sdk.scripting.conditions.IsInPhase as IsInPhaseCondition
 import com.wingedsheep.sdk.scripting.conditions.PlayerAttackedWithCreaturesThisTurn
 import com.wingedsheep.sdk.scripting.conditions.PlayerCastSpellsThisTurn
@@ -1398,6 +1399,13 @@ object Conditions {
      */
     val IsNotYourTurn: ConditionInterface =
         IsNotYourTurnCondition
+
+    /**
+     * If it's [player]'s turn — the [Player]-parametric form of [IsYourTurn]. Wrap in [Not] for
+     * "if it's not [player]'s turn" (Scytheclaw Raptor: `Not(IsPlayersTurn(Player.TriggeringPlayer))`).
+     */
+    fun IsPlayersTurn(player: Player): ConditionInterface =
+        IsPlayersTurnCondition(player)
 
     /**
      * If the current phase matches any of the listed phases.

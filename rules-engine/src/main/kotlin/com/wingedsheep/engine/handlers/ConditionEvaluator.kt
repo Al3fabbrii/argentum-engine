@@ -71,6 +71,7 @@ import com.wingedsheep.sdk.scripting.conditions.IsInStep
 import com.wingedsheep.sdk.scripting.conditions.IsFirstCombatPhaseOfTurn
 import com.wingedsheep.sdk.scripting.conditions.IsFirstEndStepOfTurn
 import com.wingedsheep.sdk.scripting.conditions.IsNotYourTurn
+import com.wingedsheep.sdk.scripting.conditions.IsPlayersTurn
 import com.wingedsheep.sdk.scripting.conditions.IsYourTurn
 import com.wingedsheep.sdk.scripting.conditions.NotCondition
 import com.wingedsheep.sdk.scripting.conditions.OpponentSpellOnStack
@@ -201,6 +202,10 @@ class ConditionEvaluator(
             // CR 805 — "your turn" is the active team's turn for every member of that team.
             is IsYourTurn -> ctx.controllerId?.let { state.isActiveTurnFor(it) } ?: false
             is IsNotYourTurn -> ctx.controllerId?.let { !state.isActiveTurnFor(it) } ?: false
+            // The Player-parametric turn check (Scytheclaw Raptor via TriggeringPlayer). Resolves the
+            // referenced player, then asks whether it's their active turn (CR 805 team-aware).
+            is IsPlayersTurn ->
+                resolvePlayer(state, condition.player, ctx)?.let { state.isActiveTurnFor(it) } ?: false
 
             // Existential over all players: does some single player's combat-damage-received running
             // total reach the threshold? Board-derived (reads a per-player accumulator), so it works
