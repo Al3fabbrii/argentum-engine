@@ -8389,6 +8389,113 @@
     ]
 }
 
+// Kutzil's Flanker
+{
+    "name": "Kutzil's Flanker",
+    "manaCost": "{2}{W}",
+    "typeLine": "Creature — Cat Warrior",
+    "oracleText": "Flash\nWhen this creature enters, choose one —\n• Put a +1/+1 counter on this creature for each creature that left the battlefield under your control this turn.\n• You gain 2 life and scry 2.\n• Exile target player's graveyard.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 1
+    },
+    "keywords": [
+        "FLASH"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Modal",
+                    "modes": [
+                        {
+                            "effect": {
+                                "type": "AddDynamicCounters",
+                                "counterType": "+1/+1",
+                                "amount": {
+                                    "type": "TurnTracking",
+                                    "player": "You",
+                                    "tracker": "CREATURES_LEFT_BATTLEFIELD"
+                                },
+                                "target": "Self"
+                            },
+                            "description": "Put a +1/+1 counter on this creature for each creature that left the battlefield under your control this turn"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GainLife",
+                                        "amount": {
+                                            "type": "Fixed",
+                                            "amount": 2
+                                        }
+                                    },
+                                    {
+                                        "type": "Scry",
+                                        "count": 2
+                                    }
+                                ]
+                            },
+                            "description": "You gain 2 life and scry 2"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "FromZone",
+                                            "zone": "Graveyard",
+                                            "player": {
+                                                "type": "ContextPlayer",
+                                                "index": 0
+                                            }
+                                        },
+                                        "storeAs": "targetGraveyard"
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "targetGraveyard",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Exile",
+                                            "player": {
+                                                "type": "ContextPlayer",
+                                                "index": 0
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            "targetRequirements": [
+                                "TargetPlayer"
+                            ],
+                            "description": "Exile target player's graveyard"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "20",
+        "rarity": "RARE",
+        "artist": "Michele Giorgi",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/1/d1201811-54ab-4c4e-b6e1-19b0d07e5ede.jpg?1782694597"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Lodestone Needle
 {
     "name": "Lodestone Needle",

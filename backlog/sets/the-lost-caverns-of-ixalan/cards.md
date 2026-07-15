@@ -143,7 +143,7 @@
 - [ ] Kellan, Daring Traveler
 - [x] Kinjalli's Dawnrunner
 - [ ] Kitesail Larcenist
-- [ ] Kutzil's Flanker
+- [x] Kutzil's Flanker
 - [ ] Kutzil, Malamet Exemplar
 - [x] Lodestone Needle
 - [x] Magmatic Galleon

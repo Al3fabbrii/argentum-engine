@@ -25,6 +25,13 @@ enum class TurnTracker {
     CREATURES_DIED,
     /** Count of nontoken creatures put into a player's graveyard from the battlefield this turn. */
     NONTOKEN_CREATURES_DIED,
+    /**
+     * Count of creatures (including tokens) that left the battlefield under a player's control this
+     * turn — regardless of destination (death, exile, bounce, …). Distinct from [CREATURES_DIED]
+     * (only battlefield→graveyard). Powers "for each creature that left the battlefield under your
+     * control this turn" (Kutzil's Flanker).
+     */
+    CREATURES_LEFT_BATTLEFIELD,
     /** Count of creatures exiled from opponents' control this turn. */
     OPPONENT_CREATURES_EXILED,
     /** Count of opponents who lost life this turn. */
@@ -108,6 +115,7 @@ enum class TurnTracker {
     fun descriptionFor(player: Player): String = when (this) {
         CREATURES_DIED -> "the number of creatures that died under ${player.possessive} control this turn"
         NONTOKEN_CREATURES_DIED -> "the number of nontoken creatures put into ${player.possessive} graveyard from the battlefield this turn"
+        CREATURES_LEFT_BATTLEFIELD -> "the number of creatures that left the battlefield under ${player.possessive} control this turn"
         OPPONENT_CREATURES_EXILED -> "the number of creatures that were exiled under your opponents' control this turn"
         OPPONENTS_WHO_LOST_LIFE -> "the number of opponents who lost life this turn"
         DAMAGE_RECEIVED -> "the damage already dealt to that player this turn"

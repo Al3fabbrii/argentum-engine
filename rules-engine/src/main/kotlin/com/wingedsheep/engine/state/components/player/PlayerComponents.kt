@@ -969,6 +969,20 @@ data class PermanentLeftBattlefieldThisTurnComponent(
 ) : Component
 
 /**
+ * Tracks the number of creatures — including tokens — that left the battlefield this turn while
+ * under this player's control, regardless of destination (death, exile, bounce, …). The
+ * creature-scoped sibling of [PermanentLeftBattlefieldThisTurnComponent]; credited to the
+ * last-known controller at the moment of departure. Cleared at end of turn by CleanupPhaseManager.
+ *
+ * Used by Kutzil's Flanker (LCI): "for each creature that left the battlefield under your control
+ * this turn" (read via `DynamicAmount.TurnTracking(You, CREATURES_LEFT_BATTLEFIELD)`).
+ */
+@Serializable
+data class CreatureLeftBattlefieldThisTurnComponent(
+    val count: Int = 0
+) : Component
+
+/**
  * Tracks the number of creatures that were exiled from opponents' control this turn.
  * Used by Vren, the Relentless: "create X tokens where X is the number of creatures
  * that were exiled under your opponents' control this turn."

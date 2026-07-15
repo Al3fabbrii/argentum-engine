@@ -6070,6 +6070,12 @@ of `AddMana`. The engine empties pools at end of turn, so:
 
 - `CREATURES_DIED` — creatures that died this turn.
 - `NONTOKEN_CREATURES_DIED` — nontoken creatures that died this turn.
+- `CREATURES_LEFT_BATTLEFIELD` — creatures (incl. tokens) that left the battlefield under the
+  player's control this turn, regardless of destination (death, exile, bounce, …). The creature-scoped
+  sibling of `PermanentLeftBattlefieldThisTurn`; broader than `CREATURES_DIED` (which is
+  battlefield→graveyard only). Powers Kutzil's Flanker ("for each creature that left the battlefield
+  under your control this turn"). Backed by `CreatureLeftBattlefieldThisTurnComponent`, credited to
+  the last-known controller and cleared at end of turn.
 - `OPPONENT_CREATURES_EXILED` — opponent creatures you exiled.
 - `OPPONENTS_WHO_LOST_LIFE` — count of opponents who lost life.
 - `DAMAGE_RECEIVED` — damage received by player.
