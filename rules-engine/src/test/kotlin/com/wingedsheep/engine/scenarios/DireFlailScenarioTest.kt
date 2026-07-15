@@ -293,6 +293,51 @@ class DireFlailScenarioTest : FunSpec({
         driver.state.getEntity(blunderbuss)?.get<AttachedToComponent>()?.targetId shouldBe courser
     }
 
+    test("a second Dire Blunderbuss (unattached) is a legal sacrifice; the granting one is excluded by attachment") {
+        val driver = setup()
+        val p1 = driver.activePlayer!!
+        val opponent = driver.getOpponent(p1)
+
+        // Two Blunderbusses: b1 will be equipped (the granting Equipment), b2 left unattached.
+        val b1 = driver.craftToBlunderbuss(p1)
+        val b2 = driver.craftToBlunderbuss(p1)
+        val courser = driver.putCreatureOnBattlefield(p1, "Centaur Courser") // 3/3 → 6/3
+        driver.removeSummoningSickness(courser)
+        driver.equipBlunderbuss(p1, b1, courser)
+        val victim = driver.putCreatureOnBattlefield(opponent, "Test Sturdy Ox") // 2/4
+
+        driver.passPriorityUntil(Step.DECLARE_ATTACKERS)
+        driver.declareAttackers(p1, listOf(courser), opponent).error shouldBe null
+
+        // Under the old `notNamed("Dire Blunderbuss")` filter both copies were excluded, leaving
+        // no fodder — so no sacrifice, no damage. With `.notAttachedToSource()` only the attached
+        // granting copy (b1) is excluded; the unattached b2 is legal fodder.
+        driver.resolveUntilDecision()
+        var guard = 0
+        while (driver.pendingDecision != null && guard++ < 10) {
+            when (val d = driver.pendingDecision) {
+                is YesNoDecision -> driver.submitYesNo(p1, true).error shouldBe null
+                is ChooseTargetsDecision -> {
+                    val legal = d.legalTargets[0].orEmpty()
+                    when {
+                        b2 in legal || b1 in legal ->
+                            driver.submitTargetSelection(p1, listOf(b2)).error shouldBe null
+                        else -> driver.submitTargetSelection(p1, listOf(victim)).error shouldBe null
+                    }
+                }
+                is SelectCardsDecision -> driver.submitCardSelection(p1, listOf(b2))
+                else -> break
+            }
+            if (driver.pendingDecision == null) driver.drainStack()
+        }
+
+        // The unattached second Blunderbuss was sacrificed; the attached granting one is intact;
+        // 6 damage killed the 2/4.
+        driver.getGraveyard(p1).shouldContain(b2)
+        driver.state.getEntity(b1)?.get<AttachedToComponent>()?.targetId shouldBe courser
+        driver.findPermanent(opponent, "Test Sturdy Ox") shouldBe null
+    }
+
     test("negative: craft rejected when the supplied material is a creature, not an artifact") {
         val driver = setup()
         val p1 = driver.activePlayer!!

@@ -178,6 +178,14 @@ object Costs {
     val ExileGrantingPermanent: AbilityCost = AbilityCost.ExileGrantingPermanent
 
     /**
+     * Sacrifice the permanent that granted this activated ability (e.g., the Equipment
+     * granting the ability to its equipped creature, like Deconstruction Hammer). The
+     * self-sacrifice sibling of [ExileGrantingPermanent]; the granter is resolved at
+     * activation time, so it sacrifices exactly the granting permanent (CR 201.5a).
+     */
+    val SacrificeGrantingPermanent: AbilityCost = AbilityCost.SacrificeGrantingPermanent
+
+    /**
      * Sacrifice a creature of the type chosen when this permanent entered the battlefield.
      * Used by cards like Doom Cannon.
      */

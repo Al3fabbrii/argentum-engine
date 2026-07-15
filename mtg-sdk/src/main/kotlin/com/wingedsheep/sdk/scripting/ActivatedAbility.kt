@@ -296,6 +296,21 @@ sealed interface AbilityCost : TextReplaceable<AbilityCost> {
     }
 
     /**
+     * Sacrifice the permanent that granted this activated ability to the source.
+     * The self-sacrifice sibling of [ExileGrantingPermanent]: an Equipment/Aura whose static
+     * ability grants an activated ability to the attached creature with "Sacrifice [this
+     * permanent]" as part of the cost (e.g. Deconstruction Hammer's granted "{3}, {T},
+     * Sacrifice Deconstruction Hammer: ..."). Per CR 201.5a the name in the granted ability
+     * refers only to the specific granting permanent, so this sacrifices exactly that one —
+     * the granter resolved at activation time — not any same-named permanent.
+     */
+    @SerialName("CostSacrificeGrantingPermanent")
+    @Serializable
+    data object SacrificeGrantingPermanent : AbilityCost {
+        override val description: String = "Sacrifice the granting permanent"
+    }
+
+    /**
      * Sacrifice a creature of the type chosen when this permanent entered the battlefield.
      * Used by cards like Doom Cannon that choose a creature type on entry and reference it in costs.
      */

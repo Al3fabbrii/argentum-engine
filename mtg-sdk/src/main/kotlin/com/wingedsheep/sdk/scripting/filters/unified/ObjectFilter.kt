@@ -718,6 +718,17 @@ data class GameObjectFilter(
     )
 
     /**
+     * Must NOT be an Aura/Equipment attached to the effect's source permanent — the negation of
+     * [attachedToSource]. Backs "an artifact other than [this granting Equipment]"-style
+     * exclusions on a granted triggered ability whose source is the equipped creature: the
+     * granting Equipment is the one attached to that creature, so this excludes it (Dire
+     * Blunderbuss's "sacrifice an artifact other than Dire Blunderbuss").
+     */
+    fun notAttachedToSource() = copy(
+        statePredicates = statePredicates + StatePredicate.Not(StatePredicate.IsAttachedToSource)
+    )
+
+    /**
      * Must be attached to a permanent matching [hostFilter] (general form of attachment matching —
      * the host filter may carry a controller predicate, e.g. "a creature you control"). Used by
      * Stolen Uniform's reflexive "if it's attached to a creature you control" guard.
