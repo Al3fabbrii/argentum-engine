@@ -130,6 +130,7 @@ import com.wingedsheep.sdk.scripting.conditions.PermanentTypeEnteredBattlefieldT
 import com.wingedsheep.sdk.scripting.conditions.PlayerCastSpellsThisTurn
 import com.wingedsheep.sdk.scripting.conditions.PlayerCommittedCrimeThisTurn
 import com.wingedsheep.sdk.scripting.conditions.PlayerHasCitysBlessing
+import com.wingedsheep.sdk.scripting.conditions.PlayerHasMostLife
 import com.wingedsheep.sdk.scripting.conditions.TriggeringPlayerIs
 import com.wingedsheep.sdk.scripting.conditions.RingHasTemptedPlayerAtLeast
 import com.wingedsheep.sdk.scripting.conditions.CreatureDiedThisTurnCondition
@@ -372,6 +373,15 @@ class ConditionEvaluator(
                 val triggeringPlayer = resolvePlayer(state, Player.TriggeringPlayer, ctx)
                 val expected = resolvePlayer(state, condition.player, ctx)
                 triggeringPlayer != null && expected != null && triggeringPlayer == expected
+            }
+
+            is PlayerHasMostLife -> {
+                val playerId = resolvePlayer(state, condition.player, ctx)
+                if (playerId == null) false else {
+                    val life = state.lifeTotal(playerId)
+                    // Most life or tied for most: no player has strictly more.
+                    state.turnOrder.all { state.lifeTotal(it) <= life }
+                }
             }
 
             is RingHasTemptedPlayerAtLeast -> {
@@ -869,6 +879,12 @@ class ConditionEvaluator(
                 state.getOpponents(c).firstOrNull()
             }
             is Player.TriggeringPlayer -> (ctx as? Resolution)?.effectContext?.triggeringPlayerId
+            // The attacked player for the source's attack assignment (read from its
+            // AttackingComponent by resolveDefendingPlayer) — Preacher of the Schism's "attacks the
+            // player with the most life".
+            is Player.DefendingPlayer -> (ctx as? Resolution)?.effectContext?.let {
+                com.wingedsheep.engine.handlers.effects.TargetResolutionUtils.resolveDefendingPlayer(it, state)
+            }
             is Player.Candidate -> (ctx as? Resolution)?.effectContext?.candidatePlayerId
             is Player.ChosenOpponent -> ctx.sourceId?.let { sourceId ->
                 state.getEntity(sourceId)?.chosenOpponent()

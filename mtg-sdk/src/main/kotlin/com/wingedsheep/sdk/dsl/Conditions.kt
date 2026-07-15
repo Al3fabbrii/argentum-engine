@@ -465,6 +465,15 @@ object Conditions {
         com.wingedsheep.sdk.scripting.conditions.TriggeringPlayerIs(player)
 
     /**
+     * [player] has the most life, or is tied for the most life, among all players. The "most life"
+     * check a binary comparison can't express. Preacher of the Schism gates its attack triggers with
+     * `PlayerHasMostLife(Player.DefendingPlayer)` (the attacked player) and
+     * `PlayerHasMostLife(Player.You)`.
+     */
+    fun PlayerHasMostLife(player: Player): ConditionInterface =
+        com.wingedsheep.sdk.scripting.conditions.PlayerHasMostLife(player)
+
+    /**
      * If the context target at [targetIndex] is a tapped battlefield permanent. Branch on a
      * target's tapped state at resolution — e.g. Shackle Slinger's "If it's tapped, put a stun
      * counter on it. Otherwise, tap it."

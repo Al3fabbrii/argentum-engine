@@ -187,7 +187,7 @@
 - [x] Plundering Pirate
 - [x] Poetic Ingenuity
 - [x] Poison Dart Frog
-- [ ] Preacher of the Schism
+- [x] Preacher of the Schism
 - [x] Primordial Gnawer
 - [x] Promising Vein
 - [x] Pugnacious Hammerskull

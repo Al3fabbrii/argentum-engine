@@ -5065,6 +5065,13 @@ answer it and would silently return `false`.
   entry point for any "if amount X (relation) amount Y" intervening-if or static gate. Used by Taii
   Wakeen, Perfect Shot's intervening-if: `CompareAmounts(ContextProperty(TRIGGER_DAMAGE_AMOUNT), EQ,
   ContextProperty(TRIGGER_RECIPIENT_TOUGHNESS))`.
+- `PlayerHasMostLife(player)` — `player` has the most life, or is tied for the most, among all
+  players (their life ≥ every player's). The "most life" check a binary `CompareAmounts` can't express
+  (it needs the max over every player). Resolve `player` to the controller (`Player.You`), the
+  attacked player (`Player.DefendingPlayer` — read from the source's attack assignment, so it works as
+  an attack-trigger intervening-if), etc. Preacher of the Schism gates its two attack triggers with
+  `PlayerHasMostLife(Player.DefendingPlayer)` ("attacks the player with the most life") and
+  `PlayerHasMostLife(Player.You)` ("attacks while you have the most life").
 - `AmountIsPrime(amount)` / `AmountIsEven(amount)` / `AmountIsOdd(amount)` /
   `AmountIsMultipleOf(amount, divisor)` — the **unary** numeric-predicate family, the counterpart to
   `CompareAmounts` for properties a two-sided threshold can't express (primality, parity,

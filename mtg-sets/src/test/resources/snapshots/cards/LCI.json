@@ -11002,6 +11002,89 @@
     ]
 }
 
+// Preacher of the Schism
+{
+    "name": "Preacher of the Schism",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Vampire Cleric",
+    "oracleText": "Deathtouch\nWhenever this creature attacks the player with the most life or tied for most life, create a 1/1 white Vampire creature token with lifelink.\nWhenever this creature attacks while you have the most life or are tied for most life, you draw a card and you lose 1 life.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 4
+    },
+    "keywords": [
+        "DEATHTOUCH"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "AttackEvent",
+                    "requires": [
+                        "AttacksDefenderIsPlayer"
+                    ]
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "WHITE"
+                    ],
+                    "creatureTypes": [
+                        "Vampire"
+                    ],
+                    "keywords": [
+                        "LIFELINK"
+                    ]
+                },
+                "triggerCondition": {
+                    "type": "PlayerHasMostLife",
+                    "player": "DefendingPlayer"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        },
+                        {
+                            "type": "LoseLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "target": "Controller"
+                        }
+                    ]
+                },
+                "triggerCondition": {
+                    "type": "PlayerHasMostLife",
+                    "player": "You"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "113",
+        "rarity": "RARE",
+        "artist": "Donato Giancola",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/9/89345f55-2b32-4356-945a-d56dded39909.jpg?1782694521"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Primordial Gnawer
 {
     "name": "Primordial Gnawer",
