@@ -171,7 +171,17 @@ class TriggerProcessor(
             requirement = targetRequirement,
             controllerId = trigger.controllerId,
             sourceId = trigger.sourceId,
-            triggeringEntityId = trigger.triggerContext.triggeringEntityId
+            triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+            // Carry the triggering player so a "target … that player controls" filter
+            // (ControllerPredicate.ControlledByTriggeringPlayer / ControlledByReferencedPlayer over
+            // Player.TriggeringPlayer) resolves identically here to the on-stack targeting path — a
+            // trigger whose associated player rides on triggeringPlayerId must reach the same
+            // legal-target verdict in this pre-check, or the may/pay question is wrongly skipped.
+            pipelineContext = com.wingedsheep.engine.handlers.PredicateContext(
+                controllerId = trigger.controllerId,
+                triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+                triggeringPlayerId = trigger.triggerContext.triggeringPlayerId,
+            )
         )
         if (legalTargets.isEmpty() && targetRequirement.effectiveMinCount > 0) return null
         return BatchKey(trigger.controllerId, identity)
@@ -358,7 +368,17 @@ class TriggerProcessor(
             requirement = targetRequirement,
             controllerId = trigger.controllerId,
             sourceId = trigger.sourceId,
-            triggeringEntityId = trigger.triggerContext.triggeringEntityId
+            triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+            // Carry the triggering player so a "target … that player controls" filter
+            // (ControllerPredicate.ControlledByTriggeringPlayer / ControlledByReferencedPlayer over
+            // Player.TriggeringPlayer) resolves identically here to the on-stack targeting path — a
+            // trigger whose associated player rides on triggeringPlayerId must reach the same
+            // legal-target verdict in this pre-check, or the may/pay question is wrongly skipped.
+            pipelineContext = com.wingedsheep.engine.handlers.PredicateContext(
+                controllerId = trigger.controllerId,
+                triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+                triggeringPlayerId = trigger.triggerContext.triggeringPlayerId,
+            )
         )
 
         if (legalTargets.isEmpty() && targetRequirement.effectiveMinCount > 0) {
@@ -454,7 +474,17 @@ class TriggerProcessor(
             requirement = targetRequirement,
             controllerId = trigger.controllerId,
             sourceId = trigger.sourceId,
-            triggeringEntityId = trigger.triggerContext.triggeringEntityId
+            triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+            // Carry the triggering player so a "target … that player controls" filter
+            // (ControllerPredicate.ControlledByTriggeringPlayer / ControlledByReferencedPlayer over
+            // Player.TriggeringPlayer) resolves identically here to the on-stack targeting path — a
+            // trigger whose associated player rides on triggeringPlayerId must reach the same
+            // legal-target verdict in this pre-check, or the may/pay question is wrongly skipped.
+            pipelineContext = com.wingedsheep.engine.handlers.PredicateContext(
+                controllerId = trigger.controllerId,
+                triggeringEntityId = trigger.triggerContext.triggeringEntityId,
+                triggeringPlayerId = trigger.triggerContext.triggeringPlayerId,
+            )
         )
 
         if (legalTargets.isEmpty() && targetRequirement.effectiveMinCount > 0) {

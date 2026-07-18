@@ -102,14 +102,13 @@ class DamageTriggerDetector(
                             sourceId = sourceId,
                             sourceName = cardComponent.name,
                             controllerId = controllerId,
-                            // When this creature dealt damage to a player (e.g. combat damage), carry
-                            // that player as the triggering player so "…to a player, [destroy target
-                            // artifact] that player controls" (Dreadmaw's Ire) resolves
-                            // Player.TriggeringPlayer / ControlledByTriggeringPlayer to the damaged
-                            // player. Mirrors the observer path (detectDamageObserverTriggers).
-                            triggerContext = TriggerContext.fromEvent(event).copy(
-                                triggeringPlayerId = event.targetId.takeIf { it in state.turnOrder }
-                            )
+                            // fromEvent already sets triggeringEntityId = event.targetId (the damaged
+                            // player for a deals-damage-to-a-player trigger), and both
+                            // Player.TriggeringPlayer and ControllerPredicate.ControlledByTriggeringPlayer
+                            // resolve as `triggeringPlayerId ?: triggeringEntityId`, so "…to a player,
+                            // destroy target artifact that player controls" (Dreadmaw's Ire) resolves to
+                            // the damaged player without any extra triggeringPlayerId copy here.
+                            triggerContext = TriggerContext.fromEvent(event)
                         )
                     )
                 }
