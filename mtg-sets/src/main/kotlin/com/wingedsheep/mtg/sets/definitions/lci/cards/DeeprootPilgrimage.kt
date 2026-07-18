@@ -33,7 +33,8 @@ val DeeprootPilgrimage = card("Deeproot Pilgrimage") {
             toughness = 1,
             colors = setOf(Color.BLUE),
             creatureTypes = setOf("Merfolk"),
-            keywords = setOf(Keyword.HEXPROOF)
+            keywords = setOf(Keyword.HEXPROOF),
+            imageUri = "https://cards.scryfall.io/normal/front/f/5/f5d353ad-7160-41fa-809c-d76b36478a2a.jpg?1783913608"
         )
     }
 
