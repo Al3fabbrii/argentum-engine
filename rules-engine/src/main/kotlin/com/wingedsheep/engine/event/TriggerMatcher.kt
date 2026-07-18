@@ -421,6 +421,9 @@ class TriggerMatcher(
             }
             is EventPattern.TapEvent -> {
                 if (event !is TappedEvent) return false
+                // Batch ("one or more become tapped") triggers fire once per tap batch, handled by
+                // detectTapBatchTriggers — never once per event here.
+                if (trigger.batch) return false
                 if (binding == TriggerBinding.SELF && event.entityId != sourceId) return false
                 val filter = trigger.filter
                 if (filter != null) {

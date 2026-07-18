@@ -627,6 +627,9 @@ class CleanupPhaseManager(
                 if (result.has<PermanentLeftBattlefieldThisTurnComponent>()) {
                     result = result.without<PermanentLeftBattlefieldThisTurnComponent>()
                 }
+                if (result.has<com.wingedsheep.engine.state.components.player.CreatureLeftBattlefieldThisTurnComponent>()) {
+                    result = result.without<com.wingedsheep.engine.state.components.player.CreatureLeftBattlefieldThisTurnComponent>()
+                }
                 if (result.has<OpponentCreaturesExiledThisTurnComponent>()) {
                     result = result.without<OpponentCreaturesExiledThisTurnComponent>()
                 }

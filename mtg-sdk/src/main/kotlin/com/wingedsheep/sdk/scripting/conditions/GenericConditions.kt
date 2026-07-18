@@ -167,6 +167,24 @@ data class Compare(
 }
 
 /**
+ * True when [player] has the most life, or is tied for the most life, among all players
+ * (their life total ≥ every player's). The "most life" comparison that a binary [Compare] can't
+ * express (it would need the max over every player). Resolve [player] to the controller
+ * (`Player.You`), the attacked player (`Player.DefendingPlayer`), the triggering player, etc.
+ *
+ * Preacher of the Schism: "Whenever this creature attacks the player with the most life or tied for
+ * most life, …" (`triggerCondition = PlayerHasMostLife(Player.DefendingPlayer)`) and "Whenever this
+ * creature attacks while you have the most life or are tied for most life, …"
+ * (`PlayerHasMostLife(Player.You)`).
+ */
+@SerialName("PlayerHasMostLife")
+@Serializable
+data class PlayerHasMostLife(val player: Player) : Condition {
+    override val description: String =
+        "if ${player.description} has the most life or is tied for most life"
+}
+
+/**
  * A unary arithmetic property a single number can satisfy, tested by [NumberMatches].
  *
  * Distinct from [ComparisonOperator], which is *binary* (compares two amounts). These are

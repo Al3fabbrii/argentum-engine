@@ -4338,6 +4338,52 @@
     ]
 }
 
+// Deeproot Pilgrimage
+{
+    "name": "Deeproot Pilgrimage",
+    "manaCost": "{1}{U}",
+    "typeLine": "Enchantment",
+    "oracleText": "Whenever one or more nontoken Merfolk you control become tapped, create a 1/1 blue Merfolk creature token with hexproof.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "TapEvent",
+                    "filter": "creature Merfolk nontoken ctrl:you",
+                    "batch": true
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "BLUE"
+                    ],
+                    "creatureTypes": [
+                        "Merfolk"
+                    ],
+                    "keywords": [
+                        "HEXPROOF"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/f/5/f5d353ad-7160-41fa-809c-d76b36478a2a.jpg?1783913608"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "52",
+        "rarity": "RARE",
+        "artist": "Rémi Jacquot",
+        "flavorText": "\"These glyphs are more than trail markings! They tell a story as they go. But does it end in celebration or tragedy?\"",
+        "imageUri": "https://cards.scryfall.io/normal/front/e/2/e2449311-a705-4a31-a345-a36d436ae561.jpg?1782694567"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Defossilize
 {
     "name": "Defossilize",
@@ -4964,6 +5010,94 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Dreadmaw's Ire
+{
+    "name": "Dreadmaw's Ire",
+    "manaCost": "{R}",
+    "typeLine": "Instant",
+    "oracleText": "Until end of turn, target attacking creature gets +2/+2 and gains trample and \"Whenever this creature deals combat damage to a player, destroy target artifact that player controls.\"",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "ModifyStats",
+                    "powerModifier": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "toughnessModifier": {
+                        "type": "Fixed",
+                        "amount": 2
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                {
+                    "type": "GrantKeyword",
+                    "keyword": "TRAMPLE",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                {
+                    "type": "GrantTriggeredAbility",
+                    "ability": {
+                        "id": "ability_1",
+                        "trigger": {
+                            "type": "DealsDamageEvent",
+                            "damageType": "DamageCombat",
+                            "recipient": "AnyPlayer"
+                        },
+                        "effect": {
+                            "type": "MoveToZone",
+                            "target": {
+                                "type": "ContextTarget",
+                                "index": 0
+                            },
+                            "destination": "Graveyard",
+                            "byDestruction": true
+                        },
+                        "targetRequirement": {
+                            "type": "TargetObject",
+                            "filter": {
+                                "baseFilter": "artifact ctrl:triggering-player"
+                            }
+                        },
+                        "descriptionOverride": "Whenever this creature deals combat damage to a player, destroy target artifact that player controls."
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                }
+            ]
+        },
+        "targetRequirements": [
+            {
+                "type": "TargetObject",
+                "filter": {
+                    "baseFilter": "creature attacking"
+                },
+                "id": "target"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "147",
+        "rarity": "UNCOMMON",
+        "artist": "Crystal Sully",
+        "flavorText": "\"That's the fifth ship lost in three days! Can't we build them out of something stronger?\"\n—Malcolm Lee",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/6/062e00a1-f1dc-4089-b640-800ab781c590.jpg?1782694492"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 
@@ -8256,6 +8390,113 @@
     ]
 }
 
+// Kutzil's Flanker
+{
+    "name": "Kutzil's Flanker",
+    "manaCost": "{2}{W}",
+    "typeLine": "Creature — Cat Warrior",
+    "oracleText": "Flash\nWhen this creature enters, choose one —\n• Put a +1/+1 counter on this creature for each creature that left the battlefield under your control this turn.\n• You gain 2 life and scry 2.\n• Exile target player's graveyard.",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 1
+    },
+    "keywords": [
+        "FLASH"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "Modal",
+                    "modes": [
+                        {
+                            "effect": {
+                                "type": "AddDynamicCounters",
+                                "counterType": "+1/+1",
+                                "amount": {
+                                    "type": "TurnTracking",
+                                    "player": "You",
+                                    "tracker": "CREATURES_LEFT_BATTLEFIELD"
+                                },
+                                "target": "Self"
+                            },
+                            "description": "Put a +1/+1 counter on this creature for each creature that left the battlefield under your control this turn"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GainLife",
+                                        "amount": {
+                                            "type": "Fixed",
+                                            "amount": 2
+                                        }
+                                    },
+                                    {
+                                        "type": "Scry",
+                                        "count": 2
+                                    }
+                                ]
+                            },
+                            "description": "You gain 2 life and scry 2"
+                        },
+                        {
+                            "effect": {
+                                "type": "Composite",
+                                "effects": [
+                                    {
+                                        "type": "GatherCards",
+                                        "source": {
+                                            "type": "FromZone",
+                                            "zone": "Graveyard",
+                                            "player": {
+                                                "type": "ContextPlayer",
+                                                "index": 0
+                                            }
+                                        },
+                                        "storeAs": "targetGraveyard"
+                                    },
+                                    {
+                                        "type": "MoveCollection",
+                                        "from": "targetGraveyard",
+                                        "destination": {
+                                            "type": "ToZone",
+                                            "zone": "Exile",
+                                            "player": {
+                                                "type": "ContextPlayer",
+                                                "index": 0
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            "targetRequirements": [
+                                "TargetPlayer"
+                            ],
+                            "description": "Exile target player's graveyard"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "20",
+        "rarity": "RARE",
+        "artist": "Michele Giorgi",
+        "imageUri": "https://cards.scryfall.io/normal/front/d/1/d1201811-54ab-4c4e-b6e1-19b0d07e5ede.jpg?1782694597"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
+}
+
 // Lodestone Needle
 {
     "name": "Lodestone Needle",
@@ -8932,6 +9173,65 @@
     },
     "colorIdentityOverride": [
         "BLUE"
+    ]
+}
+
+// Malicious Eclipse
+{
+    "name": "Malicious Eclipse",
+    "manaCost": "{1}{B}{B}",
+    "typeLine": "Sorcery",
+    "oracleText": "All creatures get -2/-2 until end of turn. If a creature an opponent controls would die this turn, exile it instead.",
+    "script": {
+        "spellEffect": {
+            "type": "Composite",
+            "effects": [
+                {
+                    "type": "GrantReplacementEffect",
+                    "replacement": {
+                        "type": "RedirectZoneChange",
+                        "newDestination": "Exile",
+                        "appliesTo": {
+                            "type": "ZoneChangeEvent",
+                            "filter": "creature ctrl:opponent",
+                            "from": "Battlefield",
+                            "to": "Graveyard"
+                        }
+                    }
+                },
+                {
+                    "type": "ForEach",
+                    "space": {
+                        "type": "IterationSpace.Group",
+                        "filter": {
+                            "baseFilter": "creature"
+                        }
+                    },
+                    "body": {
+                        "type": "ModifyStats",
+                        "powerModifier": {
+                            "type": "Fixed",
+                            "amount": -2
+                        },
+                        "toughnessModifier": {
+                            "type": "Fixed",
+                            "amount": -2
+                        },
+                        "target": "Self"
+                    }
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "collectorNumber": "111",
+        "rarity": "UNCOMMON",
+        "artist": "Campbell White",
+        "flavorText": "Aclazotz laughed as the dark shards closed around Chimil, plunging the Core into unnatural darkness. At long last, his bloody reign would begin.",
+        "imageUri": "https://cards.scryfall.io/normal/front/2/7/2796fffa-8cbf-4ec9-91a8-7b6f39fd50ec.jpg?1782694523"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
     ]
 }
 
@@ -10700,6 +11000,90 @@
     },
     "colorIdentityOverride": [
         "GREEN"
+    ]
+}
+
+// Preacher of the Schism
+{
+    "name": "Preacher of the Schism",
+    "manaCost": "{2}{B}",
+    "typeLine": "Creature — Vampire Cleric",
+    "oracleText": "Deathtouch\nWhenever this creature attacks the player with the most life or tied for most life, create a 1/1 white Vampire creature token with lifelink.\nWhenever this creature attacks while you have the most life or are tied for most life, you draw a card and you lose 1 life.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 4
+    },
+    "keywords": [
+        "DEATHTOUCH"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "AttackEvent",
+                    "requires": [
+                        "AttacksDefenderIsPlayer"
+                    ]
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "WHITE"
+                    ],
+                    "creatureTypes": [
+                        "Vampire"
+                    ],
+                    "keywords": [
+                        "LIFELINK"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/0/4/0484390e-1167-4407-84de-7ddc726e8926.jpg?1783913608"
+                },
+                "triggerCondition": {
+                    "type": "PlayerHasMostLife",
+                    "player": "DefendingPlayer"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": "AttackEvent",
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "DrawCards",
+                            "count": {
+                                "type": "Fixed",
+                                "amount": 1
+                            }
+                        },
+                        {
+                            "type": "LoseLife",
+                            "amount": {
+                                "type": "Fixed",
+                                "amount": 1
+                            },
+                            "target": "Controller"
+                        }
+                    ]
+                },
+                "triggerCondition": {
+                    "type": "PlayerHasMostLife",
+                    "player": "You"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "113",
+        "rarity": "RARE",
+        "artist": "Donato Giancola",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/9/89345f55-2b32-4356-945a-d56dded39909.jpg?1782694521"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
     ]
 }
 
@@ -12758,6 +13142,59 @@
     },
     "colorIdentityOverride": [
         "BLACK"
+    ]
+}
+
+// Scytheclaw Raptor
+{
+    "name": "Scytheclaw Raptor",
+    "manaCost": "{2}{R}",
+    "typeLine": "Creature — Dinosaur",
+    "oracleText": "Whenever a player casts a spell, if it's not their turn, this creature deals 4 damage to them.",
+    "creatureStats": {
+        "power": 4,
+        "toughness": 3
+    },
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "SpellCastEvent",
+                    "player": "Each"
+                },
+                "binding": "ANY",
+                "effect": {
+                    "type": "DealDamage",
+                    "amount": {
+                        "type": "Fixed",
+                        "amount": 4
+                    },
+                    "target": {
+                        "type": "PlayerRef",
+                        "player": "TriggeringPlayer"
+                    }
+                },
+                "triggerCondition": {
+                    "type": "Not",
+                    "condition": {
+                        "type": "IsPlayersTurn",
+                        "player": "TriggeringPlayer"
+                    }
+                },
+                "descriptionOverride": "Whenever a player casts a spell, if it's not their turn, this creature deals 4 damage to them."
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "165",
+        "rarity": "UNCOMMON",
+        "artist": "John Tedrick",
+        "flavorText": "\"She's a smart one. Noticed all on her own that the bloodsuckers wave their hands around to do their filthy magic, so she rips off their hands first.\"\n—Citamitzin, Sun Empire warrior",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/4/9436cf62-56d6-4662-9982-72e9be80d25c.jpg?1782694476"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 

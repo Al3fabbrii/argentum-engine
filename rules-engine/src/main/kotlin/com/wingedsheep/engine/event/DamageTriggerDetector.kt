@@ -102,6 +102,12 @@ class DamageTriggerDetector(
                             sourceId = sourceId,
                             sourceName = cardComponent.name,
                             controllerId = controllerId,
+                            // fromEvent already sets triggeringEntityId = event.targetId (the damaged
+                            // player for a deals-damage-to-a-player trigger), and both
+                            // Player.TriggeringPlayer and ControllerPredicate.ControlledByTriggeringPlayer
+                            // resolve as `triggeringPlayerId ?: triggeringEntityId`, so "…to a player,
+                            // destroy target artifact that player controls" (Dreadmaw's Ire) resolves to
+                            // the damaged player without any extra triggeringPlayerId copy here.
                             triggerContext = TriggerContext.fromEvent(event)
                         )
                     )

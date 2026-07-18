@@ -753,6 +753,14 @@ class PredicateEvaluator {
                     ControllerPredicate.ControlledByTargetPlayer -> {
                         context.targetPlayerId?.let { controllerId == it } ?: false
                     }
+                    ControllerPredicate.ControlledByTriggeringPlayer -> {
+                        // Mirror OwnedByTriggeringPlayer's resolution: the damaged player rides on
+                        // triggeringEntityId for a damage trigger (triggeringPlayerId is only set by
+                        // triggers that name a distinct player), so fall back to it. A non-player
+                        // triggeringEntityId (e.g. a creature) can never equal a controller playerId.
+                        val triggeringPlayer = context.triggeringPlayerId ?: context.triggeringEntityId
+                        triggeringPlayer != null && controllerId == triggeringPlayer
+                    }
                     is ControllerPredicate.ControlledByReferencedPlayer -> {
                         val referenced = context.resolvePlayerTarget(predicate.target)
                             ?: resolveReferencedPlayerFromState(state, projected, predicate.target, context)

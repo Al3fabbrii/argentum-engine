@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 244 / 286
+**Implemented:** 250 / 286
 - [x] Abrade
 - [x] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -73,7 +73,7 @@
 - [x] Deep Goblin Skulltaker
 - [x] Deep-Cavern Bat
 - [x] Deepfathom Echo
-- [ ] Deeproot Pilgrimage
+- [x] Deeproot Pilgrimage
 - [x] Defossilize
 - [x] Diamond Pick-Axe
 - [x] Didact Echo
@@ -83,7 +83,7 @@
 - [x] Disruptor Wanderglyph
 - [x] Disturbed Slumber
 - [ ] Dowsing Device
-- [ ] Dreadmaw's Ire
+- [x] Dreadmaw's Ire
 - [x] Dusk Rose Reliquary
 - [x] Earthshaker Dreadmaw
 - [x] Eaten by Piranhas
@@ -143,7 +143,7 @@
 - [ ] Kellan, Daring Traveler
 - [x] Kinjalli's Dawnrunner
 - [ ] Kitesail Larcenist
-- [ ] Kutzil's Flanker
+- [x] Kutzil's Flanker
 - [ ] Kutzil, Malamet Exemplar
 - [x] Lodestone Needle
 - [x] Magmatic Galleon
@@ -153,7 +153,7 @@
 - [x] Malamet Veteran
 - [x] Malamet War Scribe
 - [x] Malcolm, Alluring Scoundrel
-- [ ] Malicious Eclipse
+- [x] Malicious Eclipse
 - [x] Marauding Brinefang
 - [ ] Market Gnome
 - [x] Master's Guide-Mural
@@ -187,7 +187,7 @@
 - [x] Plundering Pirate
 - [x] Poetic Ingenuity
 - [x] Poison Dart Frog
-- [ ] Preacher of the Schism
+- [x] Preacher of the Schism
 - [x] Primordial Gnawer
 - [x] Promising Vein
 - [x] Pugnacious Hammerskull
@@ -216,7 +216,7 @@
 - [x] Sanguine Evangelist
 - [x] Scampering Surveyor
 - [x] Screaming Phantom
-- [ ] Scytheclaw Raptor
+- [x] Scytheclaw Raptor
 - [x] Seeker of Sunlight
 - [x] Seismic Monstrosaur
 - [x] Self-Reflection

@@ -1349,12 +1349,19 @@ sealed interface EventPattern : TextReplaceable<EventPattern> {
     @SerialName("TapEvent")
     @Serializable
     data class TapEvent(
-        val filter: GameObjectFilter? = null
+        val filter: GameObjectFilter? = null,
+        /**
+         * Batch ("one or more … become tapped") semantics (CR 603.2c). When true the trigger fires
+         * at most **once** per simultaneous tap batch regardless of how many matching permanents
+         * were tapped together (Deeproot Pilgrimage), instead of once per tapped permanent. Handled
+         * by the dedicated batch pass; the per-event path skips it. ANY-binding only.
+         */
+        val batch: Boolean = false
     ) : EventPattern {
         override val description: String = buildString {
-            append("a ")
+            append(if (batch) "one or more " else "a ")
             append(filter?.description ?: "permanent")
-            append(" becomes tapped")
+            append(if (batch) " become tapped" else " becomes tapped")
         }
         override fun applyTextReplacement(replacer: TextReplacer): EventPattern {
             val newFilter = filter?.applyTextReplacement(replacer)

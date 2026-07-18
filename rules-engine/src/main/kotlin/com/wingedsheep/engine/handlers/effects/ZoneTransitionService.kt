@@ -30,6 +30,7 @@ import com.wingedsheep.engine.state.components.player.NonTokenCreaturesDiedThisT
 import com.wingedsheep.engine.state.components.player.OpponentCreaturesExiledThisTurnComponent
 import com.wingedsheep.engine.state.components.player.PermanentEnteredFaceDownThisTurnComponent
 import com.wingedsheep.engine.state.components.player.PermanentLeftBattlefieldThisTurnComponent
+import com.wingedsheep.engine.state.components.player.CreatureLeftBattlefieldThisTurnComponent
 import com.wingedsheep.engine.state.components.player.PermanentsSacrificedThisTurnComponent
 import com.wingedsheep.engine.state.components.player.PlayerDescendedThisTurnComponent
 import com.wingedsheep.engine.state.components.player.SacrificedFoodThisTurnComponent
@@ -504,6 +505,15 @@ object ZoneTransitionService {
                 val existing = playerContainer.get<PermanentLeftBattlefieldThisTurnComponent>()
                     ?: PermanentLeftBattlefieldThisTurnComponent()
                 playerContainer.with(PermanentLeftBattlefieldThisTurnComponent(existing.count + 1))
+            }
+            // Creature-scoped sibling (Kutzil's Flanker). Uses the last-known projected type line so
+            // a creature-land counts only if it was a creature as it left.
+            if (lastKnownTypeLine?.isCreature == true) {
+                newState = newState.updateEntity(controllerId) { playerContainer ->
+                    val existing = playerContainer.get<CreatureLeftBattlefieldThisTurnComponent>()
+                        ?: CreatureLeftBattlefieldThisTurnComponent()
+                    playerContainer.with(CreatureLeftBattlefieldThisTurnComponent(existing.count + 1))
+                }
             }
         }
 
