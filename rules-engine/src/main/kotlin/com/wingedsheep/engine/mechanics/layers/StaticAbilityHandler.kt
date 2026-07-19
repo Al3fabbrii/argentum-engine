@@ -1008,6 +1008,7 @@ class StaticAbilityHandler(
             is DoubleDamage,
             is ModifyDamageAmount,
             is com.wingedsheep.sdk.scripting.CapDamage,
+            is com.wingedsheep.sdk.scripting.SetMinimumDamage,
             is com.wingedsheep.sdk.scripting.RedirectDamage,
             is com.wingedsheep.sdk.scripting.DamageCantBePrevented,
             is ReplaceDamageWithCounters,
@@ -1043,7 +1044,7 @@ class StaticAbilityHandler(
             is com.wingedsheep.sdk.scripting.ModifyExplore,
             // Token creation:
             is com.wingedsheep.sdk.scripting.ReplaceTokenCreationWithAttachedCopy,
-            is com.wingedsheep.sdk.scripting.DoubleTokenCreation,
+            is com.wingedsheep.sdk.scripting.MultiplyTokenCreation,
             is com.wingedsheep.sdk.scripting.ModifyTokenCount,
             is com.wingedsheep.sdk.scripting.CreateAdditionalToken -> true
 

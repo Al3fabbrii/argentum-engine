@@ -604,14 +604,20 @@ Atomic effect factories. For library/zone manipulation, prefer the pipelines in 
   (the opposite face — front→back), `FRONT` ("return it front face up" — the eikon Saga's final chapter flips
   back to the legend), or `BACK`. The front face's activated ability is sorcery-speed
   (`timing = TimingRule.SorcerySpeed`); Jecht uses it from a "may" combat-damage trigger instead.
-- `ReturnSelfFromGraveyardTransformed()` — "Return this card from your graveyard to the battlefield
-  transformed" (Garland, Knight of Cornelia). Returns the *source card* from the graveyard to the
-  battlefield with its back face up; pair with `activateFromZone = Zone.GRAVEYARD` on the owning
-  activated ability. No transform triggers fire (the card was never turned over on the battlefield);
-  the back face's ETB triggers fire normally. No-ops if the source left the graveyard before
-  resolution, or if it isn't a double-faced card (a single-faced card instructed to enter transformed
-  doesn't move at all). Raw type `ReturnSelfFromZoneTransformedEffect(fromZone)` generalizes to other
-  source zones.
+- `ReturnSelfFromGraveyardTransformed(tapped = false)` — "Return this card from your graveyard to the
+  battlefield transformed" (Garland, Knight of Cornelia). Returns the *source card* from the graveyard
+  to the battlefield with its back face up; pair with `activateFromZone = Zone.GRAVEYARD` on the owning
+  activated ability, **or wire it to `Triggers.Dies`** for the "when this dies, return it transformed"
+  templating (LCI god cycle — Ojer Axonil/Kaslem/Pakpatiq/Taq // Temples, Aclazotz). No transform
+  triggers fire (the card was never turned over on the battlefield); the back face's ETB triggers fire
+  normally. No-ops if the source left the graveyard before resolution, or if it isn't a double-faced
+  card (a single-faced card instructed to enter transformed doesn't move at all). Pass `tapped = true`
+  to return the back-face permanent **tapped** ("...return it to the battlefield tapped and
+  transformed"). Because the graveyard→battlefield move preserves the entity id, "...with N counters
+  on it" (Ojer Pakpatiq's three time counters) composes as `Composite(ReturnSelfFromGraveyardTransformed(
+  tapped = true), AddCounters(counter, n, EffectTarget.Self))` — the following `Self` still resolves to
+  the returned permanent. Raw type `ReturnSelfFromZoneTransformedEffect(fromZone, tapped)` generalizes
+  to other source zones.
 - `ReturnCreaturesPutInGraveyardThisTurn(player)` — Patriarch's Bidding shape.
 - `ReturnSameNamedFromGraveyard(target = ContextTarget(0))` — return the target graveyard card and
   **every other card with the same name** in the controller's graveyard to the battlefield **tapped**
@@ -4593,6 +4599,19 @@ copy of it (CR 707.10e). The activated-ability analogue of the spell-level `cant
 > multi-set parameterized keywords (`prowess()`, `rampage(n)`, `keywordAbility(…)`) remain on the core
 > builder. New set mechanics get an extension file in `dsl/mechanics/`.
 
+> **Rebound** (`Keyword.REBOUND`, CR 702.88). "If this spell was cast from your hand, instead of
+> putting it into your graveyard as it resolves, exile it and, at the beginning of your next upkeep,
+> you may cast this card from exile without paying its mana cost." Modeled entirely in the
+> spell-resolution path (`StackResolver.resolveNonPermanentSpell`): a spell whose card def carries the
+> printed keyword **or** that was granted rebound via `GrantKeywordToSpellEffect(Keyword.REBOUND, …)`
+> (stored on `SpellGrantedKeywordsComponent`) and was cast from hand exiles on resolution and schedules
+> a one-shot step-based `DelayedTriggeredAbility` (`fireAtStep = UPKEEP`, `fireOnPlayerId = caster`,
+> `notBeforeTurn = turn + 1`) whose effect is `MayEffect(GatherCards(Self) → CastFromCollectionWithoutPayingCostEffect)`
+> — the same free-cast-from-exile pipeline suspend uses. Casting from exile is not "from hand", so it
+> doesn't rebound again. **Ojer Pakpatiq, Deepest Epoch** grants it to instants you cast from hand via
+> `Triggers.youCastSpell(GameObjectFilter.Instant, requires = setOf(SpellCastPredicate.CastFromZone(Zone.HAND)))`
+> → `GrantKeywordToSpellEffect(Keyword.REBOUND, EffectTarget.TriggeringEntity)`.
+
 > **Enduring** (Duskmourn Glimmer cycle). `card { enduring() }` wires the full mechanic: "When this
 > permanent dies, if it was a creature, return it to the battlefield under its owner's control. It's an
 > enchantment. (It's not a creature.)" Modeled like **Persist** — a synthesized SELF dies-trigger detected
@@ -5508,6 +5527,10 @@ default to "you" so card authors don't need to pass it explicitly.
   `DynamicAmounts.permanentsSacrificedThisTurn()` amount for "that much" damage (Sawblade Skinripper:
   "At the beginning of your end step, if you sacrificed one or more permanents this turn, this creature
   deals that much damage to any target").
+- `YouDealtRedNoncombatDamageThisTurn(atLeast = 1)` — red sources you controlled dealt at least
+  `atLeast` noncombat damage this turn. `Compare(TurnTracking(Player.You, TurnTracker.RED_NONCOMBAT_DAMAGE_DEALT),
+  GTE, Fixed(atLeast))`, backed by the per-player `RedNoncombatDamageDealtThisTurnComponent`. Gates
+  Temple of Power's transform-back (back of Ojer Axonil, Deepest Might).
 - `GraveyardContains(filter)` — "there is at least one card matching `filter` in your graveyard"
   (`Exists(Player.You, Zone.GRAVEYARD, filter)`). Compose with `Conditions.All`/`Any` for multi-type
   checks, e.g. `All(GraveyardContains(Filters.Instant), GraveyardContains(Filters.Sorcery))` =
@@ -6204,6 +6227,11 @@ this turn").
   counter (which sums every player's sacrifices). Backs `Conditions.YouSacrificedPermanentsThisTurn(atLeast)`
   and `DynamicAmounts.permanentsSacrificedThisTurn(player)` — e.g. Sawblade Skinripper's "if you sacrificed
   one or more permanents this turn, ... deals that much damage".
+- `RED_NONCOMBAT_DAMAGE_DEALT` — total noncombat damage red sources a player controlled dealt this turn
+  (controller-scoped). Backed by the per-player `RedNoncombatDamageDealtThisTurnComponent`, incremented in
+  `DamageUtils.dealDamageToTarget` on the source's controller whenever a red source deals positive noncombat
+  damage, and reset to 0 at end of turn. Backs `Conditions.YouDealtRedNoncombatDamageThisTurn(atLeast)` —
+  Temple of Power's transform gate (back of Ojer Axonil, Deepest Might).
 
 `SubtypeEnteredUnderControlThisTurn(player, subtype, excludeTriggeringEntity?)` /
 `DynamicAmounts.subtypeEnteredUnderControlThisTurn(subtype, player?, excludeTriggeringEntity?)` —
@@ -6462,6 +6490,14 @@ replacementEffect {
   "as long as …, prevent …" statics (Spirit of Resistance: a five-distinct-colors `Compare` gate).
 - `CapDamage(maxAmount, appliesTo)` — clamp matching damage to `maxAmount` (a *replacement* distinct
   from prevent/modify; applied after all amplification). Divine Presence: `CapDamage(3, DamageEvent(recipient = Any))`.
+- `SetMinimumDamage(minAmount = 0, dynamicMinimum?, appliesTo)` — the **floor** mirror of `CapDamage`:
+  raise matching damage *up to* a minimum (larger amounts unchanged; a zero would-be amount is not
+  raised — a source only "deals damage" once it deals a positive amount). `dynamicMinimum` (a
+  `DynamicAmount`, else the flat `minAmount`) is evaluated against the **replacement's source**
+  permanent, like `ModifyDamageAmount.dynamicModifier`. Applied after all amplification/capping. Ojer
+  Axonil, Deepest Might: `SetMinimumDamage(dynamicMinimum = DynamicAmounts.sourcePower(), appliesTo =
+  DamageEvent(recipient = Opponent, source = SourceFilter.Matching(GameObjectFilter.Any.withColor(RED).youControl()),
+  damageType = NonCombat))`.
 - `DoubleDamage(restrictions?, appliesTo)` — double matching damage (Gratuitous Violence, Furnace of
   Rath). `restrictions: List<Condition>` (default empty) gates the doubling on extra conditions
   evaluated against the source's controller — the same pattern as `PreventDamage.restrictions`. The
@@ -6629,6 +6665,17 @@ replacementEffect {
   `Effects.GrantCounterPlacementModifier(...)` (§4 Counters) instead — it records a controller-scoped
   modifier in a turn-scoped game-state store consulted from the same counter-placement chokepoint,
   and expires at end of turn.
+- `MultiplyTokenCreation(factor = 2, appliesTo)` / `ModifyTokenCount(modifier, appliesTo)` —
+  **static** token-count replacements living on a battlefield permanent. `MultiplyTokenCreation`
+  multiplies the number of tokens created by `factor` (Doubling Season / Anointed Procession /
+  Exalted Sunborn — `factor = 2`; **Ojer Taq, Deepest Foundation** — `factor = 3`); several stack
+  multiplicatively. `ModifyTokenCount` shifts the count by a fixed amount. `appliesTo` defaults to
+  `EventPattern.TokenCreationEvent(controller = You)`; the multiplier runs in `CreateTokenExecutor`,
+  the executor for **creature** tokens (it always builds a "… Creature" type line — Treasure/Clue/Map
+  and other predefined tokens go through a separate executor that isn't multiplied), so an
+  unfiltered `MultiplyTokenCreation` scopes to creature tokens in practice. `tokenFilter` on the
+  event is not yet honored by the count path (filtered events are skipped), so express "creature
+  tokens" via the default rather than `tokenFilter = Creature`.
 - `ReplaceTokenCreationWithAttachedCopy(optional, oncePerTurn, attachmentVerb, appliesTo)` —
   "the first time you would create one or more tokens each turn, you may instead create that
   many tokens that are copies of [attached] permanent." Works for both Equipment and Auras —
