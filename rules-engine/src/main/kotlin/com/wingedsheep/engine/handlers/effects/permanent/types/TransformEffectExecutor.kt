@@ -165,7 +165,8 @@ internal fun returnDfcFaceFromExile(
     state: GameState,
     cardRegistry: CardRegistry,
     entityId: EntityId,
-    destinationFace: DoubleFacedComponent.Face
+    destinationFace: DoubleFacedComponent.Face,
+    tapped: Boolean = false
 ): ZoneTransitionResult {
     val container = state.getEntity(entityId)
         ?: return ZoneTransitionResult(state, emptyList())
@@ -196,6 +197,6 @@ internal fun returnDfcFaceFromExile(
         prepared,
         entityId,
         Zone.BATTLEFIELD,
-        options = ZoneEntryOptions(controllerId = ownerId)
+        options = ZoneEntryOptions(controllerId = ownerId, tapped = tapped)
     )
 }

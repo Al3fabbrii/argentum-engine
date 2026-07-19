@@ -73,7 +73,7 @@ class ReturnSelfFromZoneTransformedExecutor(
         }
 
         val transition = returnDfcFaceFromExile(
-            workingState, cardRegistry, sourceId, DoubleFacedComponent.Face.BACK
+            workingState, cardRegistry, sourceId, DoubleFacedComponent.Face.BACK, tapped = effect.tapped
         )
         return EffectResult.success(transition.state, transition.events)
     }

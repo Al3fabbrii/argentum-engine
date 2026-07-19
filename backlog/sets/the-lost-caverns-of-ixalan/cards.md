@@ -2,7 +2,7 @@
 
 **Set Size:** 286 booster cards (excluding basic lands and tokens)
 **Release Date:** November 17, 2023
-**Implemented:** 255 / 286
+**Implemented:** 256 / 286
 - [x] Abrade
 - [x] Abuelo's Awakening
 - [x] Abuelo, Ancestral Echo
@@ -169,7 +169,7 @@
 - [x] Nurturing Bristleback
 - [x] Oaken Siren
 - [ ] Ojer Axonil, Deepest Might
-- [ ] Ojer Kaslem, Deepest Growth
+- [x] Ojer Kaslem, Deepest Growth
 - [ ] Ojer Pakpatiq, Deepest Epoch
 - [ ] Ojer Taq, Deepest Foundation
 - [x] Oltec Archaeologists

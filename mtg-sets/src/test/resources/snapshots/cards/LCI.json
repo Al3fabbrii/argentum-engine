@@ -10379,6 +10379,201 @@
     ]
 }
 
+// Ojer Kaslem, Deepest Growth
+{
+    "name": "Ojer Kaslem, Deepest Growth",
+    "manaCost": "{3}{G}{G}",
+    "typeLine": "Legendary Creature — God",
+    "oracleText": "Trample\nWhenever Ojer Kaslem deals combat damage to a player, reveal that many cards from the top of your library. You may put a creature card and/or a land card from among them onto the battlefield. Put the rest on the bottom of your library in a random order.\nWhen Ojer Kaslem dies, return it to the battlefield tapped and transformed under its owner's control.",
+    "creatureStats": {
+        "power": 6,
+        "toughness": 5
+    },
+    "keywords": [
+        "TRAMPLE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "DealsDamageEvent",
+                    "damageType": "DamageCombat",
+                    "recipient": "AnyPlayer"
+                },
+                "effect": {
+                    "type": "Composite",
+                    "effects": [
+                        {
+                            "type": "GatherCards",
+                            "source": {
+                                "type": "TopOfLibrary",
+                                "count": {
+                                    "type": "ContextProperty",
+                                    "key": "TRIGGER_DAMAGE_AMOUNT"
+                                }
+                            },
+                            "storeAs": "kaslem_revealed",
+                            "revealed": true
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "kaslem_revealed",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "filter": "creature",
+                            "storeSelected": "kaslem_creature",
+                            "storeRemainder": "kaslem_afterCreature",
+                            "prompt": "You may put a creature card onto the battlefield",
+                            "selectedLabel": "Put onto the battlefield",
+                            "showAllCards": true
+                        },
+                        {
+                            "type": "SelectFromCollection",
+                            "from": "kaslem_afterCreature",
+                            "selection": {
+                                "type": "ChooseUpTo",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            },
+                            "filter": "land",
+                            "storeSelected": "kaslem_land",
+                            "storeRemainder": "kaslem_toBottom",
+                            "prompt": "You may put a land card onto the battlefield",
+                            "selectedLabel": "Put onto the battlefield",
+                            "remainderLabel": "Put on the bottom of your library",
+                            "showAllCards": true
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "kaslem_creature",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Battlefield"
+                            }
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "kaslem_land",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Battlefield"
+                            }
+                        },
+                        {
+                            "type": "MoveCollection",
+                            "from": "kaslem_toBottom",
+                            "destination": {
+                                "type": "ToZone",
+                                "zone": "Library",
+                                "placement": "Bottom"
+                            },
+                            "order": "Random"
+                        }
+                    ]
+                },
+                "descriptionOverride": "Whenever Ojer Kaslem deals combat damage to a player, reveal that many cards from the top of your library. You may put a creature card and/or a land card from among them onto the battlefield. Put the rest on the bottom of your library in a random order."
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "ReturnSelfFromZoneTransformed",
+                    "tapped": true
+                },
+                "descriptionOverride": "When Ojer Kaslem dies, return it to the battlefield tapped and transformed under its owner's control."
+            }
+        ]
+    },
+    "backFace": {
+        "name": "Temple of Cultivation",
+        "manaCost": "",
+        "typeLine": "Land",
+        "oracleText": "(Transforms from Ojer Kaslem, Deepest Growth.)\n{T}: Add {G}.\n{2}{G}, {T}: Transform this land. Activate only if you control ten or more permanents and only as a sorcery.",
+        "script": {
+            "activatedAbilities": [
+                {
+                    "id": "ability_3",
+                    "cost": "CostTap",
+                    "effect": {
+                        "type": "AddMana",
+                        "color": "GREEN"
+                    },
+                    "timing": "ManaAbility",
+                    "isManaAbility": true
+                },
+                {
+                    "id": "ability_4",
+                    "cost": {
+                        "type": "CostComposite",
+                        "costs": [
+                            {
+                                "type": "CostAtomWrapper",
+                                "atom": {
+                                    "type": "AtomMana",
+                                    "cost": "{2}{G}"
+                                }
+                            },
+                            "CostTap"
+                        ]
+                    },
+                    "effect": "Transform",
+                    "timing": "SorcerySpeed",
+                    "restrictions": [
+                        {
+                            "type": "ActivationOnlyIfCondition",
+                            "condition": {
+                                "type": "Compare",
+                                "left": {
+                                    "type": "AggregateBattlefield",
+                                    "player": "You",
+                                    "filter": "permanent"
+                                },
+                                "operator": "GTE",
+                                "right": {
+                                    "type": "Fixed",
+                                    "amount": 10
+                                }
+                            }
+                        }
+                    ],
+                    "descriptionOverride": "Transform this land. Activate only if you control ten or more permanents and only as a sorcery."
+                }
+            ]
+        },
+        "metadata": {
+            "collectorNumber": "204",
+            "rarity": "MYTHIC",
+            "artist": "Ryan Pancoast",
+            "flavorText": "Chimil gave the Oltec sacred lands. Ojer Kaslem brought them to life.",
+            "imageUri": "https://cards.scryfall.io/normal/back/0/c/0cbc43a3-8cba-4988-9de1-c89aedd79ada.jpg?1782694445"
+        },
+        "colorIdentityOverride": [
+            "GREEN"
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "204",
+        "rarity": "MYTHIC",
+        "artist": "Ryan Pancoast",
+        "imageUri": "https://cards.scryfall.io/normal/front/0/c/0cbc43a3-8cba-4988-9de1-c89aedd79ada.jpg?1782694445"
+    },
+    "colorIdentityOverride": [
+        "GREEN"
+    ]
+}
+
 // Oltec Archaeologists
 {
     "name": "Oltec Archaeologists",
