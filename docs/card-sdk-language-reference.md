@@ -3781,6 +3781,19 @@ staticAbility {
   "Enchanted creature ... is a Citizen with base power and toughness 1/1 and '{T}: Add {C}' named Humble Merchant."
 - `ConditionalStaticAbility` — static gated by a runtime `Condition`. A conditional wrapping a *multi-effect* ability
   (e.g. `TransformPermanent`) lowers through the plural converter and gates every resulting effect on the condition.
+- `CompositeStaticAbility(abilities)` — bundles several component static abilities into **one** printed static ability
+  whose single continuous effect spans multiple Rule 613 layers (CR 613.6). Use it when one printed ability grants a
+  *combination* of type/subtype/color/keyword/P/T changes to the same objects — e.g. Bello, Bard of the Brambles: "each
+  ... permanent ... is a 4/4 Elemental creature in addition to its other types and has indestructible [and] haste."
+  Authoring those as separate `staticAbility { }` blocks is wrong per CR 613.6: each block becomes an *independent*
+  effect that re-resolves its own affected set per layer (so the set can drift between layers) and drops its later-layer
+  parts if the source loses the ability in Layer 6. Bundling them tags the parts as one group so the engine locks the
+  affected-object set once (when the effect first starts to apply) and keeps applying every layer to that same set, even
+  if the ability is removed mid-sequence. The engine assigns every multi-effect ability (this, `AnimateLandGroup`,
+  `TransformPermanent`, Blood Moon's type+ability pair, ...) a shared `ContinuousEffectData.groupId` automatically; see
+  `StateProjector`'s group locking. Only layer-projected grants belong inside — abilities routed to other subsystems
+  (e.g. `GrantTriggeredAbility`, read by `TriggerDetector`) stay in their own top-level block. Gate the whole bundle by
+  wrapping it in a `ConditionalStaticAbility` (or setting `condition` on the `staticAbility { }` block).
 - `CantBeTurnedFaceUp(filter)` — matching permanents can't be turned face up (Layer 6; projects a
   `cantBeTurnedFaceUp` flag read by the turn-face-up handler/enumerator). Only meaningful while the
   permanent is face down (a face-up permanent can't be "turned face up"), so it's applied
