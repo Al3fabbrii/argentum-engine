@@ -470,6 +470,84 @@
     ]
 }
 
+// Bitter Chill
+{
+    "name": "Bitter Chill",
+    "manaCost": "{1}{U}",
+    "typeLine": "Enchantment — Aura",
+    "oracleText": "Enchant creature\nWhen this Aura enters, tap enchanted creature.\nEnchanted creature doesn't untap during its controller's untap step.\nWhen this Aura is put into a graveyard from the battlefield, you may pay {1}. If you do, scry 1, then draw a card.",
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "TapUntap",
+                    "target": "EnchantedCreature"
+                }
+            },
+            {
+                "id": "ability_2",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "from": "Battlefield",
+                    "to": "Graveyard"
+                },
+                "effect": {
+                    "type": "Gated",
+                    "gate": {
+                        "type": "Gate.MayPay",
+                        "cost": {
+                            "type": "PayManaCost",
+                            "cost": "{1}"
+                        }
+                    },
+                    "then": {
+                        "type": "Composite",
+                        "effects": [
+                            {
+                                "type": "Scry",
+                                "count": 1
+                            },
+                            {
+                                "type": "DrawCards",
+                                "count": {
+                                    "type": "Fixed",
+                                    "amount": 1
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "staticAbilities": [
+            {
+                "type": "GrantKeyword",
+                "keyword": "DOESNT_UNTAP"
+            }
+        ],
+        "auraTarget": {
+            "type": "TargetObject",
+            "filter": {
+                "baseFilter": "creature"
+            }
+        }
+    },
+    "metadata": {
+        "collectorNumber": "44",
+        "rarity": "UNCOMMON",
+        "artist": "Julie Dillon",
+        "imageUri": "https://cards.scryfall.io/normal/front/8/8/888e3c71-e21d-4e77-b1b6-09769f9cd3d6.jpg?1783915122"
+    },
+    "colorIdentityOverride": [
+        "BLUE"
+    ]
+}
+
 // Boundary Lands Ranger
 {
     "name": "Boundary Lands Ranger",
@@ -728,6 +806,56 @@
         "imageUri": "https://cards.scryfall.io/normal/front/1/a/1a860925-d912-49e5-9ddc-41ab26916bb3.jpg"
     },
     "colorIdentityOverride": []
+}
+
+// Charmed Clothier
+{
+    "name": "Charmed Clothier",
+    "manaCost": "{4}{W}",
+    "typeLine": "Creature — Faerie Advisor",
+    "oracleText": "Flying\nWhen this creature enters, create a Royal Role token attached to another target creature you control. (If you control another Role on it, put that one into the graveyard. Enchanted creature gets +1/+1 and has ward {1}.)",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreateRoleToken",
+                    "roleName": "Royal Role",
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "filter": {
+                        "baseFilter": "creature ctrl:you",
+                        "excludeSelf": true
+                    },
+                    "id": "target"
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "6",
+        "artist": "Winona Nelson",
+        "imageUri": "https://cards.scryfall.io/normal/front/9/9/994f4473-dfc9-45cd-8528-945db3aa6a9a.jpg?1783915135"
+    },
+    "colorIdentityOverride": [
+        "WHITE"
+    ]
 }
 
 // Charming Scoundrel
@@ -1163,6 +1291,64 @@
     ]
 }
 
+// Dream Spoilers
+{
+    "name": "Dream Spoilers",
+    "manaCost": "{3}{B}",
+    "typeLine": "Creature — Faerie Warlock",
+    "oracleText": "Flying\nWhenever you cast a spell during an opponent's turn, up to one target creature an opponent controls gets -1/-1 until end of turn.",
+    "creatureStats": {
+        "power": 2,
+        "toughness": 2
+    },
+    "keywords": [
+        "FLYING"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": "SpellCastEvent",
+                "binding": "ANY",
+                "effect": {
+                    "type": "ModifyStats",
+                    "powerModifier": {
+                        "type": "Fixed",
+                        "amount": -1
+                    },
+                    "toughnessModifier": {
+                        "type": "Fixed",
+                        "amount": -1
+                    },
+                    "target": {
+                        "type": "BoundVariable",
+                        "name": "target"
+                    }
+                },
+                "targetRequirement": {
+                    "type": "TargetObject",
+                    "optional": true,
+                    "filter": {
+                        "baseFilter": "creature ctrl:opponent"
+                    },
+                    "id": "target"
+                },
+                "triggerCondition": "IsNotYourTurn"
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "85",
+        "rarity": "UNCOMMON",
+        "artist": "Jodie Muir",
+        "flavorText": "The Wicked Slumber saved Eldraine from Phyrexia's grasp, but instead of fading when the invasion ended, it continued to spread.",
+        "imageUri": "https://cards.scryfall.io/normal/front/4/e/4efd1963-fe71-42c1-8ad7-53fd80145ca6.jpg?1783915109"
+    },
+    "colorIdentityOverride": [
+        "BLACK"
+    ]
+}
+
 // Dutiful Griffin
 {
     "name": "Dutiful Griffin",
@@ -1218,6 +1404,56 @@
     },
     "colorIdentityOverride": [
         "WHITE"
+    ]
+}
+
+// Edgewall Pack
+{
+    "name": "Edgewall Pack",
+    "manaCost": "{3}{R}",
+    "typeLine": "Creature — Dog",
+    "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nWhen this creature enters, create a 1/1 black Rat creature token with \"This token can't block.\"",
+    "creatureStats": {
+        "power": 3,
+        "toughness": 3
+    },
+    "keywords": [
+        "MENACE"
+    ],
+    "script": {
+        "triggeredAbilities": [
+            {
+                "id": "ability_1",
+                "trigger": {
+                    "type": "ZoneChangeEvent",
+                    "to": "Battlefield"
+                },
+                "effect": {
+                    "type": "CreateToken",
+                    "power": 1,
+                    "toughness": 1,
+                    "colors": [
+                        "BLACK"
+                    ],
+                    "creatureTypes": [
+                        "Rat"
+                    ],
+                    "imageUri": "https://cards.scryfall.io/normal/front/1/e/1e0205f2-25c1-403b-b408-56e3f2d63b4d.jpg?1783915000",
+                    "staticAbilities": [
+                        "CantBlock"
+                    ]
+                }
+            }
+        ]
+    },
+    "metadata": {
+        "collectorNumber": "126",
+        "artist": "Leesha Hannigan",
+        "flavorText": "The mayor sent hounds to root out Lord Skitter, but their loyalty was easily bought with a handful of bones.",
+        "imageUri": "https://cards.scryfall.io/normal/front/a/c/acda9d02-00fc-49e2-a9f3-176e9c0a8c5f.jpg?1783915097"
+    },
+    "colorIdentityOverride": [
+        "RED"
     ]
 }
 
