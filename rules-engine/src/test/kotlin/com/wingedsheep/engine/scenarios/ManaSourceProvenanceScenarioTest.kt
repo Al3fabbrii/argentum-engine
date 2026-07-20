@@ -26,7 +26,7 @@ import io.kotest.matchers.shouldBe
 class ManaSourceProvenanceScenarioTest : ScenarioTestBase() {
 
     init {
-        cardRegistry.register(listOf(ProvenanceRift, ProvenanceBear))
+        cardRegistry.register(listOf(ProvenanceRift, PlainRift, ProvenanceBear))
 
         context("cast using mana produced by this source") {
             test("mana tapped from the source fires its own cast trigger") {
@@ -70,6 +70,36 @@ class ManaSourceProvenanceScenarioTest : ScenarioTestBase() {
 
                 game.getLifeTotal(1) shouldBe 20
             }
+
+            // Regression: floating mana from a *second* source must not wipe the first source's
+            // provenance. Previously ActivateAbilityHandler rebuilt the pool without the provenance
+            // maps when a mana ability resolved, so tapping a second land dropped the Rift's tag and
+            // its trigger silently missed. Tap the Rift, then another land, then cast — the Rift's
+            // mana is still in the pool and its trigger fires.
+            test("floating mana from a second source does not wipe the first source's provenance") {
+                val game = scenario()
+                    .withPlayers("Player", "Opponent")
+                    .withCardOnBattlefield(1, "Provenance Rift")
+                    .withCardOnBattlefield(1, "Plain Rift")
+                    .withCardInHand(1, "Provenance Bear")
+                    .withActivePlayer(1)
+                    .inPhase(Phase.PRECOMBAT_MAIN, Step.PRECOMBAT_MAIN)
+                    .build()
+
+                val riftId = game.findPermanent("Provenance Rift")!!
+                val plainId = game.findPermanent("Plain Rift")!!
+                val riftMana = ProvenanceRift.activatedAbilities.first { it.isManaAbility }.id
+                val plainMana = PlainRift.activatedAbilities.first { it.isManaAbility }.id
+
+                // Float {G} from the Rift, then {G} from another land: pool = {G}{G}, both tagged.
+                game.execute(ActivateAbility(game.player1Id, riftId, riftMana)).error shouldBe null
+                game.execute(ActivateAbility(game.player1Id, plainId, plainMana)).error shouldBe null
+
+                game.castSpell(1, "Provenance Bear").error shouldBe null
+                game.resolveStack()
+
+                game.getLifeTotal(1) shouldBe 25
+            }
         }
     }
 
@@ -89,6 +119,17 @@ class ManaSourceProvenanceScenarioTest : ScenarioTestBase() {
                     requires = setOf(SpellCastPredicate.PaidWithManaFromSource),
                 )
                 effect = Effects.GainLife(5)
+            }
+        }
+
+        /** A plain land that taps for {G} with no cast payoff — a second, untriggered mana source. */
+        private val PlainRift = card("Plain Rift") {
+            typeLine = "Land"
+            activatedAbility {
+                cost = Costs.Tap
+                effect = Effects.AddMana(Color.GREEN, 1)
+                manaAbility = true
+                timing = TimingRule.ManaAbility
             }
         }
 
