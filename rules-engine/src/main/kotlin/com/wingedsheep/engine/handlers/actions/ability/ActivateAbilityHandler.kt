@@ -757,7 +757,13 @@ class ActivateAbilityHandler(
             red = poolComponent.red,
             green = poolComponent.green,
             colorless = poolComponent.colorless,
-            restrictedMana = poolComponent.restrictedMana
+            restrictedMana = poolComponent.restrictedMana,
+            // Carry mana-source provenance through the activation. pay()/spend() decrement colours
+            // but leave these maps untouched; the writeback below consumes them proportional to the
+            // floating mana actually spent, so tags for mana floated from earlier sources survive an
+            // ability activation instead of being wiped (mirrors CastPaymentProcessor's threading).
+            manaBySubtype = poolComponent.manaBySubtype,
+            manaBySource = poolComponent.manaBySource
         )
 
         // Pay mana costs before paying other costs
@@ -1000,6 +1006,14 @@ class ActivateAbilityHandler(
         // Always update mana pool on state after cost payment.
         // autoTapForManaCost writes the enriched (pre-payment) pool to state,
         // so we must unconditionally write the post-payment pool.
+        // Consume mana-source provenance for the floating mana this activation spent (the maps ride
+        // `manaPool` untouched by pay()/spend()), so the remaining tags reflect only the mana still
+        // in the pool — a mana ability that only adds mana consumes nothing and keeps prior tags.
+        val originalUnrestricted = poolComponent.white + poolComponent.blue + poolComponent.black +
+            poolComponent.red + poolComponent.green + poolComponent.colorless
+        val finalUnrestricted = manaPool.white + manaPool.blue + manaPool.black +
+            manaPool.red + manaPool.green + manaPool.colorless
+        val (poolAfterProvenance, _) = manaPool.consumeProvenance(maxOf(0, originalUnrestricted - finalUnrestricted))
         currentState = currentState.updateEntity(action.playerId) { c ->
             c.with(ManaPoolComponent(
                 white = manaPool.white,
@@ -1008,7 +1022,9 @@ class ActivateAbilityHandler(
                 red = manaPool.red,
                 green = manaPool.green,
                 colorless = manaPool.colorless,
-                restrictedMana = manaPool.restrictedMana
+                restrictedMana = manaPool.restrictedMana,
+                manaBySubtype = poolAfterProvenance.manaBySubtype,
+                manaBySource = poolAfterProvenance.manaBySource
             ))
         }
 
@@ -1158,9 +1174,10 @@ class ActivateAbilityHandler(
 
                 if (totalManaProduced >= 2) {
                     // Replace with 1 colorless mana: revert to old pool + 1 colorless.
-                    // Restricted mana the player had floating before this activation
-                    // is preserved — Damping Sphere only replaces what the land just
-                    // produced, not what was already in the pool.
+                    // Restricted mana and mana-source provenance the player had floating before this
+                    // activation are preserved — Damping Sphere only replaces what the land just
+                    // produced, not what was already in the pool. The replacement colorless carries no
+                    // provenance (it comes from the replacement effect, not the land).
                     val dampenedPool = ManaPoolComponent(
                         white = oldPool.white,
                         blue = oldPool.blue,
@@ -1168,7 +1185,9 @@ class ActivateAbilityHandler(
                         red = oldPool.red,
                         green = oldPool.green,
                         colorless = oldPool.colorless + 1,
-                        restrictedMana = oldPool.restrictedMana
+                        restrictedMana = oldPool.restrictedMana,
+                        manaBySubtype = oldPool.manaBySubtype,
+                        manaBySource = oldPool.manaBySource
                     )
                     currentState = currentState.updateEntity(action.playerId) { container ->
                         container.with(dampenedPool)
@@ -1412,7 +1431,9 @@ class ActivateAbilityHandler(
                     black = repeatPoolComponent.black,
                     red = repeatPoolComponent.red,
                     green = repeatPoolComponent.green,
-                    colorless = repeatPoolComponent.colorless
+                    colorless = repeatPoolComponent.colorless,
+                    manaBySubtype = repeatPoolComponent.manaBySubtype,
+                    manaBySource = repeatPoolComponent.manaBySource
                 )
 
                 // Auto-tap for mana cost
@@ -1442,7 +1463,15 @@ class ActivateAbilityHandler(
                 repeatPool = repeatCostResult.newManaPool!!
                 events.addAll(repeatCostResult.events)
 
-                // Update mana pool on state
+                // Update mana pool on state (consuming provenance for the floating mana this repeat
+                // spent, same rule as the primary writeback above).
+                val repeatOriginalUnrestricted = repeatPoolComponent.white + repeatPoolComponent.blue +
+                    repeatPoolComponent.black + repeatPoolComponent.red + repeatPoolComponent.green +
+                    repeatPoolComponent.colorless
+                val repeatFinalUnrestricted = repeatPool.white + repeatPool.blue + repeatPool.black +
+                    repeatPool.red + repeatPool.green + repeatPool.colorless
+                val (repeatPoolAfterProvenance, _) =
+                    repeatPool.consumeProvenance(maxOf(0, repeatOriginalUnrestricted - repeatFinalUnrestricted))
                 currentState = currentState.updateEntity(action.playerId) { c ->
                     c.with(ManaPoolComponent(
                         white = repeatPool.white,
@@ -1450,7 +1479,9 @@ class ActivateAbilityHandler(
                         black = repeatPool.black,
                         red = repeatPool.red,
                         green = repeatPool.green,
-                        colorless = repeatPool.colorless
+                        colorless = repeatPool.colorless,
+                        manaBySubtype = repeatPoolAfterProvenance.manaBySubtype,
+                        manaBySource = repeatPoolAfterProvenance.manaBySource
                     ))
                 }
 
@@ -1813,8 +1844,11 @@ class ActivateAbilityHandler(
             }
         }
 
-        // Update state with enriched pool — carry restrictedMana through so the
-        // ability-payment context can spend (and the leftover can stay) restricted.
+        // Update state with enriched pool — carry restrictedMana and mana-source provenance through
+        // so the ability-payment context can spend (and the leftover can stay) restricted, and so the
+        // caller's final writeback still sees tags for mana floated before this auto-tap. This write
+        // is transient (the caller overwrites the post-payment pool), but keeps intermediate state
+        // consistent for anything that reads the pool between auto-tap and payment.
         currentState = currentState.updateEntity(playerId) { c ->
             c.with(ManaPoolComponent(
                 white = currentPool.white,
@@ -1824,6 +1858,8 @@ class ActivateAbilityHandler(
                 green = currentPool.green,
                 colorless = currentPool.colorless,
                 restrictedMana = currentPool.restrictedMana,
+                manaBySubtype = currentPool.manaBySubtype,
+                manaBySource = currentPool.manaBySource,
             ))
         }
 
